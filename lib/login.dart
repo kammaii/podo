@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:podo/my_colors.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -45,7 +46,9 @@ class Login extends StatelessWidget {
         logo: 'assets/images/logo.png',
         title: 'Welcome to podo',
         theme: LoginTheme(
-          primaryColor: const Color(0xff6A69EF),
+          primaryColor: MyColors.primaryPurple,
+          pageColorLight: MyColors.green,
+          accentColor: MyColors.primaryPurple,
           titleStyle: const TextStyle(
             color: Colors.white,
             fontSize: 20,
