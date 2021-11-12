@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:podo/lesson_course.dart';
 import 'package:podo/my_colors.dart';
 
 
@@ -14,9 +15,7 @@ class MainFrame extends StatefulWidget {
 
 List<Widget> _buildScreens() {
   return [
-    Container(
-      color: Colors.red,
-    ),
+    const LessonCourse(),
     Container(
       color: Colors.blue,
     ),
