@@ -76,7 +76,7 @@ class _LessonMainState extends State<LessonMain> {
       return SliverAppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded),
-          color: MyColors.navy,
+          color: MyColors.purple,
           onPressed: () {
             Navigator.pop(context);
           },
@@ -87,7 +87,7 @@ class _LessonMainState extends State<LessonMain> {
         title: const Text(
           '타이틀',
           style: TextStyle(
-            color: MyColors.navy,
+            color: MyColors.purple,
             fontWeight: FontWeight.bold,
           ),
         ),
