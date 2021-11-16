@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Podo Korean app',
       theme: ThemeData(
-        primaryColor: MyColors.primaryPurple
+        primaryColor: MyColors.purple
       ),
       home: const MainFrame()
     );

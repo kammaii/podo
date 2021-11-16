@@ -46,9 +46,9 @@ class Login extends StatelessWidget {
         logo: 'assets/images/logo.png',
         title: 'Welcome to podo',
         theme: LoginTheme(
-          primaryColor: MyColors.primaryPurple,
+          primaryColor: MyColors.purple,
           pageColorLight: MyColors.green,
-          accentColor: MyColors.primaryPurple,
+          accentColor: MyColors.purple,
           titleStyle: const TextStyle(
             color: Colors.white,
             fontSize: 20,

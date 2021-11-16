@@ -5,6 +5,8 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:podo/lesson_course.dart';
 import 'package:podo/my_colors.dart';
 
+import 'lesson_main.dart';
+
 
 class MainFrame extends StatefulWidget {
   const MainFrame({Key? key}) : super(key: key);
@@ -15,10 +17,8 @@ class MainFrame extends StatefulWidget {
 
 List<Widget> _buildScreens() {
   return [
+    const LessonMain(),
     const LessonCourse(),
-    Container(
-      color: Colors.blue,
-    ),
     Container(
       color: Colors.green,
     ),
@@ -32,7 +32,7 @@ PersistentBottomNavBarItem _navBarItem(String title, Icon icon) {
   return PersistentBottomNavBarItem(
     icon: icon,
     title: title,
-    activeColorPrimary: MyColors.primaryPurple,
+    activeColorPrimary: MyColors.purple,
     inactiveColorPrimary: MyColors.grey,
   );
 }
