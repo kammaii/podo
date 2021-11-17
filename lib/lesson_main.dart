@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'my_colors.dart';
 
@@ -109,13 +110,30 @@ class _LessonMainState extends State<LessonMain> {
             (context, index) {
               return lessonList(index);
             },
-            childCount: 50,
+            childCount: 1,
           ),
         ),
       );
     }
 
     return Scaffold(
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {},
+            child: const Icon(FontAwesomeIcons.question),
+            backgroundColor: MyColors.green,
+          ),
+          const SizedBox(height: 5),
+          const Text(
+            'Question',
+            style: TextStyle(
+              color: MyColors.green,
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Stack(
           alignment: Alignment.center,

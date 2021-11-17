@@ -25,25 +25,14 @@ class LessonSummary extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: () {},
-            child: const Icon(FontAwesomeIcons.question),
-            backgroundColor: MyColors.pink,
-          ),
-          const SizedBox(height: 5),
-          const Text(
-            'Question',
-            style: TextStyle(
-              color: MyColors.pink,
-            ),
-          ),
         ],
       ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const Icon(
-          Icons.arrow_back_ios_rounded,
+        leading: IconButton(
+          onPressed: (){},
+          icon: const Icon(Icons.arrow_back_ios_rounded),
           color: MyColors.purple,
         ),
         title: const Text(
