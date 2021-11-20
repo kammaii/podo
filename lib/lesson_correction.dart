@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:podo/request_btn.dart';
 
 import 'my_colors.dart';
 
@@ -57,7 +58,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10,10,10,0),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.fastOutSlowIn,
@@ -78,6 +79,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                 ),
               ),
             ),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: const [
@@ -91,10 +93,9 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   style: TextStyle(
                       color: MyColors.purple, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(width: 20),
+                SizedBox(width: 10),
               ],
             ),
-            const SizedBox(height: 10),
             Expanded(
               child: Stack(
                 children: [
@@ -110,79 +111,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 교정 요청 버튼
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                primary: MyColors.green),
-                            onPressed: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'Send',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  const SizedBox(
-                                    height: 30,
-                                    child: VerticalDivider(
-                                      color: Colors.white,
-                                      thickness: 1,
-                                      width: 20,
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text('consume'),
-                                      Row(
-                                        children: const [
-                                          Icon(CupertinoIcons.ticket),
-                                          SizedBox(width: 5),
-                                          Text('2'),
-                                        ],
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            )),
-                        const SizedBox(height: 10),
-                        Column(
-                          children: [
-                            const Text(
-                              '* Not enough tickets',
-                              style: TextStyle(
-                                  color: MyColors.purple,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: const Text(
-                                'How to get tickets?',
-                                style: TextStyle(
-                                  color: MyColors.red,
-                                  decoration: TextDecoration.underline,
-                                  decorationThickness: 2
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                  RequestBtn().getRequestBtn('Send'),
                 ],
               ),
             ),
