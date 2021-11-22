@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:podo/my_colors.dart';
+import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 
 class LessonCourse extends StatelessWidget {
   const LessonCourse({Key? key}) : super(key: key);
@@ -28,7 +29,7 @@ class LessonCourse extends StatelessWidget {
                     const SizedBox(width: 20),
                     const Expanded(
                         child: Text(
-                      'Hangul',
+                      MyStrings.hangul,
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -40,7 +41,7 @@ class LessonCourse extends StatelessWidget {
                 const SizedBox(height: 20),
                 const Expanded(
                     child: Text(
-                  'This lesson is ...',
+                  MyStrings.lorem,
                   style: TextStyle(
                     color: MyColors.grey,
                     fontSize: 15,
@@ -66,7 +67,7 @@ class LessonCourse extends StatelessWidget {
               child: Row(
                 children: const [
                   Text(
-                    'Select a course',
+                    MyStrings.selectCourse,
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,

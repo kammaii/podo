@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/request_btn.dart';
-
-import 'my_colors.dart';
+import 'package:podo/screens/lesson/btn_round.dart';
+import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 
 class LessonCorrection extends StatefulWidget {
   const LessonCorrection({Key? key}) : super(key: key);
@@ -28,7 +27,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
           color: MyColors.purple,
         ),
         title: const Text(
-          'Correction',
+          MyStrings.correction,
           style: TextStyle(
             color: MyColors.purple,
           ),
@@ -58,7 +57,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(10,10,10,0),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.fastOutSlowIn,
@@ -70,7 +69,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Try making your own sentence and get correction from a professional Korean teacher by using a ticket.',
+                    MyStrings.correctionInfo,
                     style: TextStyle(
                       color: MyColors.greenDark,
                       fontSize: 15,
@@ -111,7 +110,19 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                       ),
                     ),
                   ),
-                  RequestBtn().getRequestBtn('Send'),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: Container(
+                      alignment: Alignment.bottomCenter,
+                      child: RoundBtn().getRoundBtn(
+                        true,
+                        MyStrings.send,
+                        MyColors.green,
+                        Colors.white,
+                        () {},
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -152,7 +163,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 borderSide: BorderSide(color: MyColors.navyLight, width: 1),
               ),
-              hintText: 'Make your sentence',
+              hintText: MyStrings.correctionHint,
               hintStyle: TextStyle(fontSize: 15),
               contentPadding: EdgeInsets.all(10),
             ),

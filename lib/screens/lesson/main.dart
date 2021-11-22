@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 
-import 'my_colors.dart';
 
 class LessonMain extends StatefulWidget {
   const LessonMain({Key? key}) : super(key: key);
@@ -127,7 +128,7 @@ class _LessonMainState extends State<LessonMain> {
           ),
           const SizedBox(height: 5),
           const Text(
-            'Question',
+            MyStrings.question,
             style: TextStyle(
               color: MyColors.green,
             ),
@@ -162,7 +163,7 @@ class _LessonMainState extends State<LessonMain> {
                     Column(
                       children: const [
                         Text(
-                          'Next lesson',
+                          MyStrings.nextLesson,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,

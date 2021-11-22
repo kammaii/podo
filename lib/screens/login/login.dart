@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/my_colors.dart';
+import 'package:podo/values/my_colors.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);

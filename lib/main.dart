@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:podo/lesson_correction.dart';
-import 'package:podo/lesson_question.dart';
-import 'package:podo/login.dart';
-import 'package:podo/main_frame.dart';
-import 'package:podo/my_colors.dart';
-import 'logo.dart';
+import 'package:podo/screens/lesson/question.dart';
+import 'package:podo/screens/main_frame.dart';
+import 'package:podo/values/my_colors.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: MyColors.purple
       ),
-      home: const MainFrame()
+      home: const LessonQuestion()
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/my_colors.dart';
+import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 
 class LessonSummary extends StatelessWidget {
   const LessonSummary({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class LessonSummary extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           const Text(
-            'Correction',
+            MyStrings.correction,
             style: TextStyle(
               color: MyColors.green,
             ),
@@ -36,7 +37,7 @@ class LessonSummary extends StatelessWidget {
           color: MyColors.purple,
         ),
         title: const Text(
-          'Title',
+          MyStrings.title,
           style: TextStyle(
             color: MyColors.purple,
           ),
@@ -71,7 +72,7 @@ class LessonSummary extends StatelessWidget {
         children: [
           Container(
             child: const Text(
-              'Expression1',
+              MyStrings.expression,
               style: TextStyle(
                 color: Colors.white,
               ),
