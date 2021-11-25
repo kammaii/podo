@@ -5,7 +5,8 @@ class MyStrings {
   static const String question = 'question';
   static const String questionInfo =
       'Do you have a question about Korean? Ask a question by using a ticket. The professional Korean teacher will answer your question.';
-  static const String questionHint = 'Search your question';
+  static const String questionSearchHint = 'Search your question';
+  static const String questionHint = 'Write your question';
   static const String bestQuestions = '  Best Questions';
   static const String lorem =
       'Lorem ipsum, aurum haec dimitto. Consurgo cibo duo crux damno caput eximietate passim pello. He malus longe. Civis detineo sic.Cui archa obruo. Quae ratum reus ita, doleo rei. Horum minus, maior legis magis, placitum veni. Fors, approbo frux latus.';

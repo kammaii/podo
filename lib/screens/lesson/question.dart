@@ -15,12 +15,35 @@ class _LessonQuestionState extends State<LessonQuestion> {
   bool isInfoSelected = false;
   Color infoIconColor = MyColors.grey;
   final textFieldController = TextEditingController();
-  final focusNode = FocusNode();
+  late FocusNode searchFocusNode;
+  late FocusNode askFocusNode;
   bool isAskOpened = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+    searchFocusNode = FocusNode();
+    askFocusNode = FocusNode();
+  }
+
+
+  @override
+  void dispose() {
+    searchFocusNode.dispose();
+    askFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     double maxHeight;
+    if (!isInfoSelected) {
+      infoIconColor = MyColors.grey;
+    } else {
+      infoIconColor = MyColors.green;
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -44,13 +67,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                 setState(() {
                   isAskOpened = false;
                   FocusScope.of(context).unfocus();
-                  if (isInfoSelected) {
-                    isInfoSelected = false;
-                    infoIconColor = MyColors.grey;
-                  } else {
-                    isInfoSelected = true;
-                    infoIconColor = MyColors.green;
-                  }
+                  isInfoSelected = !isInfoSelected;
                 });
               },
               icon: const Icon(CupertinoIcons.info_circle_fill),
@@ -100,7 +117,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                             children: [
                               Expanded(
                                 child: TextField(
-                                  focusNode: focusNode,
+                                  focusNode: searchFocusNode,
                                   decoration: const InputDecoration(
                                       contentPadding:
                                           EdgeInsets.symmetric(vertical: 10),
@@ -119,7 +136,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                                             color: MyColors.navyLight,
                                             width: 1.0),
                                       ),
-                                      hintText: MyStrings.questionHint,
+                                      hintText: MyStrings.questionSearchHint,
                                       filled: true,
                                       fillColor: Colors.white),
                                   controller: textFieldController,
@@ -166,7 +183,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                               ),
                             ),
                           ),
-                          Padding(
+                          Padding(  // Ask a question 버튼
                             padding: const EdgeInsets.only(bottom: 15),
                             child: Container(
                               alignment: Alignment.bottomCenter,
@@ -176,7 +193,9 @@ class _LessonQuestionState extends State<LessonQuestion> {
                                   MyColors.purple,
                                   Colors.white, () {
                                 setState(() {
+                                  isInfoSelected = false;
                                   isAskOpened = true;
+                                  askFocusNode.requestFocus();
                                 });
                               }),
                             ),
@@ -201,9 +220,20 @@ class _LessonQuestionState extends State<LessonQuestion> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Card(
-                          child: TextField(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: TextField(
+                              focusNode: askFocusNode,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: const InputDecoration.collapsed(
+                                hintText: MyStrings.questionHint,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
