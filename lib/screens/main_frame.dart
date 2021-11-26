@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:podo/screens/lesson/correction.dart';
-import 'package:podo/screens/lesson/question.dart';
-import 'package:podo/screens/lesson/summary.dart';
+import 'package:podo/screens/lesson/lesson_correction.dart';
+import 'package:podo/screens/lesson/lesson_question.dart';
+import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/values/my_colors.dart';
-import 'lesson/main.dart';
+import 'lesson/lesson_main.dart';
 
 
 class MainFrame extends StatefulWidget {

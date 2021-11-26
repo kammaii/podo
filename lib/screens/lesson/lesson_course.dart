@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:podo/common_widgets/my_text_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -27,26 +28,24 @@ class LessonCourse extends StatelessWidget {
                         height: 100,
                         child: Image.asset('assets/images/course_hangul.png')),
                     const SizedBox(width: 20),
-                    const Expanded(
-                        child: Text(
-                      MyStrings.hangul,
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: MyColors.purple,
+                    Expanded(
+                      child: MyTextWidget().getTextWidget(
+                        MyStrings.hangul,
+                        25,
+                        MyColors.purple,
+                        isBold: true,
                       ),
-                    ))
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Expanded(
-                    child: Text(
-                  MyStrings.lorem,
-                  style: TextStyle(
-                    color: MyColors.grey,
-                    fontSize: 15,
+                Expanded(
+                  child: MyTextWidget().getTextWidget(
+                    MyStrings.lorem,
+                    15,
+                    MyColors.grey,
                   ),
-                ))
+                ),
               ],
             ),
           ),
@@ -65,14 +64,8 @@ class LessonCourse extends StatelessWidget {
               color: MyColors.purple,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
-                children: const [
-                  Text(
-                    MyStrings.selectCourse,
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
+                children: [
+                  MyTextWidget().getTextWidget(MyStrings.selectCourse, 20, Colors.white, isBold: true,),
                 ],
               ),
             ),

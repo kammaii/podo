@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/values/my_colors.dart';
 
-class RoundBtn {
+class RoundBtnWidget {
   late Function callback;
 
   Widget getRoundBtn(bool isRequest, String text, Color bgColor, Color fontColor, Function f) {

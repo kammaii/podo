@@ -20,6 +20,9 @@ class MyStrings {
   static const String howToGetTickets = 'How to get tickets?';
   static const String title = 'title';
   static const String expression = 'Expression';
+  static const String congratulations = 'Congratulations';
+  static const String beginner = 'beginner';
+
 
 
 

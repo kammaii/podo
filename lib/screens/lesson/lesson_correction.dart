@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/screens/lesson/btn_round.dart';
+import 'package:podo/common_widgets/btn_round_widget.dart';
+import 'package:podo/common_widgets/my_text_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -67,32 +68,22 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   borderRadius: BorderRadius.circular(10),
                   color: MyColors.greenLight,
                 ),
-                child: const Center(
-                  child: Text(
-                    MyStrings.correctionInfo,
-                    style: TextStyle(
-                      color: MyColors.greenDark,
-                      fontSize: 15,
-                    ),
-                  ),
+                child: Center(
+                  child: MyTextWidget().getTextWidget(MyStrings.correctionInfo, 15, MyColors.greenDark)
                 ),
               ),
             ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
-                Icon(
+              children: [
+                const Icon(
                   CupertinoIcons.ticket,
                   color: MyColors.purple,
                 ),
-                SizedBox(width: 5),
-                Text(
-                  '3',
-                  style: TextStyle(
-                      color: MyColors.purple, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(width: 10),
+                const SizedBox(width: 5),
+                MyTextWidget().getTextWidget('3', 18, MyColors.purple, isBold: true),
+                const SizedBox(width: 10),
               ],
             ),
             Expanded(
@@ -114,7 +105,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                     padding: const EdgeInsets.only(bottom: 15),
                     child: Container(
                       alignment: Alignment.bottomCenter,
-                      child: RoundBtn().getRoundBtn(
+                      child: RoundBtnWidget().getRoundBtn(
                         true,
                         MyStrings.send,
                         MyColors.green,
@@ -137,17 +128,10 @@ class _LessonCorrectionState extends State<LessonCorrection> {
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            '1) ~을 거예요',
-            style: TextStyle(
-              fontSize: 20,
-              color: MyColors.purple,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 15),
-          TextField(
+        children: [
+          MyTextWidget().getTextWidget('1) ~을 거예요', 20, MyColors.purple, isBold: true),
+          const SizedBox(height: 15),
+          const TextField(
             maxLines: null,
             cursorColor: Colors.black,
             style: TextStyle(fontSize: 18),

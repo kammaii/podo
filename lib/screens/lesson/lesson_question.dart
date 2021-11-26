@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/screens/lesson/btn_round.dart';
+import 'package:podo/common_widgets/btn_round_widget.dart';
+import 'package:podo/common_widgets/my_text_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -53,12 +54,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
           icon: const Icon(Icons.arrow_back_ios_rounded),
           color: MyColors.purple,
         ),
-        title: const Text(
-          MyStrings.question,
-          style: TextStyle(
-            color: MyColors.purple,
-          ),
-        ),
+        title: MyTextWidget().getTextWidget(MyStrings.question, 18, MyColors.purple,),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -148,22 +144,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                                 color: MyColors.purple,
                               ),
                               const SizedBox(width: 5),
-                              const Text(
-                                '3',
-                                style: TextStyle(
-                                    color: MyColors.purple,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              MyTextWidget().getTextWidget('3', 18, MyColors.purple, isBold: true,),
                             ],
                           ),
                           const SizedBox(height: 20),
-                          const Text(
-                            MyStrings.bestQuestions,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          MyTextWidget().getTextWidget(MyStrings.bestQuestions, 18, Colors.black, isBold: true,),
                         ],
                       ),
                     ),
@@ -187,7 +172,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                             padding: const EdgeInsets.only(bottom: 15),
                             child: Container(
                               alignment: Alignment.bottomCenter,
-                              child: RoundBtn().getRoundBtn(
+                              child: RoundBtnWidget().getRoundBtn(
                                   false,
                                   MyStrings.askQuestion,
                                   MyColors.purple,
@@ -240,7 +225,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                       Row(
                         children: [
                           Expanded(
-                            child: RoundBtn().getRoundBtn(
+                            child: RoundBtnWidget().getRoundBtn(
                               false,
                               MyStrings.cancel,
                               MyColors.pink,
@@ -255,7 +240,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: RoundBtn().getRoundBtn(
+                            child: RoundBtnWidget().getRoundBtn(
                               true,
                               MyStrings.send,
                               MyColors.purple,
@@ -284,13 +269,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Q',
-                style: TextStyle(
-                    fontSize: 35,
-                    color: MyColors.purple,
-                    fontWeight: FontWeight.bold),
-              ),
+              MyTextWidget().getTextWidget('Q', 35, MyColors.purple, isBold: true,),
               const SizedBox(width: 10),
               Expanded(
                 child: Container(
@@ -299,12 +278,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  child: const Text(
-                    MyStrings.lorem,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
+                  child: MyTextWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
                 ),
               )
             ],
@@ -320,22 +294,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  child: const Text(
-                    MyStrings.lorem,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
+                  child: MyTextWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'A',
-                style: TextStyle(
-                    fontSize: 35,
-                    color: MyColors.purple,
-                    fontWeight: FontWeight.bold),
-              ),
+              MyTextWidget().getTextWidget('A', 35, MyColors.purple, isBold: true,),
             ],
           ),
           const Divider(

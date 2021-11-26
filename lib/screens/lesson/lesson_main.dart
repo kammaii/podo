@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:podo/common_widgets/my_text_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -40,17 +41,9 @@ class _LessonMainState extends State<LessonMain> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'Lesson title',
-                style: TextStyle(fontSize: 20, color: MyColors.navy),
-              ),
-              Text(
-                'Lesson sub title',
-                style: TextStyle(
-                  color: MyColors.grey,
-                ),
-              )
+            children: [
+              MyTextWidget().getTextWidget('Lesson title', 20, MyColors.navy,),
+              MyTextWidget().getTextWidget('Lesson sub title', 18, MyColors.grey,),
             ],
           ),
         ),
@@ -86,13 +79,7 @@ class _LessonMainState extends State<LessonMain> {
         expandedHeight: sliverAppBarHeight,
         pinned: true,
         stretch: true,
-        title: const Text(
-          '타이틀',
-          style: TextStyle(
-            color: MyColors.purple,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: MyTextWidget().getTextWidget(MyStrings.title, 18, MyColors.purple, isBold: true),
         flexibleSpace: Container(
           color: MyColors.navyLight,
         ),
@@ -127,12 +114,7 @@ class _LessonMainState extends State<LessonMain> {
             backgroundColor: MyColors.green,
           ),
           const SizedBox(height: 5),
-          const Text(
-            MyStrings.question,
-            style: TextStyle(
-              color: MyColors.green,
-            ),
-          ),
+          MyTextWidget().getTextWidget(MyStrings.question, 18, MyColors.green,),
         ],
       ),
       body: SafeArea(
@@ -161,22 +143,9 @@ class _LessonMainState extends State<LessonMain> {
                 child: Row(
                   children: [
                     Column(
-                      children: const [
-                        Text(
-                          MyStrings.nextLesson,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '~아/어요',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
-                        ),
+                      children: [
+                        MyTextWidget().getTextWidget(MyStrings.nextLesson, 15, Colors.white, isBold: true,),
+                        MyTextWidget().getTextWidget('~아/어요', 20, Colors.white,),
                       ],
                     ),
                   ],

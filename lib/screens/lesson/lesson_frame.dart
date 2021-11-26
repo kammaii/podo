@@ -1,6 +1,7 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:podo/common_widgets/my_text_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -25,12 +26,7 @@ class _LessonFrameState extends State<LessonFrame> {
             icon: const Icon(Icons.arrow_back_ios_rounded),
             color: MyColors.purple,
           ),
-          title: const Text(
-            MyStrings.title, //todo: 레슨 타이틀
-            style: TextStyle(
-              color: MyColors.purple,
-            ),
-          ),
+          title: MyTextWidget().getTextWidget(MyStrings.title, 18, MyColors.purple,),
         ),
         body: Column(
           children: [
@@ -110,8 +106,5 @@ Widget getCards(int index) {
 }
 
 Widget getCardText(String text, double size) {
-  return Text(
-    text,
-    style: TextStyle(fontSize: size),
-  );
+  return MyTextWidget().getTextWidget(text, size, Colors.black);
 }
