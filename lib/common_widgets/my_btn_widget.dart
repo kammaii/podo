@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class RoundBtnWidget {
+class MyBtnWidget {
   late Function callback;
 
   Widget getRoundBtn(bool isRequest, String text, Color bgColor, Color fontColor, Function f) {

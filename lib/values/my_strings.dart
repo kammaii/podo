@@ -21,7 +21,10 @@ class MyStrings {
   static const String title = 'title';
   static const String expression = 'Expression';
   static const String congratulations = 'Congratulations';
-  static const String beginner = 'beginner';
+  static const String beginnerLevel = 'Beginner level';
+  static const String summary = 'summary';
+  static const String home = 'home';
+
 
 
 

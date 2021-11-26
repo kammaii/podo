@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:podo/screens/lesson/lesson_correction.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/values/my_colors.dart';
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: MyColors.purple
       ),
-      home: const LessonFinish()
+      home: const LessonCorrection()
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/common_widgets/btn_round_widget.dart';
+import 'package:podo/common_widgets/my_btn_widget.dart';
+import 'package:podo/common_widgets/my_info_widget.dart';
 import 'package:podo/common_widgets/my_text_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -81,28 +82,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
               children: [
                 Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.fastOutSlowIn,
-                        height: isInfoSelected ? 80 : 0,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: MyColors.greenLight,
-                        ),
-                        child: const Center(
-                          child: Text(
-                            MyStrings.questionInfo,
-                            style: TextStyle(
-                              color: MyColors.greenDark,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    MyInfoWidget().getMyInfoWidget(isInfoSelected ? 80 : 0, MyStrings.questionInfo),
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(10),
@@ -172,7 +152,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                             padding: const EdgeInsets.only(bottom: 15),
                             child: Container(
                               alignment: Alignment.bottomCenter,
-                              child: RoundBtnWidget().getRoundBtn(
+                              child: MyBtnWidget().getRoundBtn(
                                   false,
                                   MyStrings.askQuestion,
                                   MyColors.purple,
@@ -225,7 +205,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                       Row(
                         children: [
                           Expanded(
-                            child: RoundBtnWidget().getRoundBtn(
+                            child: MyBtnWidget().getRoundBtn(
                               false,
                               MyStrings.cancel,
                               MyColors.pink,
@@ -240,7 +220,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: RoundBtnWidget().getRoundBtn(
+                            child: MyBtnWidget().getRoundBtn(
                               true,
                               MyStrings.send,
                               MyColors.purple,
