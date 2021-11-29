@@ -24,6 +24,7 @@ class MyStrings {
   static const String beginnerLevel = 'Beginner level';
   static const String summary = 'summary';
   static const String home = 'home';
+  static const String messageInfo = 'Your sentence, question and answer are shown here.';
 
 
 

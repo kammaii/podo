@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:podo/screens/lesson/lesson_correction.dart';
-import 'package:podo/screens/lesson/lesson_finish.dart';
+import 'package:podo/screens/main_frame.dart';
 import 'package:podo/values/my_colors.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -15,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: MyColors.purple
       ),
-      home: const LessonCorrection()
+      home: const MainFrame()
     );
   }
 }
