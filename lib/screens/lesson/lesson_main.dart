@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -42,8 +42,8 @@ class _LessonMainState extends State<LessonMain> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MyTextWidget().getTextWidget('Lesson title', 20, MyColors.navy,),
-              MyTextWidget().getTextWidget('Lesson sub title', 18, MyColors.grey,),
+              MyWidget().getTextWidget('Lesson title', 20, MyColors.navy,),
+              MyWidget().getTextWidget('Lesson sub title', 18, MyColors.grey,),
             ],
           ),
         ),
@@ -79,7 +79,7 @@ class _LessonMainState extends State<LessonMain> {
         expandedHeight: sliverAppBarHeight,
         pinned: true,
         stretch: true,
-        title: MyTextWidget().getTextWidget(MyStrings.title, 18, MyColors.purple, isBold: true),
+        title: MyWidget().getTextWidget(MyStrings.title, 18, MyColors.purple, isBold: true),
         flexibleSpace: Container(
           color: MyColors.navyLight,
         ),
@@ -114,7 +114,7 @@ class _LessonMainState extends State<LessonMain> {
             backgroundColor: MyColors.green,
           ),
           const SizedBox(height: 5),
-          MyTextWidget().getTextWidget(MyStrings.question, 18, MyColors.green,),
+          MyWidget().getTextWidget(MyStrings.question, 18, MyColors.green,),
         ],
       ),
       body: SafeArea(
@@ -144,8 +144,8 @@ class _LessonMainState extends State<LessonMain> {
                   children: [
                     Column(
                       children: [
-                        MyTextWidget().getTextWidget(MyStrings.nextLesson, 15, Colors.white, isBold: true,),
-                        MyTextWidget().getTextWidget('~아/어요', 20, Colors.white,),
+                        MyWidget().getTextWidget(MyStrings.nextLesson, 15, Colors.white, isBold: true,),
+                        MyWidget().getTextWidget('~아/어요', 20, Colors.white,),
                       ],
                     ),
                   ],

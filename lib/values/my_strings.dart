@@ -25,6 +25,12 @@ class MyStrings {
   static const String summary = 'summary';
   static const String home = 'home';
   static const String messageInfo = 'Your sentence, question and answer are shown here.';
+  static const String sentences = 'sentences';
+  static const String review = 'Review';
+  static const String listenAndRepeat = 'Listen & Repeat';
+  static const String speakAndListen = 'Speak & Listen';
+
+
 
 
 

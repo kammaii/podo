@@ -4,7 +4,7 @@ import 'package:flutter/painting.dart';
 class MyColors {
   static const Color purple = Color(0xff432AA3);
   static const Color purpleLight = Color(0xffF8F8FF);
-  static const Color navy = Color(0xff8389BE);
+  static const Color navy = Color(0xff8389be);
   static const Color navyLight = Color(0xffE0E3FF);
   static const Color navyLightLight = Color(0xffF5F5F5);
   static const Color mustard = Color(0xffDEA34A);

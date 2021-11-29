@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/common_widgets/my_btn_widget.dart';
-import 'package:podo/common_widgets/my_info_widget.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -16,7 +14,7 @@ class LessonQuestion extends StatefulWidget {
 class _LessonQuestionState extends State<LessonQuestion> {
   bool isInfoSelected = false;
   Color infoIconColor = MyColors.grey;
-  final textFieldController = TextEditingController();
+  late TextEditingController textFieldController;
   late FocusNode searchFocusNode;
   late FocusNode askFocusNode;
   bool isAskOpened = false;
@@ -27,14 +25,16 @@ class _LessonQuestionState extends State<LessonQuestion> {
     super.initState();
     searchFocusNode = FocusNode();
     askFocusNode = FocusNode();
+    textFieldController = TextEditingController();
   }
 
 
   @override
   void dispose() {
+    super.dispose();
     searchFocusNode.dispose();
     askFocusNode.dispose();
-    super.dispose();
+    textFieldController.dispose();
   }
 
   @override
@@ -47,31 +47,16 @@ class _LessonQuestionState extends State<LessonQuestion> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.arrow_back_ios_rounded),
-          color: MyColors.purple,
-        ),
-        title: MyTextWidget().getTextWidget(MyStrings.question, 18, MyColors.purple,),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              onPressed: () {
-                setState(() {
-                  isAskOpened = false;
-                  FocusScope.of(context).unfocus();
-                  isInfoSelected = !isInfoSelected;
-                });
-              },
-              icon: const Icon(CupertinoIcons.info_circle_fill),
-              color: infoIconColor,
-            ),
-          )
-        ],
+      appBar: MyWidget().getAppbarWithAction(
+        MyStrings.question,
+            () {
+          setState(() {
+            isAskOpened = false;
+            FocusScope.of(context).unfocus();
+            isInfoSelected = !isInfoSelected;
+          });
+        },
+        infoIconColor
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -82,7 +67,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
               children: [
                 Column(
                   children: [
-                    MyInfoWidget().getMyInfoWidget(isInfoSelected ? 80 : 0, MyStrings.questionInfo),
+                    MyWidget().getInfoWidget(isInfoSelected ? 80 : 0, MyStrings.questionInfo),
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(10),
@@ -92,31 +77,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           Row(
                             children: [
                               Expanded(
-                                child: TextField(
-                                  focusNode: searchFocusNode,
-                                  decoration: const InputDecoration(
-                                      contentPadding:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      prefixIcon: Icon(Icons.search),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30.0)),
-                                        borderSide: BorderSide(
-                                            color: MyColors.navyLight,
-                                            width: 1.0),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30.0)),
-                                        borderSide: BorderSide(
-                                            color: MyColors.navyLight,
-                                            width: 1.0),
-                                      ),
-                                      hintText: MyStrings.questionSearchHint,
-                                      filled: true,
-                                      fillColor: Colors.white),
-                                  controller: textFieldController,
-                                ),
+                                child: MyWidget().getSearchWidget(searchFocusNode, textFieldController),
                               ),
                               const SizedBox(width: 10),
                               const Icon(
@@ -124,11 +85,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                                 color: MyColors.purple,
                               ),
                               const SizedBox(width: 5),
-                              MyTextWidget().getTextWidget('3', 18, MyColors.purple, isBold: true,),
+                              MyWidget().getTextWidget('3', 18, MyColors.purple, isBold: true,),
                             ],
                           ),
                           const SizedBox(height: 20),
-                          MyTextWidget().getTextWidget(MyStrings.bestQuestions, 18, Colors.black, isBold: true,),
+                          MyWidget().getTextWidget(MyStrings.bestQuestions, 18, Colors.black, isBold: true,),
                         ],
                       ),
                     ),
@@ -150,19 +111,17 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           ),
                           Padding(  // Ask a question 버튼
                             padding: const EdgeInsets.only(bottom: 15),
-                            child: Container(
-                              alignment: Alignment.bottomCenter,
-                              child: MyBtnWidget().getRoundBtn(
-                                  false,
-                                  MyStrings.askQuestion,
-                                  MyColors.purple,
-                                  Colors.white, () {
+                            child: MyWidget().getRoundBtnWithAlert(
+                              false,
+                              MyStrings.askQuestion,
+                              MyColors.purple,
+                              Colors.white, () {
                                 setState(() {
                                   isInfoSelected = false;
                                   isAskOpened = true;
                                   askFocusNode.requestFocus();
                                 });
-                              }),
+                              }
                             ),
                           ),
                         ],
@@ -205,7 +164,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                       Row(
                         children: [
                           Expanded(
-                            child: MyBtnWidget().getRoundBtn(
+                            child: MyWidget().getRoundBtnWidget(
                               false,
                               MyStrings.cancel,
                               MyColors.pink,
@@ -220,7 +179,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: MyBtnWidget().getRoundBtn(
+                            child: MyWidget().getRoundBtnWidget(
                               true,
                               MyStrings.send,
                               MyColors.purple,
@@ -249,7 +208,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MyTextWidget().getTextWidget('Q', 35, MyColors.purple, isBold: true,),
+              MyWidget().getTextWidget('Q', 35, MyColors.purple, isBold: true,),
               const SizedBox(width: 10),
               Expanded(
                 child: Container(
@@ -258,7 +217,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  child: MyTextWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
+                  child: MyWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
                 ),
               )
             ],
@@ -274,11 +233,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  child: MyTextWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
+                  child: MyWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
                 ),
               ),
               const SizedBox(width: 10),
-              MyTextWidget().getTextWidget('A', 35, MyColors.purple, isBold: true,),
+              MyWidget().getTextWidget('A', 35, MyColors.purple, isBold: true,),
             ],
           ),
           const Divider(

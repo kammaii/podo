@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/common_widgets/my_btn_widget.dart';
-import 'package:podo/common_widgets/my_info_widget.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -20,45 +18,26 @@ class _LessonCorrectionState extends State<LessonCorrection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.arrow_back_ios_rounded),
-          color: MyColors.purple,
-        ),
-        title: const Text(
-          MyStrings.correction,
-          style: TextStyle(
-            color: MyColors.purple,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              onPressed: () {
-                setState(() {
-                  if (isInfoSelected) {
-                    isInfoSelected = false;
-                    infoIconColor = MyColors.grey;
-                  } else {
-                    isInfoSelected = true;
-                    infoIconColor = MyColors.green;
-                  }
-                });
-              },
-              icon: const Icon(CupertinoIcons.info_circle_fill),
-              color: infoIconColor,
-            ),
-          )
-        ],
+      appBar: MyWidget().getAppbarWithAction(
+        MyStrings.correction,
+        () {
+          setState(() {
+            if (isInfoSelected) {
+              isInfoSelected = false;
+              infoIconColor = MyColors.grey;
+            } else {
+              isInfoSelected = true;
+              infoIconColor = MyColors.green;
+            }
+          });
+        },
+        infoIconColor
       ),
       body: SafeArea(
         child: Column(
           children: [
-            MyInfoWidget().getMyInfoWidget(isInfoSelected? 60:0, MyStrings.correctionInfo),
+            MyWidget().getInfoWidget(
+                isInfoSelected ? 60 : 0, MyStrings.correctionInfo),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -68,7 +47,8 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   color: MyColors.purple,
                 ),
                 const SizedBox(width: 5),
-                MyTextWidget().getTextWidget('3', 18, MyColors.purple, isBold: true),
+                MyWidget()
+                    .getTextWidget('3', 18, MyColors.purple, isBold: true),
                 const SizedBox(width: 10),
               ],
             ),
@@ -89,15 +69,14 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
-                    child: Container(
-                      alignment: Alignment.bottomCenter,
-                      child: MyBtnWidget().getRoundBtn(
-                        true,
-                        MyStrings.send,
-                        MyColors.green,
-                        Colors.white,
-                        () {},
-                      ),
+                    child: MyWidget().getRoundBtnWithAlert(
+                      true,
+                      MyStrings.send,
+                      MyColors.green,
+                      Colors.white,
+                      () {
+
+                      },
                     ),
                   ),
                 ],
@@ -119,8 +98,9 @@ class _LessonCorrectionState extends State<LessonCorrection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              MyTextWidget().getTextWidget('1) ~을 거예요', 20, MyColors.purple, isBold: true),
-              MyTextWidget().getTextWidget('3/30', 13, MyColors.grey),
+              MyWidget().getTextWidget('1) ~을 거예요', 20, MyColors.purple,
+                  isBold: true),
+              MyWidget().getTextWidget('3/30', 13, MyColors.grey),
             ],
           ),
           const SizedBox(height: 10),

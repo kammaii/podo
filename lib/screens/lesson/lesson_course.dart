@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -29,7 +29,7 @@ class LessonCourse extends StatelessWidget {
                         child: Image.asset('assets/images/course_hangul.png')),
                     const SizedBox(width: 20),
                     Expanded(
-                      child: MyTextWidget().getTextWidget(
+                      child: MyWidget().getTextWidget(
                         MyStrings.hangul,
                         25,
                         MyColors.purple,
@@ -40,7 +40,7 @@ class LessonCourse extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Expanded(
-                  child: MyTextWidget().getTextWidget(
+                  child: MyWidget().getTextWidget(
                     MyStrings.lorem,
                     15,
                     MyColors.grey,
@@ -65,7 +65,7 @@ class LessonCourse extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 children: [
-                  MyTextWidget().getTextWidget(MyStrings.selectCourse, 20, Colors.white, isBold: true,),
+                  MyWidget().getTextWidget(MyStrings.selectCourse, 20, Colors.white, isBold: true,),
                 ],
               ),
             ),

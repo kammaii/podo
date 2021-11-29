@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:podo/common_widgets/my_info_widget.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
@@ -29,7 +28,7 @@ class _MessageFrameState extends State<MessageFrame> {
         body: Column(
           children: [
             if(msgList.isEmpty)
-            MyInfoWidget().getMyInfoWidget(40, MyStrings.messageInfo),
+            MyWidget().getInfoWidget(40, MyStrings.messageInfo),
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(10),
@@ -104,18 +103,18 @@ Widget msgContainer(bool isUserMsg, String tag, String msg, Color msgColor, Stri
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       if(isUserMsg)
-      MyTextWidget().getTextWidget(tag, 13, MyColors.grey),
+      MyWidget().getTextWidget(tag, 13, MyColors.grey),
       Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: msgColor,
         ),
-        child: MyTextWidget().getTextWidget(msg, 15, Colors.black),
+        child: MyWidget().getTextWidget(msg, 15, Colors.black),
       ),
       Align(
         alignment: Alignment.topRight,
-        child: MyTextWidget().getTextWidget(date, 13, MyColors.grey),
+        child: MyWidget().getTextWidget(date, 13, MyColors.grey),
       ),
     ],
   );

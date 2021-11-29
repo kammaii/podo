@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:podo/screens/favorite/favorite_review.dart';
+import 'package:podo/screens/lesson/lesson_finish.dart';
+import 'package:podo/screens/lesson/lesson_frame.dart';
+import 'package:podo/screens/lesson/lesson_question.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/values/my_colors.dart';
 
@@ -14,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: MyColors.purple
       ),
-      home: const MainFrame()
+      home: const FavoriteReview()
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -39,7 +39,7 @@ class LessonFinish extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            MyTextWidget().getTextWidget(
+            MyWidget().getTextWidget(
               MyStrings.beginnerLevel,
               20,
               MyColors.purple,
@@ -55,7 +55,7 @@ class LessonFinish extends StatelessWidget {
                     radius: 200.0,
                     lineWidth: 10.0,
                     percent: percent,
-                    center: MyTextWidget().getTextWidget(
+                    center: MyWidget().getTextWidget(
                       '${(percent * 100).toInt().toString()}%',
                       30,
                       MyColors.purple,
@@ -104,7 +104,7 @@ Widget getCircleBtn(Icon icon, String text) {
         ),
       ),
       const SizedBox(height: 5,),
-      MyTextWidget().getTextWidget(text, 17, MyColors.purple)
+      MyWidget().getTextWidget(text, 17, MyColors.purple)
     ],
   );
 }

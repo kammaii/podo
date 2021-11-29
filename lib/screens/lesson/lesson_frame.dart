@@ -1,7 +1,7 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/common_widgets/my_text_widget.dart';
+import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -18,16 +18,7 @@ class _LessonFrameState extends State<LessonFrame> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.arrow_back_ios_rounded),
-            color: MyColors.purple,
-          ),
-          title: MyTextWidget().getTextWidget(MyStrings.title, 18, MyColors.purple,),
-        ),
+        appBar: MyWidget().getAppbar(MyStrings.title),
         body: Column(
           children: [
             LinearPercentIndicator(
@@ -106,5 +97,5 @@ Widget getCards(int index) {
 }
 
 Widget getCardText(String text, double size) {
-  return MyTextWidget().getTextWidget(text, size, Colors.black);
+  return MyWidget().getTextWidget(text, size, Colors.black);
 }
