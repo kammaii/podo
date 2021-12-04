@@ -45,11 +45,13 @@ class _FavoriteReviewState extends State<FavoriteReview> {
               backgroundColor: MyColors.navyLight,
               progressColor: MyColors.purple,
             ),
+            const SizedBox(height: 10),
             Column(
               children: <Widget>[
                 ListTile(
                   title: MyWidget().getTextWidget(MyStrings.listenAndRepeat, 15, MyColors.purple),
                   leading: Radio<SingingCharacter>(
+                    activeColor: MyColors.purple,
                     value: SingingCharacter.listenAndRepeat,
                     groupValue: _character,
                     onChanged: (SingingCharacter? value) {
@@ -62,6 +64,7 @@ class _FavoriteReviewState extends State<FavoriteReview> {
                 ListTile(
                   title: MyWidget().getTextWidget(MyStrings.speakAndListen, 15, MyColors.purple),
                   leading: Radio<SingingCharacter>(
+                    activeColor: MyColors.purple,
                     value: SingingCharacter.speakAndListen,
                     groupValue: _character,
                     onChanged: (SingingCharacter? value) {
@@ -73,10 +76,41 @@ class _FavoriteReviewState extends State<FavoriteReview> {
                 ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 50),
-              child: Icon(FontAwesomeIcons.play),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white
+                  ),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        MyWidget().getTextWidget('비가와요', 30, Colors.black),
+                        MyWidget().getTextWidget('It\'s rainy', 20, MyColors.grey),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(FontAwesomeIcons.play),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 30),
+                    child: MyWidget().getRoundBtnWidget(false, MyStrings.next, MyColors.purple, Colors.white, (){}, horizontalPadding: 20),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),

@@ -164,7 +164,24 @@ class MyWidget {
     );
   }
 
-  Widget getRoundBtnWidget(bool isRequest, String text, Color bgColor, Color fontColor, Function f) {
+  Widget getRoundBtnWidget(bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? horizontalPadding}) {
+    if(horizontalPadding == null) {
+      return roundBtnWidget(isRequest, text, bgColor, fontColor, f);
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: roundBtnWidget(isRequest, text, bgColor, fontColor, f),
+            ),
+          )
+        ],
+      );
+    }
+  }
+
+  Widget roundBtnWidget(bool isRequest, String text, Color bgColor, Color fontColor, Function f) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
@@ -175,7 +192,8 @@ class MyWidget {
         f();
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: isRequest? 5:13),
+        padding: EdgeInsets.symmetric(
+            horizontal: 10, vertical: isRequest ? 5 : 13),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -184,31 +202,31 @@ class MyWidget {
               style: TextStyle(fontSize: 20, color: fontColor),
             ),
             if(isRequest)
-            Row(
-              children: [
-                const SizedBox(
-                  height: 30,
-                  child: VerticalDivider(
-                    color: Colors.white,
-                    thickness: 1,
-                    width: 20,
+              Row(
+                children: [
+                  const SizedBox(
+                    height: 30,
+                    child: VerticalDivider(
+                      color: Colors.white,
+                      thickness: 1,
+                      width: 20,
+                    ),
                   ),
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('consume'),
-                    Row(
-                      children: const [
-                        Icon(CupertinoIcons.ticket),
-                        SizedBox(width: 5),
-                        Text('2'),
-                      ],
-                    )
-                  ],
-                )
-              ],
-            )
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('consume'),
+                      Row(
+                        children: const [
+                          Icon(CupertinoIcons.ticket),
+                          SizedBox(width: 5),
+                          Text('2'),
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              ),
           ],
         ),
       ),

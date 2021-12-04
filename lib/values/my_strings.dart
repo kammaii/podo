@@ -29,6 +29,8 @@ class MyStrings {
   static const String review = 'Review';
   static const String listenAndRepeat = 'Listen & Repeat';
   static const String speakAndListen = 'Speak & Listen';
+  static const String next = 'Next';
+
 
 
 

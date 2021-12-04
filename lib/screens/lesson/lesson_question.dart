@@ -49,7 +49,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
     return Scaffold(
       appBar: MyWidget().getAppbarWithAction(
         MyStrings.question,
-            () {
+        () {
           setState(() {
             isAskOpened = false;
             FocusScope.of(context).unfocus();
