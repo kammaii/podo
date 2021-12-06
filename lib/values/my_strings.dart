@@ -2,6 +2,7 @@ class MyStrings {
   static const String askQuestion = 'Ask a question';
   static const String send = 'Send';
   static const String cancel = 'Cancel';
+  static const String yes = 'Yes';
   static const String question = 'question';
   static const String questionInfo =
       'Do you have a question about Korean? Ask a question by using a ticket. The professional Korean teacher will answer your question.';
@@ -30,11 +31,22 @@ class MyStrings {
   static const String listenAndRepeat = 'Listen & Repeat';
   static const String speakAndListen = 'Speak & Listen';
   static const String next = 'Next';
-
-
-
-
-
+  static const String podoPremium = 'Podo PREMIUM';
+  static const String freeTrial = 'Free trial';
+  static const String editProfile = 'Edit Profile';
+  static const String name = 'Name';
+  static const String email = 'Email';
+  static const String password = 'Password';
+  static const String passwordConfirm = 'Confirm Password';
+  static const String feedback = 'Feedback';
+  static const String logOut = 'Log out';
+  static const String logOutDetail = 'Do you want to log out?';
+  static const String removeAccount = 'Remove Account';
+  static const String removeDetail = 'Do you want to remove your account?';
+  static const String removeDetail2 = 'Your account cannot be recovered.';
+  static const String areYouSure = 'Are you sure?';
+  static const String feedbackDetail = 'Please send us your awesome idea.';
+  static const String feedbackHint = 'Write it here';
 
 
 

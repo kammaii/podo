@@ -56,7 +56,7 @@ Widget getMsgItem(bool isUserMsg, String image, String tag, String msg, String d
   if (isUserMsg) {
     msgColor = MyColors.navyLight;
     widgets = [
-      imageContainer(image),
+      MyWidget().getCircleImageWidget(image, 50),
       const SizedBox(width: 10),
       Expanded(child: msgContainer(isUserMsg, tag, msg, msgColor, date))
     ];
@@ -65,7 +65,7 @@ Widget getMsgItem(bool isUserMsg, String image, String tag, String msg, String d
     widgets = [
       Expanded(child: msgContainer(isUserMsg, tag, msg, msgColor, date)),
       const SizedBox(width: 10),
-      imageContainer(image),
+      MyWidget().getCircleImageWidget(image, 50),
     ];
   }
   return Padding(
@@ -79,21 +79,6 @@ Widget getMsgItem(bool isUserMsg, String image, String tag, String msg, String d
         if(!isUserMsg)
         const Divider(height: 30,),
       ],
-    ),
-  );
-}
-
-Widget imageContainer(String image) {
-  return Container(
-    width: 50,
-    height: 50,
-    decoration: BoxDecoration(
-      color: MyColors.navyLight, //todo: 지우기
-      shape: BoxShape.circle,
-      image: DecorationImage(
-        image: AssetImage(image),
-        fit: BoxFit.cover,
-      ),
     ),
   );
 }
