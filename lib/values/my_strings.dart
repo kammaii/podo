@@ -32,7 +32,12 @@ class MyStrings {
   static const String speakAndListen = 'Speak & Listen';
   static const String next = 'Next';
   static const String podoPremium = 'Podo PREMIUM';
-  static const String freeTrial = 'Free trial';
+  static const String freeTrial = 'Free trial for 3 days';
+  static const String freeTrialDetail = 'You can cancel your subscription at any time during the free trial.';
+  static const String unlockLessons = 'Unlock every lessons';
+  static const String unlockLessonsDetail = 'Improve your Korean skills with lessons made by native Korean teacher.';
+  static const String getPodoCoins = 'Get 5 coins every day';
+  static const String getPodoCoinsDetail = 'Podo coin is used for correctings sentence or requesting questions. (Unused coins won\'t be carried forward to the next day.)';
   static const String editProfile = 'Edit Profile';
   static const String name = 'Name';
   static const String email = 'Email';
@@ -47,9 +52,12 @@ class MyStrings {
   static const String areYouSure = 'Are you sure?';
   static const String feedbackDetail = 'Please send us your awesome idea.';
   static const String feedbackHint = 'Write it here';
-
-
-
+  static const String bestValue = 'Best Value';
+  static const String monthly = 'Monthly Plan';
+  static const String yearly = 'Yearly Plan';
+  static const String subscribe = 'Subscribe';
+  static const String subscribeCondition = 'Subscription is automatically renewed.';
+  static const String restoringPurchases = 'Restoring purchases';
 
 
 }

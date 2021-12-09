@@ -75,25 +75,17 @@ class MyWidget {
     );
   }
 
-  Text getTextWidget(String text, double size, Color color, {bool? isBold}) {
-    if (isBold != null) {
-      return Text(
-        text,
-        style: TextStyle(
-          fontSize: size,
-          color: color,
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    } else {
-      return Text(
-        text,
-        style: TextStyle(
-          fontSize: size,
-          color: color,
-        ),
-      );
-    }
+  Text getTextWidget(String text, double size, Color color, {bool? isBold, bool? isTextAlignCenter, bool? isLineThrough}) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: size,
+        color: color,
+        fontWeight: isBold != null ? FontWeight.bold : null,
+        decoration: isLineThrough != null ? TextDecoration.lineThrough : null,
+      ),
+      textAlign: isTextAlignCenter != null ? TextAlign.center : null,
+    );
   }
 
   Widget getInfoWidget(double height, String info) {
