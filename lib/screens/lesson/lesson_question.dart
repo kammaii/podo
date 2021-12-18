@@ -77,7 +77,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           Row(
                             children: [
                               Expanded(
-                                child: MyWidget().getSearchWidget(searchFocusNode, textFieldController),
+                                child: MyWidget().getSearchWidget(searchFocusNode, textFieldController, MyStrings.questionSearchHint),
                               ),
                               const SizedBox(width: 10),
                               const Icon(

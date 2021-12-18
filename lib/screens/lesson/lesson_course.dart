@@ -60,13 +60,11 @@ class LessonCourse extends StatelessWidget {
       child: Scaffold(
         body: Column(
           children: [
-            Container(
-              color: MyColors.purple,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  MyWidget().getTextWidget(MyStrings.selectCourse, 20, Colors.white, isBold: true,),
-                ],
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: MyWidget().getTextWidget(MyStrings.selectCourse, 20, MyColors.purple, isBold: true,),
               ),
             ),
             Expanded(

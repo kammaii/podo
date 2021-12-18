@@ -52,7 +52,7 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  MyWidget().getSearchWidget(_focusNode, _controller),
+                  MyWidget().getSearchWidget(_focusNode, _controller, MyStrings.favoriteSearchHint),
                   const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.bottomRight,

@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: MyColors.purple
       ),
-      home: const Subscribe()
+      home: const MainFrame()
     );
   }
 }

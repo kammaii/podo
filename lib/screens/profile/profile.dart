@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/profile/profile_item.dart';
+import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -51,7 +52,10 @@ class _ProfileState extends State<Profile> {
                               MyStrings.freeTrial,
                               MyColors.purple,
                               Colors.white,
-                              () {})
+                              () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const Subscribe()));
+                              },
+                          )
                         ],
                       ),
                     ),

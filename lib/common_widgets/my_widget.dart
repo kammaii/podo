@@ -53,22 +53,21 @@ class MyWidget {
     );
   }
 
-  Widget getSearchWidget(
-      FocusNode focusNode, TextEditingController controller) {
+  Widget getSearchWidget(FocusNode focusNode, TextEditingController controller, String hint) {
     return TextField(
       focusNode: focusNode,
-      decoration: const InputDecoration(
-          contentPadding: EdgeInsets.symmetric(vertical: 10),
-          prefixIcon: Icon(Icons.search),
-          focusedBorder: OutlineInputBorder(
+      decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          prefixIcon: const Icon(Icons.search),
+          focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
           ),
-          enabledBorder: OutlineInputBorder(
+          enabledBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
           ),
-          hintText: MyStrings.questionSearchHint,
+          hintText: hint,
           filled: true,
           fillColor: Colors.white),
       controller: controller,
@@ -127,14 +126,14 @@ class MyWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                MyStrings.notEnoughTickets,
+                MyStrings.notEnoughCoins,
                 style: TextStyle(
                     color: MyColors.purple, fontWeight: FontWeight.bold),
               ),
               TextButton(
                 onPressed: () {},
                 child: const Text(
-                  MyStrings.howToGetTickets,
+                  MyStrings.howToGetCoins,
                   style: TextStyle(
                       color: MyColors.red,
                       fontSize: 15,
@@ -261,6 +260,7 @@ class MyWidget {
       cursorColor: Colors.black,
       style: TextStyle(fontSize: fontSize),
       decoration: InputDecoration(
+        hintMaxLines: 2,
         filled: true,
         fillColor: Colors.white,
         border: InputBorder.none,

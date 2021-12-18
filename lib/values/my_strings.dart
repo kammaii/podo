@@ -5,27 +5,29 @@ class MyStrings {
   static const String yes = 'Yes';
   static const String question = 'question';
   static const String questionInfo =
-      'Do you have a question about Korean? Ask a question by using a ticket. The professional Korean teacher will answer your question.';
+      'Do you have a question about Korean? Ask a question by using a coin. The professional Korean teacher will answer your question.';
   static const String questionSearchHint = 'Search your question';
-  static const String questionHint = 'Write your question';
+  static const String questionHint = 'Did you get a question while studying Korean?';
   static const String bestQuestions = '  Best Questions';
   static const String lorem =
       'Lorem ipsum, aurum haec dimitto. Consurgo cibo duo crux damno caput eximietate passim pello. He malus longe. Civis detineo sic.Cui archa obruo. Quae ratum reus ita, doleo rei. Horum minus, maior legis magis, placitum veni. Fors, approbo frux latus.';
   static const String correction = 'Correction';
-  static const String correctionInfo = 'Try making your own sentence and get correction from a professional Korean teacher by using a ticket.';
-  static const String correctionHint = 'Make your sentence';
+  static const String correctionInfo = 'Try making your own sentence and get correction from a professional Korean teacher by using a coin.';
+  static const String correctionHint = 'Make your own sentence with the expressions you learned today.';
+  static const String favoriteSearchHint = 'Search your sentence';
   static const String selectCourse = 'Select a course';
   static const String hangul = 'Hangul';
   static const String nextLesson = 'Next lesson';
-  static const String notEnoughTickets = '* Not enough tickets';
-  static const String howToGetTickets = 'How to get tickets?';
+  static const String notEnoughCoins = '* Not enough coins';
+  static const String howToGetCoins = 'How to get coins?';
   static const String title = 'title';
   static const String expression = 'Expression';
   static const String congratulations = 'Congratulations';
   static const String beginnerLevel = 'Beginner level';
   static const String summary = 'summary';
   static const String home = 'home';
-  static const String messageInfo = 'Your sentence, question and answer are shown here.';
+  static const String messageInfo = 'It\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
+  static const String messageSearchHint = 'Search your message';
   static const String sentences = 'sentences';
   static const String review = 'Review';
   static const String listenAndRepeat = 'Listen & Repeat';
@@ -58,6 +60,7 @@ class MyStrings {
   static const String subscribe = 'Subscribe';
   static const String subscribeCondition = 'Subscription is automatically renewed.';
   static const String restoringPurchases = 'Restoring purchases';
-
-
+  static const String tagCorrection = '#correction';
+  static const String tagQuestion = '#question';
+  static const String tagNotice = '#notice';
 }

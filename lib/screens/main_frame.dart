@@ -4,9 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:podo/screens/favorite/favorite_frame.dart';
 import 'package:podo/screens/lesson/lesson_correction.dart';
+import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_question.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/screens/message/message_frame.dart';
+import 'package:podo/screens/profile/profile.dart';
 import 'package:podo/values/my_colors.dart';
 
 import 'lesson/lesson_main.dart';
@@ -21,10 +23,10 @@ class MainFrame extends StatefulWidget {
 
 List<Widget> _buildScreens() {
   return [
-    const LessonMain(),
+    const LessonCourse(),
     const MessageFrame(),
     const FavoriteFrame(),
-    const LessonSummary(),
+    const Profile(),
   ];
 }
 

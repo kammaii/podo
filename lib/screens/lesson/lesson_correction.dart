@@ -47,8 +47,7 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   color: MyColors.purple,
                 ),
                 const SizedBox(width: 5),
-                MyWidget()
-                    .getTextWidget('3', 18, MyColors.purple, isBold: true),
+                MyWidget().getTextWidget('3', 18, MyColors.purple, isBold: true),
                 const SizedBox(width: 10),
               ],
             ),

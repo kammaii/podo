@@ -28,62 +28,75 @@ class _SubscribeState extends State<Subscribe> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 30, bottom: 20),
-                  child: MyWidget().getTextWidget(MyStrings.podoPremium, 25, MyColors.purple, isBold: true),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 260,
-                          child: Swiper(
-                            itemCount: 3,
-                            itemBuilder: (context, index) {
-                              return getCards(index);
-                            },
-                            pagination: const SwiperPagination(
-                              builder: DotSwiperPaginationBuilder(
-                                color: MyColors.grey
-                              )
+    return Container(
+      color: MyColors.purpleLight,
+      child: SafeArea(
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                top: 16,
+                child: IconButton(
+                  onPressed: (){
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.keyboard_arrow_left_rounded),
+                  color: MyColors.purple,
+                  iconSize: 40),
+              ),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30, bottom: 20),
+                    child: MyWidget().getTextWidget(MyStrings.podoPremium, 25, MyColors.purple, isBold: true),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 270,
+                            child: Swiper(
+                              itemCount: 3,
+                              itemBuilder: (context, index) {
+                                return getCards(index);
+                              },
+                              pagination: const SwiperPagination(
+                                builder: DotSwiperPaginationBuilder(
+                                  color: MyColors.grey
+                                )
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        getPlan(selector[0], true, MyStrings.yearly, '000 dollar', '000 dollar', detail: '(000/month)'),
-                        getPlan(selector[1], false, MyStrings.monthly, '000 dollar', '000 dollar'),
-                        TextButton(
-                          child: MyWidget().getTextWidget(MyStrings.restoringPurchases, 15, MyColors.purple),
-                          onPressed: (){
+                          const SizedBox(height: 20),
+                          getPlan(selector[0], true, MyStrings.yearly, '000 dollar', '000 dollar', detail: '(000/month)'),
+                          getPlan(selector[1], false, MyStrings.monthly, '000 dollar', '000 dollar'),
+                          TextButton(
+                            child: MyWidget().getTextWidget(MyStrings.restoringPurchases, 15, MyColors.purple),
+                            onPressed: (){
 
-                          },
-                        ),
-                        const SizedBox(height: 150),
-                      ],
+                            },
+                          ),
+                          const SizedBox(height: 150),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                MyWidget().getRoundBtnWidget(false, MyStrings.subscribe, MyColors.purple, Colors.white, (){}, horizontalPadding: 10),
-                Container(
-                  color: MyColors.purpleLight,
-                  padding: const EdgeInsets.all(8),
-                  child: MyWidget().getTextWidget(MyStrings.subscribeCondition, 15, MyColors.grey, isTextAlignCenter: true),
-                ),
-              ],
-            )
-          ],
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  MyWidget().getRoundBtnWidget(false, MyStrings.subscribe, MyColors.purple, Colors.white, (){}, horizontalPadding: 10),
+                  Container(
+                    color: MyColors.purpleLight,
+                    padding: const EdgeInsets.all(8),
+                    child: MyWidget().getTextWidget(MyStrings.subscribeCondition, 15, MyColors.grey, isTextAlignCenter: true),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -93,9 +106,25 @@ class _SubscribeState extends State<Subscribe> {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Icon(items[index].icon, size: 50, color: MyColors.purple,),
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: MyColors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: const Offset(0,1),
+                )
+              ]
+            ),
+            child: Icon(items[index].icon, size: 50, color: MyColors.purple,)
+          ),
           const SizedBox(height: 20),
           MyWidget().getTextWidget(items[index].title, 20, MyColors.purple),
           const SizedBox(height: 10),
