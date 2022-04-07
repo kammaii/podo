@@ -6,7 +6,8 @@ import 'package:podo/values/my_strings.dart';
 
 
 class LessonMain extends StatefulWidget {
-  const LessonMain({Key? key}) : super(key: key);
+  const LessonMain({Key? key, required this.course}) : super(key: key);
+  final String course;
 
   @override
   _LessonMainState createState() => _LessonMainState();
@@ -79,7 +80,7 @@ class _LessonMainState extends State<LessonMain> {
         expandedHeight: sliverAppBarHeight,
         pinned: true,
         stretch: true,
-        title: MyWidget().getTextWidget(MyStrings.title, 18, MyColors.purple, isBold: true),
+        title: MyWidget().getTextWidget(widget.course, 18, MyColors.purple, isBold: true),
         flexibleSpace: Container(
           color: MyColors.navyLight,
         ),
@@ -98,25 +99,13 @@ class _LessonMainState extends State<LessonMain> {
             (context, index) {
               return lessonList(index);
             },
-            childCount: 1,
+            childCount: 10,
           ),
         ),
       );
     }
 
     return Scaffold(
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {},
-            child: const Icon(FontAwesomeIcons.question),
-            backgroundColor: MyColors.green,
-          ),
-          const SizedBox(height: 5),
-          MyWidget().getTextWidget(MyStrings.question, 18, MyColors.green,),
-        ],
-      ),
       body: SafeArea(
         child: Stack(
           alignment: Alignment.center,

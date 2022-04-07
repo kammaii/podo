@@ -63,4 +63,7 @@ class MyStrings {
   static const String tagCorrection = '#correction';
   static const String tagQuestion = '#question';
   static const String tagNotice = '#notice';
+  static const String beginner = 'Beginner';
+  static const String intermediate = 'Intermediate';
+  static const String advanced = 'Advanced';
 }

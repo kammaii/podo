@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:podo/screens/favorite/favorite_review.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
+import 'package:podo/screens/lesson/lesson_main.dart';
 import 'package:podo/screens/lesson/lesson_question.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/message/message_frame.dart';

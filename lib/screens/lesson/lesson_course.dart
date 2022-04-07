@@ -3,51 +3,49 @@ import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
+import 'lesson_main.dart';
+
 class LessonCourse extends StatelessWidget {
   const LessonCourse({Key? key}) : super(key: key);
 
-  Widget getListItem(int key) {
-    return Container(
+  Widget getListItem(BuildContext context, int key, String title) {
+    return Card(
       key: ValueKey(key),
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      height: 200,
-      child: Card(
-        child: InkWell(
-          onTap: () {
-            print(key);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                        width: 100,
-                        height: 100,
-                        child: Image.asset('assets/images/course_hangul.png')),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: MyWidget().getTextWidget(
-                        MyStrings.hangul,
-                        25,
-                        MyColors.purple,
-                        isBold: true,
-                      ),
+      child: InkWell(
+        onTap: () {
+          print(key);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LessonMain(course: title,)));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Image.asset('assets/images/course_hangul.png')),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: MyWidget().getTextWidget(
+                      title,
+                      25,
+                      MyColors.purple,
+                      isBold: true,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: MyWidget().getTextWidget(
-                    MyStrings.lorem,
-                    15,
-                    MyColors.grey,
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              MyWidget().getTextWidget(
+                MyStrings.lorem,
+                15,
+                MyColors.grey,
+              ),
+            ],
           ),
         ),
       ),
@@ -71,10 +69,10 @@ class LessonCourse extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(10),
                 children: [
-                  getListItem(0),
-                  getListItem(1),
-                  getListItem(2),
-                  getListItem(3)
+                  getListItem(context, 0, MyStrings.hangul),
+                  getListItem(context, 1, MyStrings.beginner),
+                  getListItem(context, 2, MyStrings.intermediate),
+                  getListItem(context, 3, MyStrings.advanced)
                 ],
               ),
             ),
