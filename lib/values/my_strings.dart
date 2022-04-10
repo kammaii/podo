@@ -66,4 +66,7 @@ class MyStrings {
   static const String beginner = 'Beginner';
   static const String intermediate = 'Intermediate';
   static const String advanced = 'Advanced';
+  static const String unlockEveryLessons = 'Unlock every lessons';
+  static const String startFreeTrial = 'Start free trial!';
+
 }

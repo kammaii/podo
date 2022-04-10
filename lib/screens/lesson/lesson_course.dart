@@ -9,12 +9,20 @@ class LessonCourse extends StatelessWidget {
   const LessonCourse({Key? key}) : super(key: key);
 
   Widget getListItem(BuildContext context, int key, String title) {
+    String sampleImage = 'assets/images/course_hangul.png';
     return Card(
       key: ValueKey(key),
       child: InkWell(
         onTap: () {
           print(key);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => LessonMain(course: title,)));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LessonMain(
+                        course: title,
+                        courseImage: sampleImage,
+
+                      )));
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -25,9 +33,13 @@ class LessonCourse extends StatelessWidget {
               Row(
                 children: [
                   SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: Image.asset('assets/images/course_hangul.png')),
+                      width: 80,
+                      height: 80,
+                      child: Hero(
+                        child: Image.asset(sampleImage),
+                        tag: 'courseImage:$title',
+                      ),
+                  ),
                   const SizedBox(width: 20),
                   Expanded(
                     child: MyWidget().getTextWidget(
@@ -62,7 +74,12 @@ class LessonCourse extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: MyWidget().getTextWidget(MyStrings.selectCourse, 20, MyColors.purple, isBold: true,),
+                child: MyWidget().getTextWidget(
+                  MyStrings.selectCourse,
+                  20,
+                  MyColors.purple,
+                  isBold: true,
+                ),
               ),
             ),
             Expanded(
