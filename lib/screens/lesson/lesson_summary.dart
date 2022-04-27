@@ -24,7 +24,7 @@ class LessonSummary extends StatelessWidget {
           const SizedBox(height: 10),
         ],
       ),
-      appBar: MyWidget().getAppbar(MyStrings.title),
+      appBar: MyWidget().getAppbar(context, MyStrings.title),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

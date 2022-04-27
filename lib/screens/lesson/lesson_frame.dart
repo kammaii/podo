@@ -18,7 +18,7 @@ class _LessonFrameState extends State<LessonFrame> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: MyWidget().getAppbar(MyStrings.title),
+        appBar: MyWidget().getAppbar(context, MyStrings.title),
         body: Column(
           children: [
             LinearPercentIndicator(

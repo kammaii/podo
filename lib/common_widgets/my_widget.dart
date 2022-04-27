@@ -35,12 +35,14 @@ class MyWidget {
     );
   }
 
-  AppBar getAppbar(String title) {
+  AppBar getAppbar(BuildContext context, String title) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
       leading: IconButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pop(context);
+        },
         icon: const Icon(Icons.arrow_back_ios_rounded),
         color: MyColors.purple,
       ),

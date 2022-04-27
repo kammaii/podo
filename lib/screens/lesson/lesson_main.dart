@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/lessons/lessons.dart';
+import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
@@ -21,11 +24,28 @@ class _LessonMainState extends State<LessonMain> {
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
   double itemHeight = 80.0;
+  late List<Widget> lessonWidgetList;
+
 
   @override
   void initState() {
     super.initState();
     scrollController.addListener(() => setState(() {}));
+    lessonWidgetList = [];
+    for(int i=0; i<Lessons.basicLesson.length; i++) {
+      if(!UserInfo().isPremium) {
+        if(i==0) {
+          lessonWidgetList.add(lessonList(i, false));
+        } else if(i==1) {
+          lessonWidgetList.add(premiumCard());
+        } else {
+          lessonWidgetList.add(lessonList(i-1, true));
+        }
+
+      } else {
+        lessonWidgetList.add(lessonList(i, false));
+      }
+    }
   }
 
   @override
@@ -35,20 +55,27 @@ class _LessonMainState extends State<LessonMain> {
   }
 
   Widget lessonList(int index, bool isLocked) {
+    String lessonTitle = Lessons.basicLesson[index]![Lessons.TITLE]![0].toString();
+    String lessonSubTitle = Lessons.basicLesson[index]![Lessons.SUBTITLE]![0].toString();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       height: itemHeight,
       child: Card(
         color: isLocked ? MyColors.navyLightLight : Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MyWidget().getTextWidget('Lesson title', 20, isLocked ? MyColors.grey : MyColors.navy,),
-              MyWidget().getTextWidget('Lesson sub title', 18, MyColors.grey,),
-            ],
+        child: InkWell(
+          onTap: (){
+            pushNewScreen(context, withNavBar: false, screen: const LessonFrame());
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MyWidget().getTextWidget(lessonTitle, 20, isLocked ? MyColors.grey : MyColors.navy,),
+                MyWidget().getTextWidget(lessonSubTitle, 18, MyColors.grey,),
+              ],
+            ),
           ),
         ),
       ),
@@ -91,6 +118,7 @@ class _LessonMainState extends State<LessonMain> {
         topMarginPlayBtn = 5.0;
       }
     }
+
 
     sliverAppBar() {
       return SliverAppBar(
@@ -136,17 +164,9 @@ class _LessonMainState extends State<LessonMain> {
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              if(!UserInfo().isPremium && index >= 1) {
-                if(index > 1) {
-                  return lessonList(index, true);
-                } else {
-                  return premiumCard();
-                }
-              } else {
-                return lessonList(index, false);
-              }
+              return lessonWidgetList[index];
             },
-            childCount: UserInfo().isPremium ? 8 : 8+1, // todo: 3대신 레슨.length로 변경
+            childCount: lessonWidgetList.length,
           ),
         ),
       );
