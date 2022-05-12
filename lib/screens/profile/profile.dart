@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/profile/profile_item.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
@@ -53,7 +54,7 @@ class _ProfileState extends State<Profile> {
                               MyColors.purple,
                               Colors.white,
                               () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const Subscribe()));
+                                Get.to(const Subscribe());
                               },
                           )
                         ],

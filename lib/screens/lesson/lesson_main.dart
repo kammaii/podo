@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/lessons/lessons.dart';
@@ -64,7 +65,7 @@ class _LessonMainState extends State<LessonMain> {
         color: isLocked ? MyColors.navyLightLight : Colors.white,
         child: InkWell(
           onTap: (){
-            pushNewScreen(context, withNavBar: false, screen: const LessonFrame());
+            Get.to(const LessonFrame());
           },
           child: Padding(
             padding: const EdgeInsets.all(10),

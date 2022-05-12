@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:podo/screens/favorite/favorite_review.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Podo Korean app',
       theme: ThemeData(
         primaryColor: MyColors.purple
