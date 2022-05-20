@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/screens/message/action_button.dart';
+import 'package:podo/screens/message/expandable_fab.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
@@ -30,10 +33,8 @@ class _MessageFrameState extends State<MessageFrame> {
     focusNode = FocusNode();
     controller = TextEditingController();
     msgList = [];
-    msgList.add(Message(
-        true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-    msgList.add(Message(
-        false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
+    msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
+    msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
     msgList.isEmpty ? isInfoClicked = true : isInfoClicked = false;
   }
 
@@ -58,6 +59,23 @@ class _MessageFrameState extends State<MessageFrame> {
 
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: ExpandableFab(
+          distance: 80,
+          children: [
+            ActionButton(
+              onPressed: () {
+                //todo: correction 창 올리기
+              },
+              icon: const Icon(Icons.message_rounded),
+            ),
+            ActionButton(
+              onPressed: () {
+                //todo: question 창 올리기
+              },
+              icon: const Icon(FontAwesomeIcons.question),
+            ),
+          ],
+        ),
         body: Column(
           children: [
             MyWidget().getInfoWidget(infoHeight, MyStrings.messageInfo),
@@ -66,17 +84,17 @@ class _MessageFrameState extends State<MessageFrame> {
               child: Row(
                 children: [
                   Expanded(
-                    child: MyWidget().getSearchWidget(
-                        focusNode, controller, MyStrings.messageSearchHint),
+                    child: MyWidget().getSearchWidget(focusNode, controller, MyStrings.messageSearchHint),
                   ),
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(
-                      CupertinoIcons.ticket, color: MyColors.purple,),
+                      CupertinoIcons.ticket,
+                      color: MyColors.purple,
+                    ),
                   ),
-                  MyWidget().getTextWidget(
-                      '3', 15, MyColors.purple, isBold: true),
+                  MyWidget().getTextWidget('3', 15, MyColors.purple, isBold: true),
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {
@@ -85,7 +103,9 @@ class _MessageFrameState extends State<MessageFrame> {
                       });
                     },
                     icon: Icon(
-                      CupertinoIcons.info_circle_fill, color: infoIconColor,),
+                      CupertinoIcons.info_circle_fill,
+                      color: infoIconColor,
+                    ),
                   ),
                 ],
               ),
@@ -96,9 +116,7 @@ class _MessageFrameState extends State<MessageFrame> {
                 itemCount: msgList.length,
                 itemBuilder: (BuildContext context, int index) {
                   bool isUserMsg = msgList[index].isUserMsg;
-                  String image = isUserMsg
-                      ? 'assets/images/course_hangul.png'
-                      : 'assets/images/logo.png';
+                  String image = isUserMsg ? 'assets/images/course_hangul.png' : 'assets/images/logo.png';
                   String tag = msgList[index].tag;
                   String msg = msgList[index].msg;
                   String date = msgList[index].date;
@@ -106,48 +124,48 @@ class _MessageFrameState extends State<MessageFrame> {
                 },
               ),
             ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Wrap(
-                      children: [
-                        getTagBtn(MyStrings.tagCorrection, () {
-                          setState(() {
-                            selectedTag = MyStrings.tagCorrection;
-                          });
-                        }),
-                        const SizedBox(width: 5),
-                        getTagBtn(MyStrings.tagQuestion, () {
-                          setState(() {
-                            selectedTag = MyStrings.tagQuestion;
-                          });
-                        }),
-                        const SizedBox(width: 5),
-                        getTagBtn(MyStrings.tagNotice, () {
-                          setState(() {
-                            selectedTag = MyStrings.tagNotice;
-                          });
-                        }),
-                      ],
-                    ),
-                  ),
-                  const Divider(color: Colors.white, height: 20,),
-                  if(selectedTag != null && selectedTag != MyStrings.tagNotice)
-                    getExpandWidget(isPremiumUser, selectedTag!, (){}),
-                ],
-              ),
-            )
+            // AnimatedContainer(
+            //   duration: const Duration(milliseconds: 500),
+            //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            //   decoration: const BoxDecoration(
+            //     color: Colors.red,
+            //     borderRadius: BorderRadius.only(
+            //       topLeft: Radius.circular(10),
+            //       topRight: Radius.circular(10),
+            //     ),
+            //   ),
+            //   child: Column(
+            //     children: [
+            //       Align(
+            //         alignment: Alignment.topLeft,
+            //         child: Wrap(
+            //           children: [
+            //             getTagBtn(MyStrings.tagCorrection, () {
+            //               setState(() {
+            //                 selectedTag = MyStrings.tagCorrection;
+            //               });
+            //             }),
+            //             const SizedBox(width: 5),
+            //             getTagBtn(MyStrings.tagQuestion, () {
+            //               setState(() {
+            //                 selectedTag = MyStrings.tagQuestion;
+            //               });
+            //             }),
+            //             const SizedBox(width: 5),
+            //             getTagBtn(MyStrings.tagNotice, () {
+            //               setState(() {
+            //                 selectedTag = MyStrings.tagNotice;
+            //               });
+            //             }),
+            //           ],
+            //         ),
+            //       ),
+            //       const Divider(color: Colors.white, height: 20,),
+            //       if(selectedTag != null && selectedTag != MyStrings.tagNotice)
+            //         getExpandWidget(isPremiumUser, selectedTag!, (){}),
+            //     ],
+            //   ),
+            // )
           ],
         ),
       ),
@@ -157,39 +175,38 @@ class _MessageFrameState extends State<MessageFrame> {
   Widget getExpandWidget(bool isPremiumUser, String tag, Function f) {
     String hint = '';
 
-    if(isPremiumUser) {
+    if (isPremiumUser) {
       switch (tag) {
-        case MyStrings.tagCorrection :
+        case MyStrings.tagCorrection:
           hint = MyStrings.correctionHint;
           break;
 
-        case MyStrings.tagQuestion :
+        case MyStrings.tagQuestion:
           hint = MyStrings.questionHint;
           break;
       }
       return Column(
         children: [
-          const Align(
-            alignment: Alignment.topRight,
-            child: Text('0/30')
-          ),
+          const Align(alignment: Alignment.topRight, child: Text('0/30')),
           const SizedBox(height: 5),
           MyWidget().getTextFieldWidget(hint, 15),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: MyWidget().getRoundBtnWidget(
-                true, MyStrings.send, MyColors.purple, Colors.white, f()),
+            child: MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f()),
           )
         ],
       );
-
     } else {
       return MyWidget().getRoundBtnWidget(
-        false, MyStrings.podoPremium, MyColors.purple, Colors.white, f(), horizontalPadding: 5,
+        false,
+        MyStrings.podoPremium,
+        MyColors.purple,
+        Colors.white,
+        f(),
+        horizontalPadding: 5,
       );
     }
   }
-
 
   Widget getTagBtn(String text, Function f) {
     return ElevatedButton(
@@ -206,8 +223,7 @@ class _MessageFrameState extends State<MessageFrame> {
     );
   }
 
-  Widget getMsgItem(bool isUserMsg, String image, String tag, String msg,
-      String date) {
+  Widget getMsgItem(bool isUserMsg, String image, String tag, String msg, String date) {
     List<Widget> widgets;
     Color msgColor;
     if (isUserMsg) {
