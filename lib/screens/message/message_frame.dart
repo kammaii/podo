@@ -22,11 +22,13 @@ class _MessageFrameState extends State<MessageFrame> {
   List<Message> msgList = [];
   late FocusNode focusNode;
   late TextEditingController controller;
-  late Color infoIconColor;
-  late double infoHeight;
+  late double notificationHeight;
+  late bool isNotificationClicked;
   bool isPremiumUser = true; //todo: DB에서 받아오기
   String? selectedTag;
   late int correctionCount;
+
+  String notification = 'New version has been released.\n\nOnline lesson is coming soon.';  //todo: DB에서 받아오기
 
   @override
   void initState() {
@@ -34,9 +36,12 @@ class _MessageFrameState extends State<MessageFrame> {
     correctionCount = 1;
     focusNode = FocusNode();
     controller = TextEditingController();
+    isNotificationClicked = false;
     msgList = [];
-    msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-    msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
+    msgList.add(Message(false, '', MyStrings.messageInfo, ''));
+    //todo: 이후의 메시지는 DB에서 가져오기
+    // msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
+    // msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
   }
 
   @override
@@ -50,13 +55,7 @@ class _MessageFrameState extends State<MessageFrame> {
   Widget build(BuildContext context) {
     //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
 
-    if (isInfoClicked) {
-      infoIconColor = MyColors.grey;
-      infoHeight = 80;
-    } else {
-      infoIconColor = MyColors.green;
-      infoHeight = 0;
-    }
+    notificationHeight = 120;
 
     return SafeArea(
       child: Scaffold(
@@ -81,12 +80,44 @@ class _MessageFrameState extends State<MessageFrame> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            MyWidget().getInfoWidget(infoHeight, MyStrings.messageInfo),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
+        body: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.fastOutSlowIn,
+                height: notificationHeight,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: MyColors.greenLight,
+                ),
+                child: GestureDetector(
+                  onTap: (){
+                    setState(() {
+
+                    });
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(FontAwesomeIcons.bullhorn, color: MyColors.greenDark,),
+                          const SizedBox(width: 20),
+                          Expanded(child: MyWidget().getTextWidget(MyStrings.notification, 15, MyColors.greenDark)),
+                          const Icon(Icons.arrow_drop_down, color: MyColors.greenDark),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(notification),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
                 children: [
                   Expanded(
                     child: MyWidget().getSearchWidget(focusNode, controller, MyStrings.messageSearchHint),
@@ -101,35 +132,23 @@ class _MessageFrameState extends State<MessageFrame> {
                   ),
                   MyWidget().getTextWidget('3', 15, MyColors.purple, isBold: true),
                   const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isInfoClicked = !isInfoClicked;
-                      });
-                    },
-                    icon: Icon(
-                      CupertinoIcons.info_circle_fill,
-                      color: infoIconColor,
-                    ),
-                  ),
                 ],
               ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(10),
-                itemCount: msgList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  bool isUserMsg = msgList[index].isUserMsg;
-                  String image = isUserMsg ? 'assets/images/course_hangul.png' : 'assets/images/logo.png';
-                  String tag = msgList[index].tag;
-                  String msg = msgList[index].msg;
-                  String date = msgList[index].date;
-                  return getMsgItem(isUserMsg, image, tag, msg, date);
-                },
+              Expanded(
+                child: ListView.builder(
+                  itemCount: msgList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    bool isUserMsg = msgList[index].isUserMsg;
+                    String image = isUserMsg ? 'assets/images/course_hangul.png' : 'assets/images/logo.png';
+                    String tag = msgList[index].tag;
+                    String msg = msgList[index].msg;
+                    String date = msgList[index].date;
+                    return getMsgItem(isUserMsg, image, tag, msg, date);
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

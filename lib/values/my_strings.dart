@@ -28,7 +28,7 @@ class MyStrings {
   static const String beginnerLevel = 'Beginner level';
   static const String summary = 'summary';
   static const String home = 'home';
-  static const String messageInfo = 'It\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
+  static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
   static const String sentences = 'sentences';
   static const String review = 'Review';
@@ -70,5 +70,6 @@ class MyStrings {
   static const String advanced = 'Advanced';
   static const String unlockEveryLessons = 'Unlock every lessons';
   static const String startFreeTrial = 'Start free trial!';
+  static const String notification = 'Notification';
 
 }
