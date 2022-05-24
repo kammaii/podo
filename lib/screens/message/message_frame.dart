@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
+import 'package:podo/screens/message/textfield_item.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
@@ -27,7 +28,7 @@ class _MessageFrameState extends State<MessageFrame> {
   bool isPremiumUser = true; //todo: DB에서 받아오기
   String? selectedTag;
   late int correctionCount;
-  List<Widget> correctionTextFields = [];
+  List<TextFieldItem> correctionTextFields = [];
 
   String notification = 'New version has been released.\n\nOnline lesson is coming soon.'; //todo: DB에서 받아오기
 
@@ -38,7 +39,7 @@ class _MessageFrameState extends State<MessageFrame> {
     focusNode = FocusNode();
     controller = TextEditingController();
     isNotificationClicked = false;
-    correctionTextFields.add(getTextField(MyStrings.correctionHint));
+    correctionTextFields.add(TextFieldItem(MyStrings.correctionHint, true, false));
     msgList = [];
     msgList.add(Message(false, '', MyStrings.messageInfo, ''));
     //todo: 이후의 메시지는 DB에서 가져오기
@@ -67,7 +68,9 @@ class _MessageFrameState extends State<MessageFrame> {
             ActionButton(
               onPressed: () {
                 Get.bottomSheet(
-                  getBottomSheet(isPremiumUser, MyStrings.tagCorrection, () {}),
+                  getBottomSheet(MyStrings.tagCorrection, () {
+                    //todo: correction 보내기
+                  }),
                   isScrollControlled: true,
                 );
               },
@@ -76,7 +79,9 @@ class _MessageFrameState extends State<MessageFrame> {
             ActionButton(
               onPressed: () {
                 Get.bottomSheet(
-                  getBottomSheet(isPremiumUser, MyStrings.tagQuestion, () {}),
+                  getBottomSheet(MyStrings.tagQuestion, () {
+                    //todo: question 보내기
+                  }),
                 );
               },
               icon: const Icon(FontAwesomeIcons.question),
@@ -160,12 +165,33 @@ class _MessageFrameState extends State<MessageFrame> {
     );
   }
 
-  Widget getBottomSheet(bool isPremiumUser, String tag, Function f) {
+  Widget getBottomSheet(String tag, Function f) {
     bool isCorrection;
     (tag == MyStrings.tagCorrection) ? isCorrection = true : isCorrection = false;
 
     return StatefulBuilder(
       builder: (context, reRender) {
+        List<Widget> correctionTextFieldWidgets = [];
+
+        if(isCorrection) {
+          for(int i=0; i<correctionTextFields.length; i++) {
+            correctionTextFields[i].setAddFunction(() {
+              reRender(() {
+                for(TextFieldItem item in correctionTextFields) {
+                  item.hasAddBtn = false;
+                }
+                correctionTextFields.add(TextFieldItem('', true, true));
+              });
+            });
+            correctionTextFields[i].setRemoveFunction(() {
+              reRender(() {
+                //todo:해당 textField 삭제
+              });
+            });
+            correctionTextFieldWidgets.add(correctionTextFields[i].getWidget());
+          }
+        }
+
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -191,22 +217,8 @@ class _MessageFrameState extends State<MessageFrame> {
                 ),
                 const SizedBox(height: 10),
                 isCorrection
-                    ? Column(children: correctionTextFields)
-                    : getTextField(MyStrings.questionHint),
-                Visibility(
-                  visible: isCorrection,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.add_circle_outline,
-                      color: MyColors.purple,
-                    ),
-                    onPressed: () {
-                      reRender(() {
-                        correctionTextFields.add(getTextField(''));
-                      });
-                    },
-                  ),
-                ),
+                    ? Column(children: correctionTextFieldWidgets)
+                    : TextFieldItem(MyStrings.questionHint, false, false).getWidget(),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child:
@@ -217,35 +229,6 @@ class _MessageFrameState extends State<MessageFrame> {
           ),
         );
       },
-    );
-  }
-
-  Widget getTextField(String hint) {
-    return Column(
-      children: [
-        const Align(alignment: Alignment.topRight, child: Text('0/30')),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(
-            children: [
-              Expanded(child: MyWidget().getTextFieldWidget(hint, 15)),
-              const SizedBox(width: 10),
-              Visibility(
-                visible: hasRemoveBtn,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.remove_circle_outline,
-                    color: MyColors.purple,
-                  ),
-                  onPressed: () {
-                    //todo: 해당 textField 지우기
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

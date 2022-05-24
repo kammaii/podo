@@ -9,9 +9,17 @@ class TextFieldItem {
   VoidCallback? addFunction;
   VoidCallback? removeFunction;
 
-  TextFieldItem(this.hint, this.hasAddBtn, this.hasRemoveBtn, [this.addFunction, this.removeFunction]);
+  TextFieldItem(this.hint, this.hasAddBtn, this.hasRemoveBtn);
 
-  Widget getTextFieldItem() {
+  void setAddFunction(VoidCallback f) {
+    addFunction = f;
+  }
+
+  void setRemoveFunction(VoidCallback f) {
+    removeFunction = f;
+  }
+
+  Widget getWidget() {
     return Column(
       children: [
         const Align(alignment: Alignment.topRight, child: Text('0/30')),
