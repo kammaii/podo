@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
@@ -21,21 +22,21 @@ class _MessageFrameState extends State<MessageFrame> {
   List<Message> msgList = [];
   late FocusNode focusNode;
   late TextEditingController controller;
-  late bool isInfoClicked;
   late Color infoIconColor;
   late double infoHeight;
   bool isPremiumUser = true; //todo: DB에서 받아오기
   String? selectedTag;
+  late int correctionCount;
 
   @override
   void initState() {
     super.initState();
+    correctionCount = 1;
     focusNode = FocusNode();
     controller = TextEditingController();
     msgList = [];
-    msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
     msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-    msgList.isEmpty ? isInfoClicked = true : isInfoClicked = false;
+    msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
   }
 
   @override
@@ -50,10 +51,10 @@ class _MessageFrameState extends State<MessageFrame> {
     //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
 
     if (isInfoClicked) {
-      infoIconColor = MyColors.green;
+      infoIconColor = MyColors.grey;
       infoHeight = 80;
     } else {
-      infoIconColor = MyColors.grey;
+      infoIconColor = MyColors.green;
       infoHeight = 0;
     }
 
@@ -64,13 +65,17 @@ class _MessageFrameState extends State<MessageFrame> {
           children: [
             ActionButton(
               onPressed: () {
-                //todo: correction 창 올리기
+                Get.bottomSheet(
+                  getBottomSheet(isPremiumUser, MyStrings.tagCorrection, (){}),
+                );
               },
               icon: const Icon(Icons.message_rounded),
             ),
             ActionButton(
               onPressed: () {
-                //todo: question 창 올리기
+                Get.bottomSheet(
+                  getBottomSheet(isPremiumUser, MyStrings.tagQuestion, (){}),
+                );
               },
               icon: const Icon(FontAwesomeIcons.question),
             ),
@@ -124,103 +129,78 @@ class _MessageFrameState extends State<MessageFrame> {
                 },
               ),
             ),
-            // AnimatedContainer(
-            //   duration: const Duration(milliseconds: 500),
-            //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            //   decoration: const BoxDecoration(
-            //     color: Colors.red,
-            //     borderRadius: BorderRadius.only(
-            //       topLeft: Radius.circular(10),
-            //       topRight: Radius.circular(10),
-            //     ),
-            //   ),
-            //   child: Column(
-            //     children: [
-            //       Align(
-            //         alignment: Alignment.topLeft,
-            //         child: Wrap(
-            //           children: [
-            //             getTagBtn(MyStrings.tagCorrection, () {
-            //               setState(() {
-            //                 selectedTag = MyStrings.tagCorrection;
-            //               });
-            //             }),
-            //             const SizedBox(width: 5),
-            //             getTagBtn(MyStrings.tagQuestion, () {
-            //               setState(() {
-            //                 selectedTag = MyStrings.tagQuestion;
-            //               });
-            //             }),
-            //             const SizedBox(width: 5),
-            //             getTagBtn(MyStrings.tagNotice, () {
-            //               setState(() {
-            //                 selectedTag = MyStrings.tagNotice;
-            //               });
-            //             }),
-            //           ],
-            //         ),
-            //       ),
-            //       const Divider(color: Colors.white, height: 20,),
-            //       if(selectedTag != null && selectedTag != MyStrings.tagNotice)
-            //         getExpandWidget(isPremiumUser, selectedTag!, (){}),
-            //     ],
-            //   ),
-            // )
           ],
         ),
       ),
     );
   }
 
-  Widget getExpandWidget(bool isPremiumUser, String tag, Function f) {
+  Widget getBottomSheet(bool isPremiumUser, String tag, Function f) {
     String hint = '';
+    bool isCorrection = false;
 
-    if (isPremiumUser) {
-      switch (tag) {
-        case MyStrings.tagCorrection:
-          hint = MyStrings.correctionHint;
-          break;
+    switch (tag) {
+      case MyStrings.tagCorrection:
+        isCorrection = true;
+        hint = MyStrings.correctionHint;
+        break;
 
-        case MyStrings.tagQuestion:
-          hint = MyStrings.questionHint;
-          break;
-      }
+      case MyStrings.tagQuestion:
+        hint = MyStrings.questionHint;
+        break;
+    }
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                MyWidget().getTextWidget(tag, 20, MyColors.purple),
+                IconButton(
+                  icon: const Icon(CupertinoIcons.xmark), color: MyColors.purple,
+                  onPressed: (){Get.back();},
+                )
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Align(alignment: Alignment.topRight, child: Text('0/30')),
+            const SizedBox(height: 10),
+            getTextField(hint, isCorrection),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f()),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget getTextField(String hint, bool isCorrection) {
+    if(isCorrection) {
       return Column(
         children: [
-          const Align(alignment: Alignment.topRight, child: Text('0/30')),
-          const SizedBox(height: 5),
           MyWidget().getTextFieldWidget(hint, 15),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f()),
-          )
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline, color: MyColors.purple,),
+            onPressed: () {
+              setState(() {
+                //todo: textField 추가
+              });
+            },
+          ),
         ],
       );
     } else {
-      return MyWidget().getRoundBtnWidget(
-        false,
-        MyStrings.podoPremium,
-        MyColors.purple,
-        Colors.white,
-        f(),
-        horizontalPadding: 5,
-      );
+      return MyWidget().getTextFieldWidget(hint, 15);
     }
-  }
-
-  Widget getTagBtn(String text, Function f) {
-    return ElevatedButton(
-      onPressed: () {
-        f();
-      },
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        primary: MyColors.green,
-      ),
-      child: Text(text),
-    );
   }
 
   Widget getMsgItem(bool isUserMsg, String image, String tag, String msg, String date) {
