@@ -27,8 +27,9 @@ class _MessageFrameState extends State<MessageFrame> {
   bool isPremiumUser = true; //todo: DB에서 받아오기
   String? selectedTag;
   late int correctionCount;
+  List<Widget> correctionTextFields = [];
 
-  String notification = 'New version has been released.\n\nOnline lesson is coming soon.';  //todo: DB에서 받아오기
+  String notification = 'New version has been released.\n\nOnline lesson is coming soon.'; //todo: DB에서 받아오기
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _MessageFrameState extends State<MessageFrame> {
     focusNode = FocusNode();
     controller = TextEditingController();
     isNotificationClicked = false;
+    correctionTextFields.add(getTextField(MyStrings.correctionHint));
     msgList = [];
     msgList.add(Message(false, '', MyStrings.messageInfo, ''));
     //todo: 이후의 메시지는 DB에서 가져오기
@@ -65,7 +67,8 @@ class _MessageFrameState extends State<MessageFrame> {
             ActionButton(
               onPressed: () {
                 Get.bottomSheet(
-                  getBottomSheet(isPremiumUser, MyStrings.tagCorrection, (){}),
+                  getBottomSheet(isPremiumUser, MyStrings.tagCorrection, () {}),
+                  isScrollControlled: true,
                 );
               },
               icon: const Icon(Icons.message_rounded),
@@ -73,7 +76,7 @@ class _MessageFrameState extends State<MessageFrame> {
             ActionButton(
               onPressed: () {
                 Get.bottomSheet(
-                  getBottomSheet(isPremiumUser, MyStrings.tagQuestion, (){}),
+                  getBottomSheet(isPremiumUser, MyStrings.tagQuestion, () {}),
                 );
               },
               icon: const Icon(FontAwesomeIcons.question),
@@ -94,19 +97,22 @@ class _MessageFrameState extends State<MessageFrame> {
                   color: MyColors.greenLight,
                 ),
                 child: GestureDetector(
-                  onTap: (){
-                    setState(() {
-
-                    });
+                  onTap: () {
+                    setState(() {});
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(FontAwesomeIcons.bullhorn, color: MyColors.greenDark,),
+                          const Icon(
+                            FontAwesomeIcons.bullhorn,
+                            color: MyColors.greenDark,
+                          ),
                           const SizedBox(width: 20),
-                          Expanded(child: MyWidget().getTextWidget(MyStrings.notification, 15, MyColors.greenDark)),
+                          Expanded(
+                              child:
+                                  MyWidget().getTextWidget(MyStrings.notification, 15, MyColors.greenDark)),
                           const Icon(Icons.arrow_drop_down, color: MyColors.greenDark),
                         ],
                       ),
@@ -155,71 +161,92 @@ class _MessageFrameState extends State<MessageFrame> {
   }
 
   Widget getBottomSheet(bool isPremiumUser, String tag, Function f) {
-    String hint = '';
-    bool isCorrection = false;
+    bool isCorrection;
+    (tag == MyStrings.tagCorrection) ? isCorrection = true : isCorrection = false;
 
-    switch (tag) {
-      case MyStrings.tagCorrection:
-        isCorrection = true;
-        hint = MyStrings.correctionHint;
-        break;
-
-      case MyStrings.tagQuestion:
-        hint = MyStrings.questionHint;
-        break;
-    }
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return StatefulBuilder(
+      builder: (context, reRender) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                MyWidget().getTextWidget(tag, 20, MyColors.purple),
-                IconButton(
-                  icon: const Icon(CupertinoIcons.xmark), color: MyColors.purple,
-                  onPressed: (){Get.back();},
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    MyWidget().getTextWidget(tag, 20, MyColors.purple),
+                    IconButton(
+                      icon: const Icon(CupertinoIcons.xmark),
+                      color: MyColors.purple,
+                      onPressed: () {
+                        Get.back();
+                      },
+                    )
+                  ],
+                ),
+                const SizedBox(height: 10),
+                isCorrection
+                    ? Column(children: correctionTextFields)
+                    : getTextField(MyStrings.questionHint),
+                Visibility(
+                  visible: isCorrection,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.add_circle_outline,
+                      color: MyColors.purple,
+                    ),
+                    onPressed: () {
+                      reRender(() {
+                        correctionTextFields.add(getTextField(''));
+                      });
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child:
+                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f()),
                 )
               ],
             ),
-            const SizedBox(height: 10),
-            const Align(alignment: Alignment.topRight, child: Text('0/30')),
-            const SizedBox(height: 10),
-            getTextField(hint, isCorrection),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f()),
-            )
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget getTextField(String hint, bool isCorrection) {
-    if(isCorrection) {
-      return Column(
-        children: [
-          MyWidget().getTextFieldWidget(hint, 15),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: MyColors.purple,),
-            onPressed: () {
-              setState(() {
-                //todo: textField 추가
-              });
-            },
+  Widget getTextField(String hint) {
+    return Column(
+      children: [
+        const Align(alignment: Alignment.topRight, child: Text('0/30')),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              Expanded(child: MyWidget().getTextFieldWidget(hint, 15)),
+              const SizedBox(width: 10),
+              Visibility(
+                visible: hasRemoveBtn,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: MyColors.purple,
+                  ),
+                  onPressed: () {
+                    //todo: 해당 textField 지우기
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      );
-    } else {
-      return MyWidget().getTextFieldWidget(hint, 15);
-    }
+        ),
+      ],
+    );
   }
 
   Widget getMsgItem(bool isUserMsg, String image, String tag, String msg, String date) {
