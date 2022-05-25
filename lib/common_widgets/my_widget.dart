@@ -256,8 +256,9 @@ class MyWidget {
     );
   }
 
-  Widget getTextFieldWidget(String hint, double fontSize) {
+  Widget getTextFieldWidget(String hint, double fontSize, {TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       maxLines: null,
       cursorColor: Colors.black,
       style: TextStyle(fontSize: fontSize),

@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
-import 'package:podo/screens/message/textfield_item.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
@@ -22,13 +21,13 @@ class _MessageFrameState extends State<MessageFrame> {
   String podoImage = 'assets/images/logo.png';
   List<Message> msgList = [];
   late FocusNode focusNode;
-  late TextEditingController controller;
+  late TextEditingController _searchController;
   late double notificationHeight;
   late bool isNotificationClicked;
   bool isPremiumUser = true; //todo: DB에서 받아오기
   String? selectedTag;
   late int correctionCount;
-  List<TextFieldItem> correctionTextFields = [];
+  late List<TextFieldItem> textFieldItems;
 
   String notification = 'New version has been released.\n\nOnline lesson is coming soon.'; //todo: DB에서 받아오기
 
@@ -36,10 +35,10 @@ class _MessageFrameState extends State<MessageFrame> {
   void initState() {
     super.initState();
     correctionCount = 1;
+    textFieldItems = [];
     focusNode = FocusNode();
-    controller = TextEditingController();
+    _searchController = TextEditingController();
     isNotificationClicked = false;
-    correctionTextFields.add(TextFieldItem(MyStrings.correctionHint, true, false));
     msgList = [];
     msgList.add(Message(false, '', MyStrings.messageInfo, ''));
     //todo: 이후의 메시지는 DB에서 가져오기
@@ -51,7 +50,7 @@ class _MessageFrameState extends State<MessageFrame> {
   void dispose() {
     super.dispose();
     focusNode.dispose();
-    controller.dispose();
+    _searchController.dispose();
   }
 
   @override
@@ -131,7 +130,7 @@ class _MessageFrameState extends State<MessageFrame> {
               Row(
                 children: [
                   Expanded(
-                    child: MyWidget().getSearchWidget(focusNode, controller, MyStrings.messageSearchHint),
+                    child: MyWidget().getSearchWidget(focusNode, _searchController, MyStrings.messageSearchHint),
                   ),
                   const SizedBox(width: 10),
                   IconButton(
@@ -167,29 +166,32 @@ class _MessageFrameState extends State<MessageFrame> {
 
   Widget getBottomSheet(String tag, Function f) {
     bool isCorrection;
-    (tag == MyStrings.tagCorrection) ? isCorrection = true : isCorrection = false;
+    textFieldItems.clear();
+
+    if(tag == MyStrings.tagCorrection) {
+      isCorrection = true;
+      textFieldItems.add(TextFieldItem(MyStrings.correctionHint, false));
+    } else {
+      isCorrection = false;
+      textFieldItems.add(TextFieldItem(MyStrings.questionHint, false));
+    }
 
     return StatefulBuilder(
       builder: (context, reRender) {
-        List<Widget> correctionTextFieldWidgets = [];
+        List<Widget> textFieldWidgets = [];
 
         if(isCorrection) {
-          for(int i=0; i<correctionTextFields.length; i++) {
-            correctionTextFields[i].setAddFunction(() {
+          for(int i=0; i<textFieldItems.length; i++) {
+            textFieldItems[i].setRemoveFunction(() {
               reRender(() {
-                for(TextFieldItem item in correctionTextFields) {
-                  item.hasAddBtn = false;
-                }
-                correctionTextFields.add(TextFieldItem('', true, true));
+                int removeIdx = textFieldItems.indexWhere((element) => element.key == textFieldItems[i].key);
+                textFieldItems.removeAt(removeIdx);
               });
             });
-            correctionTextFields[i].setRemoveFunction(() {
-              reRender(() {
-                //todo:해당 textField 삭제
-              });
-            });
-            correctionTextFieldWidgets.add(correctionTextFields[i].getWidget());
+            textFieldWidgets.add(textFieldItems[i].getWidget());
           }
+        } else {
+          textFieldWidgets.add(textFieldItems[0].getWidget());
         }
 
         return Container(
@@ -216,13 +218,29 @@ class _MessageFrameState extends State<MessageFrame> {
                   ],
                 ),
                 const SizedBox(height: 10),
+                Column(children: textFieldWidgets), //todo: AnimatedList로 변경하기
                 isCorrection
-                    ? Column(children: correctionTextFieldWidgets)
-                    : TextFieldItem(MyStrings.questionHint, false, false).getWidget(),
+                  ?IconButton(
+                    icon: const Icon(
+                      Icons.add_circle_outline,
+                      color: MyColors.purple,
+                    ),
+                    onPressed: () {
+                      reRender(() {
+                        if(textFieldItems.length <= 1) {
+                          for (TextFieldItem item in textFieldItems) {
+                            item.hasRemoveBtn = true;
+                          }
+                        }
+                        textFieldItems.add(TextFieldItem('',true));
+                      });
+                    },
+                  )
+                  : const SizedBox.shrink(),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child:
-                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f()),
+                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f),
                 )
               ],
             ),
@@ -283,6 +301,47 @@ class _MessageFrameState extends State<MessageFrame> {
         Align(
           alignment: Alignment.topRight,
           child: MyWidget().getTextWidget(date, 13, MyColors.grey),
+        ),
+      ],
+    );
+  }
+}
+
+
+class TextFieldItem {
+  Key key = UniqueKey();
+  late String hint;
+  late bool hasRemoveBtn;
+  VoidCallback? removeFunction;
+  TextEditingController controller = TextEditingController();
+
+  TextFieldItem(this.hint, this.hasRemoveBtn);
+
+  void setRemoveFunction(VoidCallback f) {
+    removeFunction = f;
+  }
+
+  Widget getWidget() {
+    return Column(
+      children: [
+        const Align(alignment: Alignment.topRight, child: Text('0/30')),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              Expanded(child: MyWidget().getTextFieldWidget(hint, 15, controller: controller)),
+              const SizedBox(width: 10),
+              hasRemoveBtn
+                  ? IconButton(
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: MyColors.purple,
+                  ),
+                  onPressed: removeFunction
+              )
+                  : const SizedBox.shrink(),
+            ],
+          ),
         ),
       ],
     );
