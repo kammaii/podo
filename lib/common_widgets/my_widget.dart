@@ -152,9 +152,9 @@ class MyWidget {
   }
 
   Widget getRoundBtnWidget(
-      bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? horizontalPadding, double? innerVerticalPadding}) {
+      bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? horizontalPadding, double? innerVerticalPadding, int? coinCount}) {
     if (horizontalPadding == null) {
-      return roundBtnWidget(isRequest, text, bgColor, fontColor, f, innerVerticalPadding: innerVerticalPadding);
+      return roundBtnWidget(isRequest, text, bgColor, fontColor, f, innerVerticalPadding: innerVerticalPadding, coinCount: coinCount);
     } else {
       return Row(
         children: [
@@ -169,7 +169,7 @@ class MyWidget {
     }
   }
 
-  Widget roundBtnWidget(bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? innerVerticalPadding}) {
+  Widget roundBtnWidget(bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? innerVerticalPadding, int? coinCount}) {
     double verticalPadding;
     isRequest ? verticalPadding = 5 : verticalPadding = 13;
     if(innerVerticalPadding != null) {
@@ -213,7 +213,7 @@ class MyWidget {
                         children: [
                           const Icon(CupertinoIcons.ticket),
                           const SizedBox(width: 5),
-                          Text(UserInfo().coins.toString()),
+                          Text(coinCount.toString()),
                         ],
                       )
                     ],

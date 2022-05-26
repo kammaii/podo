@@ -71,5 +71,8 @@ class MyStrings {
   static const String unlockEveryLessons = 'Unlock every lessons';
   static const String startFreeTrial = 'Start free trial!';
   static const String notification = 'Notification';
+  static const String coinAlertTitle = 'You don\'t have enough coins.';
+  static const String coinAlertSubTitlePremium = '3 coins will be charged tomorrow.';
+  static const String coinAlertSubTitleNoPremium = 'Would you like to subscribe to the app and get 3 coins every day?';
 
 }

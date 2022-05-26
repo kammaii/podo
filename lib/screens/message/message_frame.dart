@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
+import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -162,28 +163,26 @@ class _MessageFrameState extends State<MessageFrame> {
   }
 
   Widget getBottomSheet(String tag) {
-
-    bool isCorrection;
     textFieldItems.clear();
 
     if(tag == MyStrings.tagCorrection) {
-      isCorrection = true;
       textFieldItems.add(TextFieldItem(MyStrings.correctionHint, false));
     } else {
-      isCorrection = false;
       textFieldItems.add(TextFieldItem(MyStrings.questionHint, false));
     }
+    int coinCount = 1;
 
     return StatefulBuilder(
       builder: (context, reRender) {
         List<Widget> textFieldWidgets = [];
 
-        if(isCorrection) {
+        if(tag == MyStrings.tagCorrection) {
           for(int i=0; i<textFieldItems.length; i++) {
             textFieldItems[i].setRemoveFunction(() {
               reRender(() {
                 int removeIdx = textFieldItems.indexWhere((element) => element.key == textFieldItems[i].key);
                 textFieldItems.removeAt(removeIdx);
+                coinCount--;
               });
             });
             textFieldWidgets.add(textFieldItems[i].getWidget());
@@ -217,21 +216,51 @@ class _MessageFrameState extends State<MessageFrame> {
                 ),
                 const SizedBox(height: 10),
                 Column(children: textFieldWidgets), //todo: AnimatedList로 변경하기
-                isCorrection
+                tag == MyStrings.tagCorrection
                   ?IconButton(
                     icon: const Icon(
                       Icons.add_circle_outline,
                       color: MyColors.purple,
                     ),
                     onPressed: () {
-                      reRender(() {
-                        if(textFieldItems.length <= 1) {
-                          for (TextFieldItem item in textFieldItems) {
-                            item.hasRemoveBtn = true;
+                      if(UserInfo().coins == coinCount) {
+                        UserInfo().isPremium
+                        ? Get.defaultDialog(
+                          titlePadding: const EdgeInsets.all(20),
+                          contentPadding: const EdgeInsets.only(bottom: 10),
+                          title: MyStrings.coinAlertTitle,
+                          middleText: MyStrings.coinAlertSubTitlePremium,
+                          onConfirm: (){
+                            Get.back();
+                          },
+                          confirmTextColor: Colors.white,
+                          buttonColor: MyColors.purple,
+                        )
+                        : Get.defaultDialog(
+                          titlePadding: const EdgeInsets.all(20),
+                          contentPadding: const EdgeInsets.all(15),
+                          title: MyStrings.coinAlertTitle,
+                          middleText: MyStrings.coinAlertSubTitleNoPremium,
+                          onConfirm: (){
+                            Get.back();
+                            Get.to(const Subscribe());
+                          },
+                          onCancel: (){},
+                          confirmTextColor: Colors.white,
+                          cancelTextColor: MyColors.purple,
+                          buttonColor: MyColors.purple,
+                        );
+                      } else {
+                        reRender(() {
+                          if(textFieldItems.length <= 1) {
+                            for (TextFieldItem item in textFieldItems) {
+                              item.hasRemoveBtn = true;
+                            }
                           }
-                        }
-                        textFieldItems.add(TextFieldItem('',true));
-                      });
+                          textFieldItems.add(TextFieldItem('',true));
+                          coinCount++;
+                        });
+                      }
                     },
                   )
                   : const SizedBox.shrink(),
@@ -244,7 +273,7 @@ class _MessageFrameState extends State<MessageFrame> {
                         for(TextFieldItem item in textFieldItems) {
                           requests.add(item.controller.text);
                         }
-                      }),
+                      }, coinCount: coinCount),
                 )
               ],
             ),
