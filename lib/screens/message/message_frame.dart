@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
+import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
@@ -67,9 +68,7 @@ class _MessageFrameState extends State<MessageFrame> {
             ActionButton(
               onPressed: () {
                 Get.bottomSheet(
-                  getBottomSheet(MyStrings.tagCorrection, () {
-                    //todo: correction 보내기
-                  }),
+                  getBottomSheet(MyStrings.tagCorrection),
                   isScrollControlled: true,
                 );
               },
@@ -78,9 +77,7 @@ class _MessageFrameState extends State<MessageFrame> {
             ActionButton(
               onPressed: () {
                 Get.bottomSheet(
-                  getBottomSheet(MyStrings.tagQuestion, () {
-                    //todo: question 보내기
-                  }),
+                  getBottomSheet(MyStrings.tagQuestion),
                 );
               },
               icon: const Icon(FontAwesomeIcons.question),
@@ -140,7 +137,7 @@ class _MessageFrameState extends State<MessageFrame> {
                       color: MyColors.purple,
                     ),
                   ),
-                  MyWidget().getTextWidget('3', 15, MyColors.purple, isBold: true),
+                  MyWidget().getTextWidget(UserInfo().coins.toString(), 15, MyColors.purple, isBold: true),
                   const SizedBox(width: 10),
                 ],
               ),
@@ -164,7 +161,8 @@ class _MessageFrameState extends State<MessageFrame> {
     );
   }
 
-  Widget getBottomSheet(String tag, Function f) {
+  Widget getBottomSheet(String tag) {
+
     bool isCorrection;
     textFieldItems.clear();
 
@@ -240,7 +238,13 @@ class _MessageFrameState extends State<MessageFrame> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child:
-                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, f),
+                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, (){
+                        //todo: DB에 저장할 때 correction 과 question 경로를 다르게 할 것
+                        List<String> requests = [];
+                        for(TextFieldItem item in textFieldItems) {
+                          requests.add(item.controller.text);
+                        }
+                      }),
                 )
               ],
             ),
@@ -269,7 +273,7 @@ class _MessageFrameState extends State<MessageFrame> {
       ];
     }
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
           Row(
@@ -307,18 +311,26 @@ class _MessageFrameState extends State<MessageFrame> {
   }
 }
 
-
-class TextFieldItem {
+//todo: 컨트롤러 dispose() 하기
+class TextFieldItem extends GetxController{
   Key key = UniqueKey();
   late String hint;
   late bool hasRemoveBtn;
   VoidCallback? removeFunction;
-  TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController();
 
   TextFieldItem(this.hint, this.hasRemoveBtn);
 
   void setRemoveFunction(VoidCallback f) {
     removeFunction = f;
+  }
+
+
+  @override
+  void onClose() {
+    debugPrint('TextFieldItem Closed!');
+    controller.dispose();
+    super.onClose();
   }
 
   Widget getWidget() {

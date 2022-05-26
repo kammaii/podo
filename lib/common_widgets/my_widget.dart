@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -209,10 +210,10 @@ class MyWidget {
                     children: [
                       const Text('consume'),
                       Row(
-                        children: const [
-                          Icon(CupertinoIcons.ticket),
-                          SizedBox(width: 5),
-                          Text('2'),
+                        children: [
+                          const Icon(CupertinoIcons.ticket),
+                          const SizedBox(width: 5),
+                          Text(UserInfo().coins.toString()),
                         ],
                       )
                     ],

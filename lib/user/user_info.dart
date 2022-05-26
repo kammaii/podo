@@ -10,10 +10,17 @@ class UserInfo {
 
   late String email;
   late String name;
-  bool isPremium = false; //todo: late bool isPremium;
+  late bool isPremium;
+  late int coins;
+
+  void setCoins(int coin) {
+    coins = coin;
+  }
 
   UserInfo.init() {
     debugPrint('userInfo 초기화');
+    coins = 3; //todo: DB에서 받아오기
+    isPremium = false; //todo: late bool isPremium;
   }
 
   void setUserEmail(String email) {
