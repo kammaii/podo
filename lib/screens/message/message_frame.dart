@@ -24,14 +24,17 @@ class _MessageFrameState extends State<MessageFrame> {
   List<Message> msgList = [];
   late FocusNode focusNode;
   late TextEditingController _searchController;
-  late double notificationHeight;
   late bool isNotificationClicked;
   bool isPremiumUser = true; //todo: DB에서 받아오기
   String? selectedTag;
   late int correctionCount;
   late List<TextFieldItem> textFieldItems;
 
-  String notification = 'New version has been released.\n\nOnline lesson is coming soon.'; //todo: DB에서 받아오기
+  String notification =
+      'New version has been released.\n\n'
+      'Online lesson is coming soon.\n\n'
+      'New version has been released.\n\n'
+      'Online lesson is coming soon.'; //todo: DB에서 받아오기
 
   @override
   void initState() {
@@ -59,7 +62,6 @@ class _MessageFrameState extends State<MessageFrame> {
   Widget build(BuildContext context) {
     //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
 
-    notificationHeight = 120;
 
     return SafeArea(
       child: Scaffold(
@@ -89,38 +91,33 @@ class _MessageFrameState extends State<MessageFrame> {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.fastOutSlowIn,
-                height: notificationHeight,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
+              Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  color: MyColors.greenLight,
-                ),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {});
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: ExpansionTile(
+                    title: Row(
+                      children: [
+                        const Icon(
+                          FontAwesomeIcons.bullhorn,
+                          color: MyColors.greenDark,
+                        ),
+                        const SizedBox(width: 20),
+                        MyWidget().getTextWidget(MyStrings.notification, 15, MyColors.greenDark),
+                      ],
+                    ),
                     children: [
                       Row(
                         children: [
-                          const Icon(
-                            FontAwesomeIcons.bullhorn,
-                            color: MyColors.greenDark,
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                              child:
-                                  MyWidget().getTextWidget(MyStrings.notification, 15, MyColors.greenDark)),
-                          const Icon(Icons.arrow_drop_down, color: MyColors.greenDark),
+                          Text(notification),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      Text(notification),
                     ],
+                    collapsedIconColor: MyColors.greenDark,
+                    iconColor: MyColors.greenDark,
+                    collapsedBackgroundColor: MyColors.greenLight,
+                    backgroundColor: MyColors.greenLight,
+                    childrenPadding: const EdgeInsets.all(10),
                   ),
                 ),
               ),
