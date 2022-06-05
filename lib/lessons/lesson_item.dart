@@ -1,18 +1,9 @@
 class LessonItem {
 
-  String? kr;
-  String? pron;
-  String? en;
-  String? audio;
+  String lessonId;
+  String title;
+  bool isVideoLesson;
+  bool isCompleted;
 
-  setExplainItem(String explain) {
-    en = explain;
-  }
-
-  setAudioItem(String kr, String pron, String en, String audio) {
-    kr = kr;
-    pron = pron;
-    en = en;
-    audio = audio;
-  }
+  LessonItem(this.lessonId, this.title, {this.isVideoLesson = false, this.isCompleted = false});
 }

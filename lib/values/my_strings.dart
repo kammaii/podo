@@ -74,5 +74,20 @@ class MyStrings {
   static const String coinAlertTitle = 'You don\'t have enough coins.';
   static const String coinAlertSubTitlePremium = '3 coins will be charged tomorrow.';
   static const String coinAlertSubTitleNoPremium = 'Would you like to subscribe to the app and get 3 coins every day?';
+  static const String listen = 'Listen';
+  static const String speakInKorean = 'Speak in Korean';
+  static const String skip = 'skip';
+  static const String listenAndClickAnswer = 'Listen and click the answer';
+
+
+
+
+  static const String subject = 'subject';
+  static const String explain = 'explain';
+  static const String practice = 'practice';
+  static const String speak = 'speak';
+  static const String quiz = 'quiz';
+  static const String swipe = 'swipe';
+
 
 }

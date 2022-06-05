@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/lessons/lesson_item.dart';
 import 'package:podo/lessons/lessons.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
@@ -24,28 +25,32 @@ class _LessonMainState extends State<LessonMain> {
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
-  double itemHeight = 80.0;
   late List<Widget> lessonWidgetList;
-
+  List<LessonItem> sampleItems = [
+    LessonItem('b_01', '주말에 뭐 했어요?'),
+    LessonItem('b_02', '내일 뭐 할 거예요?', isVideoLesson: true, isCompleted: true),
+  ];
 
   @override
   void initState() {
     super.initState();
     scrollController.addListener(() => setState(() {}));
     lessonWidgetList = [];
-    for(int i=0; i<Lessons.basicLesson.length; i++) {
-      if(!UserInfo().isPremium) {
-        if(i==0) {
-          lessonWidgetList.add(lessonList(i, false));
-        } else if(i==1) {
-          lessonWidgetList.add(premiumCard());
-        } else {
-          lessonWidgetList.add(lessonList(i-1, true));
-        }
+    bool isPremium = UserInfo().isPremium;
+
+    for(int i=0; i<sampleItems.length; i++) {
+      if(!isPremium) {
+        bool isLocked;
+        i==0 ? isLocked = false : isLocked = true;
+        lessonWidgetList.add(lessonList(sampleItems[i], isLocked));
 
       } else {
-        lessonWidgetList.add(lessonList(i, false));
+        lessonWidgetList.add(lessonList(sampleItems[i], false));
       }
+    }
+
+    if(!isPremium) {
+      lessonWidgetList.insert(1, premiumCard());
     }
   }
 
@@ -55,12 +60,9 @@ class _LessonMainState extends State<LessonMain> {
     scrollController.dispose();
   }
 
-  Widget lessonList(int index, bool isLocked) {
-    String lessonTitle = Lessons.basicLesson[index]![Lessons.TITLE]![0].toString();
-    String lessonSubTitle = Lessons.basicLesson[index]![Lessons.SUBTITLE]![0].toString();
-    return Container(
+  Widget lessonList(LessonItem item, bool isLocked) {
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      height: itemHeight,
       child: Card(
         color: isLocked ? MyColors.navyLightLight : Colors.white,
         child: InkWell(
@@ -73,8 +75,17 @@ class _LessonMainState extends State<LessonMain> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MyWidget().getTextWidget(lessonTitle, 20, isLocked ? MyColors.grey : MyColors.navy,),
-                MyWidget().getTextWidget(lessonSubTitle, 18, MyColors.grey,),
+                Row(
+                  children: [
+                    MyWidget().getTextWidget('lesson ${item.lessonId.split('_')[1]}', 15, MyColors.grey,),
+                    const SizedBox(width: 10,),
+                    item.isVideoLesson ? const Icon(FontAwesomeIcons.youtube, color: MyColors.red,) : const SizedBox.shrink(),
+                    const Spacer(),
+                    item.isCompleted ? const Icon(Icons.check_circle, color: MyColors.green,) : const SizedBox.shrink(),
+                  ],
+                ),
+                const SizedBox(height: 10,),
+                MyWidget().getTextWidget(item.title, 20, isLocked ? MyColors.grey : MyColors.navy,),
               ],
             ),
           ),
