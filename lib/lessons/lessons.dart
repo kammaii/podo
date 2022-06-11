@@ -3,7 +3,7 @@
 // import 'package:podo/lessons/lesson_strings.dart';
 // import 'package:podo/lessons/lesson_summary.dart';
 //
-// import 'lesson.dart';
+// import 'lesson_title.dart';
 //
 // class Lessons {
 //

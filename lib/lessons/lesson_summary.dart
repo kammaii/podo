@@ -1,9 +1,6 @@
 class LessonSummary {
-  int id;
-  String titleKr;
-  String titleEn;
-  String explanation;
-  List<String> examples;
+  final int lessonId;
+  final List<Map<String,List<String>>> contents;
 
-  LessonSummary(this.id, this.titleKr, this.titleEn, this.explanation, this.examples);
+  LessonSummary(this.lessonId, this.contents);
 }

@@ -16,11 +16,11 @@ class LessonFrame extends StatefulWidget {
 
 class _LessonFrameState extends State<LessonFrame> {
 
-  LessonCard subjectSample = LessonCard('b_01', '01', MyStrings.subject, kr: '~후에', en: 'after~');
-  LessonCard explainSample = LessonCard('b_01', '02', MyStrings.explain, explain: [MyStrings.lorem, MyStrings.lorem]);
-  LessonCard practiceSample = LessonCard('b_01', '03', MyStrings.practice, kr: '밥을 먹어요', pronun: '[바블머거요]', en: 'I have a meal', audio: 'practice.mp3');
-  LessonCard speakSample = LessonCard('b_01', '04', MyStrings.speak, kr: '학교에 가요', en: 'I go to school', audio: 'speak.mp3');
-  LessonCard quizSample = LessonCard('b_01', '05', MyStrings.quiz, question: '기역', examples: ['ㄱ', 'ㄴ','ㄷ','ㄹ'], audio: 'quiz.mp3');
+  LessonCard subjectSample = LessonCard('beginner_01', 0, MyStrings.subject, kr: '~후에', en: 'after~');
+  LessonCard explainSample = LessonCard('beginner_01', 1, MyStrings.explain, explain: [MyStrings.lorem, MyStrings.lorem]);
+  LessonCard practiceSample = LessonCard('beginner_01', 2, MyStrings.practice, kr: '밥을 먹어요', pronun: '[바블머거요]', en: 'I have a meal', audio: 'practice.mp3');
+  LessonCard speakSample = LessonCard('beginner_01', 3, MyStrings.speak, kr: '학교에 가요', en: 'I go to school', audio: 'speak.mp3');
+  LessonCard quizSample = LessonCard('beginner_01', 4, MyStrings.quiz, question: '기역', examples: ['ㄱ', 'ㄴ','ㄷ','ㄹ'], audio: 'quiz.mp3');
 
   List<LessonCard> cards = [];
 

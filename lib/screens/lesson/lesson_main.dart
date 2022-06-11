@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:podo/common_widgets/my_widget.dart';
-import 'package:podo/lessons/lesson_item.dart';
-import 'package:podo/lessons/lessons.dart';
+import 'package:podo/lessons/lesson_title.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/user/user_info.dart';
@@ -26,9 +24,10 @@ class _LessonMainState extends State<LessonMain> {
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
   late List<Widget> lessonWidgetList;
-  List<LessonItem> sampleItems = [
-    LessonItem('b_01', '주말에 뭐 했어요?'),
-    LessonItem('b_02', '내일 뭐 할 거예요?', isVideoLesson: true, isCompleted: true),
+  List<LessonTitle> sampleItems = [
+    LessonTitle('beginner', 0, 'Future tense', '주말에 뭐 했어요?'),
+    LessonTitle('beginner', 1, 'Future tense', '내일 뭐 할 거예요?', isVideo: true),
+    LessonTitle('beginner', 2, 'Past tense', '밥을 먹었어요'),
   ];
 
   @override
@@ -37,15 +36,21 @@ class _LessonMainState extends State<LessonMain> {
     scrollController.addListener(() => setState(() {}));
     lessonWidgetList = [];
     bool isPremium = UserInfo().isPremium;
+    bool hasCategory = true;
 
     for(int i=0; i<sampleItems.length; i++) {
+      if(i != 0 && sampleItems[i].category == sampleItems[i-1].category) {
+        hasCategory = false;
+      } else {
+        hasCategory = true;
+      }
       if(!isPremium) {
         bool isLocked;
         i==0 ? isLocked = false : isLocked = true;
-        lessonWidgetList.add(lessonList(sampleItems[i], isLocked));
+        lessonWidgetList.add(lessonList(sampleItems[i], hasCategory, isLocked));
 
       } else {
-        lessonWidgetList.add(lessonList(sampleItems[i], false));
+        lessonWidgetList.add(lessonList(sampleItems[i], hasCategory, false));
       }
     }
 
@@ -60,36 +65,46 @@ class _LessonMainState extends State<LessonMain> {
     scrollController.dispose();
   }
 
-  Widget lessonList(LessonItem item, bool isLocked) {
+  Widget lessonList(LessonTitle title, bool hasCategory, bool isLocked) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Card(
-        color: isLocked ? MyColors.navyLightLight : Colors.white,
-        child: InkWell(
-          onTap: (){
-            Get.to(const LessonFrame());
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      child: Column(
+        children: [
+          if(hasCategory)
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 5),
+            child: MyWidget().getTextWidget(title.category, 25, MyColors.navyLight),
+          ),
+          Card(
+            color: isLocked ? MyColors.navyLightLight : Colors.white,
+            child: InkWell(
+              onTap: (){
+                Get.to(const LessonFrame());
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    MyWidget().getTextWidget('lesson ${item.lessonId.split('_')[1]}', 15, MyColors.grey,),
-                    const SizedBox(width: 10,),
-                    item.isVideoLesson ? const Icon(FontAwesomeIcons.youtube, color: MyColors.red,) : const SizedBox.shrink(),
-                    const Spacer(),
-                    item.isCompleted ? const Icon(Icons.check_circle, color: MyColors.green,) : const SizedBox.shrink(),
+                    Row(
+                      children: [
+                        MyWidget().getTextWidget('lesson ${title.lessonId.split('_')[1]}', 15, MyColors.grey,),
+                        const SizedBox(width: 10,),
+                        if(title.isVideo != null)
+                        title.isVideo! ? const Icon(FontAwesomeIcons.youtube, color: MyColors.red,) : const SizedBox.shrink(),
+                        const Spacer(),
+                        //title.isCompleted ? const Icon(Icons.check_circle, color: MyColors.green,) : const SizedBox.shrink(),
+                      ],
+                    ),
+                    const SizedBox(height: 10,),
+                    MyWidget().getTextWidget(title.title, 20, isLocked ? MyColors.grey : MyColors.navy,),
                   ],
                 ),
-                const SizedBox(height: 10,),
-                MyWidget().getTextWidget(item.title, 20, isLocked ? MyColors.grey : MyColors.navy,),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

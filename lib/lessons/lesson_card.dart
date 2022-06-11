@@ -1,19 +1,18 @@
 class LessonCard {
-  String lessonId;
-  String itemId;
-  late String uniqueId;
-  String type;
-  String? kr;
-  String? en;
-  String? pronun;
-  List<String>? explain;
-  String? audio;
-  String? question;
-  List<String>? examples;
+  final String lessonId;
+  final int orderId;
+  final String type;
+  final String? kr;
+  final String? en;
+  final String? pronun;
+  final List<String>? explain;
+  final String? audio;
+  final String? question;
+  final List<String>? examples;
 
   LessonCard(
     this.lessonId,
-    this.itemId,
+    this.orderId,
     this.type, {
     this.kr,
     this.en,
@@ -22,7 +21,5 @@ class LessonCard {
     this.audio,
     this.question,
     this.examples,
-  }) {
-    uniqueId = '${lessonId}_$itemId';
-  }
+  });
 }
