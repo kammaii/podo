@@ -1,3 +1,5 @@
+import 'package:flutter_html/flutter_html.dart';
+
 class LessonCard {
   final String lessonId;
   final int orderId;
@@ -5,7 +7,7 @@ class LessonCard {
   final String? kr;
   final String? en;
   final String? pronun;
-  final List<String>? explain;
+  final Html? explain;
   final String? audio;
   final String? question;
   final List<String>? examples;

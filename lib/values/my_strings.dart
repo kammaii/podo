@@ -77,7 +77,6 @@ class MyStrings {
   static const String listen = 'Listen';
   static const String speakInKorean = 'Speak in Korean';
   static const String skip = 'skip';
-  static const String listenAndClickAnswer = 'Listen and click the answer';
 
 
 
