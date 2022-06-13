@@ -79,7 +79,7 @@ class _LessonMainState extends State<LessonMain> {
             color: isLocked ? MyColors.navyLightLight : Colors.white,
             child: InkWell(
               onTap: (){
-                Get.to(const LessonFrame());
+                Get.to(LessonFrame());
               },
               child: Padding(
                 padding: const EdgeInsets.all(10),

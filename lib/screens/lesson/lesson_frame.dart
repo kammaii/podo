@@ -9,53 +9,23 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-class LessonFrame extends StatefulWidget {
-  const LessonFrame({Key? key}) : super(key: key);
-
-  @override
-  State<LessonFrame> createState() => _LessonFrameState();
-}
-
-class _LessonFrameState extends State<LessonFrame> {
-  LessonCard subjectSample = LessonCard('beginner_01', 0, MyStrings.subject, kr: '~후에', en: 'after~');
-
-  LessonCard explainSample = LessonCard('beginner_01', 1, MyStrings.explain, explain: Html(
-      data: """<div>
-        <h1>Demo Page</h1>
-        <p>This is a fantastic product that you should buy!</p>
-        <h3>Features</h3>
-        <ul>
-          <li>It actually works</li>
-          <li>It exists</li>
-          <li>It doesn't cost much!</li>
-        </ul>
-        <!--You can pretty much put any html in here!-->
-      </div>"""));
-
-  LessonCard practiceSample = LessonCard('beginner_01', 2, MyStrings.practice, kr: '밥을 먹어요', pronun: '[바블머거요]', en: 'I have a meal', audio: 'practice.mp3');
-
-  LessonCard speakSample = LessonCard('beginner_01', 3, MyStrings.speak, kr: '학교에 가요', en: 'I go to school', audio: 'speak.mp3');
-
-  LessonCard quizSample = LessonCard('beginner_01', 4, MyStrings.quiz, question: 'Listen and click the answer', examples: ['ㄱ', 'ㄴ','ㄷ','ㄹ'], audio: 'quiz.mp3');
+class LessonFrame extends StatelessWidget {
+  LessonFrame({Key? key}) : super(key: key);
 
   List<LessonCard> cards = [];
+  final controller = Get.put(StateManager());
 
-  final controller = Get.put(ActiveAudioBtn());
-
-
-  @override
-  void initState() {
-    super.initState();
-
-    cards.add(subjectSample);
-    cards.add(explainSample);
-    cards.add(practiceSample);
-    cards.add(speakSample);
-    cards.add(quizSample);
+  void setPlayBtn(int index) {
+    cards[index].audio != null
+        ? controller.setPlayBtn(true)
+        : controller.setPlayBtn(false);
   }
 
   @override
   Widget build(BuildContext context) {
+    cards = SampleLesson().getSampleLessons();
+    setPlayBtn(0);
+
     return SafeArea(
       child: Scaffold(
         appBar: MyWidget().getAppbar(context, MyStrings.title),
@@ -78,20 +48,22 @@ class _LessonFrameState extends State<LessonFrame> {
                 itemCount: cards.length,
                 viewportFraction: 0.8,
                 scale: 0.8,
-                onIndexChanged: (index) {},
+                onIndexChanged: (index) {
+                  setPlayBtn(index);
+                },
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
-              child: GetBuilder<ActiveAudioBtn>(
+              child: GetBuilder<StateManager>(
                 builder: (controller) {
                   return IconButton(
                     onPressed: (){
-                      controller.isActive
+                      controller.isPlayBtnActive
                         ? null //todo: 오디오 재생
                         : null;
                     },
-                    icon: Icon(FontAwesomeIcons.play, color: controller.btnColor,),
+                    icon: Icon(FontAwesomeIcons.play, color: controller.playBtnColor,),
                   );
                 },
               ),
@@ -143,9 +115,6 @@ class _LessonFrameState extends State<LessonFrame> {
   Widget getCards(LessonCard card) {
     String type = card.type;
     Widget widget;
-    card.audio != null
-      ? controller.changeActive(true)
-      : controller.changeActive(false);
 
     switch (type) {
       case  MyStrings.subject :
@@ -263,15 +232,44 @@ class _LessonFrameState extends State<LessonFrame> {
 }
 
 
-class ActiveAudioBtn extends GetxController {
-  bool isActive = true;
-  Color btnColor = Colors.black;
+class StateManager extends GetxController {
+  bool isPlayBtnActive = true;
+  Color playBtnColor = Colors.black;
 
-  void changeActive(bool isActive) {
+  void setPlayBtn(bool isActive) {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      isActive = isActive;
-      isActive ? btnColor = Colors.black : btnColor = MyColors.grey;
+      isPlayBtnActive = isActive;
+      isPlayBtnActive ? playBtnColor = Colors.black : playBtnColor = MyColors.grey;
       update();
     });
+  }
+}
+
+class SampleLesson {
+  final LessonCard subjectSample = LessonCard('beginner_01', 0, MyStrings.subject, kr: '~후에', en: 'after~');
+  final LessonCard explainSample = LessonCard('beginner_01', 1, MyStrings.explain, explain: Html(
+      data: """<div>
+        <h1>Demo Page</h1>
+        <p>This is a fantastic product that you should buy!</p>
+        <h3>Features</h3>
+        <ul>
+          <li>It actually works</li>
+          <li>It exists</li>
+          <li>It doesn't cost much!</li>
+        </ul>
+        <!--You can pretty much put any html in here!-->
+      </div>"""));
+  final LessonCard practiceSample = LessonCard('beginner_01', 2, MyStrings.practice, kr: '밥을 먹어요', pronun: '[바블머거요]', en: 'I have a meal', audio: 'practice.mp3');
+  final LessonCard speakSample = LessonCard('beginner_01', 3, MyStrings.speak, kr: '학교에 가요', en: 'I go to school', audio: 'speak.mp3');
+  final LessonCard quizSample = LessonCard('beginner_01', 4, MyStrings.quiz, question: 'Listen and click the answer', examples: ['ㄱ', 'ㄴ','ㄷ','ㄹ'], audio: 'quiz.mp3');
+
+  List<LessonCard> getSampleLessons() {
+    List<LessonCard> cards = [];
+    cards.add(subjectSample);
+    cards.add(explainSample);
+    cards.add(practiceSample);
+    cards.add(speakSample);
+    cards.add(quizSample);
+    return cards;
   }
 }
