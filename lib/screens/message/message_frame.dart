@@ -135,7 +135,7 @@ class _MessageFrameState extends State<MessageFrame> {
                       color: MyColors.purple,
                     ),
                   ),
-                  MyWidget().getTextWidget(UserInfo().coins.toString(), 15, MyColors.purple, isBold: true),
+                  MyWidget().getTextWidget(UserInfo().podo.toString(), 15, MyColors.purple, isBold: true),
                   const SizedBox(width: 10),
                 ],
               ),
@@ -167,7 +167,7 @@ class _MessageFrameState extends State<MessageFrame> {
     } else {
       textFieldItems.add(TextFieldItem(MyStrings.questionHint, false));
     }
-    int coinCount = 1;
+    int podoCount = 1;
 
     return StatefulBuilder(
       builder: (context, reRender) {
@@ -179,7 +179,7 @@ class _MessageFrameState extends State<MessageFrame> {
               reRender(() {
                 int removeIdx = textFieldItems.indexWhere((element) => element.key == textFieldItems[i].key);
                 textFieldItems.removeAt(removeIdx);
-                coinCount--;
+                podoCount--;
               });
             });
             textFieldWidgets.add(textFieldItems[i].getWidget());
@@ -220,7 +220,7 @@ class _MessageFrameState extends State<MessageFrame> {
                       color: MyColors.purple,
                     ),
                     onPressed: () {
-                      if(UserInfo().coins == coinCount) {
+                      if(UserInfo().podo == podoCount) {
                         UserInfo().isPremium
                         ? Get.defaultDialog(
                           titlePadding: const EdgeInsets.all(20),
@@ -255,7 +255,7 @@ class _MessageFrameState extends State<MessageFrame> {
                             }
                           }
                           textFieldItems.add(TextFieldItem('',true));
-                          coinCount++;
+                          podoCount++;
                         });
                       }
                     },
@@ -270,7 +270,7 @@ class _MessageFrameState extends State<MessageFrame> {
                         for(TextFieldItem item in textFieldItems) {
                           requests.add(item.controller.text);
                         }
-                      }, coinCount: coinCount),
+                      }, podoCount: podoCount),
                 )
               ],
             ),

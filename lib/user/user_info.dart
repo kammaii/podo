@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 
-class UserInfo {
+class UserInfo extends GetxController{
 
   static final UserInfo _instance = UserInfo.init();
 
@@ -11,27 +12,39 @@ class UserInfo {
   late String email;
   late String name;
   late bool isPremium;
-  late int coins;
+  late int podo;
+  late List<String> favorites;
+
 
   void setCoins(int coin) {
-    coins = coin;
+    podo = coin;
   }
 
   UserInfo.init() {
     debugPrint('userInfo 초기화');
-    coins = 3; //todo: DB에서 받아오기
-    isPremium = false; //todo: late bool isPremium;
+    //todo: DB에서 받아오기
+    email = 'danny@gmail.com';
+    name = 'danny';
+    isPremium = false;
+    podo = 3;
+    favorites = ['안녕하세요?/Hello', '고맙습니다/Thank you'];
   }
 
-  void setUserEmail(String email) {
-    this.email = email;
-  }
-
-  void setUserName(String name) {
+  void changeUserName(String name) {
     this.name = name;
   }
 
-  void setUserPremium(bool isPremium) {
+  void setIsPremium(bool isPremium) {
     this.isPremium = isPremium;
+  }
+
+  void addFavorite(String favorite) {
+    favorites.add(favorite);
+    update();
+  }
+
+  void removeFavorite(String favorite) {
+    favorites.remove(favorite);
+    update();
   }
 }

@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/lessons/lesson_card.dart';
+import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -12,19 +13,21 @@ import 'package:percent_indicator/percent_indicator.dart';
 class LessonFrame extends StatelessWidget {
   LessonFrame({Key? key}) : super(key: key);
 
-  List<LessonCard> cards = [];
-  final controller = Get.put(StateManager());
+  final _controller = Get.put(StateManager());
 
-  void setPlayBtn(int index) {
-    cards[index].audio != null
-        ? controller.setPlayBtn(true)
-        : controller.setPlayBtn(false);
+  void setBtns(int index) {
+    _controller.cards[index].audio != null
+        ? _controller.setPlayBtn(true)
+        : _controller.setPlayBtn(false);
+
+    UserInfo().favorites.contains('${_controller.cards[index].kr}/${_controller.cards[index].en}')
+        ? _controller.setFavoriteBtn(true)
+        : _controller.setFavoriteBtn(false);
   }
 
   @override
   Widget build(BuildContext context) {
-    cards = SampleLesson().getSampleLessons();
-    setPlayBtn(0);
+    setBtns(_controller.thisIndex);
 
     return SafeArea(
       child: Scaffold(
@@ -42,30 +45,31 @@ class LessonFrame extends StatelessWidget {
             Expanded(
               child: Swiper(
                 itemBuilder: (context, index) {
-                  return getCards(cards[index]);
+                  return getCards(_controller.cards[index]);
                 },
                 loop: false,
-                itemCount: cards.length,
+                itemCount: _controller.cards.length,
                 viewportFraction: 0.8,
                 scale: 0.8,
                 onIndexChanged: (index) {
-                  setPlayBtn(index);
+                  setBtns(index);
+                  _controller.thisIndex = index;
                 },
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
-              child: GetBuilder<StateManager>(
-                builder: (controller) {
-                  return IconButton(
-                    onPressed: (){
-                      controller.isPlayBtnActive
-                        ? null //todo: 오디오 재생
-                        : null;
-                    },
-                    icon: Icon(FontAwesomeIcons.play, color: controller.playBtnColor,),
-                  );
+              child: IconButton(
+                onPressed: (){
+                  _controller.isPlayBtnActive
+                      ? null //todo: 오디오 재생
+                      : null;
                 },
+                icon: GetBuilder<StateManager>(
+                  builder: (_controller) {
+                    return Icon(FontAwesomeIcons.play, color: _controller.playBtnColor,);
+                  },
+                ),
               ),
             ),
           ],
@@ -80,12 +84,20 @@ class LessonFrame extends StatelessWidget {
       children: [
         IconButton(
           onPressed: () {
-            //todo: 즐겨찾기 추가
+            _controller.setFavoriteBtn(!_controller.isFavoriteClicked);
+            String favorite = '${_controller.cards[_controller.thisIndex].kr}/${_controller.cards[_controller.thisIndex].en}';
+            _controller.isFavoriteClicked
+              ? UserInfo().addFavorite(favorite)
+              : UserInfo().removeFavorite(favorite);
           },
-          icon: const Icon(
-            Icons.star_outline_rounded,
-            color: MyColors.purple,
-            size: 30,
+          icon: GetBuilder<StateManager>(
+            builder: (_controller) {
+              return Icon(
+                _controller.favoriteIcon,
+                color: MyColors.purple,
+                size: 30,
+              );
+            },
           ),
         ),
         hasSkipBtn
@@ -225,23 +237,27 @@ class LessonFrame extends StatelessWidget {
       ),
     );
   }
-
-  Widget getCardText(String text, double size) {
-    return MyWidget().getTextWidget(text, size, Colors.black);
-  }
 }
 
 
 class StateManager extends GetxController {
+  List<LessonCard> cards = SampleLesson().getSampleLessons();
   bool isPlayBtnActive = true;
   Color playBtnColor = Colors.black;
+  bool isFavoriteClicked = false;
+  IconData favoriteIcon = Icons.star_outline_rounded;
+  int thisIndex = 0;
 
   void setPlayBtn(bool isActive) {
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      isPlayBtnActive = isActive;
-      isPlayBtnActive ? playBtnColor = Colors.black : playBtnColor = MyColors.grey;
-      update();
-    });
+    isPlayBtnActive = isActive;
+    isPlayBtnActive ? playBtnColor = Colors.black : playBtnColor = MyColors.grey;
+    update();
+  }
+
+  void setFavoriteBtn(bool isClicked) {
+    isFavoriteClicked = isClicked;
+    isFavoriteClicked ? favoriteIcon = Icons.star_rounded : favoriteIcon = Icons.star_outline_rounded;
+    update();
   }
 }
 
