@@ -27,7 +27,7 @@ class UserInfo extends GetxController{
     name = 'danny';
     isPremium = false;
     podo = 3;
-    favorites = ['안녕하세요?/Hello', '고맙습니다/Thank you'];
+    favorites = [];
   }
 
   void changeUserName(String name) {

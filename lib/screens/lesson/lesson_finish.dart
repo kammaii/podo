@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -13,6 +15,8 @@ class LessonFinish extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double percent = 0.5;
+    final ConfettiController _controller = ConfettiController(duration: const Duration(seconds: 10));
+    _controller.play();
 
     return SafeArea(
       child: Scaffold(
@@ -63,7 +67,19 @@ class LessonFinish extends StatelessWidget {
                     ),
                     progressColor: MyColors.purple,
                   ),
-                  Image.asset('assets/images/confetti.png'),
+                  //Image.asset('assets/images/confetti.png'),
+                  ConfettiWidget(
+                    confettiController: _controller,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    shouldLoop: true,
+                    gravity: 0.05,
+                    colors: const [
+                      MyColors.pink,
+                      MyColors.mustardLight,
+                      MyColors.navyLight,
+                      MyColors.greenLight,
+                    ],
+                  ),
                 ],
               ),
             ),

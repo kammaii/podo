@@ -3,6 +3,7 @@ import 'package:flutter_html/flutter_html.dart';
 class LessonCard {
   final String lessonId;
   final int orderId;
+  late final String uniqueId;
   final String type;
   final String? kr;
   final String? en;
@@ -11,6 +12,7 @@ class LessonCard {
   final String? audio;
   final String? question;
   final List<String>? examples;
+  bool? isFavorite;
 
   LessonCard(
     this.lessonId,
@@ -23,5 +25,8 @@ class LessonCard {
     this.audio,
     this.question,
     this.examples,
-  });
+    this.isFavorite,
+  }) {
+    uniqueId = '${lessonId}_${orderId.toString()}';
+  }
 }
