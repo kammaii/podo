@@ -19,7 +19,7 @@ class MainFrame extends StatefulWidget {
 List<Widget> _buildScreens() {
   return [
     const LessonCourse(),
-    const MessageFrame(),
+    MessageFrame(),
     const FavoriteFrame(),
     const Profile(),
   ];

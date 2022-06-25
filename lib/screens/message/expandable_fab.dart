@@ -1,7 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/values/my_colors.dart';
 
 const Duration _duration = Duration(milliseconds: 300);

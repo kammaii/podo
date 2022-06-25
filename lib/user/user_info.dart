@@ -11,6 +11,7 @@ class UserInfo extends GetxController{
 
   late String email;
   late String name;
+  late String userImage;
   late bool isPremium;
   late int podo;
   late List<String> favorites;
@@ -25,6 +26,7 @@ class UserInfo extends GetxController{
     //todo: DB에서 받아오기
     email = 'danny@gmail.com';
     name = 'danny';
+    userImage = 'assets/images/logo.png';
     isPremium = false;
     podo = 3;
     favorites = [];

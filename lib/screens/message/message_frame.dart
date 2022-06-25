@@ -1,68 +1,70 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
+import 'package:podo/screens/message/notice.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
 
-class MessageFrame extends StatefulWidget {
-  const MessageFrame({Key? key}) : super(key: key);
+class MessageFrame extends StatelessWidget {
+  MessageFrame({Key? key}) : super(key: key);
 
-  @override
-  _MessageFrameState createState() => _MessageFrameState();
-}
+  final _controller = Get.put(MessageFrameStateManager());
+  final String podoImage = 'assets/images/logo.png';
 
-class _MessageFrameState extends State<MessageFrame> {
-  String userImage = 'assets/images/logo.png';
-  String podoImage = 'assets/images/logo.png';
-  List<Message> msgList = [];
-  late FocusNode focusNode;
-  late TextEditingController _searchController;
-  late bool isNotificationClicked;
-  bool isPremiumUser = true; //todo: DB에서 받아오기
-  String? selectedTag;
-  late int correctionCount;
-  late List<TextFieldItem> textFieldItems;
+  Widget getExpansionTile(Notice notice) {
+    IconData icon = FontAwesomeIcons.bullhorn;
+    switch (notice.tag) {
+      case MyStrings.news:
+        icon = FontAwesomeIcons.bullhorn;
+        break;
 
-  String notification =
-      'New version has been released.\n\n'
-      'Online lesson is coming soon.\n\n'
-      'New version has been released.\n\n'
-      'Online lesson is coming soon.'; //todo: DB에서 받아오기
+      case MyStrings.imageQuiz:
+        icon = FontAwesomeIcons.image;
+        break;
 
-  @override
-  void initState() {
-    super.initState();
-    correctionCount = 1;
-    textFieldItems = [];
-    focusNode = FocusNode();
-    _searchController = TextEditingController();
-    isNotificationClicked = false;
-    msgList = [];
-    msgList.add(Message(false, '', MyStrings.messageInfo, ''));
-    //todo: 이후의 메시지는 DB에서 가져오기
-    // msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-    // msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-  }
+      case MyStrings.audioQuiz:
+        icon = FontAwesomeIcons.headphones;
+        break;
 
-  @override
-  void dispose() {
-    super.dispose();
-    focusNode.dispose();
-    _searchController.dispose();
+      case MyStrings.liveLesson:
+        icon = FontAwesomeIcons.video;
+        break;
+    }
+
+    return ExpansionTile(
+      title: Row(
+        children: [
+          Icon(
+            icon,
+            color: MyColors.greenDark,
+          ),
+          const SizedBox(width: 20),
+          MyWidget().getTextWidget(notice.title, 15, MyColors.greenDark),
+        ],
+      ),
+      children: [
+        notice.contents,
+      ],
+      collapsedIconColor: MyColors.greenDark,
+      iconColor: MyColors.greenDark,
+      collapsedBackgroundColor: MyColors.greenLight,
+      backgroundColor: MyColors.greenLight,
+      childrenPadding: const EdgeInsets.all(10),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
-
-
+    _controller.init();
     return SafeArea(
       child: Scaffold(
         floatingActionButton: ExpandableFab(
@@ -95,29 +97,22 @@ class _MessageFrameState extends State<MessageFrame> {
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: ExpansionTile(
-                    title: Row(
-                      children: [
-                        const Icon(
-                          FontAwesomeIcons.bullhorn,
-                          color: MyColors.greenDark,
+                  child: GetBuilder<MessageFrameStateManager>(
+                    builder: (_controller) {
+                      return SizedBox(
+                        height: 100,
+                        child: Swiper(
+                          itemCount: _controller.noticeList.length,
+                          itemBuilder: (context, index) {
+                            return getExpansionTile(_controller.noticeList[index]);
+                          },
+                          pagination: const SwiperPagination(
+                              builder: DotSwiperPaginationBuilder(
+                            color: MyColors.grey,
+                          )),
                         ),
-                        const SizedBox(width: 20),
-                        MyWidget().getTextWidget(MyStrings.notification, 15, MyColors.greenDark),
-                      ],
-                    ),
-                    children: [
-                      Row(
-                        children: [
-                          Text(notification),
-                        ],
-                      ),
-                    ],
-                    collapsedIconColor: MyColors.greenDark,
-                    iconColor: MyColors.greenDark,
-                    collapsedBackgroundColor: MyColors.greenLight,
-                    backgroundColor: MyColors.greenLight,
-                    childrenPadding: const EdgeInsets.all(10),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -125,13 +120,17 @@ class _MessageFrameState extends State<MessageFrame> {
               Row(
                 children: [
                   Expanded(
-                    child: MyWidget().getSearchWidget(focusNode, _searchController, MyStrings.messageSearchHint),
+                    child: MyWidget().getSearchWidget(
+                      _controller.focusNode,
+                      _controller.searchController,
+                      MyStrings.messageSearchHint,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(
-                      CupertinoIcons.ticket,
+                      CupertinoIcons.ticket, //todo: podo 아이콘으로 바꾸기
                       color: MyColors.purple,
                     ),
                   ),
@@ -139,19 +138,19 @@ class _MessageFrameState extends State<MessageFrame> {
                   const SizedBox(width: 10),
                 ],
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: msgList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    bool isUserMsg = msgList[index].isUserMsg;
-                    String image = isUserMsg ? 'assets/images/course_hangul.png' : 'assets/images/logo.png';
-                    String tag = msgList[index].tag;
-                    String msg = msgList[index].msg;
-                    String date = msgList[index].date;
-                    return getMsgItem(isUserMsg, image, tag, msg, date);
-                  },
-                ),
-              ),
+              // Expanded(
+              //   child: ListView.builder(
+              //     itemCount: msgList.length,
+              //     itemBuilder: (BuildContext context, int index) {
+              //       bool isUserMsg = msgList[index].isUserMsg;
+              //       String image = isUserMsg ? 'assets/images/course_hangul.png' : 'assets/images/logo.png';
+              //       String tag = msgList[index].tag;
+              //       String msg = msgList[index].msg;
+              //       String date = msgList[index].date;
+              //       return getMsgItem(isUserMsg, image, tag, msg, date);
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -160,9 +159,10 @@ class _MessageFrameState extends State<MessageFrame> {
   }
 
   Widget getBottomSheet(String tag) {
+    List<TextFieldItem> textFieldItems = _controller.textFieldItems;
     textFieldItems.clear();
 
-    if(tag == MyStrings.tagCorrection) {
+    if (tag == MyStrings.tagCorrection) {
       textFieldItems.add(TextFieldItem(MyStrings.correctionHint, false));
     } else {
       textFieldItems.add(TextFieldItem(MyStrings.questionHint, false));
@@ -173,8 +173,8 @@ class _MessageFrameState extends State<MessageFrame> {
       builder: (context, reRender) {
         List<Widget> textFieldWidgets = [];
 
-        if(tag == MyStrings.tagCorrection) {
-          for(int i=0; i<textFieldItems.length; i++) {
+        if (tag == MyStrings.tagCorrection) {
+          for (int i = 0; i < textFieldItems.length; i++) {
             textFieldItems[i].setRemoveFunction(() {
               reRender(() {
                 int removeIdx = textFieldItems.indexWhere((element) => element.key == textFieldItems[i].key);
@@ -214,63 +214,63 @@ class _MessageFrameState extends State<MessageFrame> {
                 const SizedBox(height: 10),
                 Column(children: textFieldWidgets), //todo: AnimatedList로 변경하기
                 tag == MyStrings.tagCorrection
-                  ?IconButton(
-                    icon: const Icon(
-                      Icons.add_circle_outline,
-                      color: MyColors.purple,
-                    ),
-                    onPressed: () {
-                      if(UserInfo().podo == podoCount) {
-                        UserInfo().isPremium
-                        ? Get.defaultDialog(
-                          titlePadding: const EdgeInsets.all(20),
-                          contentPadding: const EdgeInsets.only(bottom: 10),
-                          title: MyStrings.coinAlertTitle,
-                          middleText: MyStrings.coinAlertSubTitlePremium,
-                          onConfirm: (){
-                            Get.back();
-                          },
-                          confirmTextColor: Colors.white,
-                          buttonColor: MyColors.purple,
-                        )
-                        : Get.defaultDialog(
-                          titlePadding: const EdgeInsets.all(20),
-                          contentPadding: const EdgeInsets.all(15),
-                          title: MyStrings.coinAlertTitle,
-                          middleText: MyStrings.coinAlertSubTitleNoPremium,
-                          onConfirm: (){
-                            Get.back();
-                            Get.to(const Subscribe());
-                          },
-                          onCancel: (){},
-                          confirmTextColor: Colors.white,
-                          cancelTextColor: MyColors.purple,
-                          buttonColor: MyColors.purple,
-                        );
-                      } else {
-                        reRender(() {
-                          if(textFieldItems.length <= 1) {
-                            for (TextFieldItem item in textFieldItems) {
-                              item.hasRemoveBtn = true;
-                            }
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: MyColors.purple,
+                        ),
+                        onPressed: () {
+                          if (UserInfo().podo == podoCount) {
+                            UserInfo().isPremium
+                                ? Get.defaultDialog(
+                                    titlePadding: const EdgeInsets.all(20),
+                                    contentPadding: const EdgeInsets.only(bottom: 10),
+                                    title: MyStrings.coinAlertTitle,
+                                    middleText: MyStrings.coinAlertSubTitlePremium,
+                                    onConfirm: () {
+                                      Get.back();
+                                    },
+                                    confirmTextColor: Colors.white,
+                                    buttonColor: MyColors.purple,
+                                  )
+                                : Get.defaultDialog(
+                                    titlePadding: const EdgeInsets.all(20),
+                                    contentPadding: const EdgeInsets.all(15),
+                                    title: MyStrings.coinAlertTitle,
+                                    middleText: MyStrings.coinAlertSubTitleNoPremium,
+                                    onConfirm: () {
+                                      Get.back();
+                                      Get.to(const Subscribe());
+                                    },
+                                    onCancel: () {},
+                                    confirmTextColor: Colors.white,
+                                    cancelTextColor: MyColors.purple,
+                                    buttonColor: MyColors.purple,
+                                  );
+                          } else {
+                            reRender(() {
+                              if (textFieldItems.length <= 1) {
+                                for (TextFieldItem item in textFieldItems) {
+                                  item.hasRemoveBtn = true;
+                                }
+                              }
+                              textFieldItems.add(TextFieldItem('', true));
+                              podoCount++;
+                            });
                           }
-                          textFieldItems.add(TextFieldItem('',true));
-                          podoCount++;
-                        });
-                      }
-                    },
-                  )
-                  : const SizedBox.shrink(),
+                        },
+                      )
+                    : const SizedBox.shrink(),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child:
-                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, (){
-                        //todo: DB에 저장할 때 correction 과 question 경로를 다르게 할 것
-                        List<String> requests = [];
-                        for(TextFieldItem item in textFieldItems) {
-                          requests.add(item.controller.text);
-                        }
-                      }, podoCount: podoCount),
+                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, () {
+                    //todo: DB에 저장할 때 correction 과 question 경로를 다르게 할 것
+                    List<String> requests = [];
+                    for (TextFieldItem item in textFieldItems) {
+                      requests.add(item.controller.text);
+                    }
+                  }, podoCount: podoCount),
                 )
               ],
             ),
@@ -338,7 +338,7 @@ class _MessageFrameState extends State<MessageFrame> {
 }
 
 //todo: 컨트롤러 dispose() 하기
-class TextFieldItem extends GetxController{
+class TextFieldItem extends GetxController {
   Key key = UniqueKey();
   late String hint;
   late bool hasRemoveBtn;
@@ -350,7 +350,6 @@ class TextFieldItem extends GetxController{
   void setRemoveFunction(VoidCallback f) {
     removeFunction = f;
   }
-
 
   @override
   void onClose() {
@@ -371,17 +370,101 @@ class TextFieldItem extends GetxController{
               const SizedBox(width: 10),
               hasRemoveBtn
                   ? IconButton(
-                  icon: const Icon(
-                    Icons.remove_circle_outline,
-                    color: MyColors.purple,
-                  ),
-                  onPressed: removeFunction
-              )
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        color: MyColors.purple,
+                      ),
+                      onPressed: removeFunction)
                   : const SizedBox.shrink(),
             ],
           ),
         ),
       ],
     );
+  }
+}
+
+class MessageFrameStateManager extends GetxController {
+  late List<Message> msgList;
+  late List<Notice> noticeList;
+  late FocusNode focusNode;
+  late TextEditingController searchController;
+  late bool isPremiumUser;
+  late int correctionCount;
+  late List<TextFieldItem> textFieldItems;
+
+  void init() {
+    msgList = []; //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
+    noticeList = SampleNotice().getNotices(); //todo: DB에서 isOnBoard = true 가져오기
+    focusNode = FocusNode();
+    searchController = TextEditingController();
+    isPremiumUser = UserInfo().isPremium;
+    correctionCount = 1;
+    textFieldItems = [];
+    //msgList.add(Message(false, '', MyStrings.messageInfo, ''));
+    //todo: 이후의 메시지는 DB에서 가져오기
+    // msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
+    // msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
+  }
+
+  void disposeMessageFrame() {
+    focusNode.dispose();
+    searchController.dispose();
+    update();
+  }
+}
+
+class SampleNotice {
+  Notice sampleNews = Notice('news_000', 'Update deployed', Html(data: """
+        <div>
+          <ul>
+            <li>It actually works</li>
+            <li>It exists</li>
+            <li>It doesn't cost much!</li>
+          </ul>
+        </div>
+        """), true, 0);
+
+  Notice sampleImageQuiz = Notice('imageQuiz_000', 'Image quiz', Html(data: """
+        <div>
+          <ul>
+            <li>Look at the picture below and make a sentence.</li>
+            <li>Teacher Danny will proofread your answer.</li>
+          </ul>
+          <img src='asset:assets/images/course_hangul.png' width='100' />
+        </div>
+        """), true, 1);
+
+  Notice sampleAudioQuiz = Notice('audioQuiz_000', 'Audio quiz', Html(data: """
+        <div>
+          <ul>
+            <li>Listen to the audio and write what you hear.</li>
+          </ul>
+          <audio controls src='asset:assets/audio/sample.mp3'></audio>
+        </div>
+        """), true, 2);
+
+  Notice sampleLiveLesson = Notice('liveLesson_000', 'Free Live Lesson', Html(data: """
+        <div>
+          <ul>
+            <li>Status : available</li>
+            <li>Time : 25th June 2022, 7:00PM </li>
+            <li>Place : Zoom</li>
+            <li>Subject : Reading Hangul</li>
+            <li>Level : Beginner</li>
+            <li>Limit : 10 students</li>
+          </ul>
+          <p style="color:red;">* Lesson will be recorded and can be released on the podo YouTube channel</p>
+          <audio controls src='asset:assets/audio/sample.mp3'></audio>
+        </div>
+        """), true, 3);
+
+  List<Notice> getNotices() {
+    List<Notice> notices = [];
+    notices.add(sampleNews);
+    notices.add(sampleImageQuiz);
+    notices.add(sampleAudioQuiz);
+    notices.add(sampleLiveLesson);
+    return notices;
   }
 }

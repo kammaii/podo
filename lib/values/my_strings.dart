@@ -80,13 +80,16 @@ class MyStrings {
 
 
 
-
+  // used only in the code
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String practice = 'practice';
   static const String speak = 'speak';
   static const String quiz = 'quiz';
   static const String swipe = 'swipe';
-
+  static const String news = 'news';
+  static const String imageQuiz = 'imageQuiz';
+  static const String audioQuiz = 'audioQuiz';
+  static const String liveLesson = 'liveLesson';
 
 }
