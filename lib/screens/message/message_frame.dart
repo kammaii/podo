@@ -20,47 +20,6 @@ class MessageFrame extends StatelessWidget {
   final _controller = Get.put(MessageFrameStateManager());
   final String podoImage = 'assets/images/logo.png';
 
-  Widget getExpansionTile(Notice notice) {
-    IconData icon = FontAwesomeIcons.bullhorn;
-    switch (notice.tag) {
-      case MyStrings.news:
-        icon = FontAwesomeIcons.bullhorn;
-        break;
-
-      case MyStrings.imageQuiz:
-        icon = FontAwesomeIcons.image;
-        break;
-
-      case MyStrings.audioQuiz:
-        icon = FontAwesomeIcons.headphones;
-        break;
-
-      case MyStrings.liveLesson:
-        icon = FontAwesomeIcons.video;
-        break;
-    }
-
-    return ExpansionTile(
-      title: Row(
-        children: [
-          Icon(
-            icon,
-            color: MyColors.greenDark,
-          ),
-          const SizedBox(width: 20),
-          MyWidget().getTextWidget(notice.title, 15, MyColors.greenDark),
-        ],
-      ),
-      children: [
-        notice.contents,
-      ],
-      collapsedIconColor: MyColors.greenDark,
-      iconColor: MyColors.greenDark,
-      collapsedBackgroundColor: MyColors.greenLight,
-      backgroundColor: MyColors.greenLight,
-      childrenPadding: const EdgeInsets.all(10),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,28 +52,74 @@ class MessageFrame extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
-              Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: GetBuilder<MessageFrameStateManager>(
-                    builder: (_controller) {
-                      return SizedBox(
-                        height: 100,
+              GetBuilder<MessageFrameStateManager>(
+                builder: (_controller) {
+                  Notice notice = _controller.noticeList[_controller.thisSwiperIndex];
+                  List<Widget> contents = [
+                    notice.contents,
+                  ];
+
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: ExpansionTile(
+                      title: SizedBox(
+                        height: 80,
                         child: Swiper(
+                          onIndexChanged: (index) {
+                            _controller.thisSwiperIndex = index;
+                            _controller.update();
+                          },
                           itemCount: _controller.noticeList.length,
                           itemBuilder: (context, index) {
-                            return getExpansionTile(_controller.noticeList[index]);
+                            Notice notice = _controller.noticeList[index];
+                            IconData icon = FontAwesomeIcons.bullhorn;
+                            switch (notice.tag) {
+                              case MyStrings.news:
+                                icon = FontAwesomeIcons.bullhorn;
+                                break;
+
+                              case MyStrings.imageQuiz:
+                                icon = FontAwesomeIcons.image;
+                                break;
+
+                              case MyStrings.audioQuiz:
+                                icon = FontAwesomeIcons.headphones;
+                                break;
+
+                              case MyStrings.liveLesson:
+                                icon = FontAwesomeIcons.video;
+                                break;
+                            }
+                            return Row(
+                              children: [
+                                Icon(
+                                  icon,
+                                  color: MyColors.greenDark,
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(child: MyWidget().getTextWidget(notice.title, 15, MyColors.greenDark)),
+                                MyWidget().getTextWidget('00:00:00 left', 15, MyColors.greenDark),
+                              ],
+                            );
                           },
                           pagination: const SwiperPagination(
-                              builder: DotSwiperPaginationBuilder(
-                            color: MyColors.grey,
-                          )),
+                            alignment: Alignment.bottomRight,
+                            builder: DotSwiperPaginationBuilder(
+                              size: 8,
+                              color: MyColors.grey,
+                              activeColor: MyColors.greenDark
+                            )
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                      children: contents,
+                      collapsedIconColor: MyColors.greenDark,
+                      iconColor: MyColors.greenDark,
+                      collapsedBackgroundColor: MyColors.greenLight,
+                      backgroundColor: MyColors.greenLight,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 10),
               Row(
@@ -392,6 +397,7 @@ class MessageFrameStateManager extends GetxController {
   late bool isPremiumUser;
   late int correctionCount;
   late List<TextFieldItem> textFieldItems;
+  late int thisSwiperIndex;
 
   void init() {
     msgList = []; //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
@@ -401,13 +407,14 @@ class MessageFrameStateManager extends GetxController {
     isPremiumUser = UserInfo().isPremium;
     correctionCount = 1;
     textFieldItems = [];
+    thisSwiperIndex = 0;
     //msgList.add(Message(false, '', MyStrings.messageInfo, ''));
     //todo: 이후의 메시지는 DB에서 가져오기
     // msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
     // msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
   }
 
-  void disposeMessageFrame() {
+  void disposeControllers() {
     focusNode.dispose();
     searchController.dispose();
     update();
@@ -455,7 +462,6 @@ class SampleNotice {
             <li>Limit : 10 students</li>
           </ul>
           <p style="color:red;">* Lesson will be recorded and can be released on the podo YouTube channel</p>
-          <audio controls src='asset:assets/audio/sample.mp3'></audio>
         </div>
         """), true, 3);
 
