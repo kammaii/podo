@@ -27,7 +27,7 @@ class Login extends StatelessWidget {
     });
   }
 
-  Future<String?> _Signup(LoginData data) {
+  Future<String?> _Signup(SignupData data) {
     return Future.delayed(loginTime).then((_) {
       return 'Signup Succeed';
     });

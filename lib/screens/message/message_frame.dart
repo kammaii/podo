@@ -14,12 +14,46 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'message.dart';
 
+enum ContentsKey {
+  icon, widget
+}
+
 class MessageFrame extends StatelessWidget {
   MessageFrame({Key? key}) : super(key: key);
 
   final _controller = Get.put(MessageFrameStateManager());
   final String podoImage = 'assets/images/logo.png';
 
+  final Map<String, Map<ContentsKey, Widget>> contents = {
+    MyStrings.news : {
+      ContentsKey.icon : const Icon(FontAwesomeIcons.bullhorn),
+      ContentsKey.widget : const SizedBox.shrink(),
+    },
+    MyStrings.imageQuiz : {
+      ContentsKey.icon : const Icon(FontAwesomeIcons.image),
+      ContentsKey.widget : Column(
+        children: [
+          MyWidget().getTextFieldWidget('hint', 15),
+          const SizedBox(height: 10,),
+          MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, (){}),
+        ],
+      )
+    },
+    MyStrings.audioQuiz : {
+      ContentsKey.icon : const Icon(FontAwesomeIcons.headphones),
+      ContentsKey.widget : Column(
+        children: [
+          MyWidget().getTextFieldWidget('hint', 15),
+          const SizedBox(height: 10,),
+          MyWidget().getRoundBtnWidget(true, MyStrings.checkAnswer, MyColors.purple, Colors.white, (){}),
+        ],
+      )
+    },
+    MyStrings.liveLesson : {
+      ContentsKey.icon : const Icon(FontAwesomeIcons.video),
+
+    },
+  };
 
   @override
   Widget build(BuildContext context) {

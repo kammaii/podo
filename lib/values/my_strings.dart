@@ -77,6 +77,8 @@ class MyStrings {
   static const String listen = 'Listen...';
   static const String speakInKorean = 'Speak in Korean';
   static const String skip = 'skip';
+  static const String checkAnswer = 'Check the answer';
+
 
 
 
@@ -91,5 +93,4 @@ class MyStrings {
   static const String imageQuiz = 'imageQuiz';
   static const String audioQuiz = 'audioQuiz';
   static const String liveLesson = 'liveLesson';
-
 }
