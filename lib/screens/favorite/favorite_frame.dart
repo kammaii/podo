@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:podo/common_widgets/my_widget.dart';
-import 'package:podo/screens/favorite/favorite.dart';
+import 'package:podo/items/favorite.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -11,9 +11,7 @@ class FavoriteFrame extends StatefulWidget {
   _FavoriteFrameState createState() => _FavoriteFrameState();
 }
 
-
 class _FavoriteFrameState extends State<FavoriteFrame> {
-
   late FocusNode _focusNode;
   late TextEditingController _controller;
   List<Favorite> favoriteList = [];
@@ -25,7 +23,6 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
     _controller = TextEditingController();
   }
 
-
   @override
   void dispose() {
     super.dispose();
@@ -36,7 +33,8 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
   @override
   Widget build(BuildContext context) {
     favoriteList = [];
-    Favorite favorite = Favorite('id000', '사과', 'apple', '[사과]', 'audioString');
+    Favorite favorite =
+        Favorite(id: 'id000', korean: '사과', english: 'apple', pronunciation: '[사과]', audio: 'audioString');
     favoriteList.add(favorite);
     favoriteList.add(favorite);
     favoriteList.add(favorite);
@@ -52,12 +50,15 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  MyWidget().getSearchWidget(_focusNode, _controller, MyStrings.favoriteSearchHint),
+                  MyWidget().getSearchWidget(
+                    focusNode: _focusNode,
+                    controller: _controller,
+                    hint: MyStrings.favoriteSearchHint,
+                  ),
                   const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.bottomRight,
-                    child: MyWidget().getTextWidget(
-                        MyStrings.sentences, 15, Colors.black),
+                    child: MyWidget().getTextWidget(text: MyStrings.sentences, size: 15, color: Colors.black),
                   ),
                   Expanded(
                     child: ListView.builder(
@@ -73,19 +74,20 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
                 ],
               ),
             ),
-            Padding(  // Ask a question 버튼
+            Padding(
+              // Ask a question 버튼
               padding: const EdgeInsets.only(bottom: 15),
               child: Container(
                 alignment: Alignment.bottomCenter,
                 child: MyWidget().getRoundBtnWithAlert(
-                    false,
-                    MyStrings.review,
-                    MyColors.purple,
-                    Colors.white,
-                    () {
-                      setState(() {
-                      });
-                    }),
+                  isRequest: false,
+                  text: MyStrings.review,
+                  bgColor: MyColors.purple,
+                  fontColor: Colors.white,
+                  f: () {
+                    setState(() {});
+                  },
+                ),
               ),
             ),
           ],
@@ -100,14 +102,16 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
         Row(
           children: [
             Expanded(
-              child: MyWidget().getTextWidget('사과는 맛있어요ㅓ이닐너ㅣㅏㅇ러니ㄴㅁ하ㅣ넣나ㅣㅓ히ㅏ넣나ㅣ.', 15, Colors.black),
+              child: MyWidget()
+                  .getTextWidget(text: '사과는 맛있어요ㅓ이닐너ㅣㅏㅇ러니ㄴㅁ하ㅣ넣나ㅣㅓ히ㅏ넣나ㅣ.', size: 15, color: Colors.black),
             ),
             const SizedBox(width: 10),
             IconButton(
-              icon: const Icon(Icons.volume_up_rounded, color: MyColors.purple,),
-              onPressed: () {
-
-              },
+              icon: const Icon(
+                Icons.volume_up_rounded,
+                color: MyColors.purple,
+              ),
+              onPressed: () {},
             ),
           ],
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -15,7 +14,6 @@ class LessonCourse extends StatelessWidget {
       key: ValueKey(key),
       child: InkWell(
         onTap: () {
-          print(key);
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -37,16 +35,16 @@ class LessonCourse extends StatelessWidget {
                       width: 80,
                       height: 80,
                       child: Hero(
-                        child: Image.asset(sampleImage),
                         tag: 'courseImage:$title',
+                        child: Image.asset(sampleImage),
                       ),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
                     child: MyWidget().getTextWidget(
-                      title,
-                      25,
-                      MyColors.purple,
+                      text: title,
+                      size: 25,
+                      color: MyColors.purple,
                       isBold: true,
                     ),
                   ),
@@ -54,9 +52,9 @@ class LessonCourse extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               MyWidget().getTextWidget(
-                MyStrings.lorem,
-                15,
-                MyColors.grey,
+                text: MyStrings.lorem,
+                size: 15,
+                color: MyColors.grey,
               ),
             ],
           ),
@@ -76,9 +74,9 @@ class LessonCourse extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: MyWidget().getTextWidget(
-                  MyStrings.selectCourse,
-                  20,
-                  MyColors.purple,
+                  text: MyStrings.selectCourse,
+                  size: 20,
+                  color: MyColors.purple,
                   isBold: true,
                 ),
               ),

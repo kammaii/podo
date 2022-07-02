@@ -19,7 +19,6 @@ class _LessonQuestionState extends State<LessonQuestion> {
   late FocusNode askFocusNode;
   bool isAskOpened = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -27,7 +26,6 @@ class _LessonQuestionState extends State<LessonQuestion> {
     askFocusNode = FocusNode();
     textFieldController = TextEditingController();
   }
-
 
   @override
   void dispose() {
@@ -48,16 +46,15 @@ class _LessonQuestionState extends State<LessonQuestion> {
 
     return Scaffold(
       appBar: MyWidget().getAppbarWithAction(
-        MyStrings.question,
-        () {
-          setState(() {
-            isAskOpened = false;
-            FocusScope.of(context).unfocus();
-            isInfoSelected = !isInfoSelected;
-          });
-        },
-        infoIconColor
-      ),
+          title: MyStrings.question,
+          actionFunction: () {
+            setState(() {
+              isAskOpened = false;
+              FocusScope.of(context).unfocus();
+              isInfoSelected = !isInfoSelected;
+            });
+          },
+          actionColor: infoIconColor),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -67,7 +64,10 @@ class _LessonQuestionState extends State<LessonQuestion> {
               children: [
                 Column(
                   children: [
-                    MyWidget().getInfoWidget(isInfoSelected ? 80 : 0, MyStrings.questionInfo),
+                    MyWidget().getInfoWidget(
+                      height: isInfoSelected ? 80 : 0,
+                      info: MyStrings.questionInfo,
+                    ),
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(10),
@@ -77,7 +77,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           Row(
                             children: [
                               Expanded(
-                                child: MyWidget().getSearchWidget(searchFocusNode, textFieldController, MyStrings.questionSearchHint),
+                                child: MyWidget().getSearchWidget(
+                                  focusNode: searchFocusNode,
+                                  controller: textFieldController,
+                                  hint: MyStrings.questionSearchHint,
+                                ),
                               ),
                               const SizedBox(width: 10),
                               const Icon(
@@ -85,11 +89,21 @@ class _LessonQuestionState extends State<LessonQuestion> {
                                 color: MyColors.purple,
                               ),
                               const SizedBox(width: 5),
-                              MyWidget().getTextWidget('3', 18, MyColors.purple, isBold: true,),
+                              MyWidget().getTextWidget(
+                                text: '3',
+                                size: 18,
+                                color: MyColors.purple,
+                                isBold: true,
+                              ),
                             ],
                           ),
                           const SizedBox(height: 20),
-                          MyWidget().getTextWidget(MyStrings.bestQuestions, 18, Colors.black, isBold: true,),
+                          MyWidget().getTextWidget(
+                            text: MyStrings.bestQuestions,
+                            size: 18,
+                            color: Colors.black,
+                            isBold: true,
+                          ),
                         ],
                       ),
                     ),
@@ -109,19 +123,21 @@ class _LessonQuestionState extends State<LessonQuestion> {
                               ),
                             ),
                           ),
-                          Padding(  // Ask a question 버튼
+                          Padding(
+                            // Ask a question 버튼
                             padding: const EdgeInsets.only(bottom: 15),
                             child: MyWidget().getRoundBtnWithAlert(
-                              false,
-                              MyStrings.askQuestion,
-                              MyColors.purple,
-                              Colors.white, () {
+                              isRequest: false,
+                              text: MyStrings.askQuestion,
+                              bgColor: MyColors.purple,
+                              fontColor: Colors.white,
+                              f: () {
                                 setState(() {
                                   isInfoSelected = false;
                                   isAskOpened = true;
                                   askFocusNode.requestFocus();
                                 });
-                              }
+                              },
                             ),
                           ),
                         ],
@@ -165,11 +181,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                         children: [
                           Expanded(
                             child: MyWidget().getRoundBtnWidget(
-                              false,
-                              MyStrings.cancel,
-                              MyColors.pink,
-                              Colors.white,
-                              () {
+                              isRequest: false,
+                              text: MyStrings.cancel,
+                              bgColor: MyColors.pink,
+                              fontColor: Colors.white,
+                              f: () {
                                 setState(() {
                                   isAskOpened = false;
                                   FocusScope.of(context).unfocus();
@@ -180,11 +196,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: MyWidget().getRoundBtnWidget(
-                              true,
-                              MyStrings.send,
-                              MyColors.purple,
-                              Colors.white,
-                              () {},
+                              isRequest: true,
+                              text: MyStrings.send,
+                              bgColor: MyColors.purple,
+                              fontColor: Colors.white,
+                              f: () {},
                             ),
                           )
                         ],
@@ -208,7 +224,12 @@ class _LessonQuestionState extends State<LessonQuestion> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MyWidget().getTextWidget('Q', 35, MyColors.purple, isBold: true,),
+              MyWidget().getTextWidget(
+                text: 'Q',
+                size: 35,
+                color: MyColors.purple,
+                isBold: true,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Container(
@@ -217,7 +238,11 @@ class _LessonQuestionState extends State<LessonQuestion> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  child: MyWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
+                  child: MyWidget().getTextWidget(
+                    text: MyStrings.lorem,
+                    size: 15,
+                    color: Colors.black,
+                  ),
                 ),
               )
             ],
@@ -233,11 +258,20 @@ class _LessonQuestionState extends State<LessonQuestion> {
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  child: MyWidget().getTextWidget(MyStrings.lorem, 15, Colors.black,),
+                  child: MyWidget().getTextWidget(
+                    text: MyStrings.lorem,
+                    size: 15,
+                    color: Colors.black,
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
-              MyWidget().getTextWidget('A', 35, MyColors.purple, isBold: true,),
+              MyWidget().getTextWidget(
+                text: 'A',
+                size: 35,
+                color: MyColors.purple,
+                isBold: true,
+              ),
             ],
           ),
           const Divider(

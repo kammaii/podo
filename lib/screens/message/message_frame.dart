@@ -4,60 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:marquee/marquee.dart';
 import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/items/notice.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
-import 'package:podo/screens/message/notice.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
-import 'package:podo/user/user_info.dart';
+import 'package:podo/items/user_info.dart';
+import 'package:podo/state_manager/message_state_manager.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'message.dart';
 
-enum ContentsKey {
-  icon, widget
-}
+enum ContentsKey { icon, widget }
 
 class MessageFrame extends StatelessWidget {
   MessageFrame({Key? key}) : super(key: key);
 
-  final _controller = Get.put(MessageFrameStateManager());
+  final MessageStateManager _controller = Get.put(MessageStateManager());
   final String podoImage = 'assets/images/logo.png';
-
-  final Map<String, Map<ContentsKey, Widget>> contents = {
-    MyStrings.news : {
-      ContentsKey.icon : const Icon(FontAwesomeIcons.bullhorn),
-      ContentsKey.widget : const SizedBox.shrink(),
-    },
-    MyStrings.imageQuiz : {
-      ContentsKey.icon : const Icon(FontAwesomeIcons.image),
-      ContentsKey.widget : Column(
-        children: [
-          MyWidget().getTextFieldWidget('hint', 15),
-          const SizedBox(height: 10,),
-          MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, (){}),
-        ],
-      )
-    },
-    MyStrings.audioQuiz : {
-      ContentsKey.icon : const Icon(FontAwesomeIcons.headphones),
-      ContentsKey.widget : Column(
-        children: [
-          MyWidget().getTextFieldWidget('hint', 15),
-          const SizedBox(height: 10,),
-          MyWidget().getRoundBtnWidget(true, MyStrings.checkAnswer, MyColors.purple, Colors.white, (){}),
-        ],
-      )
-    },
-    MyStrings.liveLesson : {
-      ContentsKey.icon : const Icon(FontAwesomeIcons.video),
-
-    },
+  final Map<String, IconData> noticeIcons = {
+    MyStrings.news: FontAwesomeIcons.bullhorn,
+    MyStrings.imageQuiz: FontAwesomeIcons.image,
+    MyStrings.audioQuiz: FontAwesomeIcons.headphones,
+    MyStrings.liveLesson: FontAwesomeIcons.video,
   };
 
   @override
   Widget build(BuildContext context) {
-    _controller.init();
     return SafeArea(
       child: Scaffold(
         floatingActionButton: ExpandableFab(
@@ -86,71 +59,65 @@ class MessageFrame extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
-              GetBuilder<MessageFrameStateManager>(
-                builder: (_controller) {
-                  Notice notice = _controller.noticeList[_controller.thisSwiperIndex];
-                  List<Widget> contents = [
-                    notice.contents,
-                  ];
+              GetBuilder<MessageStateManager>(
+                builder: (controller) {
+                  Notice notice = controller.noticeList[controller.thisSwiperIndex];
+                  //getContentAction(notice.actionType);
+                  List<Widget> contents = [];
+                  contents.add(notice.content);
 
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: ExpansionTile(
                       title: SizedBox(
-                        height: 80,
+                        height: 40,
                         child: Swiper(
                           onIndexChanged: (index) {
-                            _controller.thisSwiperIndex = index;
-                            _controller.update();
+                            controller.thisSwiperIndex = index;
+                            controller.update();
                           },
-                          itemCount: _controller.noticeList.length,
+                          itemCount: controller.noticeList.length,
                           itemBuilder: (context, index) {
-                            Notice notice = _controller.noticeList[index];
-                            IconData icon = FontAwesomeIcons.bullhorn;
-                            switch (notice.tag) {
-                              case MyStrings.news:
-                                icon = FontAwesomeIcons.bullhorn;
-                                break;
-
-                              case MyStrings.imageQuiz:
-                                icon = FontAwesomeIcons.image;
-                                break;
-
-                              case MyStrings.audioQuiz:
-                                icon = FontAwesomeIcons.headphones;
-                                break;
-
-                              case MyStrings.liveLesson:
-                                icon = FontAwesomeIcons.video;
-                                break;
-                            }
+                            Notice notice = controller.noticeList[index];
                             return Row(
                               children: [
                                 Icon(
-                                  icon,
+                                  noticeIcons[notice.tag],
                                   color: MyColors.greenDark,
                                 ),
                                 const SizedBox(width: 20),
-                                Expanded(child: MyWidget().getTextWidget(notice.title, 15, MyColors.greenDark)),
-                                MyWidget().getTextWidget('00:00:00 left', 15, MyColors.greenDark),
+                                Expanded(
+                                  child: Marquee(
+                                    text:
+                                        '${notice.title} (Expiring 00:00:00 Left)                          ',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: MyColors.greenDark,
+                                    ),
+                                    startAfter: const Duration(seconds: 2),
+                                    pauseAfterRound: const Duration(seconds: 2),
+                                  ),
+                                  // child: MyWidget().getTextWidget(
+                                  //     '${notice.title} (Expiring 00:00:00 Left)', 15, MyColors.greenDark),
+                                ),
                               ],
                             );
                           },
                           pagination: const SwiperPagination(
-                            alignment: Alignment.bottomRight,
-                            builder: DotSwiperPaginationBuilder(
-                              size: 8,
-                              color: MyColors.grey,
-                              activeColor: MyColors.greenDark
-                            )
-                          ),
+                              alignment: Alignment.bottomRight,
+                              margin: EdgeInsets.only(top: 20),
+                              builder: DotSwiperPaginationBuilder(
+                                  activeSize: 6,
+                                  size: 4,
+                                  color: MyColors.grey,
+                                  activeColor: MyColors.greenDark)),
                         ),
                       ),
-                      children: contents,
                       collapsedIconColor: MyColors.greenDark,
                       iconColor: MyColors.greenDark,
                       collapsedBackgroundColor: MyColors.greenLight,
                       backgroundColor: MyColors.greenLight,
+                      children: contents,
                     ),
                   );
                 },
@@ -160,9 +127,9 @@ class MessageFrame extends StatelessWidget {
                 children: [
                   Expanded(
                     child: MyWidget().getSearchWidget(
-                      _controller.focusNode,
-                      _controller.searchController,
-                      MyStrings.messageSearchHint,
+                      focusNode: _controller.focusNode,
+                      controller: _controller.searchController,
+                      hint: MyStrings.messageSearchHint,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -173,7 +140,12 @@ class MessageFrame extends StatelessWidget {
                       color: MyColors.purple,
                     ),
                   ),
-                  MyWidget().getTextWidget(UserInfo().podo.toString(), 15, MyColors.purple, isBold: true),
+                  MyWidget().getTextWidget(
+                    text: UserInfo().podo.toString(),
+                    size: 15,
+                    color: MyColors.purple,
+                    isBold: true,
+                  ),
                   const SizedBox(width: 10),
                 ],
               ),
@@ -198,13 +170,12 @@ class MessageFrame extends StatelessWidget {
   }
 
   Widget getBottomSheet(String tag) {
-    List<TextFieldItem> textFieldItems = _controller.textFieldItems;
-    textFieldItems.clear();
+    List<TextFieldItem> textFieldItems = [];
 
     if (tag == MyStrings.tagCorrection) {
-      textFieldItems.add(TextFieldItem(MyStrings.correctionHint, false));
+      textFieldItems.add(TextFieldItem(hint: MyStrings.correctionHint, hasRemoveBtn: false));
     } else {
-      textFieldItems.add(TextFieldItem(MyStrings.questionHint, false));
+      textFieldItems.add(TextFieldItem(hint: MyStrings.questionHint, hasRemoveBtn: false));
     }
     int podoCount = 1;
 
@@ -240,7 +211,7 @@ class MessageFrame extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    MyWidget().getTextWidget(tag, 20, MyColors.purple),
+                    MyWidget().getTextWidget(text: tag, size: 20, color: MyColors.purple),
                     IconButton(
                       icon: const Icon(CupertinoIcons.xmark),
                       color: MyColors.purple,
@@ -293,7 +264,7 @@ class MessageFrame extends StatelessWidget {
                                   item.hasRemoveBtn = true;
                                 }
                               }
-                              textFieldItems.add(TextFieldItem('', true));
+                              textFieldItems.add(TextFieldItem(hint: '', hasRemoveBtn: true));
                               podoCount++;
                             });
                           }
@@ -302,14 +273,20 @@ class MessageFrame extends StatelessWidget {
                     : const SizedBox.shrink(),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
-                  child:
-                      MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, () {
-                    //todo: DB에 저장할 때 correction 과 question 경로를 다르게 할 것
-                    List<String> requests = [];
-                    for (TextFieldItem item in textFieldItems) {
-                      requests.add(item.controller.text);
-                    }
-                  }, podoCount: podoCount),
+                  child: MyWidget().getRoundBtnWidget(
+                    isRequest: true,
+                    text: MyStrings.send,
+                    bgColor: MyColors.purple,
+                    fontColor: Colors.white,
+                    f: () {
+                      //todo: DB에 저장할 때 correction 과 question 경로를 다르게 할 것
+                      List<String> requests = [];
+                      for (TextFieldItem item in textFieldItems) {
+                        requests.add(item.controller.text);
+                      }
+                    },
+                    podoCount: podoCount,
+                  ),
                 )
               ],
             ),
@@ -325,7 +302,10 @@ class MessageFrame extends StatelessWidget {
     if (isUserMsg) {
       msgColor = MyColors.navyLight;
       widgets = [
-        MyWidget().getCircleImageWidget(image, 50),
+        MyWidget().getCircleImageWidget(
+          image: image,
+          size: 50,
+        ),
         const SizedBox(width: 10),
         Expanded(child: msgContainer(isUserMsg, tag, msg, msgColor, date))
       ];
@@ -334,7 +314,10 @@ class MessageFrame extends StatelessWidget {
       widgets = [
         Expanded(child: msgContainer(isUserMsg, tag, msg, msgColor, date)),
         const SizedBox(width: 10),
-        MyWidget().getCircleImageWidget(image, 50),
+        MyWidget().getCircleImageWidget(
+          image: image,
+          size: 50,
+        ),
       ];
     }
     return Padding(
@@ -358,25 +341,62 @@ class MessageFrame extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (isUserMsg) MyWidget().getTextWidget(tag, 13, MyColors.grey),
+        if (isUserMsg)
+          MyWidget().getTextWidget(
+            text: tag,
+            size: 13,
+            color: MyColors.grey,
+          ),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: msgColor,
           ),
-          child: MyWidget().getTextWidget(msg, 15, Colors.black),
+          child: MyWidget().getTextWidget(
+            text: msg,
+            size: 15,
+            color: Colors.black,
+          ),
         ),
         Align(
           alignment: Alignment.topRight,
-          child: MyWidget().getTextWidget(date, 13, MyColors.grey),
+          child: MyWidget().getTextWidget(
+            text: date,
+            size: 13,
+            color: MyColors.grey,
+          ),
         ),
       ],
     );
   }
+
+// Widget getContentAction(int actionType) {
+//   Widget action;
+//   switch (actionType) {
+//     case 0 :
+//       action = const SizedBox.shrink();
+//       break;
+//
+//     case 1 :
+//       action = Column(
+//         children: [
+//           MyWidget().getTextFieldWidget(hint: 'hint', fontSize: 15),
+//           const SizedBox(
+//             height: 10,
+//           ),
+//           MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, () {
+//             //todo:
+//           }),
+//         ],
+//       );
+//       break;
+//   }
+//
+//   return action;
+// }
 }
 
-//todo: 컨트롤러 dispose() 하기
 class TextFieldItem extends GetxController {
   Key key = UniqueKey();
   late String hint;
@@ -384,7 +404,7 @@ class TextFieldItem extends GetxController {
   VoidCallback? removeFunction;
   final TextEditingController controller = TextEditingController();
 
-  TextFieldItem(this.hint, this.hasRemoveBtn);
+  TextFieldItem({required this.hint, required this.hasRemoveBtn});
 
   void setRemoveFunction(VoidCallback f) {
     removeFunction = f;
@@ -405,7 +425,8 @@ class TextFieldItem extends GetxController {
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(
             children: [
-              Expanded(child: MyWidget().getTextFieldWidget(hint, 15, controller: controller)),
+              Expanded(
+                  child: MyWidget().getTextFieldWidget(hint: hint, fontSize: 15, controller: controller)),
               const SizedBox(width: 10),
               hasRemoveBtn
                   ? IconButton(
@@ -423,40 +444,8 @@ class TextFieldItem extends GetxController {
   }
 }
 
-class MessageFrameStateManager extends GetxController {
-  late List<Message> msgList;
-  late List<Notice> noticeList;
-  late FocusNode focusNode;
-  late TextEditingController searchController;
-  late bool isPremiumUser;
-  late int correctionCount;
-  late List<TextFieldItem> textFieldItems;
-  late int thisSwiperIndex;
-
-  void init() {
-    msgList = []; //todo: 최신 메시지부터 10개씩 나눠서 로딩하기
-    noticeList = SampleNotice().getNotices(); //todo: DB에서 isOnBoard = true 가져오기
-    focusNode = FocusNode();
-    searchController = TextEditingController();
-    isPremiumUser = UserInfo().isPremium;
-    correctionCount = 1;
-    textFieldItems = [];
-    thisSwiperIndex = 0;
-    //msgList.add(Message(false, '', MyStrings.messageInfo, ''));
-    //todo: 이후의 메시지는 DB에서 가져오기
-    // msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-    // msgList.add(Message(false, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));
-  }
-
-  void disposeControllers() {
-    focusNode.dispose();
-    searchController.dispose();
-    update();
-  }
-}
-
 class SampleNotice {
-  Notice sampleNews = Notice('news_000', 'Update deployed', Html(data: """
+  Notice sampleNews = Notice(noticeId: 'news_000', title: 'Update deployed', content: Html(data: """
         <div>
           <ul>
             <li>It actually works</li>
@@ -464,9 +453,9 @@ class SampleNotice {
             <li>It doesn't cost much!</li>
           </ul>
         </div>
-        """), true, 0);
+        """), isOnBoard: true, actionType: 0);
 
-  Notice sampleImageQuiz = Notice('imageQuiz_000', 'Image quiz', Html(data: """
+  Notice sampleImageQuiz = Notice(noticeId: 'imageQuiz_000', title: 'Image quiz', content: Html(data: """
         <div>
           <ul>
             <li>Look at the picture below and make a sentence.</li>
@@ -474,30 +463,31 @@ class SampleNotice {
           </ul>
           <img src='asset:assets/images/course_hangul.png' width='100' />
         </div>
-        """), true, 1);
+        """), isOnBoard: true, actionType: 1);
 
-  Notice sampleAudioQuiz = Notice('audioQuiz_000', 'Audio quiz', Html(data: """
+  Notice sampleAudioQuiz = Notice(noticeId: 'audioQuiz_000', title: 'Audio quiz', content: Html(data: """
         <div>
           <ul>
             <li>Listen to the audio and write what you hear.</li>
           </ul>
           <audio controls src='asset:assets/audio/sample.mp3'></audio>
         </div>
-        """), true, 2);
+        """), isOnBoard: true, actionType: 1);
 
-  Notice sampleLiveLesson = Notice('liveLesson_000', 'Free Live Lesson', Html(data: """
+  Notice sampleLiveLesson =
+      Notice(noticeId: 'liveLesson_000', title: 'Free Live Lesson', content: Html(data: """
         <div>
           <ul>
             <li>Status : available</li>
-            <li>Time : 25th June 2022, 7:00PM </li>
-            <li>Place : Zoom</li>
-            <li>Subject : Reading Hangul</li>
-            <li>Level : Beginner</li>
-            <li>Limit : 10 students</li>
+            <li>When : 25th June 2022, 7:00PM </li>
+            <li>Where : Zoom</li>
+            <li>What about : Reading Hangul</li>
+            <li>For who : Beginner</li>
+            <li>How many : 10 students</li>
           </ul>
           <p style="color:red;">* Lesson will be recorded and can be released on the podo YouTube channel</p>
         </div>
-        """), true, 3);
+        """), isOnBoard: true, actionType: 2);
 
   List<Notice> getNotices() {
     List<Notice> notices = [];

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 
 class PlayAudio {
@@ -11,7 +12,7 @@ class PlayAudio {
   AudioPlayer player = AudioPlayer();
 
   PlayAudio.init() {
-    print('playAudio 초기화');
+    debugPrint('playAudio 초기화');
   }
 
   void setAudios(String lessonId) {

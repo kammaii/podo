@@ -9,14 +9,14 @@ class Message {
   final bool? isBestQuestion;
   final String? notificationId;
 
-  Message(
-    this.msgId,
-    this.msg,
-    this.tag,
-    this.userEmail,
-    this.reply,
-    this.sendTime,
-    this.replyTime, {
+  Message({
+    required this.msgId,
+    required this.msg,
+    required this.tag,
+    required this.userEmail,
+    required this.reply,
+    required this.sendTime,
+    required this.replyTime,
     this.isBestQuestion,
     this.notificationId,
   });

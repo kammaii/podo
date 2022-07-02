@@ -1,20 +1,16 @@
-import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:podo/common_widgets/my_widget.dart';
-import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-enum SingingCharacter {
-  listenAndRepeat, speakAndListen
-}
+enum SingingCharacter { listenAndRepeat, speakAndListen }
 
 class FavoriteReview extends StatefulWidget {
   const FavoriteReview({Key? key}) : super(key: key);
 
-@override
+  @override
   _FavoriteReviewState createState() => _FavoriteReviewState();
 }
 
@@ -33,7 +29,11 @@ class _FavoriteReviewState extends State<FavoriteReview> {
             icon: const Icon(Icons.arrow_back_ios_rounded),
             color: MyColors.purple,
           ),
-          title: MyWidget().getTextWidget(MyStrings.title, 18, MyColors.purple,),
+          title: MyWidget().getTextWidget(
+            text: MyStrings.title,
+            size: 18,
+            color: MyColors.purple,
+          ),
         ),
         body: Column(
           children: [
@@ -49,7 +49,11 @@ class _FavoriteReviewState extends State<FavoriteReview> {
             Column(
               children: <Widget>[
                 ListTile(
-                  title: MyWidget().getTextWidget(MyStrings.listenAndRepeat, 15, MyColors.purple),
+                  title: MyWidget().getTextWidget(
+                    text: MyStrings.listenAndRepeat,
+                    size: 15,
+                    color: MyColors.purple,
+                  ),
                   leading: Radio<SingingCharacter>(
                     activeColor: MyColors.purple,
                     value: SingingCharacter.listenAndRepeat,
@@ -62,7 +66,11 @@ class _FavoriteReviewState extends State<FavoriteReview> {
                   ),
                 ),
                 ListTile(
-                  title: MyWidget().getTextWidget(MyStrings.speakAndListen, 15, MyColors.purple),
+                  title: MyWidget().getTextWidget(
+                    text: MyStrings.speakAndListen,
+                    size: 15,
+                    color: MyColors.purple,
+                  ),
                   leading: Radio<SingingCharacter>(
                     activeColor: MyColors.purple,
                     value: SingingCharacter.speakAndListen,
@@ -82,17 +90,22 @@ class _FavoriteReviewState extends State<FavoriteReview> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white
-                  ),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
                   child: Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        MyWidget().getTextWidget('비가와요', 30, Colors.black),
-                        MyWidget().getTextWidget('It\'s rainy', 20, MyColors.grey),
+                        MyWidget().getTextWidget(
+                          text: '비가와요',
+                          size: 30,
+                          color: Colors.black,
+                        ),
+                        MyWidget().getTextWidget(
+                          text: 'It\'s rainy',
+                          size: 20,
+                          color: MyColors.grey,
+                        ),
                       ],
                     ),
                   ),
@@ -106,7 +119,14 @@ class _FavoriteReviewState extends State<FavoriteReview> {
                   const Icon(FontAwesomeIcons.play),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 30),
-                    child: MyWidget().getRoundBtnWidget(false, MyStrings.next, MyColors.purple, Colors.white, (){}, horizontalPadding: 20),
+                    child: MyWidget().getRoundBtnWidget(
+                      isRequest: false,
+                      text: MyStrings.next,
+                      bgColor: MyColors.purple,
+                      fontColor: Colors.white,
+                      f: () {},
+                      horizontalPadding: 20,
+                    ),
                   ),
                 ],
               ),

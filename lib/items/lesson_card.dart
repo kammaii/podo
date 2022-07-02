@@ -14,10 +14,10 @@ class LessonCard {
   final List<String>? examples;
   bool? isFavorite;
 
-  LessonCard(
-    this.lessonId,
-    this.orderId,
-    this.type, {
+  LessonCard({
+    required this.lessonId,
+    required this.orderId,
+    required this.type,
     this.kr,
     this.en,
     this.pronun,

@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +13,8 @@ class LessonFinish extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double percent = 0.5;
-    final ConfettiController _controller = ConfettiController(duration: const Duration(seconds: 10));
-    _controller.play();
+    final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
+    controller.play();
 
     return SafeArea(
       child: Scaffold(
@@ -27,10 +25,7 @@ class LessonFinish extends StatelessWidget {
             TextLiquidFill(
               loadDuration: const Duration(seconds: 2),
               text: MyStrings.congratulations,
-              textStyle: const TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+              textStyle: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
               waveColor: MyColors.purple,
               boxBackgroundColor: MyColors.purpleLight,
               boxHeight: 100,
@@ -44,9 +39,9 @@ class LessonFinish extends StatelessWidget {
               height: 20,
             ),
             MyWidget().getTextWidget(
-              MyStrings.beginnerLevel,
-              20,
-              MyColors.purple,
+              text: MyStrings.beginnerLevel,
+              size: 20,
+              color: MyColors.purple,
             ),
             Expanded(
               child: Stack(
@@ -60,16 +55,16 @@ class LessonFinish extends StatelessWidget {
                     lineWidth: 10.0,
                     percent: percent,
                     center: MyWidget().getTextWidget(
-                      '${(percent * 100).toInt().toString()}%',
-                      30,
-                      MyColors.purple,
-                      isBold: true
+                      text: '${(percent * 100).toInt().toString()}%',
+                      size: 30,
+                      color: MyColors.purple,
+                      isBold: true,
                     ),
                     progressColor: MyColors.purple,
                   ),
                   //Image.asset('assets/images/confetti.png'),
                   ConfettiWidget(
-                    confettiController: _controller,
+                    confettiController: controller,
                     blastDirectionality: BlastDirectionality.explosive,
                     shouldLoop: true,
                     gravity: 0.05,
@@ -88,7 +83,7 @@ class LessonFinish extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  getCircleBtn(const Icon(FontAwesomeIcons.fileAlt), MyStrings.summary),
+                  getCircleBtn(const Icon(FontAwesomeIcons.fileLines), MyStrings.summary),
                   getCircleBtn(const Icon(Icons.home_rounded), MyStrings.home),
                 ],
               ),
@@ -110,17 +105,25 @@ Widget getCircleBtn(Icon icon, String text) {
             color: MyColors.purple,
             width: 3,
           ),
-          borderRadius: const BorderRadius.all(Radius.circular(50),),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(50),
+          ),
         ),
         child: IconButton(
           icon: icon,
           iconSize: 40,
           color: MyColors.purple,
-          onPressed: (){},
+          onPressed: () {},
         ),
       ),
-      const SizedBox(height: 5,),
-      MyWidget().getTextWidget(text, 17, MyColors.purple)
+      const SizedBox(
+        height: 5,
+      ),
+      MyWidget().getTextWidget(
+        text: text,
+        size: 17,
+        color: MyColors.purple,
+      )
     ],
   );
 }

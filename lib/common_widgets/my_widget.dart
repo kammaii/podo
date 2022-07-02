@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:podo/user/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class MyWidget {
-  AppBar getAppbarWithAction(
-      String title, Function actionFunction, Color actionColor) {
+  AppBar getAppbarWithAction({
+    required String title,
+    required Function actionFunction,
+    required Color actionColor,
+  }) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -36,7 +38,10 @@ class MyWidget {
     );
   }
 
-  AppBar getAppbar(BuildContext context, String title) {
+  AppBar getAppbar({
+    required BuildContext context,
+    required String title,
+  }) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -56,7 +61,11 @@ class MyWidget {
     );
   }
 
-  Widget getSearchWidget(FocusNode focusNode, TextEditingController controller, String hint) {
+  Widget getSearchWidget({
+    required FocusNode focusNode,
+    required TextEditingController controller,
+    required String hint,
+  }) {
     return TextField(
       focusNode: focusNode,
       decoration: InputDecoration(
@@ -77,7 +86,14 @@ class MyWidget {
     );
   }
 
-  Text getTextWidget(String text, double size, Color color, {bool? isBold, bool? isTextAlignCenter, bool? isLineThrough}) {
+  Text getTextWidget({
+    required String text,
+    required double size,
+    required Color color,
+    bool? isBold,
+    bool? isTextAlignCenter,
+    bool? isLineThrough,
+  }) {
     return Text(
       text,
       style: TextStyle(
@@ -90,7 +106,10 @@ class MyWidget {
     );
   }
 
-  Widget getInfoWidget(double height, String info) {
+  Widget getInfoWidget({
+    required double height,
+    required String info,
+  }) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: AnimatedContainer(
@@ -102,19 +121,30 @@ class MyWidget {
           borderRadius: BorderRadius.circular(10),
           color: MyColors.greenLight,
         ),
-        child: Center(child: getTextWidget(info, 15, MyColors.greenDark)),
+        child: Center(child: getTextWidget(text: info, size: 15, color: MyColors.greenDark)),
       ),
     );
   }
 
-  Widget getRoundBtnWithAlert(
-      bool isRequest, String text, Color bgColor, Color fontColor, Function f) {
+  Widget getRoundBtnWithAlert({
+    required bool isRequest,
+    required String text,
+    required Color bgColor,
+    required Color fontColor,
+    required Function f,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Align(
-          child: getRoundBtnWidget(isRequest, text, bgColor, fontColor, f),
           alignment: Alignment.center,
+          child: getRoundBtnWidget(
+            isRequest: isRequest,
+            text: text,
+            bgColor: bgColor,
+            fontColor: fontColor,
+            f: f,
+          ),
         ),
         const SizedBox(height: 10),
         Container(
@@ -130,8 +160,7 @@ class MyWidget {
             children: [
               const Text(
                 MyStrings.notEnoughCoins,
-                style: TextStyle(
-                    color: MyColors.purple, fontWeight: FontWeight.bold),
+                style: TextStyle(color: MyColors.purple, fontWeight: FontWeight.bold),
               ),
               TextButton(
                 onPressed: () {},
@@ -151,17 +180,40 @@ class MyWidget {
     );
   }
 
-  Widget getRoundBtnWidget(
-      bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? horizontalPadding, double? innerVerticalPadding, int? podoCount}) {
+  Widget getRoundBtnWidget({
+    required bool isRequest,
+    required String text,
+    required Color bgColor,
+    required Color fontColor,
+    required Function f,
+    double? horizontalPadding,
+    double? innerVerticalPadding,
+    int? podoCount,
+  }) {
     if (horizontalPadding == null) {
-      return roundBtnWidget(isRequest, text, bgColor, fontColor, f, innerVerticalPadding: innerVerticalPadding, podoCount: podoCount);
+      return roundBtnWidget(
+        isRequest: isRequest,
+        text: text,
+        bgColor: bgColor,
+        fontColor: fontColor,
+        f: f,
+        innerVerticalPadding: innerVerticalPadding,
+        podoCount: podoCount,
+      );
     } else {
       return Row(
         children: [
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: roundBtnWidget(isRequest, text, bgColor, fontColor, f, innerVerticalPadding: innerVerticalPadding),
+              child: roundBtnWidget(
+                isRequest: isRequest,
+                text: text,
+                bgColor: bgColor,
+                fontColor: fontColor,
+                f: f,
+                innerVerticalPadding: innerVerticalPadding,
+              ),
             ),
           )
         ],
@@ -169,10 +221,18 @@ class MyWidget {
     }
   }
 
-  Widget roundBtnWidget(bool isRequest, String text, Color bgColor, Color fontColor, Function f, {double? innerVerticalPadding, int? podoCount}) {
+  Widget roundBtnWidget({
+    required bool isRequest,
+    required String text,
+    required Color bgColor,
+    required Color fontColor,
+    required Function f,
+    double? innerVerticalPadding,
+    int? podoCount,
+  }) {
     double verticalPadding;
     isRequest ? verticalPadding = 5 : verticalPadding = 13;
-    if(innerVerticalPadding != null) {
+    if (innerVerticalPadding != null) {
       verticalPadding = innerVerticalPadding;
     }
     return ElevatedButton(
@@ -185,8 +245,7 @@ class MyWidget {
         f();
       },
       child: Padding(
-        padding:
-            EdgeInsets.symmetric(horizontal: 10, vertical: verticalPadding),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: verticalPadding),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -226,7 +285,10 @@ class MyWidget {
     );
   }
 
-  Widget getCircleImageWidget(String image, double size) {
+  Widget getCircleImageWidget({
+    required String image,
+    required double size,
+  }) {
     return Container(
       width: size,
       height: size,
@@ -247,17 +309,11 @@ class MyWidget {
     );
   }
 
-  Widget getRoundedContainerWidget(double radius, Widget child) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-      child: child,
-    );
-  }
-
-  Widget getTextFieldWidget(String hint, double fontSize, {TextEditingController? controller}) {
+  Widget getTextFieldWidget({
+    required String hint,
+    required double fontSize,
+    TextEditingController? controller,
+  }) {
     return TextField(
       controller: controller,
       maxLines: null,

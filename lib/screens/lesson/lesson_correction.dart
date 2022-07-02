@@ -19,25 +19,26 @@ class _LessonCorrectionState extends State<LessonCorrection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyWidget().getAppbarWithAction(
-        MyStrings.correction,
-        () {
-          setState(() {
-            if (isInfoSelected) {
-              isInfoSelected = false;
-              infoIconColor = MyColors.grey;
-            } else {
-              isInfoSelected = true;
-              infoIconColor = MyColors.green;
-            }
-          });
-        },
-        infoIconColor
-      ),
+          title: MyStrings.correction,
+          actionFunction: () {
+            setState(() {
+              if (isInfoSelected) {
+                isInfoSelected = false;
+                infoIconColor = MyColors.grey;
+              } else {
+                isInfoSelected = true;
+                infoIconColor = MyColors.green;
+              }
+            });
+          },
+          actionColor: infoIconColor),
       body: SafeArea(
         child: Column(
           children: [
             MyWidget().getInfoWidget(
-                isInfoSelected ? 60 : 0, MyStrings.correctionInfo),
+              height: isInfoSelected ? 60 : 0,
+              info: MyStrings.correctionInfo,
+            ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -47,7 +48,12 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   color: MyColors.purple,
                 ),
                 const SizedBox(width: 5),
-                MyWidget().getTextWidget('3', 18, MyColors.purple, isBold: true),
+                MyWidget().getTextWidget(
+                  text: '3',
+                  size: 18,
+                  color: MyColors.purple,
+                  isBold: true,
+                ),
                 const SizedBox(width: 10),
               ],
             ),
@@ -69,13 +75,11 @@ class _LessonCorrectionState extends State<LessonCorrection> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: MyWidget().getRoundBtnWithAlert(
-                      true,
-                      MyStrings.send,
-                      MyColors.green,
-                      Colors.white,
-                      () {
-
-                      },
+                      isRequest: true,
+                      text: MyStrings.send,
+                      bgColor: MyColors.green,
+                      fontColor: Colors.white,
+                      f: () {},
                     ),
                   ),
                 ],
@@ -97,9 +101,17 @@ class _LessonCorrectionState extends State<LessonCorrection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              MyWidget().getTextWidget('1) ~을 거예요', 20, MyColors.purple,
-                  isBold: true),
-              MyWidget().getTextWidget('3/30', 13, MyColors.grey),
+              MyWidget().getTextWidget(
+                text: '1) ~을 거예요',
+                size: 20,
+                color: MyColors.purple,
+                isBold: true,
+              ),
+              MyWidget().getTextWidget(
+                text: '3/30',
+                size: 13,
+                color: MyColors.grey,
+              ),
             ],
           ),
           const SizedBox(height: 10),

@@ -1,6 +1,11 @@
-
 class LessonTitle {
-  LessonTitle(this.level, this.orderId, this.category, this.title, {this.isVideo}) {
+  LessonTitle({
+    required this.level,
+    required this.orderId,
+    required this.category,
+    required this.title,
+    this.isVideo,
+  }) {
     lessonId = '${level}_${orderId.toString()}';
   }
 

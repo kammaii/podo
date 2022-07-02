@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/items/lesson_title.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
-import 'package:podo/screens/lesson/lesson_title.dart';
+import 'package:podo/state_manager/lesson_state_manager.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
-import 'package:podo/user/user_info.dart';
+import 'package:podo/items/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+
 
 
 class LessonMain extends StatefulWidget {
@@ -25,9 +27,9 @@ class _LessonMainState extends State<LessonMain> {
   double sliverAppBarStretchOffset = 100.0;
   late List<Widget> lessonWidgetList;
   List<LessonTitle> sampleItems = [
-    LessonTitle('beginner', 0, 'Future tense', '주말에 뭐 했어요?'),
-    LessonTitle('beginner', 1, 'Future tense', '내일 뭐 할 거예요?', isVideo: true),
-    LessonTitle('beginner', 2, 'Past tense', '밥을 먹었어요'),
+    LessonTitle(level: 'beginner', orderId: 0, category: 'Future tense', title: '주말에 뭐 했어요?'),
+    LessonTitle(level: 'beginner', orderId: 1, category: 'Future tense', title: '내일 뭐 할 거예요?', isVideo: true),
+    LessonTitle(level: 'beginner', orderId: 2, category: 'Past tense', title: '밥을 먹었어요'),
   ];
 
   @override
@@ -38,23 +40,22 @@ class _LessonMainState extends State<LessonMain> {
     bool isPremium = UserInfo().isPremium;
     bool hasCategory = true;
 
-    for(int i=0; i<sampleItems.length; i++) {
-      if(i != 0 && sampleItems[i].category == sampleItems[i-1].category) {
+    for (int i = 0; i < sampleItems.length; i++) {
+      if (i != 0 && sampleItems[i].category == sampleItems[i - 1].category) {
         hasCategory = false;
       } else {
         hasCategory = true;
       }
-      if(!isPremium) {
+      if (!isPremium) {
         bool isLocked;
-        i==0 ? isLocked = false : isLocked = true;
+        i == 0 ? isLocked = false : isLocked = true;
         lessonWidgetList.add(lessonList(sampleItems[i], hasCategory, isLocked));
-
       } else {
         lessonWidgetList.add(lessonList(sampleItems[i], hasCategory, false));
       }
     }
 
-    if(!isPremium) {
+    if (!isPremium) {
       lessonWidgetList.insert(1, premiumCard());
     }
   }
@@ -70,17 +71,21 @@ class _LessonMainState extends State<LessonMain> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          if(hasCategory)
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 5),
-            child: MyWidget().getTextWidget(title.category, 25, MyColors.navyLight),
-          ),
+          if (hasCategory)
+            Padding(
+              padding: const EdgeInsets.only(top: 10, bottom: 5),
+              child: MyWidget().getTextWidget(
+                text: title.category,
+                size: 25,
+                color: MyColors.navyLight,
+              ),
+            ),
           Card(
             color: isLocked ? MyColors.navyLightLight : Colors.white,
             child: InkWell(
-              onTap: (){
-                final _controller = Get.put(LessonFrameStateManager());
-                _controller.init();
+              onTap: () {
+                final LessonStateManager controller = Get.put(LessonStateManager());
+                controller.onInit();
                 Get.to(LessonFrame());
               },
               child: Padding(
@@ -91,16 +96,33 @@ class _LessonMainState extends State<LessonMain> {
                   children: [
                     Row(
                       children: [
-                        MyWidget().getTextWidget('lesson ${title.lessonId.split('_')[1]}', 15, MyColors.grey,),
-                        const SizedBox(width: 10,),
-                        if(title.isVideo != null)
-                        title.isVideo! ? const Icon(FontAwesomeIcons.youtube, color: MyColors.red,) : const SizedBox.shrink(),
+                        MyWidget().getTextWidget(
+                          text: 'lesson ${title.lessonId.split('_')[1]}',
+                          size: 15,
+                          color: MyColors.grey,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        if (title.isVideo != null)
+                          title.isVideo!
+                              ? const Icon(
+                                  FontAwesomeIcons.youtube,
+                                  color: MyColors.red,
+                                )
+                              : const SizedBox.shrink(),
                         const Spacer(),
                         //title.isCompleted ? const Icon(Icons.check_circle, color: MyColors.green,) : const SizedBox.shrink(),
                       ],
                     ),
-                    const SizedBox(height: 10,),
-                    MyWidget().getTextWidget(title.title, 20, isLocked ? MyColors.grey : MyColors.navy,),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    MyWidget().getTextWidget(
+                      text: title.title,
+                      size: 20,
+                      color: isLocked ? MyColors.grey : MyColors.navy,
+                    ),
                   ],
                 ),
               ),
@@ -122,11 +144,22 @@ class _LessonMainState extends State<LessonMain> {
             children: [
               const Icon(FontAwesomeIcons.crown, color: MyColors.purple),
               const SizedBox(height: 10),
-              MyWidget().getTextWidget(MyStrings.unlockEveryLessons, 18, Colors.black),
+              MyWidget().getTextWidget(
+                text: MyStrings.unlockEveryLessons,
+                size: 18,
+                color: Colors.black,
+              ),
               const SizedBox(height: 10),
-              MyWidget().getRoundBtnWidget(false, MyStrings.startFreeTrial, MyColors.purple, Colors.white, (){
-               Navigator.push(context, MaterialPageRoute(builder: (context) => const Subscribe()));
-              },innerVerticalPadding: 8)
+              MyWidget().getRoundBtnWidget(
+                isRequest: false,
+                text: MyStrings.startFreeTrial,
+                bgColor: MyColors.purple,
+                fontColor: Colors.white,
+                f: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Subscribe()));
+                },
+                innerVerticalPadding: 8,
+              )
             ],
           ),
         ),
@@ -148,7 +181,6 @@ class _LessonMainState extends State<LessonMain> {
       }
     }
 
-
     sliverAppBar() {
       return SliverAppBar(
         leading: IconButton(
@@ -161,7 +193,12 @@ class _LessonMainState extends State<LessonMain> {
         expandedHeight: sliverAppBarHeight,
         pinned: true,
         stretch: true,
-        title: MyWidget().getTextWidget(widget.course, 18, MyColors.purple, isBold: true),
+        title: MyWidget().getTextWidget(
+          text: widget.course,
+          size: 18,
+          color: MyColors.purple,
+          isBold: true,
+        ),
         flexibleSpace: Stack(
           children: [
             Container(
@@ -219,8 +256,7 @@ class _LessonMainState extends State<LessonMain> {
               top: topMargin,
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 30.0),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 30.0, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                 decoration: const BoxDecoration(
                   color: MyColors.navy,
                   borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -229,8 +265,17 @@ class _LessonMainState extends State<LessonMain> {
                   children: [
                     Column(
                       children: [
-                        MyWidget().getTextWidget(MyStrings.nextLesson, 15, Colors.white, isBold: true,),
-                        MyWidget().getTextWidget('~아/어요', 20, Colors.white,),
+                        MyWidget().getTextWidget(
+                          text: MyStrings.nextLesson,
+                          size: 15,
+                          color: Colors.white,
+                          isBold: true,
+                        ),
+                        MyWidget().getTextWidget(
+                          text: '~아/어요',
+                          size: 20,
+                          color: Colors.white,
+                        ),
                       ],
                     ),
                   ],

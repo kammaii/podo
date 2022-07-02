@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/common_widgets/my_widget.dart';
@@ -16,15 +15,19 @@ class LessonSummary extends StatelessWidget {
         children: [
           FloatingActionButton(
             onPressed: () {},
-            child: const Icon(FontAwesomeIcons.check),
             backgroundColor: MyColors.green,
+            child: const Icon(FontAwesomeIcons.check),
           ),
           const SizedBox(height: 5),
-          MyWidget().getTextWidget(MyStrings.correction, 15, MyColors.green,),
+          MyWidget().getTextWidget(
+            text: MyStrings.correction,
+            size: 15,
+            color: MyColors.green,
+          ),
           const SizedBox(height: 10),
         ],
       ),
-      appBar: MyWidget().getAppbar(context, MyStrings.title),
+      appBar: MyWidget().getAppbar(context: context, title: MyStrings.title),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -53,12 +56,16 @@ class LessonSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            child: MyWidget().getTextWidget(MyStrings.expression, 15, Colors.white,),
             decoration: BoxDecoration(
               color: MyColors.purple,
               borderRadius: BorderRadius.circular(20),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: MyWidget().getTextWidget(
+              text: MyStrings.expression,
+              size: 15,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: 10),
           Card(
@@ -67,14 +74,27 @@ class LessonSummary extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  MyWidget().getTextWidget('~아/어요', 20, MyColors.purple, isBold: true,),
+                  MyWidget().getTextWidget(
+                    text: '~아/어요',
+                    size: 20,
+                    color: MyColors.purple,
+                    isBold: true,
+                  ),
                   const SizedBox(height: 10),
-                  MyWidget().getTextWidget('This expression means ~~', 15, MyColors.grey,),
+                  MyWidget().getTextWidget(
+                    text: 'This expression means ~~',
+                    size: 15,
+                    color: MyColors.grey,
+                  ),
                   const SizedBox(height: 20),
                   Row(
                     //todo: generate 로 바꾸기
                     children: [
-                      MyWidget().getTextWidget('예문', 18, MyColors.purple,),
+                      MyWidget().getTextWidget(
+                        text: '예문',
+                        size: 18,
+                        color: MyColors.purple,
+                      ),
                       const SizedBox(width: 10),
                       IconButton(
                         onPressed: () {},
