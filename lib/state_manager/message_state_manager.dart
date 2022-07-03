@@ -13,6 +13,8 @@ class MessageStateManager extends GetxController {
   late bool isPremiumUser;
   late int correctionCount;
   late int thisSwiperIndex;
+  late int checkedAnswer;
+  late bool isLiveLessonChecked;
 
 
   @override
@@ -24,6 +26,8 @@ class MessageStateManager extends GetxController {
     isPremiumUser = UserInfo().isPremium;
     correctionCount = 1;
     thisSwiperIndex = 0;
+    checkedAnswer = 0;
+    isLiveLessonChecked = false;
     //msgList.add(Message(false, '', MyStrings.messageInfo, ''));
     //todo: 이후의 메시지는 DB에서 가져오기
     // msgList.add(Message(true, '#${MyStrings.correction}', MyStrings.lorem, '2021년 11월 29일'));

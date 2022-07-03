@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:podo/common_widgets/my_widget.dart';
-import 'package:podo/items/favorite.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -14,7 +13,7 @@ class FavoriteFrame extends StatefulWidget {
 class _FavoriteFrameState extends State<FavoriteFrame> {
   late FocusNode _focusNode;
   late TextEditingController _controller;
-  List<Favorite> favoriteList = [];
+  List<String> favoriteList = [];
 
   @override
   void initState() {
@@ -33,14 +32,9 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
   @override
   Widget build(BuildContext context) {
     favoriteList = [];
-    Favorite favorite =
-        Favorite(id: 'id000', korean: '사과', english: 'apple', pronunciation: '[사과]', audio: 'audioString');
-    favoriteList.add(favorite);
-    favoriteList.add(favorite);
-    favoriteList.add(favorite);
-    favoriteList.add(favorite);
-    favoriteList.add(favorite);
-    favoriteList.add(favorite);
+    // Favorite favorite =
+    //     Favorite(id: 'id000', korean: '사과', english: 'apple', pronunciation: '[사과]', audio: 'audioString');
+    // favoriteList.add(favorite);
 
     return SafeArea(
       child: Scaffold(
@@ -65,9 +59,9 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
                       padding: const EdgeInsets.all(10),
                       itemCount: favoriteList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        String korean = favoriteList[index].korean;
-                        String audio = favoriteList[index].audio;
-                        return getFavoriteItem(korean, audio);
+                        // String korean = favoriteList[index].korean;
+                        // String audio = favoriteList[index].audio;
+                        return getFavoriteItem();
                       },
                     ),
                   )
@@ -96,7 +90,7 @@ class _FavoriteFrameState extends State<FavoriteFrame> {
     );
   }
 
-  Widget getFavoriteItem(String korean, String audio) {
+  Widget getFavoriteItem() {
     return Column(
       children: [
         Row(

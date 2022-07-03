@@ -78,6 +78,8 @@ class MyStrings {
   static const String speakInKorean = 'Speak in Korean';
   static const String skip = 'skip';
   static const String checkAnswer = 'Check the answer';
+  static const String makeReservation = 'Make a reservation';
+  static const String iAgree = 'I agree';
 
 
 
@@ -89,8 +91,7 @@ class MyStrings {
   static const String speak = 'speak';
   static const String quiz = 'quiz';
   static const String swipe = 'swipe';
-  static const String news = 'news';
-  static const String imageQuiz = 'imageQuiz';
-  static const String audioQuiz = 'audioQuiz';
-  static const String liveLesson = 'liveLesson';
+  static const String tagInfo = '#info';
+  static const String tagQuiz = '#quiz';
+  static const String tagLiveLesson = '#liveLesson';
 }

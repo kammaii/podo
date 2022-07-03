@@ -23,10 +23,9 @@ class MessageFrame extends StatelessWidget {
   final MessageStateManager _controller = Get.put(MessageStateManager());
   final String podoImage = 'assets/images/logo.png';
   final Map<String, IconData> noticeIcons = {
-    MyStrings.news: FontAwesomeIcons.bullhorn,
-    MyStrings.imageQuiz: FontAwesomeIcons.image,
-    MyStrings.audioQuiz: FontAwesomeIcons.headphones,
-    MyStrings.liveLesson: FontAwesomeIcons.video,
+    MyStrings.tagInfo: FontAwesomeIcons.bullhorn,
+    MyStrings.tagQuiz: Icons.quiz_rounded,
+    MyStrings.tagLiveLesson: FontAwesomeIcons.video,
   };
 
   @override
@@ -62,9 +61,9 @@ class MessageFrame extends StatelessWidget {
               GetBuilder<MessageStateManager>(
                 builder: (controller) {
                   Notice notice = controller.noticeList[controller.thisSwiperIndex];
-                  //getContentAction(notice.actionType);
                   List<Widget> contents = [];
-                  contents.add(notice.content);
+                  contents.add(notice.contents);
+                  contents.add(getContentAction(notice));
 
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(10),
@@ -97,8 +96,6 @@ class MessageFrame extends StatelessWidget {
                                     startAfter: const Duration(seconds: 2),
                                     pauseAfterRound: const Duration(seconds: 2),
                                   ),
-                                  // child: MyWidget().getTextWidget(
-                                  //     '${notice.title} (Expiring 00:00:00 Left)', 15, MyColors.greenDark),
                                 ),
                               ],
                             );
@@ -141,7 +138,7 @@ class MessageFrame extends StatelessWidget {
                     ),
                   ),
                   MyWidget().getTextWidget(
-                    text: UserInfo().podo.toString(),
+                    text: UserInfo().podoCoin.toString(),
                     size: 15,
                     color: MyColors.purple,
                     isBold: true,
@@ -230,7 +227,7 @@ class MessageFrame extends StatelessWidget {
                           color: MyColors.purple,
                         ),
                         onPressed: () {
-                          if (UserInfo().podo == podoCount) {
+                          if (UserInfo().podoCoin == podoCount) {
                             UserInfo().isPremium
                                 ? Get.defaultDialog(
                                     titlePadding: const EdgeInsets.all(20),
@@ -371,30 +368,87 @@ class MessageFrame extends StatelessWidget {
     );
   }
 
-// Widget getContentAction(int actionType) {
-//   Widget action;
-//   switch (actionType) {
-//     case 0 :
-//       action = const SizedBox.shrink();
-//       break;
-//
-//     case 1 :
-//       action = Column(
-//         children: [
-//           MyWidget().getTextFieldWidget(hint: 'hint', fontSize: 15),
-//           const SizedBox(
-//             height: 10,
-//           ),
-//           MyWidget().getRoundBtnWidget(true, MyStrings.send, MyColors.purple, Colors.white, () {
-//             //todo:
-//           }),
-//         ],
-//       );
-//       break;
-//   }
-//
-//   return action;
-// }
+  Widget getContentAction(Notice notice) {
+    Widget action;
+    switch (notice.tag) {
+      case MyStrings.tagQuiz:
+        List<Widget> actionContents = [];
+        for (int i = 0; i < notice.examples!.length; i++) {
+          actionContents.add(getTextButton(i, notice.examples![i]));
+        }
+        actionContents.add(const SizedBox(height: 10));
+        actionContents.add(MyWidget().getRoundBtnWidget(
+          isRequest: false,
+          text: MyStrings.checkAnswer,
+          bgColor: _controller.checkedAnswer != 0 ? MyColors.greenDark : MyColors.grey,
+          fontColor: _controller.checkedAnswer != 0 ? MyColors.greenLight : Colors.white,
+          f: () {
+            //todo: 정답체크
+            if(_controller.checkedAnswer != 0) {
+
+            }
+          },
+        ));
+        actionContents.add(const SizedBox(height: 10));
+        action = Column(
+          children: actionContents,
+        );
+        break;
+
+      case MyStrings.tagLiveLesson:
+        action = Column(
+          children: [
+            Row(
+              children: [
+                Checkbox(
+                  value: _controller.isLiveLessonChecked,
+                  onChanged: (bool? b) {
+                    _controller.isLiveLessonChecked = b!;
+                    _controller.update();
+                  },
+                ),
+                MyWidget().getTextWidget(text: MyStrings.iAgree, size: 15, color: MyColors.greenDark),
+              ],
+            ),
+            const SizedBox(height: 10),
+            MyWidget().getRoundBtnWidget(
+              isRequest: false,
+              text: MyStrings.makeReservation,
+              bgColor: _controller.isLiveLessonChecked ? MyColors.greenDark : MyColors.grey,
+              fontColor: _controller.isLiveLessonChecked ? MyColors.greenLight : Colors.white,
+              f: () {
+                //todo: 예약하기
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
+        );
+        break;
+
+      default:
+        action = const SizedBox.shrink();
+    }
+
+    return action;
+  }
+
+  Widget getTextButton(int index, String text) {
+    return Row(
+      children: [
+        TextButton(
+          onPressed: () {
+            _controller.checkedAnswer = index + 1;
+            _controller.update();
+          },
+          child: MyWidget().getTextWidget(
+            text: text,
+            size: 18,
+            color: _controller.checkedAnswer == index + 1 ? MyColors.purple : Colors.black,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class TextFieldItem extends GetxController {
@@ -445,7 +499,10 @@ class TextFieldItem extends GetxController {
 }
 
 class SampleNotice {
-  Notice sampleNews = Notice(noticeId: 'news_000', title: 'Update deployed', content: Html(data: """
+  Notice sampleNews = Notice(
+    noticeId: '#info_000',
+    title: 'Update deployed',
+    contents: Html(data: """
         <div>
           <ul>
             <li>It actually works</li>
@@ -453,32 +510,29 @@ class SampleNotice {
             <li>It doesn't cost much!</li>
           </ul>
         </div>
-        """), isOnBoard: true, actionType: 0);
+        """),
+    isOnBoard: true,
+  );
 
-  Notice sampleImageQuiz = Notice(noticeId: 'imageQuiz_000', title: 'Image quiz', content: Html(data: """
+  Notice sampleQuiz = Notice(
+    noticeId: '#quiz_000',
+    title: 'Let\'s solve a quiz!',
+    contents: Html(data: """
         <div>
-          <ul>
-            <li>Look at the picture below and make a sentence.</li>
-            <li>Teacher Danny will proofread your answer.</li>
-          </ul>
-          <img src='asset:assets/images/course_hangul.png' width='100' />
+          <p>Which of the following statements is correct?</p>
         </div>
-        """), isOnBoard: true, actionType: 1);
+        """),
+    isOnBoard: true,
+    examples: ['ㄱ. answer1', 'ㄴ. answer2', 'ㄷ. answer3', 'ㄹ. answer4'],
+    answer: 'ㄹ. answer4',
+  );
 
-  Notice sampleAudioQuiz = Notice(noticeId: 'audioQuiz_000', title: 'Audio quiz', content: Html(data: """
+  Notice sampleLiveLesson = Notice(
+    noticeId: '#liveLesson_000',
+    title: 'Free Live Lesson',
+    contents: Html(data: """
         <div>
           <ul>
-            <li>Listen to the audio and write what you hear.</li>
-          </ul>
-          <audio controls src='asset:assets/audio/sample.mp3'></audio>
-        </div>
-        """), isOnBoard: true, actionType: 1);
-
-  Notice sampleLiveLesson =
-      Notice(noticeId: 'liveLesson_000', title: 'Free Live Lesson', content: Html(data: """
-        <div>
-          <ul>
-            <li>Status : available</li>
             <li>When : 25th June 2022, 7:00PM </li>
             <li>Where : Zoom</li>
             <li>What about : Reading Hangul</li>
@@ -487,13 +541,14 @@ class SampleNotice {
           </ul>
           <p style="color:red;">* Lesson will be recorded and can be released on the podo YouTube channel</p>
         </div>
-        """), isOnBoard: true, actionType: 2);
+        """),
+    isOnBoard: true,
+  );
 
   List<Notice> getNotices() {
     List<Notice> notices = [];
     notices.add(sampleNews);
-    notices.add(sampleImageQuiz);
-    notices.add(sampleAudioQuiz);
+    notices.add(sampleQuiz);
     notices.add(sampleLiveLesson);
     return notices;
   }

@@ -2,20 +2,26 @@ import 'package:flutter_html/flutter_html.dart';
 
 class Notice {
   final String noticeId;
-  late final String tag;
+  late final String tag; // #info, #quiz, #liveLesson
   final String title;
-  final Html content;
+  final Html contents;
   final bool isOnBoard;
-  final int actionType; // 0: no action, 1: textEdit + btn, 2: checkBox + btn
+
+  // for #quiz, #liveLesson
   final int? deadline;
+
+  // for #quiz
+  final List<String>? examples;
+  final String? answer;
 
   Notice({
     required this.noticeId,
     required this.title,
-    required this.content,
+    required this.contents,
     required this.isOnBoard,
-    required this.actionType,
     this.deadline,
+    this.examples,
+    this.answer,
   }) {
     tag = noticeId.split('_')[0];
   }

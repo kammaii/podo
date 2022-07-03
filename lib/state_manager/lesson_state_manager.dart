@@ -14,7 +14,7 @@ class LessonStateManager extends GetxController {
   void onInit() {
     cards = SampleLesson().getSampleLessons(); //todo: DB에서 해당 레슨카드 가져오기
     for (LessonCard card in cards) {
-      UserInfo().favorites.contains(card.uniqueId)
+      UserInfo().favorites!.contains(card.uniqueId)
           ? card.isFavorite = true
           : card.isFavorite = false;
     }

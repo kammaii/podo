@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:podo/items/lesson_title.dart';
+import 'package:podo/items/podo_coin_usage.dart';
+import 'package:podo/items/premium.dart';
 
 class UserInfo extends GetxController{
 
@@ -10,15 +13,23 @@ class UserInfo extends GetxController{
   }
 
   late String email;
-  late String name;
-  late String userImage;
+  late String? name;
+  late String? userImage;
+  late String? country;
+  late double dateSignUp;
+  late double dateLastSignIn;
   late bool isPremium;
-  late int podo;
-  late List<String> favorites;
+  late double? datePremiumStart;
+  late double? datePremiumEnd;
+  late List<Premium>? premiumRecord;
+  late int podoCoin;
+  late List<PodoCoinUsage>? podoCoinRecord;
+  late List<LessonTitle>? completeLessons;
+  late List<String>? favorites;
 
 
   void setCoins(int coin) {
-    podo = coin;
+    podoCoin = coin;
   }
 
   UserInfo.init() {
@@ -28,7 +39,7 @@ class UserInfo extends GetxController{
     name = 'danny';
     userImage = 'assets/images/logo.png';
     isPremium = false;
-    podo = 3;
+    podoCoin = 3;
     favorites = [];
   }
 
@@ -41,12 +52,12 @@ class UserInfo extends GetxController{
   }
 
   void addFavorite(String favorite) {
-    favorites.add(favorite);
+    favorites!.add(favorite);
     update();
   }
 
   void removeFavorite(String favorite) {
-    favorites.remove(favorite);
+    favorites!.remove(favorite);
     update();
   }
 }
