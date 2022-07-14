@@ -8,6 +8,7 @@ class LessonStateManager extends GetxController {
   late List<LessonCard> cards;
   late bool isPlayBtnActive;
   late int thisIndex;
+  late double audioPercent;
 
 
   @override
@@ -22,6 +23,7 @@ class LessonStateManager extends GetxController {
         ? isPlayBtnActive = true
         : isPlayBtnActive = false;
     thisIndex = 0;
+    audioPercent = 0.0;
     update();
   }
 

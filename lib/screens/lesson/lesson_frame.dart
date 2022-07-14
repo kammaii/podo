@@ -139,7 +139,7 @@ class LessonFrame extends StatelessWidget {
         ));
   }
 
-  Widget bottomDirection(String text, {double? cpTime}) {
+  Widget bottomDirection(String text, {bool hasCircleProgress = false}) {
     return Column(
       children: [
         const Divider(
@@ -156,16 +156,18 @@ class LessonFrame extends StatelessWidget {
             const SizedBox(
               width: 10,
             ),
-            const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                value: 0.7,
-                strokeWidth: 2.5,
-                color: MyColors.purple,
-                backgroundColor: MyColors.navyLight,
-              ),
-            )
+            hasCircleProgress
+                ? GetBuilder<LessonStateManager>(builder: (controller) {
+                    return CircularPercentIndicator(
+                      radius: 10,
+                      lineWidth: 3,
+                      percent: _controller.audioPercent,
+                      progressColor: MyColors.purple,
+                      animation: true,
+                      animateFromLastPercent: true,
+                    );
+                  })
+                : const SizedBox.shrink(),
           ],
         ),
       ],
@@ -237,7 +239,7 @@ class LessonFrame extends StatelessWidget {
               size: 20,
               color: Colors.black,
             ),
-            bottomDirection(MyStrings.listen),
+            bottomDirection(MyStrings.listen, hasCircleProgress: true),
           ],
         );
         break;
@@ -257,7 +259,7 @@ class LessonFrame extends StatelessWidget {
               size: 20,
               color: Colors.black,
             ),
-            bottomDirection(MyStrings.speakInKorean),
+            bottomDirection(MyStrings.speakInKorean, hasCircleProgress: true),
           ],
         );
         break;
