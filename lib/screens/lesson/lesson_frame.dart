@@ -239,7 +239,7 @@ class LessonFrame extends StatelessWidget {
               size: 20,
               color: Colors.black,
             ),
-            bottomDirection(MyStrings.listen, hasCircleProgress: true),
+            bottomDirection(MyStrings.listen1, hasCircleProgress: true),
           ],
         );
         break;

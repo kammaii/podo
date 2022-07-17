@@ -74,7 +74,12 @@ class MyStrings {
   static const String coinAlertTitle = 'You don\'t have enough coins.';
   static const String coinAlertSubTitlePremium = '3 coins will be charged tomorrow.';
   static const String coinAlertSubTitleNoPremium = 'Would you like to subscribe to the app and get 3 coins every day?';
-  static const String listen = 'Listen...';
+  static const String listen1 = 'Listen (slow)';
+  static const String listen2 = 'Listen (little faster)';
+  static const String listen3 = 'Listen (like a native)';
+  static const String repeat1 = 'Repeat (1/3)';
+  static const String repeat2 = 'Repeat (2/3)';
+  static const String repeat3 = 'Repeat (3/3)';
   static const String speakInKorean = 'Speak in Korean';
   static const String skip = 'skip';
   static const String checkAnswer = 'Check the answer';

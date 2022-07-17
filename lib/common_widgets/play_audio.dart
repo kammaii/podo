@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
+import 'package:podo/values/my_strings.dart';
 
 class PlayAudio {
 
@@ -29,13 +30,38 @@ class PlayAudio {
     duration = const Duration(seconds: 0);
     currentPosition = const Duration(seconds: 0);
     duration = await player.setAsset('assets/audio/$audio');
+    if(controller.cards[controller.thisIndex].type == MyStrings.practice) {
+      setListenerAfterListen(controller);
+      setPositionListener(controller);
+    }
+    await player.setVolume(1);
+    await player.setSpeed(1);
+    player.play();
+  }
+
+  void setListenerAfterListen(LessonStateManager controller) {
     player.playerStateStream.listen((event) {
       if(event.processingState == ProcessingState.completed) {
-        print('끝!');
-        controller.audioPercent = 0;
-        controller.update();
+        print('리슨 끝!');
+        controller.setPracticeDirection(true);
+        setListenerAfterRepeat(controller);
+        player.play();
       }
     });
+  }
+
+  void setListenerAfterRepeat(LessonStateManager controller) {
+    player.playerStateStream.listen((event) {
+      if(event.processingState == ProcessingState.completed) {
+        print('리핏 끝!');
+        controller.setPracticeDirection(false);
+        setListenerAfterListen(controller);
+        player.play();
+      }
+    });
+  }
+
+  void setPositionListener(LessonStateManager controller) {
     player.positionStream.listen((position) {
       currentPosition = position;
       double percentTemp = currentPosition.inMilliseconds / duration!.inMilliseconds;
@@ -46,9 +72,6 @@ class PlayAudio {
       controller.audioPercent = percentTemp;
       controller.update();
     });
-    await player.setVolume(1);
-    await player.setSpeed(1);
-    player.play();
   }
 
 
