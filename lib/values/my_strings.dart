@@ -74,9 +74,17 @@ class MyStrings {
   static const String coinAlertTitle = 'You don\'t have enough coins.';
   static const String coinAlertSubTitlePremium = '3 coins will be charged tomorrow.';
   static const String coinAlertSubTitleNoPremium = 'Would you like to subscribe to the app and get 3 coins every day?';
-  static const String listen = 'Listen...';
+  static const String swipe = 'swipe';
+  static const String listen1 = 'Listen (slow)';
+  static const String listen2 = 'Listen (litter faster)';
+  static const String listen3 = 'Listen (like a native)';
+  static const String repeat1 = 'Repeat (1/3)';
+  static const String repeat2 = 'Repeat (2/3)';
+  static const String repeat3 = 'Repeat (3/3)';
+  static const String praise1= 'Good job!';
+  static const String praise2= 'Awesome!';
+  static const String praise3= 'Nice work!';
   static const String speakInKorean = 'Speak in Korean';
-  static const String skip = 'skip';
   static const String checkAnswer = 'Check the answer';
   static const String makeReservation = 'Make a reservation';
   static const String iAgree = 'I agree';
@@ -87,10 +95,9 @@ class MyStrings {
   // used only in the code
   static const String subject = 'subject';
   static const String explain = 'explain';
-  static const String practice = 'practice';
+  static const String repeat = 'repeat';
   static const String speak = 'speak';
   static const String quiz = 'quiz';
-  static const String swipe = 'swipe';
   static const String tagInfo = '#info';
   static const String tagQuiz = '#quiz';
   static const String tagLiveLesson = '#liveLesson';

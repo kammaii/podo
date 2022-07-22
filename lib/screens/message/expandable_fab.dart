@@ -63,8 +63,8 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
       animChildren.add(_ExpandableActionButton(
         distance: widget.distance,
         progress: _expandAnimation,
-        child: widget.children[i],
         degree: degree,
+        child: widget.children[i],
       ));
     }
     return animChildren;

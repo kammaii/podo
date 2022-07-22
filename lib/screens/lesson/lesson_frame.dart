@@ -12,11 +12,13 @@ import 'package:podo/items/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:scratcher/scratcher.dart';
 
 class LessonFrame extends StatelessWidget {
   LessonFrame({Key? key}) : super(key: key);
 
   final _controller = Get.find<LessonStateManager>();
+  final _scratchKey = GlobalKey<ScratcherState>();
 
   @override
   Widget build(BuildContext context) {
@@ -56,37 +58,92 @@ class LessonFrame extends StatelessWidget {
                 viewportFraction: 0.8,
                 scale: 0.8,
                 onIndexChanged: (index) {
-                  _controller.thisIndex = index;
+                  _controller.changeIndex(index);
                   if (index >= _controller.cards.length) {
                     Get.to(const LessonFinish());
                     return;
-                  }
-                  LessonCard card = _controller.cards[_controller.thisIndex];
-                  if (card.audio != null) {
-                    _controller.setPlayBtn(true);
-                    playAudio(card.audio!);
-                  } else {
-                    _controller.setPlayBtn(false);
                   }
                 },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 50),
-              child: IconButton(
-                onPressed: () {
-                  _controller.isPlayBtnActive
-                      ? PlayAudio().playAudio(_controller.cards[_controller.thisIndex].audio!)
-                      : null;
+              padding: const EdgeInsets.only(top: 30, bottom: 50),
+              child: GetBuilder<LessonStateManager>(
+                builder: (controller) {
+                  String type = controller.cards[controller.thisIndex].type;
+                  
+                  return Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          MyWidget().getTextWidget(
+                            text: controller.direction,
+                            size: 15,
+                            color: MyColors.grey,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Visibility(
+                            visible: controller.isAudioProgressActive,
+                            child: CircularPercentIndicator(
+                              radius: 10,
+                              lineWidth: 3,
+                              percent: controller.audioProgress,
+                              progressColor: MyColors.purple,
+                              animation: true,
+                              animateFromLastPercent: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Visibility(
+                              visible: controller.isResponseBtn1Active,
+                              child: IconButton(
+                                onPressed: () {
+                                  controller.practiceCount++;
+                                  if (type == MyStrings.repeat) {
+                                    controller.playRepeat();
+                                  } else if (type == MyStrings.speak) {
+                                    controller.playSpeak();
+                                  }
+                                },
+                                icon: type == MyStrings.repeat ? getResponseIcon(Icons.check_circle) : getResponseIcon(FontAwesomeIcons.microphone),
+                                padding: EdgeInsets.zero,
+                              ),
+                            ),
+                            Visibility(
+                              visible: controller.isResponseBtn2Active,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: getResponseIcon(Icons.replay_circle_filled_rounded),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: getResponseIcon(Icons.play_circle_filled_rounded),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: getResponseIcon(Icons.next_plan_rounded),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  );
                 },
-                icon: GetBuilder<LessonStateManager>(
-                  builder: (controller) {
-                    return Icon(
-                      FontAwesomeIcons.play,
-                      color: controller.isPlayBtnActive ? Colors.black : MyColors.grey,
-                    );
-                  },
-                ),
               ),
             ),
           ],
@@ -95,48 +152,37 @@ class LessonFrame extends StatelessWidget {
     );
   }
 
-  void playAudio(String audio) async {
-    //await _audioPlayer.setSourceUrl(audio);
-    PlayAudio().playAudio(audio);
-  }
-
-  Widget topBtns(int index, {bool hasFavoriteBtn = true, bool hasSkipBtn = true}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        hasFavoriteBtn
-            ? IconButton(
-                onPressed: () {
-                  LessonCard card = _controller.cards[index];
-                  _controller.setFavorite(index, !card.isFavorite!);
-                  card.isFavorite!
-                      ? UserInfo().addFavorite(card.uniqueId)
-                      : UserInfo().removeFavorite(card.uniqueId);
-                },
-                icon: GetBuilder<LessonStateManager>(
-                  builder: (controller) {
-                    return Icon(
-                      controller.cards[index].isFavorite! ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: MyColors.purple,
-                      size: 30,
-                    );
-                  },
-                ),
-              )
-            : const SizedBox.shrink(),
-        hasSkipBtn ? skipBtn() : const SizedBox.shrink(),
-      ],
+  Icon getResponseIcon(IconData iconData) {
+    return Icon(
+      iconData,
+      size: 50,
+      color: MyColors.purple,
     );
   }
 
-  Widget skipBtn() {
-    return TextButton(
-        onPressed: () {},
-        child: MyWidget().getTextWidget(
-          text: MyStrings.skip,
-          size: 15,
-          color: MyColors.grey,
-        ));
+  Widget topBtns(int index) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: () {
+            LessonCard card = _controller.cards[index];
+            _controller.setFavorite(index, !card.isFavorite!);
+            card.isFavorite!
+                ? UserInfo().addFavorite(card.uniqueId)
+                : UserInfo().removeFavorite(card.uniqueId);
+          },
+          icon: GetBuilder<LessonStateManager>(
+            builder: (controller) {
+              return Icon(
+                controller.cards[index].isFavorite! ? Icons.star_rounded : Icons.star_outline_rounded,
+                color: MyColors.purple,
+                size: 30,
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Widget bottomDirection(String text, {bool hasCircleProgress = false}) {
@@ -161,7 +207,7 @@ class LessonFrame extends StatelessWidget {
                     return CircularPercentIndicator(
                       radius: 10,
                       lineWidth: 3,
-                      percent: _controller.audioPercent,
+                      percent: _controller.audioProgress,
                       progressColor: MyColors.purple,
                       animation: true,
                       animateFromLastPercent: true,
@@ -182,20 +228,25 @@ class LessonFrame extends StatelessWidget {
     switch (type) {
       case MyStrings.subject:
         widget = Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            topBtns(index, hasSkipBtn: false),
-            MyWidget().getTextWidget(
-              text: card.kr!,
-              size: 30,
-              color: Colors.black,
-            ),
-            MyWidget().getTextWidget(
-              text: card.en!,
-              size: 20,
-              color: Colors.black,
-            ),
-            bottomDirection(MyStrings.swipe),
+            topBtns(index),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  MyWidget().getTextWidget(
+                    text: card.kr!,
+                    size: 30,
+                    color: Colors.black,
+                  ),
+                  MyWidget().getTextWidget(
+                    text: card.en!,
+                    size: 20,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+            )
           ],
         );
         break;
@@ -207,100 +258,116 @@ class LessonFrame extends StatelessWidget {
             SingleChildScrollView(
               child: card.explain,
             ),
-            bottomDirection(MyStrings.swipe),
           ],
         );
         break;
 
-      case MyStrings.practice:
+      case MyStrings.repeat:
         widget = Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             topBtns(index),
-            Column(
-              children: [
-                MyWidget().getTextWidget(
-                  text: card.kr!,
-                  size: 30,
-                  color: Colors.black,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                MyWidget().getTextWidget(
-                  text: card.pronun!,
-                  size: 20,
-                  color: Colors.black,
-                ),
-              ],
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      MyWidget().getTextWidget(
+                        text: card.kr!,
+                        size: 30,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      MyWidget().getTextWidget(
+                        text: card.pronun!,
+                        size: 20,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ),
+                  MyWidget().getTextWidget(
+                    text: card.en!,
+                    size: 20,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
             ),
-            MyWidget().getTextWidget(
-              text: card.en!,
-              size: 20,
-              color: Colors.black,
-            ),
-            bottomDirection(MyStrings.listen, hasCircleProgress: true),
           ],
         );
         break;
 
       case MyStrings.speak:
         widget = Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             topBtns(index),
-            MyWidget().getTextWidget(
-              text: card.kr!,
-              size: 30,
-              color: Colors.black,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Scratcher(
+                    key: _scratchKey,
+                    color: MyColors.grey,
+                    onScratchStart: (){
+                      //todo: scroll 정지상태로 만들기
+                    },
+                    onScratchEnd: () {
+                      _scratchKey.currentState!.reset(duration: const Duration(milliseconds: 500));
+                    },
+                    child: MyWidget().getTextWidget(
+                      text: card.kr!,
+                      size: 30,
+                      color: Colors.black,
+                    ),
+                  ),
+                  MyWidget().getTextWidget(
+                    text: card.en!,
+                    size: 20,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
             ),
-            MyWidget().getTextWidget(
-              text: card.en!,
-              size: 20,
-              color: Colors.black,
-            ),
-            bottomDirection(MyStrings.speakInKorean, hasCircleProgress: true),
           ],
         );
         break;
 
       case MyStrings.quiz:
         widget = Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            topBtns(index, hasFavoriteBtn: false),
-            Expanded(
-              child: Center(
-                child: GridView.builder(
-                    shrinkWrap: true,
-                    itemCount: card.examples!.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          //todo: 정답여부 판별
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                              color: MyColors.purpleLight, //todo: 정답여부에 따라 변경하기
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: Center(
-                              child: MyWidget().getTextWidget(
-                                text: card.examples![index],
-                                size: 20,
-                                color: Colors.black,
-                              ),
-                            )),
-                      );
-                    }),
-              ),
-            ),
-            bottomDirection(card.question!),
+            MyWidget().getTextWidget(text: card.question!, size: 15, color: Colors.black),
+            const SizedBox(height: 10),
+            GridView.builder(
+                shrinkWrap: true,
+                itemCount: card.examples!.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      //todo: 정답여부 판별
+                    },
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.purpleLight, //todo: 정답여부에 따라 변경하기
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Center(
+                          child: MyWidget().getTextWidget(
+                            text: card.examples![index],
+                            size: 20,
+                            color: Colors.black,
+                          ),
+                        )),
+                  );
+                }),
           ],
         );
         break;
@@ -310,7 +377,7 @@ class LessonFrame extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50),
+      padding: const EdgeInsets.only(top: 50),
       child: Card(
           child: Padding(
         padding: const EdgeInsets.all(10),
@@ -338,7 +405,7 @@ class SampleLesson {
   final LessonCard practiceSample = LessonCard(
       lessonId: 'bgn_01',
       orderId: 2,
-      type: MyStrings.practice,
+      type: MyStrings.repeat,
       kr: '밥을 먹어요',
       pronun: '[바블머거요]',
       en: 'I have a meal',

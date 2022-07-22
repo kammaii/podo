@@ -51,7 +51,7 @@ class LessonFinish extends StatelessWidget {
                     animation: true,
                     animationDuration: 1200,
                     circularStrokeCap: CircularStrokeCap.round,
-                    radius: 200.0,
+                    radius: 150.0,
                     lineWidth: 10.0,
                     percent: percent,
                     center: MyWidget().getTextWidget(
@@ -62,7 +62,6 @@ class LessonFinish extends StatelessWidget {
                     ),
                     progressColor: MyColors.purple,
                   ),
-                  //Image.asset('assets/images/confetti.png'),
                   ConfettiWidget(
                     confettiController: controller,
                     blastDirectionality: BlastDirectionality.explosive,
