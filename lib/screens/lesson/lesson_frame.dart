@@ -4,7 +4,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common_widgets/my_widget.dart';
-import 'package:podo/common_widgets/play_audio.dart';
 import 'package:podo/items/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
@@ -19,6 +18,7 @@ class LessonFrame extends StatelessWidget {
 
   final _controller = Get.find<LessonStateManager>();
   final _scratchKey = GlobalKey<ScratcherState>();
+  //final _record = Record();
 
   @override
   Widget build(BuildContext context) {
@@ -107,12 +107,16 @@ class LessonFrame extends StatelessWidget {
                             Visibility(
                               visible: controller.isResponseBtn1Active,
                               child: IconButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   controller.practiceCount++;
                                   if (type == MyStrings.repeat) {
                                     controller.playRepeat();
                                   } else if (type == MyStrings.speak) {
                                     controller.playSpeak();
+                                    // if(await _record.hasPermission()) {
+                                    //   await _record.start();
+                                    //   print('hi');
+                                    // }
                                   }
                                 },
                                 icon: type == MyStrings.repeat ? getResponseIcon(Icons.check_circle) : getResponseIcon(FontAwesomeIcons.microphone),

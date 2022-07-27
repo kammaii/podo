@@ -21,6 +21,7 @@ class LessonStateManager extends GetxController {
   late Duration currentPosition;
   final List<String> praiseComments = [MyStrings.praise1, MyStrings.praise2, MyStrings.praise3];
   late AudioPlayer player;
+  bool stopListener = false;
 
   @override
   void onInit() {
@@ -103,13 +104,15 @@ class LessonStateManager extends GetxController {
       isAudioProgressActive = true;
 
       player.positionStream.listen((position) {
-        currentPosition = position;
-        audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
-        audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
-        if (audioProgress > 1) {
-          audioProgress = 1;
+        if(!stopListener) {
+          currentPosition = position;
+          audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
+          audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
+          if (audioProgress > 1) {
+            audioProgress = 1;
+          }
+          update();
         }
-        update();
       });
 
       duration = const Duration(seconds: 0);
@@ -117,14 +120,16 @@ class LessonStateManager extends GetxController {
       playAudio(audioSpeed);
 
       player.playerStateStream.listen((event) {
-        print('listener fired');
-        if (event.processingState == ProcessingState.completed) {
-          print('끝!');
-          direction = directionText2;
-          audioProgress = 0;
-          setResponseBtn(btn1: true);
-          isAudioProgressActive = false;
-          update();
+        if(!stopListener) {
+          print('listener fired');
+          if (event.processingState == ProcessingState.completed) {
+            print('끝!');
+            direction = directionText2;
+            audioProgress = 0;
+            setResponseBtn(btn1: true);
+            isAudioProgressActive = false;
+            update();
+          }
         }
       });
     }
@@ -162,9 +167,12 @@ class LessonStateManager extends GetxController {
   }
 
   void changeIndex(int index) {
+    //stopListener = true;
     thisIndex = index;
     LessonCard card = cards[thisIndex];
     initIndexChange();
+    //update();
+    //stopListener = false;
 
     switch (card.type) {
       case MyStrings.subject:
@@ -192,6 +200,10 @@ class LessonStateManager extends GetxController {
         update();
         break;
     }
+  }
+
+  void doUpdate() {
+    update();
   }
 
   void setFavorite(int index, bool isFavorite) {
