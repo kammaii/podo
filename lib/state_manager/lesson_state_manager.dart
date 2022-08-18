@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podo/common_widgets/play_audio.dart';
@@ -19,9 +20,12 @@ class LessonStateManager extends GetxController {
   late int practiceCount;
   late Duration? duration;
   late Duration currentPosition;
+  final List<String> directionTexts1 = [MyStrings.listen1, MyStrings.listen2, MyStrings.listen3];
+  final List<String> directionTexts2 = [MyStrings.repeat1, MyStrings.repeat2, MyStrings.repeat3];
   final List<String> praiseComments = [MyStrings.praise1, MyStrings.praise2, MyStrings.praise3];
   late AudioPlayer player;
-  bool stopListener = false;
+  late ScrollPhysics scrollPhysics;
+  //bool stopListener = false;
 
   @override
   void onInit() {
@@ -40,6 +44,7 @@ class LessonStateManager extends GetxController {
     duration = const Duration(seconds: 0);
     currentPosition = const Duration(seconds: 0);
     player = AudioPlayer();
+    scrollPhysics = const AlwaysScrollableScrollPhysics();
   }
 
   void playSpeak() {
@@ -70,22 +75,17 @@ class LessonStateManager extends GetxController {
     String directionText2 = '';
     double audioSpeed = 1;
 
+
     switch (practiceCount) {
       case 0:
-        directionText1 = MyStrings.listen1;
-        directionText2 = MyStrings.repeat1;
         audioSpeed = 0.6;
         break;
 
       case 1:
-        directionText1 = MyStrings.listen2;
-        directionText2 = MyStrings.repeat2;
         audioSpeed = 0.8;
         break;
 
       case 2:
-        directionText1 = MyStrings.listen3;
-        directionText2 = MyStrings.repeat3;
         audioSpeed = 1.0;
         break;
 
@@ -97,41 +97,12 @@ class LessonStateManager extends GetxController {
     }
 
     if(practiceCount < 3) {
-      direction = directionText1;
+      direction = directionTexts1[practiceCount];
+      playAudio(audioSpeed);
 
       isResponseBtn1Active = false;
       isResponseBtn2Active = false;
       isAudioProgressActive = true;
-
-      player.positionStream.listen((position) {
-        if(!stopListener) {
-          currentPosition = position;
-          audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
-          audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
-          if (audioProgress > 1) {
-            audioProgress = 1;
-          }
-          update();
-        }
-      });
-
-      duration = const Duration(seconds: 0);
-      currentPosition = const Duration(seconds: 0);
-      playAudio(audioSpeed);
-
-      player.playerStateStream.listen((event) {
-        if(!stopListener) {
-          print('listener fired');
-          if (event.processingState == ProcessingState.completed) {
-            print('끝!');
-            direction = directionText2;
-            audioProgress = 0;
-            setResponseBtn(btn1: true);
-            isAudioProgressActive = false;
-            update();
-          }
-        }
-      });
     }
   }
 
@@ -155,7 +126,30 @@ class LessonStateManager extends GetxController {
 
   void initIndexChange() {
     player.dispose();
-    player = AudioPlayer();
+    if(cards[thisIndex].type == MyStrings.repeat) {
+      player = AudioPlayer();
+      player.positionStream.listen((position) {
+        currentPosition = position;
+        audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
+        audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
+        if (audioProgress > 1) {
+          audioProgress = 1;
+        }
+        update();
+      });
+
+      player.playerStateStream.listen((event) {
+        print('listener fired : ${event.processingState}');
+        if (event.processingState == ProcessingState.completed) {
+          print('끝!');
+          direction = directionTexts2[practiceCount];
+          audioProgress = 0;
+          setResponseBtn(btn1: true);
+          isAudioProgressActive = false;
+          update();
+        }
+      });
+    }
     audioProgress = 0.0;
     direction = MyStrings.swipe;
     isResponseBtn1Active = false;

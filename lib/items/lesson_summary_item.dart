@@ -1,5 +1,5 @@
 class LessonSummaryItem {
-  final int lessonId;
+  final String lessonId;
   final List<Map<String, List<String>>> contents;
 
   LessonSummaryItem({

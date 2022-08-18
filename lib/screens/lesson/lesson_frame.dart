@@ -44,27 +44,32 @@ class LessonFrame extends StatelessWidget {
                 );
               },
             ),
-            Expanded(
-              child: Swiper(
-                itemBuilder: (context, index) {
-                  if (index < _controller.cards.length) {
-                    return getCards(index);
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-                loop: false,
-                itemCount: _controller.cards.length + 1,
-                viewportFraction: 0.8,
-                scale: 0.8,
-                onIndexChanged: (index) {
-                  _controller.changeIndex(index);
-                  if (index >= _controller.cards.length) {
-                    Get.to(const LessonFinish());
-                    return;
-                  }
-                },
-              ),
+            GetBuilder<LessonStateManager>(
+              builder: (controller) {
+                return Expanded(
+                  child: Swiper(
+                    itemBuilder: (context, index) {
+                      if (index < _controller.cards.length) {
+                        return getCards(index);
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                    loop: false,
+                    itemCount: _controller.cards.length + 1,
+                    viewportFraction: 0.8,
+                    scale: 0.8,
+                    physics: _controller.scrollPhysics,
+                    onIndexChanged: (index) {
+                      _controller.changeIndex(index);
+                      if (index >= _controller.cards.length) {
+                        Get.to(const LessonFinish());
+                        return;
+                      }
+                    },
+                  ),
+                );
+              },
             ),
             Padding(
               padding: const EdgeInsets.only(top: 30, bottom: 50),
@@ -315,10 +320,13 @@ class LessonFrame extends StatelessWidget {
                     key: _scratchKey,
                     color: MyColors.grey,
                     onScratchStart: (){
-                      //todo: scroll 정지상태로 만들기
+                      _controller.scrollPhysics = const NeverScrollableScrollPhysics();
+                      _controller.update();
                     },
                     onScratchEnd: () {
                       _scratchKey.currentState!.reset(duration: const Duration(milliseconds: 500));
+                      _controller.scrollPhysics = const AlwaysScrollableScrollPhysics();
+                      _controller.update();
                     },
                     child: MyWidget().getTextWidget(
                       text: card.kr!,
