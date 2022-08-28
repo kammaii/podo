@@ -18,6 +18,7 @@ class LessonFrame extends StatelessWidget {
 
   final _controller = Get.find<LessonStateManager>();
   final _scratchKey = GlobalKey<ScratcherState>();
+
   //final _record = Record();
 
   @override
@@ -30,23 +31,21 @@ class LessonFrame extends StatelessWidget {
           context: context,
           title: MyStrings.title,
         ),
-        body: Column(
-          children: [
-            GetBuilder<LessonStateManager>(
-              builder: (controller) {
-                return LinearPercentIndicator(
+        body: GetBuilder<LessonStateManager>(
+          builder: (controller) {
+            String type = controller.cards[controller.thisIndex].type;
+
+            return Column(
+              children: [
+                LinearPercentIndicator(
                   animateFromLastPercent: true,
                   animation: true,
                   lineHeight: 3.0,
                   percent: controller.thisIndex / totalCardNo,
                   backgroundColor: MyColors.navyLight,
                   progressColor: MyColors.purple,
-                );
-              },
-            ),
-            GetBuilder<LessonStateManager>(
-              builder: (controller) {
-                return Expanded(
+                ),
+                Expanded(
                   child: Swiper(
                     itemBuilder: (context, index) {
                       if (index < _controller.cards.length) {
@@ -68,16 +67,10 @@ class LessonFrame extends StatelessWidget {
                       }
                     },
                   ),
-                );
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 30, bottom: 50),
-              child: GetBuilder<LessonStateManager>(
-                builder: (controller) {
-                  String type = controller.cards[controller.thisIndex].type;
-                  
-                  return Column(
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 30, bottom: 50),
+                  child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -124,7 +117,9 @@ class LessonFrame extends StatelessWidget {
                                     // }
                                   }
                                 },
-                                icon: type == MyStrings.repeat ? getResponseIcon(Icons.check_circle) : getResponseIcon(FontAwesomeIcons.microphone),
+                                icon: type == MyStrings.repeat
+                                    ? getResponseIcon(Icons.check_circle)
+                                    : getResponseIcon(FontAwesomeIcons.microphone),
                                 padding: EdgeInsets.zero,
                               ),
                             ),
@@ -151,11 +146,11 @@ class LessonFrame extends StatelessWidget {
                         ),
                       )
                     ],
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -316,22 +311,24 @@ class LessonFrame extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Scratcher(
-                    key: _scratchKey,
-                    color: MyColors.grey,
-                    onScratchStart: (){
+                  Listener(
+                    onPointerDown: (event) {
                       _controller.scrollPhysics = const NeverScrollableScrollPhysics();
                       _controller.update();
                     },
-                    onScratchEnd: () {
-                      _scratchKey.currentState!.reset(duration: const Duration(milliseconds: 500));
-                      _controller.scrollPhysics = const AlwaysScrollableScrollPhysics();
-                      _controller.update();
-                    },
-                    child: MyWidget().getTextWidget(
-                      text: card.kr!,
-                      size: 30,
-                      color: Colors.black,
+                    child: Scratcher(
+                      key: _scratchKey,
+                      color: MyColors.grey,
+                      onScratchEnd: () {
+                        _scratchKey.currentState!.reset(duration: const Duration(milliseconds: 500));
+                        _controller.scrollPhysics = const AlwaysScrollableScrollPhysics();
+                        _controller.update();
+                      },
+                      child: MyWidget().getTextWidget(
+                        text: card.kr!,
+                        size: 30,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                   MyWidget().getTextWidget(

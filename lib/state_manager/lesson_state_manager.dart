@@ -1,9 +1,7 @@
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podo/common_widgets/play_audio.dart';
 import 'package:podo/items/lesson_card.dart';
 import 'package:podo/items/user_info.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
@@ -25,7 +23,6 @@ class LessonStateManager extends GetxController {
   final List<String> praiseComments = [MyStrings.praise1, MyStrings.praise2, MyStrings.praise3];
   late AudioPlayer player;
   late ScrollPhysics scrollPhysics;
-  //bool stopListener = false;
 
   @override
   void onInit() {
@@ -71,11 +68,9 @@ class LessonStateManager extends GetxController {
   }
 
   void playRepeat() async {
-    String directionText1 = '';
-    String directionText2 = '';
     double audioSpeed = 1;
 
-
+    
     switch (practiceCount) {
       case 0:
         audioSpeed = 0.6;
