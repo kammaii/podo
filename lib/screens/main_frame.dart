@@ -37,7 +37,7 @@ PersistentBottomNavBarItem _navBarItem(String title, Icon icon) {
 List<PersistentBottomNavBarItem> _navBarsItems() {
   return [
     _navBarItem('Lessons', const Icon(FontAwesomeIcons.book)),
-    _navBarItem('Messages', const Icon(FontAwesomeIcons.commentDots)),
+    _navBarItem('Community', const Icon(FontAwesomeIcons.commentDots)),
     _navBarItem('Favorites', const Icon(Icons.bookmark)),
     _navBarItem('Settings', const Icon(Icons.settings)),
   ];

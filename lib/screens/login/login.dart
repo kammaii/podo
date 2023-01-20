@@ -3,6 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+// apple OAuth callback : https://podo-49335.firebaseapp.com/__/auth/handler
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -27,7 +30,44 @@ class Login extends StatelessWidget {
     });
   }
 
-  Future<String?> _Signup(SignupData data) {
+  Future<String?> _Signup(SignupData data) async {
+
+    try {
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: data.name.toString(),
+        password: data.password.toString(),
+      );
+
+      print('here');
+
+      var acs = ActionCodeSettings(
+        // URL you want to redirect back to. The domain (www.example.com) for this
+        // URL must be whitelisted in the Firebase Console.
+          url: 'https://www.example.com/finishSignUp?cartId=1234',
+          // This must be true
+          handleCodeInApp: true,
+          iOSBundleId: 'com.example.ios',
+          androidPackageName: 'com.example.android',
+          // installIfNotAvailable
+          androidInstallApp: true,
+          // minimumVersion
+          androidMinimumVersion: '12');
+
+      final user = FirebaseAuth.instance.currentUser;
+      await user?.sendEmailVerification();
+      print('email sent');
+
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      } else {
+        print('ERRORRR: $e');
+      }
+    } catch (e) {
+      print(e);
+    }
     return Future.delayed(loginTime).then((_) {
       return 'Signup Succeed';
     });
@@ -72,7 +112,7 @@ class Login extends StatelessWidget {
           )
         ],
         onSignup: (signupData) {
-          print('signupData');
+          print('signupData : $signupData');
           return _Signup(signupData);
         },
         onLogin: (loginData) {
@@ -87,6 +127,7 @@ class Login extends StatelessWidget {
           return _Recover(name);
         },
         onSubmitAnimationCompleted: () {
+          print('onSubmitAnimationCompleted');
           //Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MainFrame()));
         },
       ),

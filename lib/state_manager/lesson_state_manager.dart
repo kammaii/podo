@@ -70,7 +70,7 @@ class LessonStateManager extends GetxController {
   void playRepeat() async {
     double audioSpeed = 1;
 
-    
+
     switch (practiceCount) {
       case 0:
         audioSpeed = 0.6;
@@ -125,8 +125,12 @@ class LessonStateManager extends GetxController {
       player = AudioPlayer();
       player.positionStream.listen((position) {
         currentPosition = position;
-        audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
-        audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
+        if(duration!.inMilliseconds > 0) {
+          audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
+          audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
+        } else {
+          audioProgress = 0.0;
+        }
         if (audioProgress > 1) {
           audioProgress = 1;
         }
