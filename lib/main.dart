@@ -1,3 +1,4 @@
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/favorite/favorite_review.dart';
@@ -21,16 +22,31 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Get any initial links : When the app is just opened by clicking the deepLink.
+  final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+  if (initialLink != null) {
+    final Uri deepLink = initialLink.link;
+    print(deepLink);
+  }
+
   // auth emulator init
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  runApp(const MyApp());
+  runApp(MyApp(link: initialLink));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key, PendingDynamicLinkData? link}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    // DynamicLink listener : When the app is already running
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+      print('dynamic link listening');
+    }).onError((error) {
+      // Handle errors
+    });
+
     return GetMaterialApp(
       title: 'Podo Korean app',
       theme: ThemeData(

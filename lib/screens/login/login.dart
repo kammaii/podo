@@ -43,18 +43,18 @@ class Login extends StatelessWidget {
       var acs = ActionCodeSettings(
         // URL you want to redirect back to. The domain (www.example.com) for this
         // URL must be whitelisted in the Firebase Console.
-          url: 'https://www.example.com/finishSignUp?cartId=1234',
+          url: 'https://podoverify.page.link/XktS',
           // This must be true
           handleCodeInApp: true,
-          iOSBundleId: 'com.example.ios',
-          androidPackageName: 'com.example.android',
+          iOSBundleId: 'net.awesomekorean.podo',
+          androidPackageName: 'net.awesomekorean.podo',
           // installIfNotAvailable
           androidInstallApp: true,
           // minimumVersion
           androidMinimumVersion: '12');
 
       final user = FirebaseAuth.instance.currentUser;
-      await user?.sendEmailVerification();
+      await user?.sendEmailVerification(acs);
       print('email sent');
 
     } on FirebaseAuthException catch (e) {
