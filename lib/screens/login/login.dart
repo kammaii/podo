@@ -31,7 +31,6 @@ class Login extends StatelessWidget {
   }
 
   Future<String?> _Signup(SignupData data) async {
-
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: data.name.toString(),
@@ -43,20 +42,18 @@ class Login extends StatelessWidget {
       var acs = ActionCodeSettings(
         // URL you want to redirect back to. The domain (www.example.com) for this
         // URL must be whitelisted in the Firebase Console.
-          url: 'https://podoverify.page.link/XktS',
-          // This must be true
-          handleCodeInApp: true,
-          iOSBundleId: 'net.awesomekorean.podo',
-          androidPackageName: 'net.awesomekorean.podo',
-          // installIfNotAvailable
-          androidInstallApp: true,
-          // minimumVersion
-          androidMinimumVersion: '12');
+        url: 'http://localhost/?email=${credential.user!.email}',
+        dynamicLinkDomain: 'podoverify.page.link',
+        androidPackageName: 'net.awesomekorean.podo',
+        androidInstallApp: true,
+        androidMinimumVersion: '12',
+        iOSBundleId: 'net.awesomekorean.podo',
+        handleCodeInApp: true,
+      );
 
       final user = FirebaseAuth.instance.currentUser;
-      await user?.sendEmailVerification(acs);
+      await user?.sendEmailVerification();
       print('email sent');
-
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -86,15 +83,11 @@ class Login extends StatelessWidget {
         logo: 'assets/images/logo.png',
         title: 'Welcome to podo',
         theme: LoginTheme(
-          primaryColor: MyColors.purple,
-          pageColorLight: MyColors.green,
-          accentColor: MyColors.purple,
-          titleStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold
-          )
-        ),
+            primaryColor: MyColors.purple,
+            pageColorLight: MyColors.green,
+            accentColor: MyColors.purple,
+            titleStyle: const TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
         loginProviders: <LoginProvider>[
           LoginProvider(
             icon: FontAwesomeIcons.google,

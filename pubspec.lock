@@ -53,10 +53,10 @@ packages:
   card_swiper:
     dependency: "direct main"
     description:
-      path: "G:\\card_swiper-master"
-      relative: false
-    source: path
-    version: "3.0.0"
+      name: card_swiper
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.4"
   characters:
     dependency: transitive
     description:
