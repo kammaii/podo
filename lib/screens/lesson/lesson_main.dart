@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/common/my_widget.dart';
 import 'package:podo/items/lesson_title.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
@@ -9,8 +9,6 @@ import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/items/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-
-
 
 class LessonMain extends StatefulWidget {
   const LessonMain({Key? key, required this.course, required this.courseImage}) : super(key: key);

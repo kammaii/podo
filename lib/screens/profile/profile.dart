@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/common/my_widget.dart';
 import 'package:podo/items/profile_item.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/values/my_colors.dart';

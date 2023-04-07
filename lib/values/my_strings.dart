@@ -1,6 +1,10 @@
 // ignore_for_file: constant_identifier_names
 
 class MyStrings {
+  static const String beg = 'Beg.';
+  static const String int = 'Int.';
+
+
   static const String askQuestion = 'Ask a question';
   static const String send = 'Send';
   static const String cancel = 'Cancel';

@@ -5,7 +5,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
-import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/common/my_widget.dart';
 import 'package:podo/items/notice.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';

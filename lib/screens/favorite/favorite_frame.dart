@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:podo/common_widgets/my_widget.dart';
+import 'package:podo/common/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
