@@ -3,6 +3,7 @@
 class MyStrings {
   static const String beg = 'Beg.';
   static const String int = 'Int.';
+  static const String courseError = 'Error: Failed to load lessons. Please contact the developer for assistance.';
 
 
   static const String askQuestion = 'Ask a question';

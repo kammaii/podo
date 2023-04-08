@@ -2,7 +2,7 @@ class LessonCourse {
   late String id;
   late int orderId;
   String? image;
-  late Map<String,dynamic> course;
+  late Map<String,dynamic> title;
   late Map<String,dynamic> description;
   late bool isBeginnerMode;
   String? tag;
@@ -12,7 +12,7 @@ class LessonCourse {
   static const String ID = 'id';
   static const String ORDERID = 'orderId';
   static const String IMAGE = 'image';
-  static const String COURSE = 'course';
+  static const String TITLE = 'title';
   static const String DESCRIPTION = 'description';
   static const String ISBEGINNERMODE = 'isBeginnerMode';
   static const String TAG = 'tag';
@@ -23,7 +23,7 @@ class LessonCourse {
     id = json[ID];
     orderId = json[ORDERID];
     image = json[IMAGE] ?? null;
-    course = json[COURSE];
+    title = json[TITLE];
     description = json[DESCRIPTION];
     isBeginnerMode = json[ISBEGINNERMODE];
     tag = json[TAG] ?? null;
@@ -35,7 +35,7 @@ class LessonCourse {
     Map<String, dynamic> map = {
       ID: id,
       ORDERID: orderId,
-      COURSE: course,
+      TITLE: title,
       DESCRIPTION: description,
       ISBEGINNERMODE: isBeginnerMode,
       LESSONS: lessons,
