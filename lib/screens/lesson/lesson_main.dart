@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/items/lesson_course.dart';
 import 'package:podo/items/lesson_title.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
@@ -11,9 +12,7 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class LessonMain extends StatefulWidget {
-  const LessonMain({Key? key, required this.course, required this.courseImage}) : super(key: key);
-  final String course;
-  final String courseImage;
+  const LessonMain({Key? key}) : super(key: key);
 
   @override
   _LessonMainState createState() => _LessonMainState();
@@ -28,7 +27,14 @@ class _LessonMainState extends State<LessonMain> {
     LessonTitle(level: 'beginner', orderId: 0, category: 'Future tense', title: '주말에 뭐 했어요?'),
     LessonTitle(level: 'beginner', orderId: 1, category: 'Future tense', title: '내일 뭐 할 거예요?', isVideo: true),
     LessonTitle(level: 'beginner', orderId: 2, category: 'Past tense', title: '밥을 먹었어요'),
+    LessonTitle(level: 'beginner', orderId: 0, category: 'Future tense', title: '주말에 뭐 했어요?'),
+    LessonTitle(level: 'beginner', orderId: 1, category: 'Future tense', title: '내일 뭐 할 거예요?', isVideo: true),
+    LessonTitle(level: 'beginner', orderId: 2, category: 'Past tense', title: '밥을 먹었어요'),
+
   ];
+  LessonCourse course = Get.arguments;
+  String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  String sampleImage = 'assets/images/course_hangul.png';
 
   @override
   void initState() {
@@ -192,7 +198,7 @@ class _LessonMainState extends State<LessonMain> {
         pinned: true,
         stretch: true,
         title: MyWidget().getTextWidget(
-          text: widget.course,
+          text: course.title[setLanguage],
           size: 18,
           color: MyColors.purple,
           isBold: true,
@@ -203,15 +209,15 @@ class _LessonMainState extends State<LessonMain> {
               color: MyColors.navyLight,
             ),
             Positioned(
+              top: -50,
+              right: -30,
               child: Hero(
-                tag: 'courseImage:${widget.course}',
+                tag: 'courseImage:${course.orderId}',
                 child: Image.asset(
-                  widget.courseImage,
+                  sampleImage,
                   width: 250,
                 ),
               ),
-              top: -50,
-              right: -30,
             )
           ],
         ),

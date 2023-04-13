@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/items/lesson_course.dart';
@@ -17,23 +18,16 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
   List<bool> modeToggle = [true, false];
   final LESSON_COURSES = 'LessonCourses';
   final ORDER_ID = 'orderId';
-  late Future<List<dynamic>> futureList;
+  final IS_BEGINNER_MODE = 'isBeginnerMode';
   late List<LessonCourse> courses;
+  String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
 
-  Widget getListItem(
-      {required BuildContext context, required int key, required String title, required String desc}) {
+  Widget getListItem({required LessonCourse lessonCourse}) {
     String sampleImage = 'assets/images/course_hangul.png';
     return Card(
-      key: ValueKey(key),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LessonMain(
-                        course: title,
-                        courseImage: sampleImage,
-                      )));
+          Get.to(const LessonMain(), arguments: lessonCourse);
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -47,14 +41,14 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
                     width: 80,
                     height: 80,
                     child: Hero(
-                      tag: 'courseImage:$title',
+                      tag: 'courseImage:${lessonCourse.orderId}',
                       child: Image.asset(sampleImage),
                     ),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
                     child: MyWidget().getTextWidget(
-                      text: title,
+                      text: lessonCourse.title[setLanguage],
                       size: 25,
                       color: MyColors.purple,
                       isBold: true,
@@ -62,28 +56,19 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              MyWidget().getTextWidget(
-                text: desc,
-                size: 15,
-                color: MyColors.grey,
-              ),
+              SizedBox(height: modeToggle[0] ? 20 : 0),
+              modeToggle[0]
+                  ? MyWidget().getTextWidget(
+                      text: lessonCourse.description[setLanguage],
+                      size: 15,
+                      color: MyColors.grey,
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
       ),
     );
-  }
-
-  getCourses() {
-    futureList = Database().getDocsFromDb(collection: LESSON_COURSES, orderBy: ORDER_ID);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    courses = [];
-    getCourses();
   }
 
   @override
@@ -126,7 +111,12 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
               ),
               Expanded(
                 child: FutureBuilder(
-                  future: futureList,
+                  future: Database().getDocsFromDb(
+                      collection: LESSON_COURSES,
+                      field: IS_BEGINNER_MODE,
+                      equalTo: modeToggle[0],
+                      orderBy: ORDER_ID,
+                      descending: false),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                       courses = [];
@@ -134,18 +124,14 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
                         courses.add(LessonCourse.fromJson(snapshot));
                       }
                       if (courses.isEmpty) {
-                        return const Center(child: Text(MyStrings.courseError));
+                        return const Center(
+                            child: Text(MyStrings.courseError, style: TextStyle(color: MyColors.purple)));
                       } else {
-                        courses.sort((a, b) => a.orderId.compareTo(b.orderId));
                         return ListView.builder(
                           itemCount: courses.length,
                           itemBuilder: (BuildContext context, int index) {
                             LessonCourse course = courses[index];
-                            return getListItem(
-                                context: context,
-                                key: index,
-                                title: course.title['en'],
-                                desc: course.description['en']);
+                            return getListItem(lessonCourse: course);
                           },
                         );
                       }
