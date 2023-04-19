@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:podo/items/lesson_title.dart';
+import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/items/podo_coin_usage.dart';
 import 'package:podo/items/premium.dart';
 
@@ -24,7 +24,7 @@ class UserInfo extends GetxController{
   late List<Premium>? premiumRecord;
   late int podoCoin;
   late List<PodoCoinUsage>? podoCoinRecord;
-  late List<LessonTitle>? completeLessons;
+  late List<String>? completeLessons;
   late List<String>? favorites;
 
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/items/lesson_course.dart';
+import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'lesson_main.dart';
@@ -41,7 +41,7 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
                     width: 80,
                     height: 80,
                     child: Hero(
-                      tag: 'courseImage:${lessonCourse.orderId}',
+                      tag: 'courseImage:${lessonCourse.id}',
                       child: Image.asset(sampleImage),
                     ),
                   ),

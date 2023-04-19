@@ -4,6 +4,8 @@ class MyStrings {
   static const String beg = 'Beg.';
   static const String int = 'Int.';
   static const String courseError = 'Error: Failed to load lessons. Please contact the developer for assistance.';
+  static const String lessons = 'lessons';
+  static const String nextLesson = 'Next lesson';
 
 
   static const String askQuestion = 'Ask a question';
@@ -24,7 +26,6 @@ class MyStrings {
   static const String favoriteSearchHint = 'Search your sentence';
   static const String selectCourse = 'Select a course';
   static const String hangul = 'Hangul';
-  static const String nextLesson = 'Next lesson';
   static const String notEnoughCoins = '* Not enough coins';
   static const String howToGetCoins = 'How to get coins?';
   static const String title = 'title';

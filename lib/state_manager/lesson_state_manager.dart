@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podo/items/lesson_card.dart';
 import 'package:podo/items/user_info.dart';
+import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/values/my_strings.dart';
 

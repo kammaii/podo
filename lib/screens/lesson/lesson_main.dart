@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/items/lesson_course.dart';
-import 'package:podo/items/lesson_title.dart';
+import 'package:podo/screens/lesson/lesson.dart';
+import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
-import 'package:podo/items/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -18,51 +17,22 @@ class LessonMain extends StatefulWidget {
   _LessonMainState createState() => _LessonMainState();
 }
 
-class _LessonMainState extends State<LessonMain> {
+class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
-  late List<Widget> lessonWidgetList;
-  List<LessonTitle> sampleItems = [
-    LessonTitle(level: 'beginner', orderId: 0, category: 'Future tense', title: '주말에 뭐 했어요?'),
-    LessonTitle(level: 'beginner', orderId: 1, category: 'Future tense', title: '내일 뭐 할 거예요?', isVideo: true),
-    LessonTitle(level: 'beginner', orderId: 2, category: 'Past tense', title: '밥을 먹었어요'),
-    LessonTitle(level: 'beginner', orderId: 0, category: 'Future tense', title: '주말에 뭐 했어요?'),
-    LessonTitle(level: 'beginner', orderId: 1, category: 'Future tense', title: '내일 뭐 할 거예요?', isVideo: true),
-    LessonTitle(level: 'beginner', orderId: 2, category: 'Past tense', title: '밥을 먹었어요'),
-
-  ];
   LessonCourse course = Get.arguments;
-  String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  String language = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
   String sampleImage = 'assets/images/course_hangul.png';
-
-  @override
-  void initState() {
-    super.initState();
-    scrollController.addListener(() => setState(() {}));
-    lessonWidgetList = [];
-    bool isPremium = UserInfo().isPremium;
-    bool hasCategory = true;
-
-    for (int i = 0; i < sampleItems.length; i++) {
-      if (i != 0 && sampleItems[i].category == sampleItems[i - 1].category) {
-        hasCategory = false;
-      } else {
-        hasCategory = true;
-      }
-      if (!isPremium) {
-        bool isLocked;
-        i == 0 ? isLocked = false : isLocked = true;
-        lessonWidgetList.add(lessonList(sampleItems[i], hasCategory, isLocked));
-      } else {
-        lessonWidgetList.add(lessonList(sampleItems[i], hasCategory, false));
-      }
-    }
-
-    if (!isPremium) {
-      lessonWidgetList.insert(1, premiumCard());
-    }
-  }
+  String nextLesson = '~아/어요'; //todo: userInfo 에서  completeLessons 참고하기
+  final KO = 'ko';
+  final LESSON = 'Lesson';
+  int lessonIndex = -1;
+  bool isCompleted = true; //todo: userInfo 에서 가져오기
+  double cardBorderRadius = 8;
+  bool isImageVisible = true;
+  late AnimationController animationController;
+  late Animation<double> animation;
 
   @override
   void dispose() {
@@ -70,70 +40,120 @@ class _LessonMainState extends State<LessonMain> {
     scrollController.dispose();
   }
 
-  Widget lessonList(LessonTitle title, bool hasCategory, bool isLocked) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          if (hasCategory)
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 5),
-              child: MyWidget().getTextWidget(
-                text: title.category,
-                size: 25,
-                color: MyColors.navyLight,
-              ),
-            ),
-          Card(
-            color: isLocked ? MyColors.navyLightLight : Colors.white,
-            child: InkWell(
-              onTap: () {
-                final LessonStateManager controller = Get.put(LessonStateManager());
-                controller.onInit();
-                Get.to(LessonFrame());
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        MyWidget().getTextWidget(
-                          text: 'lesson ${title.lessonId.split('_')[1]}',
-                          size: 15,
-                          color: MyColors.grey,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        if (title.isVideo != null)
-                          title.isVideo!
-                              ? const Icon(
-                                  FontAwesomeIcons.youtube,
-                                  color: MyColors.red,
-                                )
-                              : const SizedBox.shrink(),
-                        const Spacer(),
-                        //title.isCompleted ? const Icon(Icons.check_circle, color: MyColors.green,) : const SizedBox.shrink(),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    MyWidget().getTextWidget(
-                      text: title.title,
-                      size: 20,
-                      color: isLocked ? MyColors.grey : MyColors.navy,
-                    ),
-                  ],
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    animation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeIn,
+    ));
+    scrollController.addListener(() => setState(() {
+          if (scrollController.offset <= 100) {
+            if (animationController.value == 1) {
+              animationController.reverse();
+            }
+          } else {
+            if (animationController.value == 0) {
+              animationController.forward();
+            }
+          }
+        }));
+  }
+
+  Widget lessonListWidget(dynamic lessonMap) {
+    late Lesson lesson;
+    if (lessonMap is Map) {
+      lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
+      lesson.category == LESSON ? lessonIndex++ : null;
+    }
+    return Column(
+      children: [
+        lessonMap is String
+            ? Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 5),
+                child: MyWidget().getTextWidget(
+                  text: lessonMap,
+                  size: 25,
+                  color: MyColors.navyLight,
                 ),
+              )
+            : Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(cardBorderRadius),
+                      ),
+                      color: lesson.isFree ? Colors.white : MyColors.navyLightLight,
+                      child: InkWell(
+                        onTap: () {
+                          final LessonStateManager controller = Get.find<LessonStateManager>();
+                          controller.onInit();
+                          Get.to(LessonFrame());
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  MyWidget().getTextWidget(
+                                    text:
+                                        lesson.category == LESSON ? '$LESSON $lessonIndex' : lesson.category,
+                                    size: 15,
+                                    color: MyColors.grey,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  isCompleted
+                                      ? const Icon(
+                                          Icons.check_circle,
+                                          color: MyColors.green,
+                                        )
+                                      : const SizedBox.shrink(),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              MyWidget().getTextWidget(
+                                text: lesson.title[KO],
+                                size: 20,
+                                color: lesson.isFree ? MyColors.navy : MyColors.grey,
+                              ),
+                              const SizedBox(height: 10),
+                              MyWidget().getTextWidget(
+                                text: lesson.title[language],
+                                size: 15,
+                                color: MyColors.grey,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  lesson.tag != null
+                      ? Positioned(
+                          top: 5,
+                          right: 15,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.pink,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(cardBorderRadius),
+                                  bottomLeft: Radius.circular(cardBorderRadius),
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                              child: const Text('New', style: TextStyle(color: MyColors.red))))
+                      : const SizedBox.shrink(),
+                ],
               ),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -171,75 +191,85 @@ class _LessonMainState extends State<LessonMain> {
     );
   }
 
+  sliverAppBar() {
+    return SliverAppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_rounded),
+        color: MyColors.purple,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      expandedHeight: sliverAppBarHeight,
+      collapsedHeight: 60,
+      pinned: true,
+      stretch: true,
+      title: MyWidget().getTextWidget(
+        text: '${course.title[language]} (${course.lessons.length} ${MyStrings.lessons})',
+        size: 18,
+        color: MyColors.purple,
+        isBold: true,
+      ),
+      flexibleSpace: Stack(
+        children: [
+          Container(
+            color: MyColors.navyLight,
+          ),
+          Positioned(
+            top: -50,
+            right: -30,
+            child: Hero(
+              tag: 'courseImage:${course.id}',
+            child: FadeTransition(
+              opacity: animation,
+              child: Image.asset(
+                sampleImage,
+                width: 250,
+              ),
+            ),
+            ),
+          ),
+          const LinearProgressIndicator(
+            value: 0.5,
+            color: MyColors.purple,
+            backgroundColor: MyColors.purpleLight,
+          )
+        ],
+      ),
+      bottom: const PreferredSize(
+        preferredSize: Size.fromHeight(10.0),
+        child: Text(''),
+      ),
+    );
+  }
+
+  sliverList() {
+    return SliverPadding(
+      padding: const EdgeInsets.only(top: 60.0),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return lessonListWidget(course.lessons[index]);
+          },
+          childCount: course.lessons.length,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    lessonIndex = -1;
     double topMargin = sliverAppBarHeight - 30.0;
     double topMarginPlayBtn = sliverAppBarHeight - 25.0;
 
     if (scrollController.hasClients) {
       topMargin -= scrollController.offset;
-      if (sliverAppBarHeight - scrollController.offset >= 30) {
+      if (sliverAppBarHeight - scrollController.offset >= 34) {
         topMarginPlayBtn -= scrollController.offset;
       } else {
-        topMarginPlayBtn = 5.0;
+        topMarginPlayBtn = 9.0;
       }
-    }
-
-    sliverAppBar() {
-      return SliverAppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_rounded),
-          color: MyColors.purple,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        expandedHeight: sliverAppBarHeight,
-        pinned: true,
-        stretch: true,
-        title: MyWidget().getTextWidget(
-          text: course.title[setLanguage],
-          size: 18,
-          color: MyColors.purple,
-          isBold: true,
-        ),
-        flexibleSpace: Stack(
-          children: [
-            Container(
-              color: MyColors.navyLight,
-            ),
-            Positioned(
-              top: -50,
-              right: -30,
-              child: Hero(
-                tag: 'courseImage:${course.orderId}',
-                child: Image.asset(
-                  sampleImage,
-                  width: 250,
-                ),
-              ),
-            )
-          ],
-        ),
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(10.0),
-          child: Text(''),
-        ),
-      );
-    }
-
-    sliverList() {
-      return SliverPadding(
-        padding: const EdgeInsets.only(top: 60.0),
-        sliver: SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return lessonWidgetList[index];
-            },
-            childCount: lessonWidgetList.length,
-          ),
-        ),
-      );
     }
 
     return Scaffold(
@@ -276,7 +306,7 @@ class _LessonMainState extends State<LessonMain> {
                           isBold: true,
                         ),
                         MyWidget().getTextWidget(
-                          text: '~아/어요',
+                          text: nextLesson,
                           size: 20,
                           color: Colors.white,
                         ),
@@ -297,7 +327,9 @@ class _LessonMainState extends State<LessonMain> {
                   color: MyColors.navy,
                   size: 50.0,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  //todo: nextLesson start
+                },
               ),
             )
           ],

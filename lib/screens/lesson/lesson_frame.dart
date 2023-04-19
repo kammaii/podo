@@ -4,7 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/items/lesson_card.dart';
+import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
 import 'package:podo/items/user_info.dart';
