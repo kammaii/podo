@@ -92,9 +92,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
                       color: lesson.isFree ? Colors.white : MyColors.navyLightLight,
                       child: InkWell(
                         onTap: () {
-                          final LessonStateManager controller = Get.find<LessonStateManager>();
-                          controller.onInit();
-                          Get.to(LessonFrame());
+                          Get.to(LessonFrame(), arguments: lesson.id);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10),

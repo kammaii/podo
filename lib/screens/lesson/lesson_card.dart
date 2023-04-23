@@ -1,32 +1,20 @@
-import 'package:flutter_html/flutter_html.dart';
+import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
 
 class LessonCard {
-  final String lessonId;
-  final int orderId;
-  late final String uniqueId;
-  final String type;
-  final String? kr;
-  final String? en;
-  final String? pronun;
-  final Html? explain;
-  final String? audio;
-  final String? question;
-  final List<String>? examples;
-  bool? isFavorite;
+  late String id;
+  late int orderId;
+  late String type;
+  late Map<String, dynamic> content;
 
-  LessonCard({
-    required this.lessonId,
-    required this.orderId,
-    required this.type,
-    this.kr,
-    this.en,
-    this.pronun,
-    this.explain,
-    this.audio,
-    this.question,
-    this.examples,
-    this.isFavorite,
-  }) {
-    uniqueId = '${lessonId}_${orderId.toString()}';
-  }
+  static const String ID = 'id';
+  static const String ORDERID = 'orderId';
+  static const String TYPE = 'type';
+  static const String CONTENT = 'content';
+
+  LessonCard.fromJson(Map<String, dynamic> json)
+      : id = json[ID],
+        orderId = json[ORDERID],
+        type = json[TYPE],
+        content = json[CONTENT];
 }

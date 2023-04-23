@@ -14,7 +14,7 @@ class Database {
     print('Database 초기화');
   }
 
-  Future<List<dynamic>> getDocsFromDb(
+  Future<List<dynamic>> getDocs(
       {required String collection,
         dynamic field,
         dynamic equalTo,

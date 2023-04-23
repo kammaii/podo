@@ -88,15 +88,17 @@ class MyWidget {
 
   Text getTextWidget({
     required String text,
-    required double size,
-    required Color color,
+    double size = 15,
+    Color color = Colors.black,
     bool? isBold,
     bool? isTextAlignCenter,
     bool? isLineThrough,
+    bool isKorean = false,
   }) {
     return Text(
       text,
       style: TextStyle(
+        fontFamily: isKorean ? 'KoreanFont' : 'EnglishFont',
         fontSize: size,
         color: color,
         fontWeight: isBold != null ? FontWeight.bold : null,

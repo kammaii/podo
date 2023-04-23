@@ -1,11 +1,18 @@
 // ignore_for_file: constant_identifier_names
 
 class MyStrings {
+  // 번역해야 할 것들
   static const String beg = 'Beg.';
   static const String int = 'Int.';
-  static const String courseError = 'Error: Failed to load lessons. Please contact the developer for assistance.';
+  static const String lessonLoadError = 'Error: Failed to load lessons. Please contact the developer for assistance.';
   static const String lessons = 'lessons';
   static const String nextLesson = 'Next lesson';
+  static const String newExpression = 'New expression';
+  static const String listenAndRepeat = 'Listen and repeat';
+  static const String speakInKorean = 'Speak in Korean';
+  static const String nativesTip = 'Native\'s tip';
+  static const String scratch = 'scratch';
+  static const String takeQuiz = 'Let\'s take a quiz.';
 
 
   static const String askQuestion = 'Ask a question';
@@ -32,13 +39,11 @@ class MyStrings {
   static const String expression = 'Expression';
   static const String congratulations = 'Congratulations';
   static const String beginnerLevel = 'Beginner level';
-  static const String summary = 'summary';
   static const String home = 'home';
   static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
   static const String sentences = 'sentences';
   static const String review = 'Review';
-  static const String listenAndRepeat = 'Listen & Repeat';
   static const String speakAndListen = 'Speak & Listen';
   static const String next = 'Next';
   static const String podoPremium = 'Podo PREMIUM';
@@ -90,7 +95,6 @@ class MyStrings {
   static const String praise1= 'Good job!';
   static const String praise2= 'Awesome!';
   static const String praise3= 'Nice work!';
-  static const String speakInKorean = 'Speak in Korean';
   static const String checkAnswer = 'Check the answer';
   static const String makeReservation = 'Make a reservation';
   static const String iAgree = 'I agree';
@@ -102,8 +106,13 @@ class MyStrings {
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String repeat = 'repeat';
-  static const String speak = 'speak';
+  static const String speaking = 'speaking';
   static const String quiz = 'quiz';
+  static const String summary = 'summary';
+  static const String mention = 'mention';
+  static const String tip = 'tip';
+  static const String listening = 'listening';
+
   static const String tagInfo = '#info';
   static const String tagQuiz = '#quiz';
   static const String tagLiveLesson = '#liveLesson';

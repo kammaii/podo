@@ -111,7 +111,7 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
               ),
               Expanded(
                 child: FutureBuilder(
-                  future: Database().getDocsFromDb(
+                  future: Database().getDocs(
                       collection: LESSON_COURSES,
                       field: IS_BEGINNER_MODE,
                       equalTo: modeToggle[0],
@@ -125,7 +125,7 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
                       }
                       if (courses.isEmpty) {
                         return const Center(
-                            child: Text(MyStrings.courseError, style: TextStyle(color: MyColors.purple)));
+                            child: Text(MyStrings.lessonLoadError, style: TextStyle(color: MyColors.purple)));
                       } else {
                         return ListView.builder(
                           itemCount: courses.length,
