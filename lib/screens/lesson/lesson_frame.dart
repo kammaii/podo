@@ -24,6 +24,7 @@ class _LessonFrameState extends State<LessonFrame> {
   final lessonId = Get.arguments;
   int thisIndex = 0;
   ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
+  final controller = Get.put(LessonStateManager());
   final KO = 'ko';
   final PRONUN = 'pronun';
   final EX1 = 'ex1';
@@ -41,7 +42,6 @@ class _LessonFrameState extends State<LessonFrame> {
   late String answer;
   Color quizBorderColor = Colors.white;
   SwiperController swiperController = SwiperController();
-
 
   Widget getCards(int index) {
     LessonCard card = cards[index];
@@ -92,8 +92,8 @@ class _LessonFrameState extends State<LessonFrame> {
                 child: Html(
                   data: card.content[fo],
                   style: {
-                    'html': Style(
-                      fontSize: const FontSize(30),
+                    'span': Style(
+                      fontSize: const FontSize(18),
                     )
                   },
                 ),
@@ -265,7 +265,7 @@ class _LessonFrameState extends State<LessonFrame> {
         break;
 
       case MyStrings.quiz:
-        if(examples.isEmpty) {
+        if (examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
           examples.shuffle(Random());
@@ -290,15 +290,15 @@ class _LessonFrameState extends State<LessonFrame> {
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        if(examples[index] == answer) {
+                        if (examples[index] == answer) {
                           quizBorderColor = MyColors.purple;
-                          Future.delayed(const Duration(seconds: 1), (){
-                            swiperController.move(thisIndex+1);
+                          Future.delayed(const Duration(seconds: 1), () {
+                            swiperController.move(thisIndex + 1);
                             quizBorderColor = Colors.white;
                           });
                         } else {
                           quizBorderColor = MyColors.red;
-                          Future.delayed(const Duration(seconds: 1), (){
+                          Future.delayed(const Duration(seconds: 1), () {
                             setState(() {
                               quizBorderColor = Colors.white;
                             });
@@ -354,7 +354,6 @@ class _LessonFrameState extends State<LessonFrame> {
   @override
   void initState() {
     super.initState();
-    Get.put(LessonStateManager);
     isLoading = true;
     Database()
         .getDocs(collection: 'Lessons/$lessonId/LessonCards', orderBy: 'orderId', descending: false)
@@ -487,88 +486,94 @@ class _LessonFrameState extends State<LessonFrame> {
                       },
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30, bottom: 50),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  SizedBox(
+                    height: 170,
+                    child: Visibility(
+                      visible: cards[thisIndex].type == 'repeat',
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 30),
+                        child: Column(
                           children: [
                             MyWidget().getTextWidget(
-                              text: 'controller.direction',
+                              text: MyStrings.practice3Times,
                               size: 15,
                               color: MyColors.grey,
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            // Visibility(
-                            //   visible: controller.isAudioProgressActive,
-                            //   child: CircularPercentIndicator(
-                            //     radius: 10,
-                            //     lineWidth: 3,
-                            //     percent: controller.audioProgress,
-                            //     progressColor: MyColors.purple,
-                            //     animation: true,
-                            //     animateFromLastPercent: true,
-                            //   ),
-                            // ),
+                            const SizedBox(height: 20),
+                            GetBuilder<LessonStateManager>(
+                              builder: (controller) {
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    getSpeedBtn(isNormal: true),
+                                    const SizedBox(width: 20),
+                                    Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        CircularPercentIndicator(
+                                          radius: 30,
+                                          lineWidth: 4,
+                                          percent: 0.5,
+                                          animation: true,
+                                          animateFromLastPercent: true,
+                                          progressColor: MyColors.purple,
+                                        ),
+                                        IconButton(
+                                          iconSize: 60,
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.play_arrow_rounded,
+                                            color: MyColors.purple,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 20),
+                                    getSpeedBtn(isNormal: false),
+                                  ],
+                                );
+                              },
+                            )
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        // SizedBox(
-                        //   height: 50,
-                        //   child: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Visibility(
-                        //         visible: controller.isResponseBtn1Active,
-                        //         child: IconButton(
-                        //           onPressed: () async {
-                        //             controller.practiceCount++;
-                        //             if (type == MyStrings.repeat) {
-                        //               controller.playRepeat();
-                        //             } else if (type == MyStrings.speak) {
-                        //               controller.playSpeak();
-                        //               // if(await _record.hasPermission()) {
-                        //               //   await _record.start();
-                        //               //   print('hi');
-                        //               // }
-                        //             }
-                        //           },
-                        //           icon: type == MyStrings.repeat
-                        //               ? getResponseIcon(Icons.check_circle)
-                        //               : getResponseIcon(FontAwesomeIcons.microphone),
-                        //           padding: EdgeInsets.zero,
-                        //         ),
-                        //       ),
-                        //       Visibility(
-                        //         visible: controller.isResponseBtn2Active,
-                        //         child: Row(
-                        //           children: [
-                        //             IconButton(
-                        //               onPressed: () {},
-                        //               icon: getResponseIcon(Icons.replay_circle_filled_rounded),
-                        //             ),
-                        //             IconButton(
-                        //               onPressed: () {},
-                        //               icon: getResponseIcon(Icons.play_circle_filled_rounded),
-                        //             ),
-                        //             IconButton(
-                        //               onPressed: () {},
-                        //               icon: getResponseIcon(Icons.next_plan_rounded),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // )
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget getSpeedBtn({required isNormal}) {
+    Color containerColor;
+    Color borderColor;
+    if (isNormal && controller.audioSpeedToggle[0] || !isNormal && controller.audioSpeedToggle[1]) {
+      containerColor = MyColors.navyLight;
+      borderColor = Colors.white;
+    } else {
+      containerColor = Colors.white;
+      borderColor = MyColors.purple;
+    }
+
+    return GestureDetector(
+      onTap: () {
+        isNormal
+            ? controller.changeAudioSpeedToggle(isNormal: true)
+            : controller.changeAudioSpeedToggle(isNormal: false);
+      },
+      child: Container(
+        width: 90,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor),
+          color: containerColor,
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Center(
+          child: MyWidget().getTextWidget(
+              text: isNormal ? MyStrings.normal : MyStrings.speedDown, color: MyColors.purple, isBold: true),
+        ),
       ),
     );
   }
