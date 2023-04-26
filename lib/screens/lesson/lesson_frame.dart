@@ -2,8 +2,10 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/state_manager/lesson_state_manager.dart';
@@ -31,6 +33,8 @@ class _LessonFrameState extends State<LessonFrame> {
   final EX2 = 'ex2';
   final EX3 = 'ex3';
   final EX4 = 'ex4';
+  final AUDIO = 'audio';
+  final FILE_NAME = 'fileName';
   String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
   bool isLoading = true;
 
@@ -42,6 +46,7 @@ class _LessonFrameState extends State<LessonFrame> {
   late String answer;
   Color quizBorderColor = Colors.white;
   SwiperController swiperController = SwiperController();
+  Map<String, String> audios = {};
 
   Widget getCards(int index) {
     LessonCard card = cards[index];
@@ -355,14 +360,20 @@ class _LessonFrameState extends State<LessonFrame> {
   void initState() {
     super.initState();
     isLoading = true;
-    Database()
-        .getDocs(collection: 'Lessons/$lessonId/LessonCards', orderBy: 'orderId', descending: false)
-        .then((value) => setState(() {
-              for (dynamic map in value) {
-                cards.add(LessonCard.fromJson(map));
-              }
-              isLoading = false;
-            }));
+    Future.wait([
+      Database().getDocs(collection: 'Lessons/$lessonId/LessonCards', orderBy: 'orderId', descending: false),
+      CloudStorage().getLessonAudios(lessonId: lessonId),
+    ]).then((value) {
+      setState(() {
+        for(dynamic map in value[0]) {
+          cards.add(LessonCard.fromJson(map));
+        }
+        for(dynamic map in value[1]) {
+          audios.addAll(map);
+        }
+        isLoading = false;
+      });
+    });
   }
 
   // void initIndexChange() {
@@ -476,12 +487,19 @@ class _LessonFrameState extends State<LessonFrame> {
                       scale: 0.8,
                       physics: scrollPhysics,
                       onIndexChanged: (index) {
-                        setState(() {
-                          thisIndex = index;
-                        });
                         if (index >= cards.length) {
                           Get.to(const LessonFinish());
                           return;
+                        } else {
+                          setState(() {
+                            thisIndex = index;
+                            if(cards[thisIndex].content.containsKey(AUDIO)) {
+                              String fileName = cards[thisIndex].content[AUDIO];
+                              if(audios.containsKey(fileName)) {
+                                PlayAudio().setUrl(url: audios[fileName]!);
+                              }
+                            }
+                          });
                         }
                       },
                     ),
@@ -520,7 +538,9 @@ class _LessonFrameState extends State<LessonFrame> {
                                         ),
                                         IconButton(
                                           iconSize: 60,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            PlayAudio().playAudio();
+                                          },
                                           icon: const Icon(
                                             Icons.play_arrow_rounded,
                                             color: MyColors.purple,

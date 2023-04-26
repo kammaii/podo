@@ -68,7 +68,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
     late Lesson lesson;
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
-      lesson.category == LESSON ? lessonIndex++ : null;
+      lesson.type == LESSON ? lessonIndex++ : null;
     }
     return Column(
       children: [
@@ -103,7 +103,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
                                 children: [
                                   MyWidget().getTextWidget(
                                     text:
-                                        lesson.category == LESSON ? '$LESSON $lessonIndex' : lesson.category,
+                                        lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
                                     size: 15,
                                     color: MyColors.grey,
                                   ),
@@ -190,6 +190,12 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
   }
 
   sliverAppBar() {
+    int lessonCount = 0;
+    for(dynamic lesson in course.lessons) {
+      if(lesson is Map) {
+        lessonCount++;
+      }
+    }
     return SliverAppBar(
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_rounded),
@@ -203,7 +209,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
       pinned: true,
       stretch: true,
       title: MyWidget().getTextWidget(
-        text: '${course.title[language]} (${course.lessons.length} ${MyStrings.lessons})',
+        text: '${course.title[language]} ($lessonCount ${MyStrings.lessons})',
         size: 18,
         color: MyColors.purple,
         isBold: true,

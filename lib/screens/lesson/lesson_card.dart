@@ -1,5 +1,3 @@
-import 'package:get/get.dart';
-import 'package:uuid/uuid.dart';
 
 class LessonCard {
   late String id;

@@ -15,16 +15,31 @@ class PlayAudio {
     debugPrint('playAudio 초기화');
   }
 
-  void setAudios(String lessonId) {
-    //todo: 해당 레슨의 모든 오디오를 미리 불러와서 저장하기
+  void setUrl({required String url}) async {
+    print('SETTING URL : $url');
+    await player.setUrl(url).then((value) => playAudio());
   }
 
+  // void setUrls({required List<dynamic> audios}) async {
+  //   List<AudioSource> sources = [];
+  //   for(Map<String,String> audio in audios) {
+  //     sources.add(AudioSource.uri(Uri.parse(audio['url']!)));
+  //   }
+  //   await player.setAudioSource(ConcatenatingAudioSource(children: sources));
+  // }
+
+  // void playAudioIndex(int index) {
+  //   print('PLAY AUDIO');
+  //   player.seek(Duration.zero, index: index);
+  //   player.play();
+  // }
+
   void playAudio() async {
+    print('PLAYING AUDIO');
     await player.setVolume(1);
     await player.setSpeed(1);
     player.play();
   }
-
 
   void playCorrect() async {
     await player.setAsset('assets/audio/correct.mp3');
