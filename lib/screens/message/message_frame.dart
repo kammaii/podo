@@ -11,7 +11,7 @@ import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/items/user_info.dart';
-import 'package:podo/state_manager/message_state_manager.dart';
+import 'package:podo/screens/message/message_state_manager.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 

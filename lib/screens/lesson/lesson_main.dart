@@ -5,7 +5,7 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
-import 'package:podo/state_manager/lesson_state_manager.dart';
+import 'package:podo/screens/lesson/lesson_state_manager.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';

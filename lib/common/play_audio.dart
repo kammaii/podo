@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 
 class PlayAudio {
-
   static final PlayAudio _instance = PlayAudio.init();
 
   factory PlayAudio() {
@@ -13,32 +12,6 @@ class PlayAudio {
 
   PlayAudio.init() {
     debugPrint('playAudio 초기화');
-  }
-
-  void setUrl({required String url}) async {
-    print('SETTING URL : $url');
-    await player.setUrl(url).then((value) => playAudio());
-  }
-
-  // void setUrls({required List<dynamic> audios}) async {
-  //   List<AudioSource> sources = [];
-  //   for(Map<String,String> audio in audios) {
-  //     sources.add(AudioSource.uri(Uri.parse(audio['url']!)));
-  //   }
-  //   await player.setAudioSource(ConcatenatingAudioSource(children: sources));
-  // }
-
-  // void playAudioIndex(int index) {
-  //   print('PLAY AUDIO');
-  //   player.seek(Duration.zero, index: index);
-  //   player.play();
-  // }
-
-  void playAudio() async {
-    print('PLAYING AUDIO');
-    await player.setVolume(1);
-    await player.setSpeed(1);
-    player.play();
   }
 
   void playCorrect() async {
@@ -58,5 +31,4 @@ class PlayAudio {
     await player.setVolume(0.1);
     player.play();
   }
-
 }

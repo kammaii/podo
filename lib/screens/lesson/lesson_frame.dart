@@ -8,7 +8,7 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
-import 'package:podo/state_manager/lesson_state_manager.dart';
+import 'package:podo/screens/lesson/lesson_state_manager.dart';
 import 'dart:math';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -493,10 +493,11 @@ class _LessonFrameState extends State<LessonFrame> {
                         } else {
                           setState(() {
                             thisIndex = index;
+                            controller.player.stop();
                             if(cards[thisIndex].content.containsKey(AUDIO)) {
                               String fileName = cards[thisIndex].content[AUDIO];
                               if(audios.containsKey(fileName)) {
-                                PlayAudio().setUrl(url: audios[fileName]!);
+                                controller.setAudioUrlAndPlay(url: audios[fileName]!);
                               }
                             }
                           });
@@ -531,15 +532,14 @@ class _LessonFrameState extends State<LessonFrame> {
                                         CircularPercentIndicator(
                                           radius: 30,
                                           lineWidth: 4,
-                                          percent: 0.5,
-                                          animation: true,
+                                          percent: controller.audioProgress,
                                           animateFromLastPercent: true,
                                           progressColor: MyColors.purple,
                                         ),
                                         IconButton(
                                           iconSize: 60,
                                           onPressed: () {
-                                            PlayAudio().playAudio();
+                                            controller.playAudio();
                                           },
                                           icon: const Icon(
                                             Icons.play_arrow_rounded,
