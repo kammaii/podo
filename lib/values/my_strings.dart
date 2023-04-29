@@ -16,6 +16,8 @@ class MyStrings {
   static const String practice3Times = 'Practice it at least 3 times';
   static const String normal = 'normal';
   static const String speedDown = 'x0.8';
+  static const String failedUserTitle = 'Failed to load user information.';
+  static const String failedUserContent = 'If the problem persists, please contact the developer.';
 
 
   static const String askQuestion = 'Ask a question';

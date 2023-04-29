@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
+import 'package:podo/screens/profile/user.dart' as user;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,10 +46,29 @@ class MyApp extends StatelessWidget {
       // Handle errors
     });
 
-    return GetMaterialApp(
-      title: 'Podo Korean app',
-      theme: ThemeData(primaryColor: MyColors.purple),
-      home: const MainFrame(),
+    Widget homeWidget;
+
+    return FutureBuilder(
+      future: SharedPreferences.getInstance(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+          bool isLogin = snapshot.data.getBool('isLogin') ?? false;
+          if (isLogin) {
+            homeWidget = const MainFrame();
+            user.User();
+
+          } else {
+            homeWidget = const Login();
+          }
+        } else {
+          homeWidget = const Login();
+        }
+        return GetMaterialApp(
+          title: 'Podo Korean app',
+          theme: ThemeData(primaryColor: MyColors.purple),
+          home: homeWidget,
+        );
+      },
     );
   }
 }

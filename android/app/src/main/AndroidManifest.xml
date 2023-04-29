@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.awesomekorean.podo">
+    package="net.awesomekorean.newpodo">
    <application
         android:label="podo"
         android:usesCleartextTraffic="true"

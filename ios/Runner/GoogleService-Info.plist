@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1025269170157-bo8encbak25jgt9cpkdkh9rtm71nv1q8.apps.googleusercontent.com</string>
+	<string>1025269170157-vivongh8rhgvsetif1baaehpqigt5a9a.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1025269170157-bo8encbak25jgt9cpkdkh9rtm71nv1q8</string>
+	<string>com.googleusercontent.apps.1025269170157-vivongh8rhgvsetif1baaehpqigt5a9a</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1025269170157-d0tq6uta9rp3jrtcns8hth1bps6rnvrn.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDl6pIQgKsdsVgeP5QwKDkEh-KTGYiQCRk</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>net.awesomekorean.podo</string>
+	<string>net.awesomekorean.newpodo</string>
 	<key>PROJECT_ID</key>
 	<string>podo-49335</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1025269170157:ios:f413de2a58a6d1befcf1e4</string>
+	<string>1:1025269170157:ios:bf1db4ca54970228fcf1e4</string>
 </dict>
 </plist>

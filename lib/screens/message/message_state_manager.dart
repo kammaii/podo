@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/items/message.dart';
 import 'package:podo/items/notice.dart';
-import 'package:podo/items/user_info.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/screens/message/message_frame.dart';
 
 class MessageStateManager extends GetxController {
@@ -23,7 +23,7 @@ class MessageStateManager extends GetxController {
     noticeList = SampleNotice().getNotices(); //todo: DB에서 isOnBoard = true 가져오기
     focusNode = FocusNode();
     searchController = TextEditingController();
-    isPremiumUser = UserInfo().isPremium;
+    //isPremiumUser = User().isPremium;
     correctionCount = 1;
     thisSwiperIndex = 0;
     checkedAnswer = 0;

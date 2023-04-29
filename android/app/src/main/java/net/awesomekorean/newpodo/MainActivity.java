@@ -1,4 +1,4 @@
-package net.awesomekorean.podo;
+package net.awesomekorean.newpodo;
 
 import io.flutter.embedding.android.FlutterActivity;
 

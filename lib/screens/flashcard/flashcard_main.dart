@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class FavoriteFrame extends StatefulWidget {
-  const FavoriteFrame({Key? key}) : super(key: key);
+class FlashcardMain extends StatefulWidget {
+  const FlashcardMain({Key? key}) : super(key: key);
 
   @override
-  _FavoriteFrameState createState() => _FavoriteFrameState();
+  _FlashcardMainState createState() => _FlashcardMainState();
 }
 
-class _FavoriteFrameState extends State<FavoriteFrame> {
+class _FlashcardMainState extends State<FlashcardMain> {
   late FocusNode _focusNode;
   late TextEditingController _controller;
   List<String> favoriteList = [];

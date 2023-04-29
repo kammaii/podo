@@ -14,6 +14,11 @@ class Database {
     print('Database 초기화');
   }
 
+  Future<dynamic> getDoc({required String collection, required String docId}) async {
+    final ref = firestore.collection(collection).doc(docId);
+    return await ref.get().then((value) => print('$collection/$docId is loaded'));
+  }
+
   Future<List<dynamic>> getDocs(
       {required String collection,
         dynamic field,

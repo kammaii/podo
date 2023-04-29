@@ -10,7 +10,7 @@ import 'package:podo/items/notice.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
-import 'package:podo/items/user_info.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/screens/message/message_state_manager.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -137,12 +137,12 @@ class MessageFrame extends StatelessWidget {
                       color: MyColors.purple,
                     ),
                   ),
-                  MyWidget().getTextWidget(
-                    text: UserInfo().podoCoin.toString(),
-                    size: 15,
-                    color: MyColors.purple,
-                    isBold: true,
-                  ),
+                  // MyWidget().getTextWidget(
+                  //   text: UserInfo().podoCoin.toString(),
+                  //   size: 15,
+                  //   color: MyColors.purple,
+                  //   isBold: true,
+                  // ),
                   const SizedBox(width: 10),
                 ],
               ),
@@ -227,44 +227,44 @@ class MessageFrame extends StatelessWidget {
                           color: MyColors.purple,
                         ),
                         onPressed: () {
-                          if (UserInfo().podoCoin == podoCount) {
-                            UserInfo().isPremium
-                                ? Get.defaultDialog(
-                                    titlePadding: const EdgeInsets.all(20),
-                                    contentPadding: const EdgeInsets.only(bottom: 10),
-                                    title: MyStrings.coinAlertTitle,
-                                    middleText: MyStrings.coinAlertSubTitlePremium,
-                                    onConfirm: () {
-                                      Get.back();
-                                    },
-                                    confirmTextColor: Colors.white,
-                                    buttonColor: MyColors.purple,
-                                  )
-                                : Get.defaultDialog(
-                                    titlePadding: const EdgeInsets.all(20),
-                                    contentPadding: const EdgeInsets.all(15),
-                                    title: MyStrings.coinAlertTitle,
-                                    middleText: MyStrings.coinAlertSubTitleNoPremium,
-                                    onConfirm: () {
-                                      Get.back();
-                                      Get.to(const Subscribe());
-                                    },
-                                    onCancel: () {},
-                                    confirmTextColor: Colors.white,
-                                    cancelTextColor: MyColors.purple,
-                                    buttonColor: MyColors.purple,
-                                  );
-                          } else {
-                            reRender(() {
-                              if (textFieldItems.length <= 1) {
-                                for (TextFieldItem item in textFieldItems) {
-                                  item.hasRemoveBtn = true;
-                                }
-                              }
-                              textFieldItems.add(TextFieldItem(hint: '', hasRemoveBtn: true));
-                              podoCount++;
-                            });
-                          }
+                          // if (UserInfo().podoCoin == podoCount) {
+                          //   UserInfo().isPremium
+                          //       ? Get.defaultDialog(
+                          //           titlePadding: const EdgeInsets.all(20),
+                          //           contentPadding: const EdgeInsets.only(bottom: 10),
+                          //           title: MyStrings.coinAlertTitle,
+                          //           middleText: MyStrings.coinAlertSubTitlePremium,
+                          //           onConfirm: () {
+                          //             Get.back();
+                          //           },
+                          //           confirmTextColor: Colors.white,
+                          //           buttonColor: MyColors.purple,
+                          //         )
+                          //       : Get.defaultDialog(
+                          //           titlePadding: const EdgeInsets.all(20),
+                          //           contentPadding: const EdgeInsets.all(15),
+                          //           title: MyStrings.coinAlertTitle,
+                          //           middleText: MyStrings.coinAlertSubTitleNoPremium,
+                          //           onConfirm: () {
+                          //             Get.back();
+                          //             Get.to(const Subscribe());
+                          //           },
+                          //           onCancel: () {},
+                          //           confirmTextColor: Colors.white,
+                          //           cancelTextColor: MyColors.purple,
+                          //           buttonColor: MyColors.purple,
+                          //         );
+                          // } else {
+                          //   reRender(() {
+                          //     if (textFieldItems.length <= 1) {
+                          //       for (TextFieldItem item in textFieldItems) {
+                          //         item.hasRemoveBtn = true;
+                          //       }
+                          //     }
+                          //     textFieldItems.add(TextFieldItem(hint: '', hasRemoveBtn: true));
+                          //     podoCount++;
+                          //   });
+                          // }
                         },
                       )
                     : const SizedBox.shrink(),

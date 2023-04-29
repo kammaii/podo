@@ -7,14 +7,14 @@ import 'package:podo/values/my_strings.dart';
 
 enum SingingCharacter { listenAndRepeat, speakAndListen }
 
-class FavoriteReview extends StatefulWidget {
-  const FavoriteReview({Key? key}) : super(key: key);
+class FlashcardReview extends StatefulWidget {
+  const FlashcardReview({Key? key}) : super(key: key);
 
   @override
-  _FavoriteReviewState createState() => _FavoriteReviewState();
+  _FlashcardReviewState createState() => _FlashcardReviewState();
 }
 
-class _FavoriteReviewState extends State<FavoriteReview> {
+class _FlashcardReviewState extends State<FlashcardReview> {
   SingingCharacter? _character = SingingCharacter.listenAndRepeat;
 
   @override

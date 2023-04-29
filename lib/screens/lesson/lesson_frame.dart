@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/screens/lesson/lesson_state_manager.dart';
@@ -37,8 +36,6 @@ class _LessonFrameState extends State<LessonFrame> {
   final FILE_NAME = 'fileName';
   String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
   bool isLoading = true;
-
-  //final _record = Record();
   List<LessonCard> cards = [];
   Map<int, GlobalKey<ScratcherState>> scratchKey = {};
   bool isScratchTextVisible = true;
@@ -81,7 +78,7 @@ class _LessonFrameState extends State<LessonFrame> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         );
         break;
@@ -97,7 +94,7 @@ class _LessonFrameState extends State<LessonFrame> {
                 child: Html(
                   data: card.content[fo],
                   style: {
-                    'span': Style(
+                    'p': Style(
                       fontSize: const FontSize(18),
                     )
                   },
@@ -375,81 +372,6 @@ class _LessonFrameState extends State<LessonFrame> {
       });
     });
   }
-
-  // void initIndexChange() {
-  //   player.dispose();
-  //   if(cards[thisIndex].type == MyStrings.repeat) {
-  //     player = AudioPlayer();
-  //     player.positionStream.listen((position) {
-  //       currentPosition = position;
-  //       if(duration!.inMilliseconds > 0) {
-  //         audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
-  //         audioProgress = num.parse(audioProgress.toStringAsFixed(3)).toDouble();
-  //       } else {
-  //         audioProgress = 0.0;
-  //       }
-  //       if (audioProgress > 1) {
-  //         audioProgress = 1;
-  //       }
-  //       update();
-  //     });
-  //
-  //     player.playerStateStream.listen((event) {
-  //       print('listener fired : ${event.processingState}');
-  //       if (event.processingState == ProcessingState.completed) {
-  //         print('끝!');
-  //         direction = directionTexts2[practiceCount];
-  //         audioProgress = 0;
-  //         setResponseBtn(btn1: true);
-  //         isAudioProgressActive = false;
-  //         update();
-  //       }
-  //     });
-  //   }
-  //   audioProgress = 0.0;
-  //   direction = MyStrings.swipe;
-  //   isResponseBtn1Active = false;
-  //   isResponseBtn2Active = false;
-  //   isAudioProgressActive = false;
-  //   practiceCount = 0;
-  //   duration = const Duration(seconds: 0);
-  //   currentPosition = const Duration(seconds: 0);
-  // };
-  // void changeIndex(int index) {
-  //   //stopListener = true;
-  //   thisIndex = index;
-  //   LessonCard card = cards[thisIndex];
-  //   initIndexChange();
-  //   //update();
-  //   //stopListener = false;
-  //
-  //   switch (card.type) {
-  //     case MyStrings.subject:
-  //       direction = MyStrings.swipe;
-  //       update();
-  //       break;
-  //
-  //     case MyStrings.explain:
-  //       direction = MyStrings.swipe;
-  //       update();
-  //       break;
-  //
-  //     case MyStrings.repeat:
-  //       direction = MyStrings.listen1;
-  //       playRepeat();
-  //       break;
-  //
-  //     case MyStrings.speak:
-  //       direction = MyStrings.speakInKorean;
-  //       playSpeak();
-  //       break;
-  //
-  //     case MyStrings.quiz:
-  //       direction = '';
-  //       update();
-  //       break;
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
