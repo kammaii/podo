@@ -18,6 +18,7 @@ class MyStrings {
   static const String speedDown = 'x0.8';
   static const String failedUserTitle = 'Failed to load user information.';
   static const String failedUserContent = 'If the problem persists, please contact the developer.';
+  static const String verificationEmailSent = 'Verification email sent to your email';
 
 
   static const String askQuestion = 'Ask a question';

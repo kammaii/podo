@@ -83,17 +83,26 @@ class User{
   }
 
   void getUser() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    email = pref.getString('email')!;
-    DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: email);
-    if(snapshot.exists) {
-      User.fromJson(snapshot.data()!);
+    if (email.isNotEmpty) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(
+          collection: 'Users', docId: email);
+      if (snapshot.exists) {
+        User.fromJson(snapshot.data()!);
+      } else {
+        Get.dialog(AlertDialog(
+          title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),
+          content: MyWidget().getTextWidget(text: MyStrings.failedUserContent),
+        ));
+      }
     } else {
-      Get.dialog(AlertDialog(
-        title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),
-        content: MyWidget().getTextWidget(text: MyStrings.failedUserContent),
-      ));
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      email = pref.getString('email')!;
+      getUser();
     }
+  }
+
+  void setUserEmail(String email) {
+    this.email = email;
   }
 
   void changeUserName(String name) {

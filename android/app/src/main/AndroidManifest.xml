@@ -38,7 +38,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                    android:host="podoverify.page.link"
+                    android:host="newpodo.page.link"
                     android:scheme="https"/>
             </intent-filter>
         </activity>

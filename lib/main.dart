@@ -55,13 +55,14 @@ class MyApp extends StatelessWidget {
           bool isLogin = snapshot.data.getBool('isLogin') ?? false;
           if (isLogin) {
             homeWidget = const MainFrame();
-            user.User();
+            user.User().setUserEmail(snapshot.data.getString('email'));
+
 
           } else {
-            homeWidget = const Login();
+            homeWidget = Login();
           }
         } else {
-          homeWidget = const Login();
+          homeWidget = Login();
         }
         return GetMaterialApp(
           title: 'Podo Korean app',
