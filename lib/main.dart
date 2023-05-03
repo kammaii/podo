@@ -56,13 +56,12 @@ class MyApp extends StatelessWidget {
           if (isLogin) {
             homeWidget = const MainFrame();
             user.User().setUserEmail(snapshot.data.getString('email'));
-
-
           } else {
-            homeWidget = Login();
+            //homeWidget = Login();
+            homeWidget = const MainFrame();
           }
         } else {
-          homeWidget = Login();
+          homeWidget = const CircularProgressIndicator();
         }
         return GetMaterialApp(
           title: 'Podo Korean app',

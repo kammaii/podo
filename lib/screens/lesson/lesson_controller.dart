@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
-class LessonStateManager extends GetxController {
+class LessonController extends GetxController {
   late AudioPlayer player;
   late Duration currentPosition;
   Duration? duration;

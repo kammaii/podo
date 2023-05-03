@@ -7,7 +7,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
-import 'package:podo/screens/lesson/lesson_state_manager.dart';
+import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'dart:math';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -25,7 +25,7 @@ class _LessonFrameState extends State<LessonFrame> {
   final lessonId = Get.arguments;
   int thisIndex = 0;
   ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
-  final controller = Get.put(LessonStateManager());
+  final controller = Get.put(LessonController());
   final KO = 'ko';
   final PRONUN = 'pronun';
   final EX1 = 'ex1';
@@ -441,7 +441,7 @@ class _LessonFrameState extends State<LessonFrame> {
                               color: MyColors.grey,
                             ),
                             const SizedBox(height: 20),
-                            GetBuilder<LessonStateManager>(
+                            GetBuilder<LessonController>(
                               builder: (controller) {
                                 return Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -569,7 +569,7 @@ class _LessonFrameState extends State<LessonFrame> {
               width: 10,
             ),
             hasCircleProgress
-                ? GetBuilder<LessonStateManager>(builder: (controller) {
+                ? GetBuilder<LessonController>(builder: (controller) {
                     return CircularPercentIndicator(
                       radius: 10,
                       lineWidth: 3,

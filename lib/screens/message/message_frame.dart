@@ -127,6 +127,7 @@ class MessageFrame extends StatelessWidget {
                       focusNode: _controller.focusNode,
                       controller: _controller.searchController,
                       hint: MyStrings.messageSearchHint,
+                      onChanged: (s) {}
                     ),
                   ),
                   const SizedBox(width: 10),

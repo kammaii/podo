@@ -20,7 +20,7 @@ List<Widget> _buildScreens() {
   return [
     LessonCourseMain(),
     MessageFrame(),
-    const FlashcardMain(),
+    const FlashCardMain(),
     const Profile(),
   ];
 }
@@ -38,7 +38,7 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
   return [
     _navBarItem('Lessons', const Icon(FontAwesomeIcons.book)),
     _navBarItem('Community', const Icon(FontAwesomeIcons.commentDots)),
-    _navBarItem('Favorites', const Icon(Icons.bookmark)),
+    _navBarItem('Flashcards', const Icon(Icons.star_rounded)),
     _navBarItem('Settings', const Icon(Icons.settings)),
   ];
 }

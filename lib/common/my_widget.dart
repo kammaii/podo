@@ -65,6 +65,7 @@ class MyWidget {
     required FocusNode focusNode,
     required TextEditingController controller,
     required String hint,
+    required Function(String?) onChanged
   }) {
     return TextField(
       focusNode: focusNode,
@@ -81,8 +82,10 @@ class MyWidget {
           ),
           hintText: hint,
           filled: true,
-          fillColor: Colors.white),
+          fillColor: Colors.white,
+      ),
       controller: controller,
+      onChanged: onChanged,
     );
   }
 
@@ -338,6 +341,14 @@ class MyWidget {
         hintStyle: TextStyle(fontSize: fontSize),
         contentPadding: const EdgeInsets.all(10),
       ),
+    );
+  }
+
+  Widget getCheckBox({required bool value, required Function(bool?) onChanged}) {
+    return Checkbox(
+      value: value,
+      onChanged: onChanged,
+      activeColor: MyColors.purple,
     );
   }
 }

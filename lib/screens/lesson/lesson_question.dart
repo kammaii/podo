@@ -81,6 +81,7 @@ class _LessonQuestionState extends State<LessonQuestion> {
                                   focusNode: searchFocusNode,
                                   controller: textFieldController,
                                   hint: MyStrings.questionSearchHint,
+                                  onChanged: (s) {}
                                 ),
                               ),
                               const SizedBox(width: 10),

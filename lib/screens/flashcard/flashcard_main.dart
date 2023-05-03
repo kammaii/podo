@@ -1,42 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
+import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class FlashcardMain extends StatefulWidget {
-  const FlashcardMain({Key? key}) : super(key: key);
+class FlashCardMain extends StatefulWidget {
+  const FlashCardMain({Key? key}) : super(key: key);
 
   @override
-  _FlashcardMainState createState() => _FlashcardMainState();
+  _FlashCardMainState createState() => _FlashCardMainState();
 }
 
-class _FlashcardMainState extends State<FlashcardMain> {
-  late FocusNode _focusNode;
-  late TextEditingController _controller;
-  List<String> favoriteList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode = FocusNode();
-    _controller = TextEditingController();
-  }
+class _FlashCardMainState extends State<FlashCardMain> {
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController searchController = TextEditingController();
+  final userEmail = 'gabmanpark@gmail.com';
+  final USERS = 'Users';
+  final FLASHCARDS = 'FlashCards';
+  List<FlashCard> cards = [];
+  List<FlashCard> cardsSearch = [];
+  final controller = Get.put(FlashCardController());
+  final duration = const Duration(milliseconds: 200);
+  String searchText = '';
 
   @override
   void dispose() {
     super.dispose();
     _focusNode.dispose();
-    _controller.dispose();
+    searchController.dispose();
+  }
+
+  Widget animationWidget(Widget child) {
+    return AnimatedContainer(
+      width: controller.isLongClicked ? 30 : 0,
+      duration: duration,
+      curve: Curves.easeInOut,
+      child: AnimatedOpacity(
+        opacity: controller.isLongClicked ? 1.0 : 0.0,
+        duration: duration,
+        child: child,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    favoriteList = [];
-    // Favorite favorite =
-    //     Favorite(id: 'id000', korean: '사과', english: 'apple', pronunciation: '[사과]', audio: 'audioString');
-    // favoriteList.add(favorite);
-
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -46,23 +57,101 @@ class _FlashcardMainState extends State<FlashcardMain> {
               child: Column(
                 children: [
                   MyWidget().getSearchWidget(
-                    focusNode: _focusNode,
-                    controller: _controller,
-                    hint: MyStrings.favoriteSearchHint,
-                  ),
+                      focusNode: _focusNode,
+                      controller: searchController,
+                      hint: MyStrings.search,
+                      onChanged: (text) {
+                        searchText = searchController.text;
+                        controller.update();
+                      }),
                   const SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: MyWidget().getTextWidget(text: MyStrings.sentences, size: 15, color: Colors.black),
-                  ),
                   Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(10),
-                      itemCount: favoriteList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        // String korean = favoriteList[index].korean;
-                        // String audio = favoriteList[index].audio;
-                        return getFavoriteItem();
+                    child: FutureBuilder(
+                      future:
+                          Database().getDocs(collection: '$USERS/$userEmail/$FLASHCARDS', orderBy: 'date'),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                          if (cards.isEmpty) {
+                            controller.initChecks(snapshot.data.length);
+                          }
+
+                          for (dynamic snapshot in snapshot.data) {
+                            cards.add(FlashCard.fromJson(snapshot));
+                          }
+                          if (cards.isNotEmpty) {
+                            return GetBuilder<FlashCardController>(
+                              builder: (_) {
+                                int cardsLength = cards.length;
+                                if(searchText.isNotEmpty) {
+                                  cardsSearch = [];
+                                  for(FlashCard card in cards) {
+                                    if (searchText.isNotEmpty &&
+                                        (card.ko.toLowerCase().contains(searchText) ||
+                                            card.fo.toLowerCase().contains(searchText))) {
+                                      cardsSearch.add(card);
+                                    }
+                                  }
+                                  cardsLength = cardsSearch.length;
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          animationWidget(MyWidget().getCheckBox(
+                                              value: controller.isCheckedAll,
+                                              onChanged: (value) {
+                                                controller.isCheckedAllClicked(value!);
+                                              })),
+                                          Row(
+                                            children: [
+                                              animationWidget(IconButton(
+                                                  onPressed: () {},
+                                                  icon: const Icon(
+                                                    Icons.delete,
+                                                    color: MyColors.red,
+                                                  ))),
+                                              const SizedBox(width: 20),
+                                              MyWidget().getTextWidget(
+                                                  text: '$cardsLength ${MyStrings.cards}',
+                                                  size: 15,
+                                                  color: Colors.black),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _focusNode.unfocus();
+                                          },
+                                          onLongPress: () {
+                                            controller.isLongClicked = !controller.isLongClicked;
+                                            controller.update();
+                                          },
+                                          child: ListView.builder(
+                                            padding: const EdgeInsets.only(top: 10, bottom: 80),
+                                            itemCount: cardsLength,
+                                            itemBuilder: (BuildContext context, int index) {
+                                              return getFlashCardItem(index);
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards));
+                          }
+                        } else {
+                          return const Center(child: CircularProgressIndicator());
+                        }
                       },
                     ),
                   )
@@ -70,18 +159,15 @@ class _FlashcardMainState extends State<FlashcardMain> {
               ),
             ),
             Padding(
-              // Ask a question 버튼
-              padding: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.symmetric(vertical: 30),
               child: Container(
                 alignment: Alignment.bottomCenter,
-                child: MyWidget().getRoundBtnWithAlert(
+                child: MyWidget().getRoundBtnWidget(
                   isRequest: false,
                   text: MyStrings.review,
                   bgColor: MyColors.purple,
                   fontColor: Colors.white,
-                  f: () {
-                    setState(() {});
-                  },
+                  f: () {},
                 ),
               ),
             ),
@@ -91,26 +177,43 @@ class _FlashcardMainState extends State<FlashcardMain> {
     );
   }
 
-  Widget getFavoriteItem() {
-    return Column(
+  Widget getFlashCardItem(int index) {
+    FlashCard card;
+    searchText.isEmpty ? card = cards[index] : card = cardsSearch[index];
+    String ko = card.ko;
+    String fo = card.fo;
+
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: MyWidget()
-                  .getTextWidget(text: '사과는 맛있어요ㅓ이닐너ㅣㅏㅇ러니ㄴㅁ하ㅣ넣나ㅣㅓ히ㅏ넣나ㅣ.', size: 15, color: Colors.black),
+        animationWidget(MyWidget().getCheckBox(
+            value: controller.isChecked[index],
+            onChanged: (value) {
+              print(index);
+              controller.isChecked[index] = value!;
+              controller.update();
+            })),
+        const SizedBox(width: 10),
+        Expanded(
+            child:
+                Text(ko, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+        const SizedBox(width: 20, height: 20, child: VerticalDivider(thickness: 1, color: MyColors.grey)),
+        Expanded(
+            child:
+                Text(fo, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+        Opacity(
+          opacity: card.audio == null ? 0 : 1,
+          child: IconButton(
+            icon: const Icon(
+              Icons.volume_up_rounded,
+              color: MyColors.purple,
             ),
-            const SizedBox(width: 10),
-            IconButton(
-              icon: const Icon(
-                Icons.volume_up_rounded,
-                color: MyColors.purple,
-              ),
-              onPressed: () {},
-            ),
-          ],
+            onPressed: card.audio == null
+                ? null
+                : () {
+                    print('click');
+                  },
+          ),
         ),
-        const Divider(),
       ],
     );
   }

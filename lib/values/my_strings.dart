@@ -19,6 +19,9 @@ class MyStrings {
   static const String failedUserTitle = 'Failed to load user information.';
   static const String failedUserContent = 'If the problem persists, please contact the developer.';
   static const String verificationEmailSent = 'Verification email sent to your email';
+  static const String noFlashCards = 'No flashcards';
+  static const String cards = 'cards';
+  static const String search = 'search';
 
 
   static const String askQuestion = 'Ask a question';
@@ -36,7 +39,6 @@ class MyStrings {
   static const String correction = 'Correction';
   static const String correctionInfo = 'Try making your own sentence and get correction from a professional Korean teacher by using a coin.';
   static const String correctionHint = 'Make your own sentence with the expressions you learned today.';
-  static const String favoriteSearchHint = 'Search your sentence';
   static const String selectCourse = 'Select a course';
   static const String hangul = 'Hangul';
   static const String notEnoughCoins = '* Not enough coins';
