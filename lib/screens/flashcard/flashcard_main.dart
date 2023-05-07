@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
@@ -71,10 +73,8 @@ class _FlashCardMainState extends State<FlashCardMain> {
                           Database().getDocs(collection: '$USERS/$userEmail/$FLASHCARDS', orderBy: 'date'),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                          if (cards.isEmpty) {
-                            controller.initChecks(snapshot.data.length);
-                          }
-
+                          controller.initChecks(snapshot.data.length);
+                          cards = [];
                           for (dynamic snapshot in snapshot.data) {
                             cards.add(FlashCard.fromJson(snapshot));
                           }
@@ -82,9 +82,9 @@ class _FlashCardMainState extends State<FlashCardMain> {
                             return GetBuilder<FlashCardController>(
                               builder: (_) {
                                 int cardsLength = cards.length;
-                                if(searchText.isNotEmpty) {
+                                if (searchText.isNotEmpty) {
                                   cardsSearch = [];
-                                  for(FlashCard card in cards) {
+                                  for (FlashCard card in cards) {
                                     if (searchText.isNotEmpty &&
                                         (card.ko.toLowerCase().contains(searchText) ||
                                             card.fo.toLowerCase().contains(searchText))) {
@@ -109,7 +109,31 @@ class _FlashCardMainState extends State<FlashCardMain> {
                                           Row(
                                             children: [
                                               animationWidget(IconButton(
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    List<String> ids = [];
+                                                    for (int i = 0; i < controller.isChecked.length; i++) {
+                                                      controller.isChecked[i] ? ids.add(cards[i].id) : null;
+                                                    }
+                                                    if (ids.isNotEmpty) {
+                                                      setState(() {
+                                                        String ref = '$USERS/$userEmail/$FLASHCARDS';
+                                                        print(ids);
+                                                        Future<void> runBatch;
+                                                        if (ids.length > 1) {
+                                                          runBatch = Database()
+                                                              .deleteDocs(collection: ref, ids: ids);
+                                                        } else {
+                                                          runBatch = Database()
+                                                              .deleteDoc(collection: ref, docId: ids[0]);
+                                                        }
+                                                        runBatch
+                                                            .then((value) =>
+                                                                Get.snackbar(MyStrings.deleteSucceed, ''))
+                                                            .onError((error, stackTrace) =>
+                                                                Get.snackbar(MyStrings.deleteFailed, ''));
+                                                      });
+                                                    }
+                                                  },
                                                   icon: const Icon(
                                                     Icons.delete,
                                                     color: MyColors.red,
@@ -209,8 +233,12 @@ class _FlashCardMainState extends State<FlashCardMain> {
             ),
             onPressed: card.audio == null
                 ? null
-                : () {
-                    print('click');
+                : () async {
+                    List<String> audioRex = card.audio!.split(RegExp(r'_+'));
+                    String url = await CloudStorage().getAudio(folderRef: audioRex[0], fileRef: audioRex[1]);
+                    final player = AudioPlayer();
+                    await player.setUrl(url);
+                    await player.play();
                   },
           ),
         ),

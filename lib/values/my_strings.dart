@@ -22,6 +22,13 @@ class MyStrings {
   static const String noFlashCards = 'No flashcards';
   static const String cards = 'cards';
   static const String search = 'search';
+  static const String deleteSucceed = 'Deleted successfully';
+  static const String deleteFailed = 'Failed to delete. If problems persist, please contact the developer.';
+
+
+
+
+
 
 
   static const String askQuestion = 'Ask a question';
