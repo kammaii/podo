@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podo/common/cloud_storage.dart';
 
 class PlayAudio {
   static final PlayAudio _instance = PlayAudio.init();
@@ -12,6 +13,16 @@ class PlayAudio {
 
   PlayAudio.init() {
     debugPrint('playAudio 초기화');
+  }
+
+  void playFlashcard(String? audio) async {
+    if(audio != null) {
+      List<String> audioRegex = audio.split(RegExp(r'_+'));
+      String url = await CloudStorage().getAudio(folderRef: audioRegex[0], fileRef: audioRegex[1]);
+      final player = AudioPlayer();
+      await player.setUrl(url);
+      await player.play();
+    }
   }
 
   void playCorrect() async {

@@ -24,8 +24,12 @@ class MyStrings {
   static const String search = 'search';
   static const String deleteSucceed = 'Deleted successfully';
   static const String deleteFailed = 'Failed to delete. If problems persist, please contact the developer.';
-
-
+  static const String review = 'Review';
+  static const String next = 'Next';
+  static const String shuffle = 'Shuffle';
+  static const String today = 'Today';
+  static const String flashCardReviewCompleted= 'Congratulations! You have completed your flashcard reviews for today.';
+  static const String reviewAgainTomorrow = 'I\'ll review again tomorrow';
 
 
 
@@ -58,9 +62,6 @@ class MyStrings {
   static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
   static const String sentences = 'sentences';
-  static const String review = 'Review';
-  static const String speakAndListen = 'Speak & Listen';
-  static const String next = 'Next';
   static const String podoPremium = 'Podo PREMIUM';
   static const String freeTrial = 'Free trial for 3 days';
   static const String freeTrialDetail = 'You can cancel your subscription at any time during the free trial.';

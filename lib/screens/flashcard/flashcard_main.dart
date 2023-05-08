@@ -4,8 +4,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
+import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -191,7 +193,9 @@ class _FlashCardMainState extends State<FlashCardMain> {
                   text: MyStrings.review,
                   bgColor: MyColors.purple,
                   fontColor: Colors.white,
-                  f: () {},
+                  f: () {
+                    Get.to(const FlashCardReview(), arguments: cards);
+                  },
                 ),
               ),
             ),
@@ -231,15 +235,9 @@ class _FlashCardMainState extends State<FlashCardMain> {
               Icons.volume_up_rounded,
               color: MyColors.purple,
             ),
-            onPressed: card.audio == null
-                ? null
-                : () async {
-                    List<String> audioRex = card.audio!.split(RegExp(r'_+'));
-                    String url = await CloudStorage().getAudio(folderRef: audioRex[0], fileRef: audioRex[1]);
-                    final player = AudioPlayer();
-                    await player.setUrl(url);
-                    await player.play();
-                  },
+            onPressed: () {
+              PlayAudio().playFlashcard(card.audio!);
+            },
           ),
         ),
       ],
