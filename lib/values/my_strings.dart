@@ -30,7 +30,7 @@ class MyStrings {
   static const String today = 'Today';
   static const String flashCardReviewCompleted= 'Congratulations! You have completed your flashcard reviews for today.';
   static const String reviewAgainTomorrow = 'I\'ll review again tomorrow';
-
+  static const String noReading = 'There is no reading available on the category.';
 
 
 

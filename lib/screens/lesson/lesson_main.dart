@@ -29,7 +29,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
   final LESSON = 'Lesson';
   int lessonIndex = -1;
   bool isCompleted = true; //todo: userInfo 에서 가져오기
-  double cardBorderRadius = 8;
+  final cardBorderRadius = 8.0;
   bool isImageVisible = true;
   late AnimationController animationController;
   late Animation<double> animation;
@@ -89,7 +89,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(cardBorderRadius),
                       ),
-                      color: lesson.isFree ? Colors.white : MyColors.navyLightLight,
+                      color: Colors.white,
                       child: InkWell(
                         onTap: () {
                           Get.to(LessonFrame(), arguments: lesson.id);
@@ -104,7 +104,6 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
                                   MyWidget().getTextWidget(
                                     text:
                                         lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
-                                    size: 15,
                                     color: MyColors.grey,
                                   ),
                                   const SizedBox(width: 10),
@@ -120,12 +119,11 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
                               MyWidget().getTextWidget(
                                 text: lesson.title[KO],
                                 size: 20,
-                                color: lesson.isFree ? MyColors.navy : MyColors.grey,
+                                color: MyColors.navy,
                               ),
                               const SizedBox(height: 10),
                               MyWidget().getTextWidget(
                                 text: lesson.title[language],
-                                size: 15,
                                 color: MyColors.grey,
                               ),
                             ],

@@ -4,8 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course_main.dart';
-import 'package:podo/screens/message/message_frame.dart';
 import 'package:podo/screens/profile/profile.dart';
+import 'package:podo/screens/reading/reading_main.dart';
 import 'package:podo/values/my_colors.dart';
 
 
@@ -19,7 +19,7 @@ class MainFrame extends StatefulWidget {
 List<Widget> _buildScreens() {
   return [
     LessonCourseMain(),
-    MessageFrame(),
+    ReadingMain(),
     const FlashCardMain(),
     const Profile(),
   ];
@@ -36,8 +36,8 @@ PersistentBottomNavBarItem _navBarItem(String title, Icon icon) {
 
 List<PersistentBottomNavBarItem> _navBarsItems() {
   return [
-    _navBarItem('Lessons', const Icon(FontAwesomeIcons.book)),
-    _navBarItem('Community', const Icon(FontAwesomeIcons.commentDots)),
+    _navBarItem('Lessons', const Icon(FontAwesomeIcons.chalkboard)),
+    _navBarItem('Reading', const Icon(FontAwesomeIcons.book)),
     _navBarItem('Flashcards', const Icon(Icons.star_rounded)),
     _navBarItem('Settings', const Icon(Icons.settings)),
   ];
