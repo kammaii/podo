@@ -18,12 +18,21 @@ class PlayAudio {
   void playFlashcard(String? audio) async {
     if(audio != null) {
       List<String> audioRegex = audio.split(RegExp(r'_+'));
-      String url = await CloudStorage().getAudio(folderRef: audioRegex[0], fileRef: audioRegex[1]);
-      final player = AudioPlayer();
+      String url = await CloudStorage().getLessonAudio(folderRef: audioRegex[0], fileRef: audioRegex[1]);
       await player.setUrl(url);
       await player.play();
     }
   }
+
+  void playReading(String? audio) async {
+    if(audio != null) {
+      List<String> audioRegex = audio.split(RegExp(r'_+'));
+      String url = await CloudStorage().getReadingAudio(folderRef: audioRegex[0], fileRef: audioRegex[1]);
+      await player.setUrl(url);
+      await player.play();
+    }
+  }
+
 
   void playCorrect() async {
     await player.setAsset('assets/audio/correct.mp3');

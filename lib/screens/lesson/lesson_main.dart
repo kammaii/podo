@@ -30,7 +30,6 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
   int lessonIndex = -1;
   bool isCompleted = true; //todo: userInfo 에서 가져오기
   final cardBorderRadius = 8.0;
-  bool isImageVisible = true;
   late AnimationController animationController;
   late Animation<double> animation;
 

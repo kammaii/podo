@@ -97,6 +97,7 @@ class MyWidget {
     bool? isTextAlignCenter,
     bool? isLineThrough,
     bool isKorean = false,
+    double? height,
   }) {
     return Text(
       text,
@@ -106,6 +107,7 @@ class MyWidget {
         color: color,
         fontWeight: isBold != null ? FontWeight.bold : null,
         decoration: isLineThrough != null ? TextDecoration.lineThrough : null,
+        height: height,
       ),
       textAlign: isTextAlignCenter != null ? TextAlign.center : null,
     );

@@ -4,6 +4,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/reading/reading.dart';
+import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +18,7 @@ class ReadingMain extends StatefulWidget {
 
 class _ReadingMainState extends State<ReadingMain> {
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
-  final categories = ['culture', 'food', 'travel', 'language', 'k-pop', 'k-drama', 'story book'];
+  final categories = ['culture', 'food', 'travel', 'story book'];
   final cardBorderRadius = 8.0;
   int selectedCategory = 0;
   final KO = 'ko';
@@ -38,7 +39,7 @@ class _ReadingMainState extends State<ReadingMain> {
           color: Colors.white,
           child: InkWell(
             onTap: () {
-              //Get.to(LessonFrame(), arguments: lesson.id);
+              Get.to(const ReadingFrame(), arguments: reading);
             },
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -47,17 +48,17 @@ class _ReadingMainState extends State<ReadingMain> {
                   SizedBox(
                     width: 80,
                     height: 80,
-                    child: Image.asset('assets/images/course_hangul.png'),
+                    child: Hero(
+                      tag: 'readingImage:${reading.id}',
+                      child: Image.asset('assets/images/course_hangul.png'),
+                    ),
                   ),
                   const SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          MyWidget().getTextWidget(text: reading.orderId.toString(), color: MyColors.grey),
-                          const SizedBox(width: 10),
                           Transform.scale(
                             alignment: Alignment.bottomLeft,
                             scale: 0.8,
@@ -66,6 +67,7 @@ class _ReadingMainState extends State<ReadingMain> {
                           const Icon(
                             Icons.check_circle,
                             color: MyColors.green,
+                            size: 20,
                           ),
                         ],
                       ),
@@ -90,7 +92,7 @@ class _ReadingMainState extends State<ReadingMain> {
         reading.tag.isNotEmpty
             ? Positioned(
                 top: 5,
-                right: 15,
+                right: 4,
                 child: Container(
                     decoration: BoxDecoration(
                       color: MyColors.pink,
@@ -159,8 +161,11 @@ class _ReadingMainState extends State<ReadingMain> {
                       }
                       if (readings.isEmpty) {
                         return Center(
-                            child: MyWidget()
-                                .getTextWidget(text: MyStrings.noReading, color: MyColors.purple, size: 20, isTextAlignCenter: true));
+                            child: MyWidget().getTextWidget(
+                                text: MyStrings.noReading,
+                                color: MyColors.purple,
+                                size: 20,
+                                isTextAlignCenter: true));
                       } else {
                         return ListView.builder(
                           itemCount: readings.length,

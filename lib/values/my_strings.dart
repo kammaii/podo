@@ -31,6 +31,11 @@ class MyStrings {
   static const String flashCardReviewCompleted= 'Congratulations! You have completed your flashcard reviews for today.';
   static const String reviewAgainTomorrow = 'I\'ll review again tomorrow';
   static const String noReading = 'There is no reading available on the category.';
+  static const String complete = 'complete';
+  static const String continueReading = 'Would you like to continue reading?';
+  static const String yes = 'Yes';
+  static const String no = 'No';
+
 
 
 
@@ -38,7 +43,6 @@ class MyStrings {
   static const String askQuestion = 'Ask a question';
   static const String send = 'Send';
   static const String cancel = 'Cancel';
-  static const String yes = 'Yes';
   static const String question = 'question';
   static const String questionInfo =
       'Do you have a question about Korean? Ask a question by using a coin. The professional Korean teacher will answer your question.';
@@ -61,7 +65,6 @@ class MyStrings {
   static const String home = 'home';
   static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
-  static const String sentences = 'sentences';
   static const String podoPremium = 'Podo PREMIUM';
   static const String freeTrial = 'Free trial for 3 days';
   static const String freeTrialDetail = 'You can cancel your subscription at any time during the free trial.';

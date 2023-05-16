@@ -9,8 +9,9 @@ class Reading {
   late String image;
   late Map<String, dynamic> content;
   late Map<String, dynamic> words;
-  late Map<String, dynamic> quizzes;
   late bool isReleased;
+  late bool isFree;
+  late List<String> audio;
 
   static const String ID = 'id';
   static const String ORDERID = 'orderId';
@@ -21,8 +22,9 @@ class Reading {
   static const String IMAGE = 'image';
   static const String CONTENT = 'content';
   static const String WORDS = 'words';
-  static const String QUIZZES = 'quizzes';
   static const String ISRELEASED = 'isReleased';
+  static const String ISFREE = 'isFree';
+  static const String AUDIO = 'audio';
 
   Reading.fromJson(Map<String, dynamic> json) {
     id = json[ID];
@@ -34,7 +36,8 @@ class Reading {
     image = json[IMAGE];
     content = json[CONTENT];
     words = json[WORDS];
-    quizzes = json[QUIZZES];
     isReleased = json[ISRELEASED];
+    isFree = json[ISFREE];
+    audio = json[AUDIO];
   }
 }
