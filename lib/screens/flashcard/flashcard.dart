@@ -3,14 +3,14 @@ import 'package:uuid/uuid.dart';
 
 class FlashCard {
   late String id;
-  late String ko;
-  late String fo;
+  late String front;
+  late String back;
   String? audio;
   late DateTime date;
 
   static const String ID = 'id';
-  static const String KO = 'ko';
-  static const String FO = 'fo';
+  static const String FRONT = 'front';
+  static const String BACK = 'back';
   static const String AUDIO = 'audio';
   static const String DATE = 'date';
 
@@ -20,8 +20,8 @@ class FlashCard {
 
   FlashCard.fromJson(Map<String, dynamic> json) {
     id = json[ID];
-    ko = json[KO];
-    fo = json[FO];
+    front = json[FRONT];
+    back = json[BACK];
     audio = json[AUDIO];
     Timestamp stamp = json[DATE];
     date = stamp.toDate();
@@ -30,8 +30,8 @@ class FlashCard {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {};
     map[ID] = id;
-    map[KO] = ko;
-    map[FO] = fo;
+    map[FRONT] = front;
+    map[BACK] = back;
     map[AUDIO] = audio ?? null;
     map[DATE] = Timestamp.now();
     return map;

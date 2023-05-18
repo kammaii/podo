@@ -11,7 +11,6 @@ class Reading {
   late Map<String, dynamic> words;
   late bool isReleased;
   late bool isFree;
-  late List<String> audio;
 
   static const String ID = 'id';
   static const String ORDERID = 'orderId';
@@ -24,7 +23,6 @@ class Reading {
   static const String WORDS = 'words';
   static const String ISRELEASED = 'isReleased';
   static const String ISFREE = 'isFree';
-  static const String AUDIO = 'audio';
 
   Reading.fromJson(Map<String, dynamic> json) {
     id = json[ID];
@@ -38,6 +36,5 @@ class Reading {
     words = json[WORDS];
     isReleased = json[ISRELEASED];
     isFree = json[ISFREE];
-    audio = json[AUDIO];
   }
 }

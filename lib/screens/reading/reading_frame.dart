@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -38,6 +40,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       LocalStorage().prefs.remove(reading.id);
     }
     scrollController.dispose();
+    PlayAudio().reset();
   }
 
   @override
@@ -212,7 +215,11 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                         text: MyStrings.complete,
                         bgColor: MyColors.purple,
                         fontColor: Colors.white,
-                        f: () {})
+                        f: () {
+                          LocalStorage().prefs.remove(reading.id);
+                          Get.back();
+                          //todo: User().readingRecord 에 추가
+                        })
                     : const SizedBox.shrink(),
               ],
             );
@@ -235,15 +242,25 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               padding: const EdgeInsets.only(left: 10),
               child: MyWidget().getTextWidget(text: (index+1).toString(), color: MyColors.purple, isBold: true),
             )),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.star_outline_rounded, color: MyColors.purple),
+            Material(
+              child: IconButton(
+                icon: const Icon(Icons.star_outline_rounded, color: MyColors.purple),
+                onPressed: () {
+                  FlashCard flashcard = FlashCard();
+                  flashcard.front = contentKo;
+                  flashcard.back = reading.content[fo][index];
+                  flashcard.audio = 'ReadingAudios_${reading.id}_$index';
+                  Database().setFlashcard(flashCard: flashcard);
+                },
+              ),
             ),
-            IconButton(
-              onPressed: () {
-                //PlayAudio().playReading(reading.audio[index]);
-              },
-              icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
+            Material(
+              child: IconButton(
+                icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
+                onPressed: () {
+                  PlayAudio().playReading(readingId: reading.id, index: index);
+                },
+              ),
             ),
           ],
         ),

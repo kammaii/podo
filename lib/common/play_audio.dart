@@ -9,28 +9,31 @@ class PlayAudio {
     return _instance;
   }
 
-  AudioPlayer player = AudioPlayer();
+  late AudioPlayer player;
 
   PlayAudio.init() {
+    player = AudioPlayer();
     debugPrint('playAudio 초기화');
+  }
+
+  void reset() {
+    player.dispose();
+    player = AudioPlayer();
   }
 
   void playFlashcard(String? audio) async {
     if(audio != null) {
       List<String> audioRegex = audio.split(RegExp(r'_+'));
-      String url = await CloudStorage().getLessonAudio(folderRef: audioRegex[0], fileRef: audioRegex[1]);
+      String url = await CloudStorage().getAudio(audio: audioRegex);
       await player.setUrl(url);
       await player.play();
     }
   }
 
-  void playReading(String? audio) async {
-    if(audio != null) {
-      List<String> audioRegex = audio.split(RegExp(r'_+'));
-      String url = await CloudStorage().getReadingAudio(folderRef: audioRegex[0], fileRef: audioRegex[1]);
-      await player.setUrl(url);
-      await player.play();
-    }
+  void playReading({required String readingId, required int index}) async {
+    String url = await CloudStorage().getReadingAudio(folderRef: readingId, index: index);
+    await player.setUrl(url);
+    await player.play();
   }
 
 

@@ -23,7 +23,7 @@ class MyStrings {
   static const String cards = 'cards';
   static const String search = 'search';
   static const String deleteSucceed = 'Deleted successfully';
-  static const String deleteFailed = 'Failed to delete. If problems persist, please contact the developer.';
+  static const String deleteFailed = 'Failed to delete. If the problem persist, please contact the developer.';
   static const String review = 'Review';
   static const String next = 'Next';
   static const String shuffle = 'Shuffle';
@@ -35,9 +35,9 @@ class MyStrings {
   static const String continueReading = 'Would you like to continue reading?';
   static const String yes = 'Yes';
   static const String no = 'No';
-
-
-
+  static const String setError = 'Failed to save to database. If the problem persists, please contact the developer.';
+  static const String flashcardSave = 'Flashcard has been saved.';
+  static const String haveFlashcard = 'You already have this flash card.';
 
 
   static const String askQuestion = 'Ask a question';

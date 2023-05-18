@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podo/common/play_audio.dart';
 
 class LessonController extends GetxController {
-  late AudioPlayer player;
   late Duration currentPosition;
   Duration? duration;
   late double audioProgress;
@@ -11,7 +11,6 @@ class LessonController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    player = AudioPlayer();
     audioProgress = 0.0;
     duration = const Duration(seconds: 0);
     currentPosition = const Duration(seconds: 0);
@@ -20,8 +19,8 @@ class LessonController extends GetxController {
 
   void setAudioUrlAndPlay({required String url}) async {
     print('SETTING URL');
-    duration = await player.setUrl(url);
-    player.positionStream.listen((position) {
+    duration = await PlayAudio().player.setUrl(url);
+    PlayAudio().player.positionStream.listen((position) {
       currentPosition = position;
       if(duration!.inMilliseconds > 0) {
         audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
@@ -39,10 +38,10 @@ class LessonController extends GetxController {
 
   void playAudio() async {
     print('PLAYING AUDIO');
-    await player.seek(Duration.zero);
-    await player.setVolume(1);
-    await player.setSpeed(audioSpeedToggle[0] ? 1 : 0.8);
-    player.play();
+    await PlayAudio().player.seek(Duration.zero);
+    await PlayAudio().player.setVolume(1);
+    await PlayAudio().player.setSpeed(audioSpeedToggle[0] ? 1 : 0.8);
+    PlayAudio().player.play();
   }
 
   void changeAudioSpeedToggle({required bool isNormal}) {
@@ -53,9 +52,8 @@ class LessonController extends GetxController {
   }
 
   void initAudio() {
-    player.dispose();
-    player = AudioPlayer();
-    player.positionStream.listen((position) {
+    PlayAudio().reset();
+    PlayAudio().player.positionStream.listen((position) {
       currentPosition = position;
       if (duration!.inMilliseconds > 0) {
         audioProgress = currentPosition.inMilliseconds / duration!.inMilliseconds;
@@ -69,7 +67,7 @@ class LessonController extends GetxController {
       update();
     });
 
-    player.playerStateStream.listen((event) {
+    PlayAudio().player.playerStateStream.listen((event) {
       print('listener fired : ${event.processingState}');
       if (event.processingState == ProcessingState.completed) {
         print('끝!');

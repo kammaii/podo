@@ -16,7 +16,8 @@ class User{
     return _instance;
   }
 
-  late String email;
+  //late String email;
+  String email = 'gabmanpark@gmail.com';
   late String name;
   late String image;
   late String language;
@@ -25,11 +26,12 @@ class User{
   late DateTime dateSignIn;
   late List<Premium>? premiumRecord;
   late Map<String, List<String>> lessonRecord;
+  late Map<String, List<String>> readingRecord;
   late String fcmToken;
   late String fcmState;
 
   User.init() {
-    getUser();
+    //getUser();
     debugPrint('User init');
   }
 
@@ -42,6 +44,7 @@ class User{
   static const String DATE_SIGN_IN = 'dateSignIn';
   static const String PREMIUM_RECORD = 'premiumRecord';
   static const String LESSON_RECORD = 'lessonRecord';
+  static const String READING_RECORD = 'readingRecord';
   static const String FCM_TOKEN = 'fcmToken';
   static const String FCM_STATE = 'fcmState';
 
@@ -55,6 +58,7 @@ class User{
     dateSignIn = json[DATE_SIGN_IN];
     premiumRecord = json[PREMIUM_RECORD];
     lessonRecord = json[LESSON_RECORD];
+    readingRecord = json[READING_RECORD];
     fcmToken = json[FCM_TOKEN];
     fcmState = json[FCM_STATE];
   }
@@ -69,6 +73,7 @@ class User{
       DATE_SIGN_UP: dateSignUp,
       DATE_SIGN_IN: dateSignIn,
       LESSON_RECORD: lessonRecord,
+      READING_RECORD: readingRecord,
       FCM_TOKEN: fcmToken,
       FCM_STATE: fcmState,
     };

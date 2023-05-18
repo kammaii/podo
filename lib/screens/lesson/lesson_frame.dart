@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_finish.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
@@ -415,7 +416,7 @@ class _LessonFrameState extends State<LessonFrame> {
                         } else {
                           setState(() {
                             thisIndex = index;
-                            controller.player.stop();
+                            PlayAudio().player.stop();
                             if(cards[thisIndex].content.containsKey(AUDIO)) {
                               String fileName = cards[thisIndex].content[AUDIO];
                               if(audios.containsKey(fileName)) {

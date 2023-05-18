@@ -81,7 +81,7 @@ class _FlashCardReviewState extends State<FlashCardReview> {
               return GetBuilder<FlashCardController>(
                 builder: (_) {
                   for (FlashCard card in cards) {
-                    print(card.ko);
+                    print(card.front);
                   }
 
                   if (cards.isNotEmpty) {
@@ -128,7 +128,7 @@ class _FlashCardReviewState extends State<FlashCardReview> {
                                         child: FittedBox(
                                           fit: BoxFit.scaleDown,
                                           child: MyWidget().getTextWidget(
-                                            text: cards[0].ko,
+                                            text: cards[0].front,
                                             size: 30,
                                             color: Colors.black,
                                           ),
@@ -143,7 +143,7 @@ class _FlashCardReviewState extends State<FlashCardReview> {
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                             child: MyWidget().getTextWidget(
-                                              text: cards[0].fo,
+                                              text: cards[0].back,
                                               size: 20,
                                               color: MyColors.grey,
                                             ),

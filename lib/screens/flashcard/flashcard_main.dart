@@ -8,6 +8,7 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -21,7 +22,6 @@ class FlashCardMain extends StatefulWidget {
 class _FlashCardMainState extends State<FlashCardMain> {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
-  final userEmail = 'gabmanpark@gmail.com';
   final USERS = 'Users';
   final FLASHCARDS = 'FlashCards';
   List<FlashCard> cards = [];
@@ -72,7 +72,7 @@ class _FlashCardMainState extends State<FlashCardMain> {
                   Expanded(
                     child: FutureBuilder(
                       future:
-                          Database().getDocs(collection: '$USERS/$userEmail/$FLASHCARDS', orderBy: 'date'),
+                          Database().getDocs(collection: '$USERS/${User().email}/$FLASHCARDS', orderBy: 'date'),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                           controller.initChecks(snapshot.data.length);
@@ -88,8 +88,8 @@ class _FlashCardMainState extends State<FlashCardMain> {
                                   cardsSearch = [];
                                   for (FlashCard card in cards) {
                                     if (searchText.isNotEmpty &&
-                                        (card.ko.toLowerCase().contains(searchText) ||
-                                            card.fo.toLowerCase().contains(searchText))) {
+                                        (card.front.toLowerCase().contains(searchText) ||
+                                            card.back.toLowerCase().contains(searchText))) {
                                       cardsSearch.add(card);
                                     }
                                   }
@@ -118,7 +118,7 @@ class _FlashCardMainState extends State<FlashCardMain> {
                                                     }
                                                     if (ids.isNotEmpty) {
                                                       setState(() {
-                                                        String ref = '$USERS/$userEmail/$FLASHCARDS';
+                                                        String ref = '$USERS/${User().email}/$FLASHCARDS';
                                                         print(ids);
                                                         Future<void> runBatch;
                                                         if (ids.length > 1) {
@@ -208,8 +208,8 @@ class _FlashCardMainState extends State<FlashCardMain> {
   Widget getFlashCardItem(int index) {
     FlashCard card;
     searchText.isEmpty ? card = cards[index] : card = cardsSearch[index];
-    String ko = card.ko;
-    String fo = card.fo;
+    String front = card.front;
+    String back = card.back;
 
     return Row(
       children: [
@@ -223,11 +223,11 @@ class _FlashCardMainState extends State<FlashCardMain> {
         const SizedBox(width: 10),
         Expanded(
             child:
-                Text(ko, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+                Text(front, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
         const SizedBox(width: 20, height: 20, child: VerticalDivider(thickness: 1, color: MyColors.grey)),
         Expanded(
             child:
-                Text(fo, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+                Text(back, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
         Opacity(
           opacity: card.audio == null ? 0 : 1,
           child: IconButton(
