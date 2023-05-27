@@ -45,6 +45,13 @@ class _FlashCardReviewState extends State<FlashCardReview> {
     controller.update();
   }
 
+
+  @override
+  void dispose() {
+    super.dispose();
+    PlayAudio().stop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -80,10 +87,6 @@ class _FlashCardReviewState extends State<FlashCardReview> {
 
               return GetBuilder<FlashCardController>(
                 builder: (_) {
-                  for (FlashCard card in cards) {
-                    print(card.front);
-                  }
-
                   if (cards.isNotEmpty) {
                     PlayAudio().playFlashcard(cards[0].audio);
                     return Column(
@@ -125,13 +128,10 @@ class _FlashCardReviewState extends State<FlashCardReview> {
                                   children: [
                                     Expanded(
                                       child: Center(
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: MyWidget().getTextWidget(
-                                            text: cards[0].front,
-                                            size: 30,
-                                            color: Colors.black,
-                                          ),
+                                        child: MyWidget().getTextWidget(
+                                          text: cards[0].front,
+                                          size: 20,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),

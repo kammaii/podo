@@ -98,6 +98,7 @@ class MyWidget {
     bool? isLineThrough,
     bool isKorean = false,
     double? height,
+    int? maxLine,
   }) {
     return Text(
       text,
@@ -110,6 +111,7 @@ class MyWidget {
         height: height,
       ),
       textAlign: isTextAlignCenter != null ? TextAlign.center : null,
+      maxLines: maxLine,
     );
   }
 
@@ -320,12 +322,15 @@ class MyWidget {
     required String hint,
     required double fontSize,
     TextEditingController? controller,
+    int? maxLines,
+    Function(String)? onChanged,
   }) {
     return TextField(
       controller: controller,
-      maxLines: null,
+      maxLines: maxLines,
       cursorColor: Colors.black,
       style: TextStyle(fontSize: fontSize),
+      onChanged: onChanged,
       decoration: InputDecoration(
         hintMaxLines: 2,
         filled: true,

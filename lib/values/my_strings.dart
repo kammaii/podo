@@ -38,6 +38,12 @@ class MyStrings {
   static const String setError = 'Failed to save to database. If the problem persists, please contact the developer.';
   static const String flashcardSave = 'Flashcard has been saved.';
   static const String haveFlashcard = 'You already have this flash card.';
+  static const String flashcardEdit = 'Flashcard Edit';
+  static const String save = 'save';
+  static const String flashcardUpdated = 'Flashcard has been updated.';
+
+
+
 
 
   static const String askQuestion = 'Ask a question';

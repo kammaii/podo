@@ -7,6 +7,7 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
+import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
@@ -19,16 +20,17 @@ class FlashCardMain extends StatefulWidget {
   _FlashCardMainState createState() => _FlashCardMainState();
 }
 
-class _FlashCardMainState extends State<FlashCardMain> {
+class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
   final USERS = 'Users';
   final FLASHCARDS = 'FlashCards';
-  List<FlashCard> cards = [];
   List<FlashCard> cardsSearch = [];
   final controller = Get.put(FlashCardController());
   final duration = const Duration(milliseconds: 200);
   String searchText = '';
+  Map<int, AnimationController> animatedIconControllers = {};
+
 
   @override
   void dispose() {
@@ -76,17 +78,23 @@ class _FlashCardMainState extends State<FlashCardMain> {
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                           controller.initChecks(snapshot.data.length);
-                          cards = [];
+                          controller.cards = [];
                           for (dynamic snapshot in snapshot.data) {
-                            cards.add(FlashCard.fromJson(snapshot));
+                            controller.cards.add(FlashCard.fromJson(snapshot));
                           }
-                          if (cards.isNotEmpty) {
+                          if (controller.cards.isNotEmpty) {
+                            for(int i=0; i<controller.cards.length; i++) {
+                              animatedIconControllers[i] = AnimationController(
+                                duration: const Duration(milliseconds: 500),
+                                vsync: this,
+                              );
+                            }
                             return GetBuilder<FlashCardController>(
                               builder: (_) {
-                                int cardsLength = cards.length;
+                                int cardsLength = controller.cards.length;
                                 if (searchText.isNotEmpty) {
                                   cardsSearch = [];
-                                  for (FlashCard card in cards) {
+                                  for (FlashCard card in controller.cards) {
                                     if (searchText.isNotEmpty &&
                                         (card.front.toLowerCase().contains(searchText) ||
                                             card.back.toLowerCase().contains(searchText))) {
@@ -114,19 +122,18 @@ class _FlashCardMainState extends State<FlashCardMain> {
                                                   onPressed: () {
                                                     List<String> ids = [];
                                                     for (int i = 0; i < controller.isChecked.length; i++) {
-                                                      controller.isChecked[i] ? ids.add(cards[i].id) : null;
+                                                      controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
                                                     }
                                                     if (ids.isNotEmpty) {
                                                       setState(() {
                                                         String ref = '$USERS/${User().email}/$FLASHCARDS';
-                                                        print(ids);
                                                         Future<void> runBatch;
                                                         if (ids.length > 1) {
-                                                          runBatch = Database()
-                                                              .deleteDocs(collection: ref, ids: ids);
+                                                          runBatch =
+                                                              Database().deleteDocs(collection: ref, ids: ids);
                                                         } else {
-                                                          runBatch = Database()
-                                                              .deleteDoc(collection: ref, docId: ids[0]);
+                                                          runBatch =
+                                                              Database().deleteDoc(collection: ref, docId: ids[0]);
                                                         }
                                                         runBatch
                                                             .then((value) =>
@@ -194,7 +201,7 @@ class _FlashCardMainState extends State<FlashCardMain> {
                   bgColor: MyColors.purple,
                   fontColor: Colors.white,
                   f: () {
-                    Get.to(const FlashCardReview(), arguments: cards);
+                    Get.to(const FlashCardReview(), arguments: controller.cards);
                   },
                 ),
               ),
@@ -205,9 +212,20 @@ class _FlashCardMainState extends State<FlashCardMain> {
     );
   }
 
+  void setAnimatedIcon(int index, {required bool isForward}) {
+    if(isForward) {
+      animatedIconControllers[index]!.forward();
+      controller.cards[index].isPlay = true;
+    } else {
+      animatedIconControllers[index]!.reverse();
+      controller.cards[index].isPlay = false;
+    }
+  }
+
+
   Widget getFlashCardItem(int index) {
     FlashCard card;
-    searchText.isEmpty ? card = cards[index] : card = cardsSearch[index];
+    searchText.isEmpty ? card = controller.cards[index] : card = cardsSearch[index];
     String front = card.front;
     String back = card.back;
 
@@ -216,29 +234,55 @@ class _FlashCardMainState extends State<FlashCardMain> {
         animationWidget(MyWidget().getCheckBox(
             value: controller.isChecked[index],
             onChanged: (value) {
-              print(index);
               controller.isChecked[index] = value!;
               controller.update();
             })),
         const SizedBox(width: 10),
         Expanded(
-            child:
-                Text(front, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
-        const SizedBox(width: 20, height: 20, child: VerticalDivider(thickness: 1, color: MyColors.grey)),
-        Expanded(
-            child:
-                Text(back, overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+          child: GestureDetector(
+            onTap: () {
+              Get.to(FlashCardEdit(), arguments: card);
+            },
+            child: Row(
+              children: [
+                Expanded(
+                    child: Text(front,
+                        overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+                const SizedBox(width: 20, height: 20, child: VerticalDivider(thickness: 1, color: MyColors.grey)),
+                Expanded(
+                    child: Text(back,
+                        overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+              ],
+            ),
+          ),
+        ),
         Opacity(
           opacity: card.audio == null ? 0 : 1,
-          child: IconButton(
-            icon: const Icon(
-              Icons.volume_up_rounded,
+          child: GestureDetector(
+            onTap: () {
+              PlayAudio().stop();
+              if(card.isPlay) {
+                setAnimatedIcon(index, isForward: false);
+              } else {
+                PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
+                  if(event.processingState == ProcessingState.completed) {
+                    setAnimatedIcon(index, isForward: false);
+                    PlayAudio().stream.cancel();
+                  }
+                });
+                for(int i=0; i<controller.cards.length; i++) {
+                  setAnimatedIcon(i, isForward: false);
+                }
+                setAnimatedIcon(index, isForward: true);
+              }
+            },
+            child: AnimatedIcon(
+              icon: AnimatedIcons.play_pause,
+              progress: animatedIconControllers[index]!,
+              size: 30,
               color: MyColors.purple,
             ),
-            onPressed: () {
-              PlayAudio().playFlashcard(card.audio!);
-            },
-          ),
+          )
         ),
       ],
     );

@@ -35,13 +35,14 @@ class MyApp extends StatelessWidget {
     if (initialLink != null) {
       // Dynamic link를 통해 앱을 신규설치하거나 업데이트 했을 때 작동 -> 해당 딥링크에 맞는 화면 보여줌
       final Uri deepLink = initialLink!.link;
-      print(deepLink);
+      Get.snackbar('InitialLink', '$deepLink');
     }
 
     // DynamicLink listener : When the app is already running
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      print('dynamic link listening');
-      print('verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}');
+      Get.snackbar(
+          'dynamic link listening', 'verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData'
+      );
     }).onError((error) {
       // Handle errors
     });

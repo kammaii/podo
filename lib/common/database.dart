@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
+import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -20,14 +20,23 @@ class Database {
 
   Future<void> setFlashcard({required FlashCard flashCard}) async {
     final collection = 'Users/${User().email}/FlashCards';
-    final ref =
-        firestore.collection(collection).where('front', isEqualTo: flashCard.front);
+    final ref = firestore.collection(collection).where('front', isEqualTo: flashCard.front);
     QuerySnapshot snapshot = await ref.get();
     if (snapshot.docs.isEmpty) {
       setDoc(collection: collection, doc: flashCard, completeMention: MyStrings.flashcardSave);
     } else {
       Get.snackbar(MyStrings.haveFlashcard, '');
     }
+  }
+
+  Future<void> updateFlashcard({required String id, required String front, required String back}) async {
+    final collection = 'Users/${User().email}/FlashCards';
+    DocumentReference ref = firestore.collection(collection).doc(id);
+    return await ref.update({'front': front, 'back': back}).then((value) {
+      Get.find<FlashCardController>().updateCard(id: id, front: front, back: back);
+      Get.back();
+      Get.snackbar(MyStrings.flashcardUpdated, '', snackPosition: SnackPosition.BOTTOM);
+    }).catchError((e) => print(e));
   }
 
   Future<void> setDoc({required String collection, required dynamic doc, required String completeMention}) async {
@@ -118,14 +127,6 @@ class Database {
 //   }).catchError((e) => print(e));
 // }
 //
-// Future<void> updateField(
-//     {required String collection, required String docId, required Map<String, dynamic> map}) async {
-//   DocumentReference ref = firestore.collection(collection).doc(docId);
-//   return await ref.update(map).then((value) {
-//     print('Updated');
-//     Get.snackbar('Updated', 'id: ${docId}', snackPosition: SnackPosition.BOTTOM);
-//   }).catchError((e) => print(e));
-// }
 //
 // Future<void> switchOrderTransaction(
 //     {required String collection, required String docId1, required String docId2}) async {

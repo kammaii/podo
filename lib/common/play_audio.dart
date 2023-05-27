@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podo/common/cloud_storage.dart';
@@ -10,10 +12,17 @@ class PlayAudio {
   }
 
   late AudioPlayer player;
+  late StreamSubscription<PlayerState> stream;
 
   PlayAudio.init() {
     player = AudioPlayer();
+    stream = player.playerStateStream.listen((event) { });
     debugPrint('playAudio 초기화');
+  }
+
+  void stop() {
+    player.stop();
+    stream.cancel();
   }
 
   void reset() {
@@ -21,10 +30,13 @@ class PlayAudio {
     player = AudioPlayer();
   }
 
-  void playFlashcard(String? audio) async {
+  void playFlashcard(String? audio, {Function(dynamic event)? addStreamCompleted}) async {
     if(audio != null) {
       List<String> audioRegex = audio.split(RegExp(r'_+'));
       String url = await CloudStorage().getAudio(audio: audioRegex);
+      if(addStreamCompleted != null) {
+        stream = player.playerStateStream.listen(addStreamCompleted);
+      }
       await player.setUrl(url);
       await player.play();
     }

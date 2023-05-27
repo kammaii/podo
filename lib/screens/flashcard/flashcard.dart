@@ -7,6 +7,7 @@ class FlashCard {
   late String back;
   String? audio;
   late DateTime date;
+  bool isPlay = false;
 
   static const String ID = 'id';
   static const String FRONT = 'front';
