@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
@@ -17,7 +19,7 @@ class FlashCardReview extends StatefulWidget {
   _FlashCardReviewState createState() => _FlashCardReviewState();
 }
 
-class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderStateMixin{
+class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderStateMixin {
   List<FlashCard> allCards = Get.arguments;
   late List<FlashCard> cards;
   final controller = Get.find<FlashCardController>();
@@ -27,28 +29,42 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
   late List<String> reviewedCards;
   late String today;
   bool isViewAllClicked = false;
-  late AnimationController iconController;
-
+  late PlayStopIcon playStopIcon;
+  late FlashCard card;
 
   @override
   void initState() {
     super.initState();
-
-    iconController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
+    playStopIcon = PlayStopIcon(this, size: 50);
   }
 
   @override
   void dispose() {
     super.dispose();
-    PlayAudio().stop();
+    setPlayStopIcon(isForward: false);
   }
 
+  void setPlayStopIcon({required bool isForward}) {
+    if (isForward) {
+      PlayAudio().playFlashcard(card.audio, addStreamCompleted: (event) {
+        if (event.processingState == ProcessingState.completed) {
+          setPlayStopIcon(isForward: false);
+          PlayAudio().stream.cancel();
+        }
+      });
+      playStopIcon.clickIcon(isForward: true);
+      card.isPlay = true;
+    } else {
+      PlayAudio().stop();
+      playStopIcon.clickIcon(isForward: false);
+      card.isPlay = false;
+    }
+  }
 
   void checkShuffle(bool? value) {
-    controller.isRandomChecked = value!;
+    PlayAudio().stop();
+    setPlayStopIcon(isForward: false);
+    controller.isShuffleChecked = value!;
     if (value) {
       cards.shuffle();
     } else {
@@ -64,7 +80,6 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
     cards.removeAt(0);
     controller.update();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -98,11 +113,11 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                 reviewedCards = [];
                 cards = [...allCards];
               }
-
               return GetBuilder<FlashCardController>(
                 builder: (_) {
                   if (cards.isNotEmpty) {
-                    PlayAudio().playFlashcard(cards[0].audio);
+                    card = cards[0];
+                    setPlayStopIcon(isForward: true);
                     return Column(
                       children: [
                         LinearPercentIndicator(
@@ -119,7 +134,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                             Row(
                               children: [
                                 MyWidget().getCheckBox(
-                                    value: controller.isRandomChecked,
+                                    value: controller.isShuffleChecked,
                                     onChanged: (value) {
                                       checkShuffle(value);
                                     }),
@@ -144,7 +159,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                     Expanded(
                                       child: Center(
                                         child: MyWidget().getTextWidget(
-                                          text: cards[0].front,
+                                          text: card.front,
                                           size: 20,
                                           color: Colors.black,
                                         ),
@@ -157,7 +172,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                             ? Padding(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                                 child: MyWidget().getTextWidget(
-                                                  text: cards[0].back,
+                                                  text: card.back,
                                                   size: 20,
                                                   color: MyColors.grey,
                                                 ))
@@ -166,7 +181,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                                 child: Padding(
                                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                                   child: MyWidget().getTextWidget(
-                                                    text: cards[0].back,
+                                                    text: card.back,
                                                     size: 20,
                                                     color: MyColors.grey,
                                                   ),
@@ -192,16 +207,17 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            PlayAudio().stop();
-                            PlayAudio().playFlashcard(cards[0].audio);
-                          },
-                          child: AnimatedIcon(
-                            icon: AnimatedIcons.play_pause,
-                            progress: iconController,
-                            size: 50,
-                            color: cards[0].audio != null ? MyColors.purple : MyColors.grey,
+                        Opacity(
+                          opacity: card.audio == null ? 0 : 1,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (card.isPlay) {
+                                setPlayStopIcon(isForward: false);
+                              } else {
+                                setPlayStopIcon(isForward: true);
+                              }
+                            },
+                            child: playStopIcon.icon,
                           ),
                         ),
                         Padding(

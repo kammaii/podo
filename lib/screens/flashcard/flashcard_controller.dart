@@ -5,7 +5,7 @@ class FlashCardController extends GetxController {
   late bool isCheckedAll;
   late List<bool> isChecked;
   late bool isLongClicked;
-  bool isRandomChecked = false;
+  bool isShuffleChecked = false;
   List<FlashCard> cards = [];
 
   init() {

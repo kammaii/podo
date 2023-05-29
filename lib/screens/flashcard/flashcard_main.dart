@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
@@ -30,7 +31,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   final controller = Get.put(FlashCardController());
   final duration = const Duration(milliseconds: 200);
   String searchText = '';
-  Map<int, AnimationController> animatedIconControllers = {};
+  Map<String, PlayStopIcon> playStopIcons = {};
   final int docsLimit = 12; //todo: 20 개 이상으로 변경
   final scrollController = ScrollController();
   late int cardsLength;
@@ -57,8 +58,12 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
       snapshots = await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit);
     }
     for (dynamic snapshot in snapshots) {
-      controller.cards.add(FlashCard.fromJson(snapshot));
+      FlashCard card = FlashCard.fromJson(snapshot);
+      controller.cards.add(card);
       controller.isChecked.add(false);
+      if (card.audio != null) {
+        playStopIcons[card.id] = PlayStopIcon(this);
+      }
     }
     controller.update();
   }
@@ -108,12 +113,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                       builder: (_) {
                         if (controller.cards.isNotEmpty) {
                           cardsLength = controller.cards.length;
-                          for (int i = 0; i < cardsLength; i++) {
-                            animatedIconControllers[i] = AnimationController(
-                              duration: const Duration(milliseconds: 500),
-                              vsync: this,
-                            );
-                          }
 
                           if (searchText.isNotEmpty) {
                             cardsSearch = [];
@@ -158,7 +157,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                                   runBatch
                                                       .then((value) => Get.snackbar(MyStrings.deleteSucceed, ''))
                                                       .onError((error, stackTrace) =>
-                                                      Get.snackbar(MyStrings.deleteFailed, ''));
+                                                          Get.snackbar(MyStrings.deleteFailed, ''));
                                                 });
                                               }
                                             },
@@ -218,8 +217,9 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                       bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
                       fontColor: Colors.white,
                       f: () {
-                        controller.cards.isNotEmpty ?
-                        Get.to(const FlashCardReview(), arguments: controller.cards) : null;
+                        controller.cards.isNotEmpty
+                            ? Get.to(const FlashCardReview(), arguments: controller.cards)
+                            : null;
                       },
                     );
                   },
@@ -232,13 +232,14 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
     );
   }
 
-  void setAnimatedIcon(int index, {required bool isForward}) {
+  void setPlayStopIcon(int index, {required bool isForward}) {
+    FlashCard card = controller.cards[index];
     if (isForward) {
-      animatedIconControllers[index]!.forward();
-      controller.cards[index].isPlay = true;
+      playStopIcons[card.id]!.clickIcon(isForward: true);
+      card.isPlay = true;
     } else {
-      animatedIconControllers[index]!.reverse();
-      controller.cards[index].isPlay = false;
+      playStopIcons[card.id]!.clickIcon(isForward: false);
+      card.isPlay = false;
     }
   }
 
@@ -278,30 +279,29 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
         Opacity(
             opacity: card.audio == null ? 0 : 1,
             child: GestureDetector(
-              onTap: () {
-                PlayAudio().stop();
-                if (card.isPlay) {
-                  setAnimatedIcon(index, isForward: false);
-                } else {
-                  PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
-                    if (event.processingState == ProcessingState.completed) {
-                      setAnimatedIcon(index, isForward: false);
-                      PlayAudio().stream.cancel();
+                onTap: () {
+                  PlayAudio().stop();
+                  if (card.isPlay) {
+                    setPlayStopIcon(index, isForward: false);
+                  } else {
+                    PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
+                      if (event.processingState == ProcessingState.completed) {
+                        setPlayStopIcon(index, isForward: false);
+                        PlayAudio().stream.cancel();
+                      }
+                    });
+                    for (int i = 0; i < controller.cards.length; i++) {
+                      if(controller.cards[i].audio != null) {
+                        setPlayStopIcon(i, isForward: false);
+                      }
                     }
-                  });
-                  for (int i = 0; i < controller.cards.length; i++) {
-                    setAnimatedIcon(i, isForward: false);
+                    setPlayStopIcon(index, isForward: true);
                   }
-                  setAnimatedIcon(index, isForward: true);
-                }
-              },
-              child: AnimatedIcon(
-                icon: AnimatedIcons.play_pause,
-                progress: animatedIconControllers[index]!,
-                size: 30,
-                color: MyColors.purple,
-              ),
-            )),
+                },
+                child: SizedBox(
+                  width: 30,
+                  child: card.audio == null ? const SizedBox.shrink() : playStopIcons[card.id]!.icon,
+                ))),
       ],
     );
   }
