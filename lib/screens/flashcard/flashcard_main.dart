@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -9,6 +10,7 @@ import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
+import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -23,20 +25,50 @@ class FlashCardMain extends StatefulWidget {
 class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
-  final USERS = 'Users';
-  final FLASHCARDS = 'FlashCards';
+  final ref = 'Users/${User().email}/FlashCards';
   List<FlashCard> cardsSearch = [];
   final controller = Get.put(FlashCardController());
   final duration = const Duration(milliseconds: 200);
   String searchText = '';
   Map<int, AnimationController> animatedIconControllers = {};
+  final int docsLimit = 12; //todo: 20 개 이상으로 변경
+  final scrollController = ScrollController();
+  late int cardsLength;
 
+  @override
+  void initState() {
+    super.initState();
+    controller.init();
+    loadFlashcards();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        LoadingController.to.isLoading = true;
+        loadFlashcards(isContinue: true);
+        LoadingController.to.isLoading = false;
+      }
+    });
+  }
+
+  loadFlashcards({bool isContinue = false}) async {
+    List<dynamic> snapshots;
+    if (isContinue) {
+      snapshots = await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit, isContinue: true);
+    } else {
+      snapshots = await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit);
+    }
+    for (dynamic snapshot in snapshots) {
+      controller.cards.add(FlashCard.fromJson(snapshot));
+      controller.isChecked.add(false);
+    }
+    controller.update();
+  }
 
   @override
   void dispose() {
     super.dispose();
     _focusNode.dispose();
     searchController.dispose();
+    scrollController.dispose();
   }
 
   Widget animationWidget(Widget child) {
@@ -72,118 +104,101 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                       }),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: FutureBuilder(
-                      future:
-                          Database().getDocs(collection: '$USERS/${User().email}/$FLASHCARDS', orderBy: 'date'),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                          controller.initChecks(snapshot.data.length);
-                          controller.cards = [];
-                          for (dynamic snapshot in snapshot.data) {
-                            controller.cards.add(FlashCard.fromJson(snapshot));
-                          }
-                          if (controller.cards.isNotEmpty) {
-                            for(int i=0; i<controller.cards.length; i++) {
-                              animatedIconControllers[i] = AnimationController(
-                                duration: const Duration(milliseconds: 500),
-                                vsync: this,
-                              );
-                            }
-                            return GetBuilder<FlashCardController>(
-                              builder: (_) {
-                                int cardsLength = controller.cards.length;
-                                if (searchText.isNotEmpty) {
-                                  cardsSearch = [];
-                                  for (FlashCard card in controller.cards) {
-                                    if (searchText.isNotEmpty &&
-                                        (card.front.toLowerCase().contains(searchText) ||
-                                            card.back.toLowerCase().contains(searchText))) {
-                                      cardsSearch.add(card);
-                                    }
-                                  }
-                                  cardsLength = cardsSearch.length;
-                                }
-
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          animationWidget(MyWidget().getCheckBox(
-                                              value: controller.isCheckedAll,
-                                              onChanged: (value) {
-                                                controller.isCheckedAllClicked(value!);
-                                              })),
-                                          Row(
-                                            children: [
-                                              animationWidget(IconButton(
-                                                  onPressed: () {
-                                                    List<String> ids = [];
-                                                    for (int i = 0; i < controller.isChecked.length; i++) {
-                                                      controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
-                                                    }
-                                                    if (ids.isNotEmpty) {
-                                                      setState(() {
-                                                        String ref = '$USERS/${User().email}/$FLASHCARDS';
-                                                        Future<void> runBatch;
-                                                        if (ids.length > 1) {
-                                                          runBatch =
-                                                              Database().deleteDocs(collection: ref, ids: ids);
-                                                        } else {
-                                                          runBatch =
-                                                              Database().deleteDoc(collection: ref, docId: ids[0]);
-                                                        }
-                                                        runBatch
-                                                            .then((value) =>
-                                                                Get.snackbar(MyStrings.deleteSucceed, ''))
-                                                            .onError((error, stackTrace) =>
-                                                                Get.snackbar(MyStrings.deleteFailed, ''));
-                                                      });
-                                                    }
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: MyColors.red,
-                                                  ))),
-                                              const SizedBox(width: 20),
-                                              MyWidget().getTextWidget(
-                                                  text: '$cardsLength ${MyStrings.cards}',
-                                                  size: 15,
-                                                  color: Colors.black),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _focusNode.unfocus();
-                                          },
-                                          onLongPress: () {
-                                            controller.isLongClicked = !controller.isLongClicked;
-                                            controller.update();
-                                          },
-                                          child: ListView.builder(
-                                            padding: const EdgeInsets.only(top: 10, bottom: 80),
-                                            itemCount: cardsLength,
-                                            itemBuilder: (BuildContext context, int index) {
-                                              return getFlashCardItem(index);
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                    child: GetBuilder<FlashCardController>(
+                      builder: (_) {
+                        if (controller.cards.isNotEmpty) {
+                          cardsLength = controller.cards.length;
+                          for (int i = 0; i < cardsLength; i++) {
+                            animatedIconControllers[i] = AnimationController(
+                              duration: const Duration(milliseconds: 500),
+                              vsync: this,
                             );
-                          } else {
-                            return Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards));
                           }
+
+                          if (searchText.isNotEmpty) {
+                            cardsSearch = [];
+                            for (FlashCard card in controller.cards) {
+                              if (searchText.isNotEmpty &&
+                                  (card.front.toLowerCase().contains(searchText) ||
+                                      card.back.toLowerCase().contains(searchText))) {
+                                cardsSearch.add(card);
+                              }
+                            }
+                            cardsLength = cardsSearch.length;
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    animationWidget(MyWidget().getCheckBox(
+                                        value: controller.isCheckedAll,
+                                        onChanged: (value) {
+                                          controller.isCheckedAllClicked(value!);
+                                        })),
+                                    Row(
+                                      children: [
+                                        animationWidget(IconButton(
+                                            onPressed: () {
+                                              List<String> ids = [];
+                                              for (int i = 0; i < controller.isChecked.length; i++) {
+                                                controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
+                                              }
+                                              if (ids.isNotEmpty) {
+                                                setState(() {
+                                                  Future<void> runBatch;
+                                                  if (ids.length > 1) {
+                                                    runBatch = Database().deleteDocs(collection: ref, ids: ids);
+                                                  } else {
+                                                    runBatch =
+                                                        Database().deleteDoc(collection: ref, docId: ids[0]);
+                                                  }
+                                                  runBatch
+                                                      .then((value) => Get.snackbar(MyStrings.deleteSucceed, ''))
+                                                      .onError((error, stackTrace) =>
+                                                      Get.snackbar(MyStrings.deleteFailed, ''));
+                                                });
+                                              }
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: MyColors.red,
+                                            ))),
+                                        const SizedBox(width: 20),
+                                        MyWidget().getTextWidget(
+                                            text: '$cardsLength ${MyStrings.cards}',
+                                            size: 15,
+                                            color: Colors.black),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _focusNode.unfocus();
+                                    },
+                                    onLongPress: () {
+                                      controller.isLongClicked = !controller.isLongClicked;
+                                      controller.update();
+                                    },
+                                    child: ListView.builder(
+                                      controller: scrollController,
+                                      padding: const EdgeInsets.only(top: 10, bottom: 80),
+                                      itemCount: cardsLength,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return getFlashCardItem(index);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
                         } else {
-                          return const Center(child: CircularProgressIndicator());
+                          return Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards));
                         }
                       },
                     ),
@@ -195,13 +210,18 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Container(
                 alignment: Alignment.bottomCenter,
-                child: MyWidget().getRoundBtnWidget(
-                  isRequest: false,
-                  text: MyStrings.review,
-                  bgColor: MyColors.purple,
-                  fontColor: Colors.white,
-                  f: () {
-                    Get.to(const FlashCardReview(), arguments: controller.cards);
+                child: GetBuilder<FlashCardController>(
+                  builder: (_) {
+                    return MyWidget().getRoundBtnWidget(
+                      isRequest: false,
+                      text: MyStrings.review,
+                      bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
+                      fontColor: Colors.white,
+                      f: () {
+                        controller.cards.isNotEmpty ?
+                        Get.to(const FlashCardReview(), arguments: controller.cards) : null;
+                      },
+                    );
                   },
                 ),
               ),
@@ -213,7 +233,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   }
 
   void setAnimatedIcon(int index, {required bool isForward}) {
-    if(isForward) {
+    if (isForward) {
       animatedIconControllers[index]!.forward();
       controller.cards[index].isPlay = true;
     } else {
@@ -221,7 +241,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
       controller.cards[index].isPlay = false;
     }
   }
-
 
   Widget getFlashCardItem(int index) {
     FlashCard card;
@@ -257,33 +276,32 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
           ),
         ),
         Opacity(
-          opacity: card.audio == null ? 0 : 1,
-          child: GestureDetector(
-            onTap: () {
-              PlayAudio().stop();
-              if(card.isPlay) {
-                setAnimatedIcon(index, isForward: false);
-              } else {
-                PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
-                  if(event.processingState == ProcessingState.completed) {
-                    setAnimatedIcon(index, isForward: false);
-                    PlayAudio().stream.cancel();
+            opacity: card.audio == null ? 0 : 1,
+            child: GestureDetector(
+              onTap: () {
+                PlayAudio().stop();
+                if (card.isPlay) {
+                  setAnimatedIcon(index, isForward: false);
+                } else {
+                  PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
+                    if (event.processingState == ProcessingState.completed) {
+                      setAnimatedIcon(index, isForward: false);
+                      PlayAudio().stream.cancel();
+                    }
+                  });
+                  for (int i = 0; i < controller.cards.length; i++) {
+                    setAnimatedIcon(i, isForward: false);
                   }
-                });
-                for(int i=0; i<controller.cards.length; i++) {
-                  setAnimatedIcon(i, isForward: false);
+                  setAnimatedIcon(index, isForward: true);
                 }
-                setAnimatedIcon(index, isForward: true);
-              }
-            },
-            child: AnimatedIcon(
-              icon: AnimatedIcons.play_pause,
-              progress: animatedIconControllers[index]!,
-              size: 30,
-              color: MyColors.purple,
-            ),
-          )
-        ),
+              },
+              child: AnimatedIcon(
+                icon: AnimatedIcons.play_pause,
+                progress: animatedIconControllers[index]!,
+                size: 30,
+                color: MyColors.purple,
+              ),
+            )),
       ],
     );
   }

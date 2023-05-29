@@ -8,6 +8,13 @@ class FlashCardController extends GetxController {
   bool isRandomChecked = false;
   List<FlashCard> cards = [];
 
+  init() {
+    cards = [];
+    isChecked = [];
+    isCheckedAll = false;
+    isLongClicked = false;
+  }
+
   updateCard({required String id, required String front, required String back}) {
     for(FlashCard card in cards) {
       if(card.id == id) {
@@ -18,10 +25,12 @@ class FlashCardController extends GetxController {
     update();
   }
 
-  initChecks(int length) {
-    isCheckedAll = false;
-    isChecked = List.generate(length, (index) => false);
-    isLongClicked = false;
+  setCheckbox() {
+    if(isCheckedAll) {
+      isChecked = List.generate(cards.length, (index) => true);
+    } else {
+      isChecked = List.generate(cards.length, (index) => false);
+    }
   }
 
   isCheckedAllClicked(bool value) {

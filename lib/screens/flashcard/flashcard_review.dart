@@ -17,7 +17,7 @@ class FlashCardReview extends StatefulWidget {
   _FlashCardReviewState createState() => _FlashCardReviewState();
 }
 
-class _FlashCardReviewState extends State<FlashCardReview> {
+class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderStateMixin{
   List<FlashCard> allCards = Get.arguments;
   late List<FlashCard> cards;
   final controller = Get.find<FlashCardController>();
@@ -26,6 +26,26 @@ class _FlashCardReviewState extends State<FlashCardReview> {
   late SharedPreferences prefs;
   late List<String> reviewedCards;
   late String today;
+  bool isViewAllClicked = false;
+  late AnimationController iconController;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    iconController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    PlayAudio().stop();
+  }
+
 
   void checkShuffle(bool? value) {
     controller.isRandomChecked = value!;
@@ -45,12 +65,6 @@ class _FlashCardReviewState extends State<FlashCardReview> {
     controller.update();
   }
 
-
-  @override
-  void dispose() {
-    super.dispose();
-    PlayAudio().stop();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +139,7 @@ class _FlashCardReviewState extends State<FlashCardReview> {
                                   BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
                               child: Center(
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Expanded(
                                       child: Center(
@@ -138,18 +153,38 @@ class _FlashCardReviewState extends State<FlashCardReview> {
                                     const Divider(height: 20),
                                     Expanded(
                                       child: Center(
-                                        child: Scratcher(
-                                          color: MyColors.grey,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                            child: MyWidget().getTextWidget(
-                                              text: cards[0].back,
-                                              size: 20,
-                                              color: MyColors.grey,
-                                            ),
-                                          ),
-                                        ),
+                                        child: isViewAllClicked
+                                            ? Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                                child: MyWidget().getTextWidget(
+                                                  text: cards[0].back,
+                                                  size: 20,
+                                                  color: MyColors.grey,
+                                                ))
+                                            : Scratcher(
+                                                color: MyColors.grey,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                                  child: MyWidget().getTextWidget(
+                                                    text: cards[0].back,
+                                                    size: 20,
+                                                    color: MyColors.grey,
+                                                  ),
+                                                ),
+                                              ),
                                       ),
+                                    ),
+                                    GestureDetector(
+                                      onTapDown: (_) {
+                                        isViewAllClicked = true;
+                                        controller.update();
+                                      },
+                                      onTapUp: (_) {
+                                        isViewAllClicked = false;
+                                        controller.update();
+                                      },
+                                      child: MyWidget()
+                                          .getTextWidget(text: MyStrings.viewAll, color: MyColors.grey, size: 13),
                                     ),
                                   ],
                                 ),
@@ -157,13 +192,17 @@ class _FlashCardReviewState extends State<FlashCardReview> {
                             ),
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.volume_up_rounded),
-                          iconSize: 50,
-                          color: cards[0].audio != null ? MyColors.purple : MyColors.grey,
-                          onPressed: () {
+                        GestureDetector(
+                          onTap: (){
+                            PlayAudio().stop();
                             PlayAudio().playFlashcard(cards[0].audio);
                           },
+                          child: AnimatedIcon(
+                            icon: AnimatedIcons.play_pause,
+                            progress: iconController,
+                            size: 50,
+                            color: cards[0].audio != null ? MyColors.purple : MyColors.grey,
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 30),

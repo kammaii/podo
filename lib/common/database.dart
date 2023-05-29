@@ -52,24 +52,49 @@ class Database {
     return await ref.get().then((value) => print('$collection/$docId is loaded'));
   }
 
+  DocumentSnapshot? lastDoc;
+
   Future<List<dynamic>> getDocs(
       {required String collection,
       dynamic field,
       dynamic equalTo,
       required String orderBy,
+      int? limit,
+      bool isContinue = false,
       bool descending = true}) async {
     List<dynamic> documents = [];
+
     final ref = firestore.collection(collection);
-    final queryRef;
-    if (field != null) {
-      queryRef = ref.where(field, isEqualTo: equalTo).orderBy(orderBy, descending: descending);
+    Query queryRef;
+
+    if (limit == null) {
+      if (field != null) {
+        queryRef = ref.where(field, isEqualTo: equalTo).orderBy(orderBy, descending: descending);
+      } else {
+        queryRef = ref.orderBy(orderBy, descending: descending);
+      }
     } else {
-      queryRef = ref.orderBy(orderBy, descending: descending);
+      if (field != null) {
+        queryRef = ref.where(field, isEqualTo: equalTo).orderBy(orderBy, descending: descending).limit(limit);
+      } else {
+        queryRef = ref.orderBy(orderBy, descending: descending).limit(limit);
+      }
+      if (isContinue) {
+        queryRef = queryRef.startAfterDocument(lastDoc!);
+      }
     }
+
     await queryRef.get().then((QuerySnapshot snapshot) {
       print('quiring');
       for (QueryDocumentSnapshot documentSnapshot in snapshot.docs) {
         documents.add(documentSnapshot.data() as Map<String, dynamic>);
+      }
+      if (limit != null) {
+        if(documents.isNotEmpty) {
+          lastDoc = snapshot.docs.last;
+        } else {
+          return;
+        }
       }
     }, onError: (e) => print('ERROR : $e'));
     return documents;
