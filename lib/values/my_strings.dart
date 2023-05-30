@@ -123,7 +123,8 @@ class MyStrings {
   static const String checkAnswer = 'Check the answer';
   static const String makeReservation = 'Make a reservation';
   static const String iAgree = 'I agree';
-
+  static const String startLearning = 'Start Learning!';
+  static const String lessonSummary = 'Lesson Summary';
 
 
 

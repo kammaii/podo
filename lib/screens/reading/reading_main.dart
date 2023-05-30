@@ -1,188 +1,362 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/lesson/lesson_course.dart';
+import 'package:podo/common/play_audio.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/reading/reading.dart';
-import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ReadingMain extends StatefulWidget {
-  ReadingMain({Key? key}) : super(key: key);
+  const ReadingMain({Key? key}) : super(key: key);
 
   @override
-  State<ReadingMain> createState() => _ReadingMainState();
+  _ReadingMainState createState() => _ReadingMainState();
 }
 
-class _ReadingMainState extends State<ReadingMain> {
-  final rockets = ['rocket1', 'rocket2', 'rocket3'];
-  final categories = ['culture', 'food', 'travel', 'story book'];
-  final cardBorderRadius = 8.0;
-  int selectedCategory = 0;
+class _ReadingMainState extends State<ReadingMain> with TickerProviderStateMixin {
+  ScrollController scrollController = ScrollController();
+  double sliverAppBarHeight = 200.0;
+  double sliverAppBarStretchOffset = 100.0;
+  Reading reading = Get.arguments;
+  String fo = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  String sampleImage = 'assets/images/course_hangul.png';
   final KO = 'ko';
-  final READINGS = 'Readings';
-  final CATEGORY = 'category';
-  final ORDER_ID = 'orderId';
-  String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
-  late List<Reading> readings;
-  String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  final cardBorderRadius = 8.0;
+  bool isImageVisible = true;
+  late AnimationController animationController;
+  late Animation<double> animation;
+  double currentScrollPercent = 0;
+  double scrollPosition = 0;
 
-  Widget getListItem({required Reading reading}) {
-    return Stack(
-      children: [
-        Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(cardBorderRadius),
+  @override
+  void dispose() {
+    super.dispose();
+    if (currentScrollPercent > 0.1 && currentScrollPercent < 0.9) {
+      LocalStorage().prefs.setDouble(reading.id, scrollPosition);
+    } else {
+      LocalStorage().prefs.remove(reading.id);
+    }
+    scrollController.dispose();
+    PlayAudio().reset();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    animation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeIn,
+    ));
+    scrollController.addListener(() => setState(() {
+          if (scrollController.offset <= 50) {
+            if (animationController.value == 1) {
+              animationController.reverse();
+            }
+          } else {
+            if (animationController.value == 0) {
+              animationController.forward();
+            }
+          }
+          double maxScroll = scrollController.position.maxScrollExtent;
+          scrollPosition = scrollController.position.pixels;
+          currentScrollPercent = scrollPosition / maxScroll;
+          if (currentScrollPercent <= 0) {
+            currentScrollPercent = 0;
+          }
+          if (currentScrollPercent >= 1) {
+            currentScrollPercent = 1;
+          }
+        }));
+
+    double? position = LocalStorage().prefs.getDouble(reading.id);
+    print(position);
+    if (position != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.dialog(AlertDialog(
+          title: const Text(MyStrings.continueReading),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Get.back();
+                },
+                child: const Text(MyStrings.no, style: TextStyle(color: MyColors.navy))),
+            TextButton(
+                onPressed: () {
+                  Get.back();
+                  scrollController.animateTo(position,
+                      duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                },
+                child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.purple))),
+          ],
+        ));
+      });
+    }
+  }
+
+  Widget letterContainer(String text) {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Colors.white,
+            width: 2,
+          )),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(1),
+          child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+      ),
+    );
+  }
+
+  sliverAppBar() {
+    return SliverAppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_rounded),
+        color: Colors.white,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      expandedHeight: sliverAppBarHeight,
+      collapsedHeight: 60,
+      pinned: true,
+      stretch: true,
+      title: MyWidget().getTextWidget(
+        text: '${reading.title[KO]}',
+        size: 18,
+        color: Colors.white,
+        isBold: true,
+      ),
+      flexibleSpace: Stack(
+        children: [
+          Container(
+            color: MyColors.navyLight,
           ),
-          color: Colors.white,
-          child: InkWell(
-            onTap: () {
-              Get.to(const ReadingFrame(), arguments: reading);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: Hero(
-                      tag: 'readingImage:${reading.id}',
-                      child: Image.asset('assets/images/course_hangul.png'),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Transform.scale(
-                            alignment: Alignment.bottomLeft,
-                            scale: 0.8,
-                            child: Image.asset('assets/images/${rockets[reading.level]}.png'),
-                          ),
-                          const Icon(
-                            Icons.check_circle,
-                            color: MyColors.green,
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      MyWidget().getTextWidget(
-                        text: reading.title[KO] ?? '',
-                        size: 20,
-                        color: MyColors.navy,
-                      ),
-                      const SizedBox(height: 10),
-                      MyWidget().getTextWidget(
-                        text: reading.title[fo] ?? '',
-                        color: MyColors.grey,
-                      ),
-                    ],
-                  ),
-                ],
+          Positioned(
+            top: -50,
+            right: -30,
+            child: Hero(
+              tag: 'readingImage:${reading.id}',
+              child: FadeTransition(
+                opacity: animation,
+                child: Image.asset(
+                  sampleImage,
+                  width: 250,
+                ),
               ),
             ),
           ),
+          Opacity(
+            opacity: 0.2,
+            child: Container(
+              color: Colors.black,
+            ),
+          ),
+          LinearProgressIndicator(
+            value: currentScrollPercent,
+            color: MyColors.purple,
+            backgroundColor: MyColors.purpleLight,
+          ),
+          FadeTransition(
+            opacity: animation,
+            child: FlexibleSpaceBar(
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  letterContainer('S'),
+                  const SizedBox(width: 10),
+                  Text('${reading.content[KO].length}'),
+                  const SizedBox(width: 20),
+                  const Text('|'),
+                  const SizedBox(width: 20),
+                  letterContainer('W'),
+                  const SizedBox(width: 10),
+                  Text('${reading.content[KO].length}'),
+                ],
+              ),
+              expandedTitleScale: 1.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  sliverList() {
+    int length = reading.content[KO].length;
+    return SliverPadding(
+      padding: const EdgeInsets.all(10),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return Column(
+              children: [
+                partContentKo(index),
+                const SizedBox(height: 30),
+                partWords(index),
+                const SizedBox(height: 30),
+                partContentFo(index),
+                const Divider(),
+                const SizedBox(height: 30),
+                index == length - 1
+                    ? MyWidget().getRoundBtnWidget(
+                        isRequest: false,
+                        text: MyStrings.complete,
+                        bgColor: MyColors.purple,
+                        fontColor: Colors.white,
+                        f: () {
+                          LocalStorage().prefs.remove(reading.id);
+                          Get.back();
+                          //todo: User().readingRecord 에 추가
+                        })
+                    : const SizedBox.shrink(),
+              ],
+            );
+          },
+          childCount: length,
         ),
-        reading.tag.isNotEmpty
-            ? Positioned(
-                top: 5,
-                right: 4,
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: MyColors.pink,
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(cardBorderRadius),
-                        bottomLeft: Radius.circular(cardBorderRadius),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    child: Text(reading.tag, style: const TextStyle(color: MyColors.red))),
-              )
-            : const SizedBox.shrink(),
+      ),
+    );
+  }
+
+  Widget partContentKo(int index) {
+    final contentKo = reading.content[KO][index];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: MyWidget().getTextWidget(text: (index+1).toString(), color: MyColors.purple, isBold: true),
+            )),
+            Material(
+              child: IconButton(
+                icon: const Icon(Icons.star_outline_rounded, color: MyColors.purple),
+                onPressed: () {
+                  FlashCard flashcard = FlashCard();
+                  flashcard.front = contentKo;
+                  flashcard.back = reading.content[fo][index];
+                  flashcard.audio = 'ReadingAudios_${reading.id}_$index';
+                  Database().setFlashcard(flashCard: flashcard);
+                },
+              ),
+            ),
+            Material(
+              child: IconButton(
+                icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
+                onPressed: () {
+                  PlayAudio().playReading(readingId: reading.id, index: index);
+                },
+              ),
+            ),
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: MyWidget().getTextWidget(text: contentKo, size: 18, height: 1.8, isKorean: true),
+        ),
       ],
     );
   }
 
+  Widget partContentFo(int index) {
+    final contentFo = reading.content[fo][index];
+    return ExpansionTile(
+      leading: const Icon(Icons.g_translate_rounded),
+      iconColor: MyColors.purple,
+      title: const Text(''),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 10),
+      children: [
+        MyWidget().getTextWidget(text: contentFo, color: MyColors.grey),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget partWords(int index) {
+    final wordList = reading.words[KO];
+    final contentKo = reading.content[KO][index];
+    List<String> wordKoList = [];
+    List<String> wordFoList = [];
+
+    for (int i = 0; i < wordList.length; i++) {
+      String word = wordList[i];
+
+      String insideText = '';
+      String outsideText = '';
+
+      int startIdx = word.indexOf('(');
+      int endIdx = word.indexOf(')');
+
+      if (startIdx != -1 && endIdx != -1 && startIdx < endIdx) {
+        insideText = word.substring(startIdx + 1, endIdx);
+        outsideText = word.substring(0, startIdx) + word.substring(endIdx + 1);
+      } else {
+        insideText = word;
+        outsideText = word;
+      }
+
+      if (contentKo.contains(outsideText)) {
+        wordKoList.add(insideText);
+        wordFoList.add(reading.words[fo][i]);
+      }
+    }
+
+    return ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: wordKoList.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                const SizedBox(
+                  height: 10,
+                  child: VerticalDivider(
+                    color: MyColors.purple,
+                    thickness: 1,
+                    width: 18,
+                  ),
+                ),
+                MyWidget().getTextWidget(text: wordKoList[index], isKorean: true, size: 18),
+                const Text(' : '),
+                MyWidget().getTextWidget(text: wordFoList[index])
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 30,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = index;
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: selectedCategory == index ? MyColors.purple : MyColors.navy,
-                            borderRadius: const BorderRadius.all(Radius.circular(20)),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                          child: MyWidget().getTextWidget(text: categories[index], color: Colors.white, size: 17),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: FutureBuilder(
-                  future: Database().getDocs(
-                      collection: READINGS,
-                      field: CATEGORY,
-                      equalTo: categories[selectedCategory],
-                      orderBy: ORDER_ID,
-                      descending: false),
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                      readings = [];
-                      for (dynamic snapshot in snapshot.data) {
-                        readings.add(Reading.fromJson(snapshot));
-                      }
-                      if (readings.isEmpty) {
-                        return Center(
-                            child: MyWidget().getTextWidget(
-                                text: MyStrings.noReading,
-                                color: MyColors.purple,
-                                size: 20,
-                                isTextAlignCenter: true));
-                      } else {
-                        return ListView.builder(
-                          itemCount: readings.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            Reading reading = readings[index];
-                            return getListItem(reading: reading);
-                          },
-                        );
-                      }
-                    } else if (snapshot.hasError) {
-                      return Text('에러: ${snapshot.error}');
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
-              ),
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          color: MyColors.purpleLight,
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            controller: scrollController,
+            slivers: [
+              sliverAppBar(),
+              sliverList(),
             ],
           ),
         ),

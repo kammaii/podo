@@ -3,12 +3,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:podo/screens/login/login.dart';
+import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/main_frame.dart';
+import 'package:podo/screens/profile/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'firebase_options.dart';
-import 'package:podo/screens/profile/user.dart' as user;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

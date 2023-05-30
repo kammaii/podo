@@ -15,15 +15,15 @@ import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:scratcher/scratcher.dart';
 
-class LessonFrame extends StatefulWidget {
-  LessonFrame({Key? key}) : super(key: key);
+class LessonCardMain extends StatefulWidget {
+  LessonCardMain({Key? key}) : super(key: key);
 
   @override
-  State<LessonFrame> createState() => _LessonFrameState();
+  State<LessonCardMain> createState() => _LessonCardMainState();
 }
 
-class _LessonFrameState extends State<LessonFrame> {
-  final lessonId = Get.arguments;
+class _LessonCardMainState extends State<LessonCardMain> {
+  final lesson = Get.arguments;
   int thisIndex = 0;
   ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
   final controller = Get.put(LessonController());
@@ -359,8 +359,8 @@ class _LessonFrameState extends State<LessonFrame> {
     super.initState();
     isLoading = true;
     Future.wait([
-      Database().getDocs(collection: 'Lessons/$lessonId/LessonCards', orderBy: 'orderId', descending: false),
-      CloudStorage().getLessonAudios(lessonId: lessonId),
+      Database().getDocs(collection: 'Lessons/${lesson.id}/LessonCards', orderBy: 'orderId', descending: false),
+      CloudStorage().getLessonAudios(lessonId: lesson.id),
     ]).then((value) {
       setState(() {
         for(dynamic map in value[0]) {
@@ -380,7 +380,7 @@ class _LessonFrameState extends State<LessonFrame> {
       child: Scaffold(
         appBar: MyWidget().getAppbar(
           context: context,
-          title: MyStrings.title,
+          title: lesson.title[KO],
         ),
         body: isLoading
             ? const Center(child: CircularProgressIndicator())

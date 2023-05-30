@@ -4,20 +4,19 @@ import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
-import 'package:podo/screens/lesson/lesson_frame.dart';
-import 'package:podo/screens/lesson/lesson_controller.dart';
+import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class LessonMain extends StatefulWidget {
-  const LessonMain({Key? key}) : super(key: key);
+class LessonListMain extends StatefulWidget {
+  const LessonListMain({Key? key}) : super(key: key);
 
   @override
-  _LessonMainState createState() => _LessonMainState();
+  _LessonListMainState createState() => _LessonListMainState();
 }
 
-class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
+class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
@@ -91,7 +90,7 @@ class _LessonMainState extends State<LessonMain> with TickerProviderStateMixin {
                       color: Colors.white,
                       child: InkWell(
                         onTap: () {
-                          Get.to(LessonFrame(), arguments: lesson.id);
+                          Get.to(LessonSummaryMain(), arguments: lesson);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10),

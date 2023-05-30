@@ -8,7 +8,7 @@ import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course_main.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/profile/profile.dart';
-import 'package:podo/screens/reading/reading_main.dart';
+import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/values/my_colors.dart';
 
 
@@ -22,7 +22,7 @@ class MainFrame extends StatefulWidget {
 List<Widget> _buildScreens() {
   return [
     LessonCourseMain(),
-    ReadingMain(),
+    ReadingListMain(),
     const FlashCardMain(),
     const Profile(),
   ];

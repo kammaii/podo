@@ -5,7 +5,7 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'lesson_main.dart';
+import 'lesson_list_main.dart';
 
 class LessonCourseMain extends StatefulWidget {
   LessonCourseMain({Key? key}) : super(key: key);
@@ -27,7 +27,7 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
     return Card(
       child: InkWell(
         onTap: () {
-          Get.to(const LessonMain(), arguments: lessonCourse);
+          Get.to(const LessonListMain(), arguments: lessonCourse);
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
