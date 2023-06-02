@@ -9,14 +9,14 @@ import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class ReadingMain extends StatefulWidget {
-  const ReadingMain({Key? key}) : super(key: key);
+class ReadingFrame extends StatefulWidget {
+  const ReadingFrame({Key? key}) : super(key: key);
 
   @override
-  _ReadingMainState createState() => _ReadingMainState();
+  _ReadingFrameState createState() => _ReadingFrameState();
 }
 
-class _ReadingMainState extends State<ReadingMain> with TickerProviderStateMixin {
+class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;

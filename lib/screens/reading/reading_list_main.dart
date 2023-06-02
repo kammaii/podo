@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/reading/reading.dart';
-import 'package:podo/screens/reading/reading_main.dart';
+import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -37,7 +37,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
           color: Colors.white,
           child: InkWell(
             onTap: () {
-              Get.to(const ReadingMain(), arguments: reading);
+              Get.to(const ReadingFrame(), arguments: reading);
             },
             child: Padding(
               padding: const EdgeInsets.all(10),

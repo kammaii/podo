@@ -40,8 +40,9 @@ class Login extends StatelessWidget {
         androidInstallApp: true,
         androidMinimumVersion: '12',
         iOSBundleId: 'net.awesomekorean.newpodo',
-        handleCodeInApp: true,
-      ),
+        handleCodeInApp: false,
+        dynamicLinkDomain: 'newpodo.page.link',
+      )
     );
     print('EMAIL SENT');
   }

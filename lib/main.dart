@@ -4,6 +4,7 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
+import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/profile/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
       // Dynamic link를 통해 앱을 신규설치하거나 업데이트 했을 때 작동 -> 해당 딥링크에 맞는 화면 보여줌
       final Uri deepLink = initialLink!.link;
       Get.snackbar('InitialLink', '$deepLink');
+      print('InitialLink: $deepLink');
     }
 
     // DynamicLink listener : When the app is already running
@@ -44,6 +46,7 @@ class MyApp extends StatelessWidget {
       Get.snackbar(
           'dynamic link listening', 'verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData'
       );
+      print('dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData');
     }).onError((error) {
       // Handle errors
     });

@@ -15,14 +15,14 @@ import 'package:podo/values/my_strings.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:scratcher/scratcher.dart';
 
-class LessonCardMain extends StatefulWidget {
-  LessonCardMain({Key? key}) : super(key: key);
+class LessonFrame extends StatefulWidget {
+  LessonFrame({Key? key}) : super(key: key);
 
   @override
-  State<LessonCardMain> createState() => _LessonCardMainState();
+  State<LessonFrame> createState() => _LessonFrameState();
 }
 
-class _LessonCardMainState extends State<LessonCardMain> {
+class _LessonFrameState extends State<LessonFrame> {
   final lesson = Get.arguments;
   int thisIndex = 0;
   ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
@@ -378,10 +378,7 @@ class _LessonCardMainState extends State<LessonCardMain> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: MyWidget().getAppbar(
-          context: context,
-          title: lesson.title[KO],
-        ),
+        appBar: MyWidget().getAppbar(title: lesson.title[KO]),
         body: isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(

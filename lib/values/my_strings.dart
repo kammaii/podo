@@ -125,7 +125,11 @@ class MyStrings {
   static const String iAgree = 'I agree';
   static const String startLearning = 'Start Learning!';
   static const String lessonSummary = 'Lesson Summary';
-
+  static const String writing = 'Writing';
+  static const String writingTopics = 'Writing Topics';
+  static const String myWritings = 'My writings';
+  static const String unlockWritingTopics = 'Unlock the writing topics by completing the lessons.';
+  static const String selectQuestion = 'Select a question';
 
 
   // used only in the code

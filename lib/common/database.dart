@@ -76,6 +76,7 @@ class Database {
     } else {
       if (field != null) {
         queryRef = ref.where(field, isEqualTo: equalTo).orderBy(orderBy, descending: descending).limit(limit);
+        //queryRef.count()
       } else {
         queryRef = ref.orderBy(orderBy, descending: descending).limit(limit);
       }

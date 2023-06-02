@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -38,16 +39,13 @@ class MyWidget {
     );
   }
 
-  AppBar getAppbar({
-    required BuildContext context,
-    required String title,
-  }) {
+  AppBar getAppbar({required String title}) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
       leading: IconButton(
         onPressed: () {
-          Navigator.pop(context);
+          Get.back();
         },
         icon: const Icon(Icons.arrow_back_ios_rounded),
         color: MyColors.purple,
@@ -61,28 +59,27 @@ class MyWidget {
     );
   }
 
-  Widget getSearchWidget({
-    required FocusNode focusNode,
-    required TextEditingController controller,
-    required String hint,
-    required Function(String?) onChanged
-  }) {
+  Widget getSearchWidget(
+      {required FocusNode focusNode,
+      required TextEditingController controller,
+      required String hint,
+      required Function(String?) onChanged}) {
     return TextField(
       focusNode: focusNode,
       decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
-          prefixIcon: const Icon(Icons.search),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30.0)),
-            borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
-          ),
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30.0)),
-            borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
-          ),
-          hintText: hint,
-          filled: true,
-          fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+        prefixIcon: const Icon(Icons.search),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+          borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+          borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
+        ),
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
       ),
       controller: controller,
       onChanged: onChanged,
@@ -112,6 +109,7 @@ class MyWidget {
       ),
       textAlign: isTextAlignCenter != null ? TextAlign.center : null,
       maxLines: maxLine,
+      overflow: maxLine != null ? TextOverflow.ellipsis : null,
     );
   }
 
@@ -310,10 +308,7 @@ class MyWidget {
           ),
           boxShadow: [
             BoxShadow(
-                color: MyColors.grey.withOpacity(0.5),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, 1)),
+                color: MyColors.grey.withOpacity(0.5), spreadRadius: 1, blurRadius: 5, offset: const Offset(0, 1)),
           ]),
     );
   }

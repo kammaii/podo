@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
-import 'package:podo/screens/lesson/lesson_card_main.dart';
+import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -33,7 +33,7 @@ class LessonSummaryMain extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     onPressed: () {
-                      Get.to(LessonCardMain(), arguments: lesson);
+                      Get.to(LessonFrame(), arguments: lesson);
                     },
                     backgroundColor: MyColors.green,
                     child: const Icon(Icons.play_arrow_rounded, size: 40),
@@ -47,7 +47,7 @@ class LessonSummaryMain extends StatelessWidget {
                   const SizedBox(height: 10),
                 ],
               ),
-              appBar: MyWidget().getAppbar(context: context, title: lesson.title[KO]),
+              appBar: MyWidget().getAppbar(title: lesson.title[KO]),
               body: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
