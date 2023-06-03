@@ -5,8 +5,10 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
+import 'package:podo/screens/writing/writing_list_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonSummaryMain extends StatelessWidget {
   LessonSummaryMain({Key? key}) : super(key: key);
@@ -33,34 +35,57 @@ class LessonSummaryMain extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     onPressed: () {
-                      Get.to(LessonFrame(), arguments: lesson);
+                      Get.to(WritingListMain(), arguments: lesson.id);
                     },
                     backgroundColor: MyColors.green,
+                    child: const Icon(FontAwesomeIcons.penToSquare, size: 25),
+                  ),
+                  const SizedBox(height: 5),
+                  MyWidget().getTextWidget(
+                    text: MyStrings.writing,
+                    size: 15,
+                    color: MyColors.greenDark,
+                    isBold: true,
+                  ),
+                  const SizedBox(height: 15),
+                  FloatingActionButton(
+                    onPressed: () {
+                      Get.to(LessonFrame(), arguments: lesson);
+                    },
+                    backgroundColor: MyColors.pink,
                     child: const Icon(Icons.play_arrow_rounded, size: 40),
                   ),
                   const SizedBox(height: 5),
                   MyWidget().getTextWidget(
-                    text: MyStrings.startLearning,
+                    text: MyStrings.learning,
                     size: 15,
-                    color: MyColors.green,
+                    color: MyColors.wine,
+                    isBold: true,
                   ),
                   const SizedBox(height: 10),
                 ],
               ),
-              appBar: MyWidget().getAppbar(title: lesson.title[KO]),
+              appBar: MyWidget().getAppbar(title: MyStrings.lessonSummary),
               body: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 30),
-                        child: MyWidget().getTextWidget(
-                          text: MyStrings.lessonSummary,
-                          size: 23,
-                          color: MyColors.navyLight,
-                        ),
+                      Row(
+                        children: [
+                          Container(height: 10, width: 10, color: MyColors.purple),
+                          const SizedBox(width: 10),
+                          MyWidget().getTextWidget(
+                            text: lesson.title[KO],
+                            size: 18,
+                            color: MyColors.purple,
+                            isKorean: true,
+                            isBold: true,
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 30),
                       Expanded(
                         child: ListView.builder(
                           itemCount: summaries.length,
@@ -90,7 +115,6 @@ class LessonSummaryMain extends StatelessWidget {
           MyWidget().getTextWidget(
             text: '${(index + 1).toString()}. ${summary.content[KO]} ',
             color: MyColors.purple,
-            size: 20,
             isBold: true,
             isKorean: true,
           ),
@@ -104,7 +128,7 @@ class LessonSummaryMain extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MyWidget().getTextWidget(text: summary.content[fo], size: 18),
+                MyWidget().getTextWidget(text: summary.content[fo]),
                 const SizedBox(height: 15),
                 summary.examples != null
                     ? ListView.builder(
@@ -127,7 +151,6 @@ class LessonSummaryMain extends StatelessWidget {
                                 MyWidget().getTextWidget(
                                   text: summary.examples![index],
                                   isKorean: true,
-                                  size: 16,
                                 ),
                               ],
                             ),

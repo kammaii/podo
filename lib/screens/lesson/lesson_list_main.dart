@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
-import 'package:podo/screens/writing/writing_topic_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 
 class LessonListMain extends StatefulWidget {
   const LessonListMain({Key? key}) : super(key: key);
@@ -219,15 +219,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           Positioned(
             top: -50,
             right: -30,
-            child: Hero(
-              tag: 'courseImage:${course.id}',
             child: FadeTransition(
               opacity: animation,
               child: Image.asset(
                 sampleImage,
                 width: 250,
               ),
-            ),
             ),
           ),
           const LinearProgressIndicator(
@@ -336,27 +333,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           ],
         ),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              Get.to(WritingTopicMain(), arguments: course
-              );
-            },
-            backgroundColor: MyColors.green,
-            child: const Icon(FontAwesomeIcons.penToSquare, size: 25),
-          ),
-          const SizedBox(height: 5),
-          MyWidget().getTextWidget(
-            text: MyStrings.writing,
-            size: 15,
-            color: MyColors.green,
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
-
     );
   }
 }

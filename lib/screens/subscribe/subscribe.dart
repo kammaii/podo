@@ -211,7 +211,7 @@ class _SubscribeState extends State<Subscribe> {
                               text: exPrice,
                               size: 15,
                               color: MyColors.grey,
-                              isLineThrough: true,
+                              hasLineThrough: true,
                             ),
                             const SizedBox(width: 20),
                             MyWidget().getTextWidget(

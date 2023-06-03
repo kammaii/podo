@@ -40,10 +40,7 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
                   SizedBox(
                     width: 80,
                     height: 80,
-                    child: Hero(
-                      tag: 'courseImage:${lessonCourse.id}',
-                      child: Image.asset(sampleImage),
-                    ),
+                    child: Image.asset(sampleImage),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
