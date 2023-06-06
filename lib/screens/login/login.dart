@@ -1,4 +1,3 @@
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -35,7 +34,7 @@ class Login extends StatelessWidget {
   Future<void> _sendEmailVerificationLink(String email) async {
     await _auth.currentUser?.sendEmailVerification(
       ActionCodeSettings(
-        url: 'https://localhost/?email=$email',
+        url: 'https://newpodo.page.link/?mode=verifyEmail',
         androidPackageName: 'net.awesomekorean.newpodo',
         androidInstallApp: true,
         androidMinimumVersion: '12',
@@ -47,11 +46,11 @@ class Login extends StatelessWidget {
     print('EMAIL SENT');
   }
 
-  Future<String?> _signUp(SignupData data) async {
+  Future<String?> _signUpWithEmail(SignupData data) async {
     try {
       String email = data.name.toString();
       await _auth.createUserWithEmailAndPassword(email: email, password: data.password.toString());
-      print('CREATED');
+      print('USER CREATED');
 
       final user = _auth.currentUser;
       if (user != null && !user.emailVerified) {
@@ -86,7 +85,7 @@ class Login extends StatelessWidget {
     return Center(
       child: FlutterLogin(
         logo: 'assets/images/logo.png',
-        title: 'Welcome to podo',
+        title: MyStrings.welcome,
         theme: LoginTheme(
             primaryColor: MyColors.purple,
             pageColorLight: MyColors.green,
@@ -110,7 +109,7 @@ class Login extends StatelessWidget {
         ],
         onSignup: (signupData) {
           print('signupData : $signupData');
-          return _signUp(signupData);
+          return _signUpWithEmail(signupData);
         },
         onLogin: (loginData) {
           String email = loginData.name;

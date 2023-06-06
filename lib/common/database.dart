@@ -39,11 +39,14 @@ class Database {
     }).catchError((e) => print(e));
   }
 
-  Future<void> setDoc({required String collection, required dynamic doc, required String completeMention}) async {
+  Future<void> setDoc({required String collection, required dynamic doc, String? completeMention}) async {
     final ref = firestore.collection(collection).doc(doc.id);
     await ref
         .set(doc.toJson())
-        .then((value) => Get.snackbar(completeMention, ''))
+        .then((value) {
+          completeMention != null ? Get.snackbar(completeMention, '') : null;
+          print('setDoc is completed');
+        })
         .catchError((e) => Get.snackbar(MyStrings.setError, e));
   }
 

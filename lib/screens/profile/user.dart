@@ -1,23 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/profile/premium.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:podo/common/database.dart';
 
-
-class User{
+class User {
   static final User _instance = User.init();
 
   factory User() {
     return _instance;
   }
 
-  //late String email;
-  String email = 'gabmanpark@gmail.com';
+  late String email;
   late String name;
   late String image;
   late String language;
@@ -27,11 +26,11 @@ class User{
   late List<Premium>? premiumRecord;
   late Map<String, List<String>> lessonRecord;
   late Map<String, List<String>> readingRecord;
-  late String fcmToken;
-  late String fcmState;
+  String? fcmToken;
+  String? fcmState;
+  late int status;
 
   User.init() {
-    //getUser();
     debugPrint('User init');
   }
 
@@ -47,6 +46,7 @@ class User{
   static const String READING_RECORD = 'readingRecord';
   static const String FCM_TOKEN = 'fcmToken';
   static const String FCM_STATE = 'fcmState';
+  static const String STATUS = 'status';
 
   User.fromJson(Map<String, dynamic> json) {
     email = json[EMAIL];
@@ -59,12 +59,17 @@ class User{
     premiumRecord = json[PREMIUM_RECORD];
     lessonRecord = json[LESSON_RECORD];
     readingRecord = json[READING_RECORD];
-    fcmToken = json[FCM_TOKEN];
-    fcmState = json[FCM_STATE];
+    if(json[FCM_TOKEN] != null) {
+      fcmToken = json[FCM_TOKEN];
+    }
+    if(json[FCM_STATE != null]) {
+      fcmState = json[FCM_STATE];
+    }
+    status = json[STATUS];
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    Map<String, dynamic> map = {
       EMAIL: email,
       NAME: name,
       IMAGE: image,
@@ -74,35 +79,46 @@ class User{
       DATE_SIGN_IN: dateSignIn,
       LESSON_RECORD: lessonRecord,
       READING_RECORD: readingRecord,
-      FCM_TOKEN: fcmToken,
-      FCM_STATE: fcmState,
+      STATUS: status,
     };
+    if(fcmToken != null) {
+      map[FCM_TOKEN] = fcmToken;
+    }
+    if(fcmState != null) {
+      map[FCM_STATE] = fcmState;
+    }
+    return map;
   }
 
-  void initUser() {
-
-  }
-
-  void setUser() {
-
+  Future<void> initUserWithEmail(BuildContext context) async {
+    auth.User user = auth.FirebaseAuth.instance.currentUser!;
+    email = user.email!;
+    name = user.displayName ?? '-';
+    image = user.photoURL ?? '';
+    language = Localizations.localeOf(context).languageCode;
+    if(!Languages().fos.contains(language)) {
+      language = 'en';
+    }
+    isBeginnerMode = true;
+    dateSignUp = DateTime.now();
+    dateSignIn = DateTime.now();
+    premiumRecord = [];
+    lessonRecord = {};
+    readingRecord = {};
+    status = 0;
+    Database().setDoc(collection: 'Users', doc: email);
   }
 
   void getUser() async {
-    if (email.isNotEmpty) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(
-          collection: 'Users', docId: email);
-      if (snapshot.exists) {
-        User.fromJson(snapshot.data()!);
-      } else {
-        Get.dialog(AlertDialog(
-          title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),
-          content: MyWidget().getTextWidget(text: MyStrings.failedUserContent),
-        ));
-      }
+    email = auth.FirebaseAuth.instance.currentUser!.email!;
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: email);
+    if (snapshot.exists) {
+      User.fromJson(snapshot.data()!);
     } else {
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      email = pref.getString('email')!;
-      getUser();
+      Get.dialog(AlertDialog(
+        title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),
+        content: MyWidget().getTextWidget(text: MyStrings.failedUserContent),
+      ));
     }
   }
 

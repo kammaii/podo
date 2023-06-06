@@ -3,13 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/profile/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'firebase_options.dart';
 
 void main() async {
@@ -17,7 +16,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  WidgetsFlutterBinding.ensureInitialized();
 
   // Get any initial links : When the app is just opened by clicking the deepLink.
   final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
@@ -28,12 +26,26 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  PendingDynamicLinkData? initialLink;
-
   MyApp({Key? key, this.initialLink}) : super(key: key);
+
+  PendingDynamicLinkData? initialLink;
+  User? currentUser;
+  bool isVerified = false;
 
   @override
   Widget build(BuildContext context) {
+    currentUser = FirebaseAuth.instance.currentUser;
+    currentUser != null && currentUser!.emailVerified ? isVerified = true : isVerified = false;
+
+    Widget homeWidget;
+    if (currentUser != null && isVerified) {
+      homeWidget = const MainFrame();
+      user.User().getUser();
+    } else {
+      homeWidget = Login();
+    }
+
+
     if (initialLink != null) {
       // Dynamic link를 통해 앱을 신규설치하거나 업데이트 했을 때 작동 -> 해당 딥링크에 맞는 화면 보여줌
       final Uri deepLink = initialLink!.link;
@@ -42,38 +54,31 @@ class MyApp extends StatelessWidget {
     }
 
     // DynamicLink listener : When the app is already running
-    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      Get.snackbar(
-          'dynamic link listening', 'verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData'
-      );
-      print('dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData');
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
+      FirebaseAuth.instance.currentUser!.reload();
+      currentUser = FirebaseAuth.instance.currentUser;
+      print(
+          'dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData');
+      Uri uri = Uri.parse(dynamicLinkData.link.toString());
+      String mode = uri.queryParameters['mode']!;
+
+      if (mode == 'verifyEmail' && currentUser!.emailVerified) {
+        await user.User().initUserWithEmail(context);
+        Get.snackbar(MyStrings.welcome, '');
+        Get.to(const MainFrame());
+      } else {
+        Get.to(Login());
+      }
     }).onError((error) {
-      // Handle errors
+      print('ERROR on DynamicLinkListener: $error');
     });
 
-    Widget homeWidget;
 
-    return FutureBuilder(
-      future: SharedPreferences.getInstance(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-          bool isLogin = snapshot.data.getBool('isLogin') ?? false;
-          if (isLogin) {
-            homeWidget = const MainFrame();
-            user.User().setUserEmail(snapshot.data.getString('email'));
-          } else {
-            //homeWidget = Login();
-            homeWidget = const MainFrame();
-          }
-        } else {
-          homeWidget = const CircularProgressIndicator();
-        }
-        return GetMaterialApp(
-          title: 'Podo Korean app',
-          theme: ThemeData(primaryColor: MyColors.purple),
-          home: homeWidget,
-        );
-      },
+    return GetMaterialApp(
+      title: 'Podo Korean app',
+      theme: ThemeData(primaryColor: MyColors.purple),
+      home: homeWidget,
     );
+    ;
   }
 }
