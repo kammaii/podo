@@ -32,6 +32,23 @@ class MyApp extends StatelessWidget {
   User? currentUser;
   bool isVerified = false;
 
+  void runDeepLink(BuildContext context, PendingDynamicLinkData dynamicLinkData) async {
+    FirebaseAuth.instance.currentUser!.reload();
+    currentUser = FirebaseAuth.instance.currentUser;
+    print(
+        'dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData');
+    Uri uri = Uri.parse(dynamicLinkData.link.toString());
+    String mode = uri.queryParameters['mode']!;
+
+    if (mode == 'verifyEmail' && currentUser!.emailVerified) {
+      await user.User().initUserWithEmail(context);
+      Get.snackbar(MyStrings.welcome, '');
+      Get.to(const MainFrame());
+    } else {
+      Get.to(Login());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     currentUser = FirebaseAuth.instance.currentUser;
@@ -47,28 +64,14 @@ class MyApp extends StatelessWidget {
 
 
     if (initialLink != null) {
-      // Dynamic link를 통해 앱을 신규설치하거나 업데이트 했을 때 작동 -> 해당 딥링크에 맞는 화면 보여줌
-      final Uri deepLink = initialLink!.link;
-      Get.snackbar('InitialLink', '$deepLink');
-      print('InitialLink: $deepLink');
+      // Dynamic listener : When the app is just opened.
+      runDeepLink(context, initialLink!);
+      print('InitialLink: $initialLink');
     }
 
-    // DynamicLink listener : When the app is already running
+    // DynamicLink listener : When the app is already running.
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
-      FirebaseAuth.instance.currentUser!.reload();
-      currentUser = FirebaseAuth.instance.currentUser;
-      print(
-          'dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData');
-      Uri uri = Uri.parse(dynamicLinkData.link.toString());
-      String mode = uri.queryParameters['mode']!;
-
-      if (mode == 'verifyEmail' && currentUser!.emailVerified) {
-        await user.User().initUserWithEmail(context);
-        Get.snackbar(MyStrings.welcome, '');
-        Get.to(const MainFrame());
-      } else {
-        Get.to(Login());
-      }
+      runDeepLink(context, dynamicLinkData);
     }).onError((error) {
       print('ERROR on DynamicLinkListener: $error');
     });
@@ -79,6 +82,5 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primaryColor: MyColors.purple),
       home: homeWidget,
     );
-    ;
   }
 }

@@ -272,7 +272,6 @@ class MessageFrame extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: MyWidget().getRoundBtnWidget(
-                    isRequest: true,
                     text: MyStrings.send,
                     bgColor: MyColors.purple,
                     fontColor: Colors.white,
@@ -379,7 +378,6 @@ class MessageFrame extends StatelessWidget {
         }
         actionContents.add(const SizedBox(height: 10));
         actionContents.add(MyWidget().getRoundBtnWidget(
-          isRequest: false,
           text: MyStrings.checkAnswer,
           bgColor: _controller.checkedAnswer != 0 ? MyColors.greenDark : MyColors.grey,
           fontColor: _controller.checkedAnswer != 0 ? MyColors.greenLight : Colors.white,
@@ -413,7 +411,6 @@ class MessageFrame extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             MyWidget().getRoundBtnWidget(
-              isRequest: false,
               text: MyStrings.makeReservation,
               bgColor: _controller.isLiveLessonChecked ? MyColors.greenDark : MyColors.grey,
               fontColor: _controller.isLiveLessonChecked ? MyColors.greenLight : Colors.white,

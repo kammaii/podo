@@ -57,7 +57,8 @@ class Login extends StatelessWidget {
         print('USER: $user');
         await _sendEmailVerificationLink(user.email!);
         Get.dialog(const AlertDialog(
-          title: Text(MyStrings.verificationEmailSent),
+          title: Text(MyStrings.verificationEmailTitle),
+          content: Text(MyStrings.verificationEmailContent),
         ));
       }
     } on FirebaseAuthException catch (e) {

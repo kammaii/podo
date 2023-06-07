@@ -3,18 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/screens/writing/writing_question.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class WritingListMain extends StatefulWidget {
-  WritingListMain({Key? key}) : super(key: key);
+class WritingMain extends StatefulWidget {
+  WritingMain({Key? key}) : super(key: key);
 
   @override
-  State<WritingListMain> createState() => _WritingListMainState();
+  State<WritingMain> createState() => _WritingMainState();
 }
 
-class _WritingListMainState extends State<WritingListMain> with SingleTickerProviderStateMixin {
+class _WritingMainState extends State<WritingMain> with SingleTickerProviderStateMixin {
   String lessonId = Get.arguments;
   List<WritingQuestion> questions = [];
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
@@ -25,6 +26,10 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
   bool isVisible = false;
   Radius borderRadius = const Radius.circular(20);
   late Future future;
+  WritingQuestion? selectedQuestion;
+  final controller = Get.put(WritingController());
+  int maxLength = 50;
+  final textEditController = TextEditingController();
 
   @override
   void initState() {
@@ -49,11 +54,39 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
   toggleVisibility() {
     setState(() {
       isVisible = !isVisible;
+      if (isVisible) {
+        animationController.forward();
+      } else {
+        animationController.reverse();
+      }
     });
-    if (isVisible) {
-      animationController.forward();
+  }
+
+  Function? onSendBtn() {
+    if (controller.isChecked) {
+      return () {
+        Get.dialog(
+          AlertDialog(
+            title: const Text(MyStrings.wantRequestCorrection),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Get.back();
+                },
+                style: ElevatedButton.styleFrom(primary: MyColors.pink),
+                child: const Text(MyStrings.cancel),
+              ),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(primary: MyColors.purple),
+                child: const Text(MyStrings.send),
+              ),
+            ],
+          ),
+        );
+      };
     } else {
-      animationController.reverse();
+      return null;
     }
   }
 
@@ -65,7 +98,10 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
       ),
       color: Colors.white,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          toggleVisibility();
+          selectedQuestion = question;
+        },
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -98,6 +134,7 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: MyWidget().getAppbar(title: MyStrings.writing),
         body: Stack(
           children: [
@@ -113,9 +150,7 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
                         MyWidget().getTextWidget(
                             text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
                         TextButton(
-                            onPressed: () {
-                              toggleVisibility();
-                            },
+                            onPressed: () {},
                             child: const Text(MyStrings.myWritings,
                                 style: TextStyle(
                                   color: MyColors.purple,
@@ -156,6 +191,8 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
                 onTap: () {
                   if (isVisible) {
                     toggleVisibility();
+                    textEditController.text = '';
+                    FocusScope.of(context).unfocus();
                   }
                 },
                 child: Container(
@@ -170,10 +207,80 @@ class _WritingListMainState extends State<WritingListMain> with SingleTickerProv
                 position: animationOffset,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height *2/3,
+                  height: MediaQuery.of(context).size.height * 2 / 3,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(topLeft: borderRadius, topRight: borderRadius),
                     color: Colors.white,
+                  ),
+                  child: GetBuilder<WritingController>(
+                    builder: (_) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                  onPressed: () {},
+                                  child: TextButton(
+                                      onPressed: () {},
+                                      child: const Text(MyStrings.viewOtherUsersWriting,
+                                          style: TextStyle(
+                                            color: MyColors.purple,
+                                            decoration: TextDecoration.underline,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ))),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            MyWidget().getTextWidget(
+                              text: selectedQuestion != null ? selectedQuestion!.title[KO] : '',
+                              isKorean: true,
+                              size: 20,
+                            ),
+                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
+                            MyWidget().getTextFieldWidget(
+                              controller: textEditController,
+                              maxLength: maxLength,
+                              hint: MyStrings.writeYourAnswerInKorean,
+                              fontSize: 15,
+                            ),
+                            const SizedBox(height: 30),
+                            MyWidget().getRoundBtnWidget(
+                              text: MyStrings.correction,
+                              textSize: 15,
+                              bgColor: MyColors.purple,
+                              fontColor: Colors.white,
+                              f: onSendBtn,
+                            ),
+                            const SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () {
+                                controller.setCheckbox(!controller.isChecked);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  MyWidget()
+                                      .getCheckBox(value: controller.isChecked, onChanged: controller.setCheckbox),
+                                  MyWidget().getTextWidget(text: MyStrings.iveReadTheFollowing),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Expanded(
+                                child: SingleChildScrollView(
+                                    child: MyWidget()
+                                        .getTextWidget(text: MyStrings.writingComment, color: MyColors.grey))),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

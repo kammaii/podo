@@ -91,7 +91,6 @@ class _SubscribeState extends State<Subscribe> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   MyWidget().getRoundBtnWidget(
-                    isRequest: false,
                     text: MyStrings.subscribe,
                     bgColor: MyColors.purple,
                     fontColor: Colors.white,

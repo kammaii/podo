@@ -51,7 +51,6 @@ class _ProfileState extends State<Profile> {
                           ),
                           const SizedBox(height: 15),
                           MyWidget().getRoundBtnWidget(
-                            isRequest: false,
                             text: MyStrings.startFreeTrial,
                             bgColor: MyColors.purple,
                             fontColor: Colors.white,
@@ -132,7 +131,6 @@ class _ProfileState extends State<Profile> {
                                           width: 10,
                                         ),
                                         MyWidget().getRoundBtnWidget(
-                                          isRequest: false,
                                           text: MyStrings.send,
                                           bgColor: MyColors.purple,
                                           fontColor: Colors.white,
@@ -163,7 +161,6 @@ class _ProfileState extends State<Profile> {
                                         children: [
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            isRequest: false,
                                             text: MyStrings.yes,
                                             bgColor: MyColors.purple,
                                             fontColor: Colors.white,
@@ -177,7 +174,6 @@ class _ProfileState extends State<Profile> {
                                           ),
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            isRequest: false,
                                             text: MyStrings.cancel,
                                             bgColor: MyColors.red,
                                             fontColor: Colors.white,
@@ -210,7 +206,6 @@ class _ProfileState extends State<Profile> {
                                         children: [
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            isRequest: false,
                                             text: MyStrings.yes,
                                             bgColor: MyColors.purple,
                                             fontColor: Colors.white,
@@ -256,7 +251,6 @@ class _ProfileState extends State<Profile> {
                                           ),
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            isRequest: false,
                                             text: MyStrings.cancel,
                                             bgColor: MyColors.red,
                                             fontColor: Colors.white,

@@ -5,7 +5,7 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
-import 'package:podo/screens/writing/writing_list_main.dart';
+import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -34,8 +34,9 @@ class LessonSummaryMain extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   FloatingActionButton(
+                    heroTag: 'wiringBtn',
                     onPressed: () {
-                      Get.to(WritingListMain(), arguments: lesson.id);
+                      Get.to(WritingMain(), arguments: lesson.id);
                     },
                     backgroundColor: MyColors.green,
                     child: const Icon(FontAwesomeIcons.penToSquare, size: 25),
@@ -49,6 +50,7 @@ class LessonSummaryMain extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
                   FloatingActionButton(
+                    heroTag: 'learningBtn',
                     onPressed: () {
                       Get.to(LessonFrame(), arguments: lesson);
                     },

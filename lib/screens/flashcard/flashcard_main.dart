@@ -51,12 +51,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   }
 
   loadFlashcards({bool isContinue = false}) async {
-    List<dynamic> snapshots;
-    if (isContinue) {
-      snapshots = await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit, isContinue: true);
-    } else {
-      snapshots = await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit);
-    }
+    List<dynamic> snapshots =
+        await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit, isContinue: isContinue);
     for (dynamic snapshot in snapshots) {
       FlashCard card = FlashCard.fromJson(snapshot);
       controller.cards.add(card);
@@ -212,7 +208,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                 child: GetBuilder<FlashCardController>(
                   builder: (_) {
                     return MyWidget().getRoundBtnWidget(
-                      isRequest: false,
                       text: MyStrings.review,
                       bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
                       fontColor: Colors.white,
@@ -291,7 +286,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                       }
                     });
                     for (int i = 0; i < controller.cards.length; i++) {
-                      if(controller.cards[i].audio != null) {
+                      if (controller.cards[i].audio != null) {
                         setPlayStopIcon(i, isForward: false);
                       }
                     }

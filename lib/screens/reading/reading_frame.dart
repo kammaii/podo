@@ -211,7 +211,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 const SizedBox(height: 30),
                 index == length - 1
                     ? MyWidget().getRoundBtnWidget(
-                        isRequest: false,
                         text: MyStrings.complete,
                         bgColor: MyColors.purple,
                         fontColor: Colors.white,

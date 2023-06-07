@@ -170,7 +170,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               ),
               const SizedBox(height: 10),
               MyWidget().getRoundBtnWidget(
-                isRequest: false,
                 text: MyStrings.startFreeTrial,
                 bgColor: MyColors.purple,
                 fontColor: Colors.white,

@@ -113,99 +113,24 @@ class MyWidget {
     );
   }
 
-  Widget getInfoWidget({
-    required double height,
-    required String info,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastOutSlowIn,
-        height: height,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: MyColors.greenLight,
-        ),
-        child: Center(child: getTextWidget(text: info, size: 15, color: MyColors.greenDark)),
-      ),
-    );
-  }
-
-  Widget getRoundBtnWithAlert({
-    required bool isRequest,
-    required String text,
-    required Color bgColor,
-    required Color fontColor,
-    required Function f,
-  }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: getRoundBtnWidget(
-            isRequest: isRequest,
-            text: text,
-            bgColor: bgColor,
-            fontColor: fontColor,
-            f: f,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          decoration: const BoxDecoration(
-            color: MyColors.pink,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                MyStrings.notEnoughCoins,
-                style: TextStyle(color: MyColors.purple, fontWeight: FontWeight.bold),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  MyStrings.howToGetCoins,
-                  style: TextStyle(
-                      color: MyColors.red,
-                      fontSize: 15,
-                      decoration: TextDecoration.underline,
-                      decorationThickness: 2),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget getRoundBtnWidget({
-    required bool isRequest,
     required String text,
     required Color bgColor,
     required Color fontColor,
     required Function f,
     double? horizontalPadding,
-    double? innerVerticalPadding,
+    double innerVerticalPadding = 13,
     int? podoCount,
+    double textSize = 20,
   }) {
     if (horizontalPadding == null) {
       return roundBtnWidget(
-        isRequest: isRequest,
         text: text,
         bgColor: bgColor,
         fontColor: fontColor,
         f: f,
         innerVerticalPadding: innerVerticalPadding,
-        podoCount: podoCount,
+        textSize: textSize,
       );
     } else {
       return Row(
@@ -214,7 +139,6 @@ class MyWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
               child: roundBtnWidget(
-                isRequest: isRequest,
                 text: text,
                 bgColor: bgColor,
                 fontColor: fontColor,
@@ -229,64 +153,25 @@ class MyWidget {
   }
 
   Widget roundBtnWidget({
-    required bool isRequest,
     required String text,
     required Color bgColor,
     required Color fontColor,
     required Function f,
-    double? innerVerticalPadding,
-    int? podoCount,
+    required double innerVerticalPadding,
+    double? textSize,
   }) {
-    double verticalPadding;
-    isRequest ? verticalPadding = 5 : verticalPadding = 13;
-    if (innerVerticalPadding != null) {
-      verticalPadding = innerVerticalPadding;
-    }
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
           primary: bgColor),
-      onPressed: () {
-        f();
-      },
+      onPressed: f(),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: verticalPadding),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              text,
-              style: TextStyle(fontSize: 20, color: fontColor),
-            ),
-            if (isRequest)
-              Row(
-                children: [
-                  const SizedBox(
-                    height: 30,
-                    child: VerticalDivider(
-                      color: Colors.white,
-                      thickness: 1,
-                      width: 20,
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('consume'),
-                      Row(
-                        children: [
-                          const Icon(CupertinoIcons.ticket),
-                          const SizedBox(width: 5),
-                          Text(podoCount.toString()),
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-          ],
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: innerVerticalPadding),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: textSize, color: fontColor),
         ),
       ),
     );
@@ -318,11 +203,13 @@ class MyWidget {
     required double fontSize,
     TextEditingController? controller,
     int? maxLines,
+    int? maxLength,
     Function(String)? onChanged,
   }) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      maxLength: maxLength,
       cursorColor: Colors.black,
       style: TextStyle(fontSize: fontSize),
       onChanged: onChanged,
@@ -351,6 +238,17 @@ class MyWidget {
       value: value,
       onChanged: onChanged,
       activeColor: MyColors.purple,
+    );
+  }
+
+  Widget getWhiteContainer(Widget widget) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: widget,
     );
   }
 }

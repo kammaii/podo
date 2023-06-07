@@ -18,7 +18,8 @@ class MyStrings {
   static const String speedDown = 'x0.8';
   static const String failedUserTitle = 'Failed to load user information.';
   static const String failedUserContent = 'If the problem persists, please contact the developer.';
-  static const String verificationEmailSent = 'Verification email sent to your email';
+  static const String verificationEmailTitle = 'Verify your email';
+  static const String verificationEmailContent = 'We\'ve sent a verification link to your email. If you don\'t see it, you may need to check your spam folder.';
   static const String noFlashCards = 'No flashcards';
   static const String cards = 'cards';
   static const String search = 'search';
@@ -42,13 +43,25 @@ class MyStrings {
   static const String save = 'save';
   static const String flashcardUpdated = 'Flashcard has been updated.';
   static const String viewAll = 'View all';
+  static const String viewOtherUsersWriting = 'View other user\'s writing';
+  static const String writeYourAnswerInKorean = 'Write your answer in Korean';
+  static const String send = 'Send';
+  static const String correction = 'Correction';
+  static const String iveReadTheFollowing = 'I\'ve read the following';
+  static const String writingComment = 'Your writing will be corrected by a Korean teacher. \nPlease provide answers within the character limit. \nYou can expect a response within 24 hours, although it may take longer if there are many requests. \nYou can make up to 3 requests, and once a response is completed, you can make another one. \nThe following cases are not eligible for correction: \n - Non-Korean writing \n - Irrelevant or personal questions \n - Writing that is hard to understand the meaning. \n(It is recommended practicing based on what you have learned)';
+  static const String wantRequestCorrection = 'Do you want to request correction?';
+  static const String cancel = 'Cancel';
+  static const String writingStatus0 = 'submitted';
+  static const String writingStatus1 = 'corrected';
+  static const String writingStatus2 = 'perfect writing';
+  static const String writingStatus3 = 'uncorrectable';
+  static const String writingStatus4 = 'canceled';
+
 
 
 
 
   static const String askQuestion = 'Ask a question';
-  static const String send = 'Send';
-  static const String cancel = 'Cancel';
   static const String question = 'question';
   static const String questionInfo =
       'Do you have a question about Korean? Ask a question by using a coin. The professional Korean teacher will answer your question.';
@@ -57,7 +70,6 @@ class MyStrings {
   static const String bestQuestions = '  Best Questions';
   static const String lorem =
       'Lorem ipsum, aurum haec dimitto. Consurgo cibo duo crux damno caput eximietate passim pello. He malus longe. Civis detineo sic.Cui archa obruo. Quae ratum reus ita, doleo rei. Horum minus, maior legis magis, placitum veni. Fors, approbo frux latus.';
-  static const String correction = 'Correction';
   static const String correctionInfo = 'Try making your own sentence and get correction from a professional Korean teacher by using a coin.';
   static const String correctionHint = 'Make your own sentence with the expressions you learned today.';
   static const String selectCourse = 'Select a course';

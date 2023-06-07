@@ -223,7 +223,6 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 30),
                           child: MyWidget().getRoundBtnWidget(
-                            isRequest: false,
                             text: MyStrings.next,
                             bgColor: MyColors.purple,
                             fontColor: Colors.white,
@@ -248,7 +247,6 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                               size: 20),
                           const SizedBox(height: 30),
                           MyWidget().getRoundBtnWidget(
-                              isRequest: false,
                               text: MyStrings.reviewAgainTomorrow,
                               bgColor: MyColors.purple,
                               fontColor: Colors.white,

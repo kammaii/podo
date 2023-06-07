@@ -90,7 +90,6 @@ class FlashCardEdit extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: MyWidget().getRoundBtnWidget(
-                    isRequest: false,
                     text: MyStrings.save,
                     bgColor: isCorrected ? MyColors.purple : MyColors.grey,
                     fontColor: Colors.white,
