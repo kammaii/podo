@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/values/my_strings.dart';
 
 class Database {
@@ -41,13 +41,10 @@ class Database {
 
   Future<void> setDoc({required String collection, required dynamic doc, String? completeMention}) async {
     final ref = firestore.collection(collection).doc(doc.id);
-    await ref
-        .set(doc.toJson())
-        .then((value) {
-          completeMention != null ? Get.snackbar(completeMention, '') : null;
-          print('setDoc is completed');
-        })
-        .catchError((e) => Get.snackbar(MyStrings.setError, e));
+    await ref.set(doc.toJson()).then((value) {
+      completeMention != null ? Get.snackbar(completeMention, '') : null;
+      print('setDoc is completed');
+    }).catchError((e) => Get.snackbar(MyStrings.setError, e));
   }
 
   Future<dynamic> getDoc({required String collection, required String docId}) async {
@@ -94,11 +91,23 @@ class Database {
         documents.add(documentSnapshot.data() as Map<String, dynamic>);
       }
       if (limit != null) {
-        if(documents.isNotEmpty) {
+        if (documents.isNotEmpty) {
           lastDoc = snapshot.docs.last;
         } else {
           return;
         }
+      }
+    }, onError: (e) => print('ERROR : $e'));
+    return documents;
+  }
+
+  Future<List<dynamic>> getDocsWithQuery({required Query query}) async {
+    List<dynamic> documents = [];
+
+    await query.get().then((QuerySnapshot snapshot) {
+      print('quiring');
+      for (QueryDocumentSnapshot documentSnapshot in snapshot.docs) {
+        documents.add(documentSnapshot.data() as Map<String, dynamic>);
       }
     }, onError: (e) => print('ERROR : $e'));
     return documents;

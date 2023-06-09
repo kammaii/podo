@@ -241,12 +241,17 @@ class MyWidget {
     );
   }
 
-  Widget getWhiteContainer(Widget widget) {
+  Widget getRoundedContainer({
+    required Widget widget,
+    double radius = 10,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(10),
+    Color bgColor = Colors.white,
+  }) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(radius),
       ),
       child: widget,
     );

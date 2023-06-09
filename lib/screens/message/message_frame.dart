@@ -10,7 +10,7 @@ import 'package:podo/items/notice.dart';
 import 'package:podo/screens/message/action_button.dart';
 import 'package:podo/screens/message/expandable_fab.dart';
 import 'package:podo/screens/subscribe/subscribe.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/screens/message/message_state_manager.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';

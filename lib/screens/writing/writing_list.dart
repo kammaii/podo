@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/loading_controller.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
+import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class WritingList extends StatefulWidget {
@@ -26,16 +28,37 @@ class _WritingListState extends State<WritingList> {
   late String field;
   late String equalTo;
   String? questionId = Get.arguments;
-  List<String> writingStatus = [MyStrings.writingStatus0, MyStrings.writingStatus1, MyStrings.writingStatus2, MyStrings.writingStatus3, MyStrings.writingStatus4];
+  List<String> statusList = [
+    MyStrings.writingStatus0,
+    MyStrings.writingStatus1,
+    MyStrings.writingStatus2,
+    MyStrings.writingStatus3
+  ];
+  List<Color> statusColors = [MyColors.green, MyColors.purple, MyColors.mustard, MyColors.red];
 
   loadWritings({bool isContinue = false}) async {
-    List<dynamic> snapshots = await Database().getDocs(
-        collection: 'Writings',
-        field: field,
-        equalTo: equalTo,
-        orderBy: 'dateWriting',
-        limit: docsLimit,
-        isContinue: isContinue);
+    List<dynamic> snapshots;
+
+    if (widget.isMyWritings) {
+      snapshots = await Database().getDocs(
+          collection: 'Writings',
+          field: 'userEmail',
+          equalTo: User().email,
+          orderBy: 'dateWriting',
+          limit: docsLimit,
+          isContinue: isContinue);
+    } else {
+      Query query = FirebaseFirestore.instance
+          .collection('Writings')
+          .where('questionId', isEqualTo: questionId!)
+          .where('userEmail', isNotEqualTo: User().email)
+          .where('status', whereIn: [1, 2])
+          .orderBy('dateWriting', descending: true)
+          .limit(docsLimit);
+      snapshots = await Database().getDocsWithQuery(query: query);
+      //todo: getDocs 이렇게 수정하기
+    }
+
     for (dynamic snapshot in snapshots) {
       Writing writing = Writing.fromJson(snapshot);
       writings.add(writing);
@@ -47,60 +70,70 @@ class _WritingListState extends State<WritingList> {
     return Row(
       children: [
         MyWidget().getTextWidget(text: '$title. ', isBold: true),
-        MyWidget().getTextWidget(text: content, isKorean: true),
+        const SizedBox(width: 15),
+        Expanded(child: MyWidget().getTextWidget(text: content, isKorean: true, height: 1.5)),
       ],
     );
   }
 
   Widget getWritingList(int index) {
     Writing writing = writings[index];
+    int status = writing.status;
 
-    if(widget.isMyWritings) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(writingStatus[writing.status]),
-              Text(MyDateFormat().getDateFormat(writing.dateWriting)),
-            ],
-          ),
-          const SizedBox(height: 15),
-          MyWidget().getWhiteContainer(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  getItem('Q', writing.questionTitle),
-                  const SizedBox(height: 10),
-                  getItem('A', writing.userWriting),
-                  const SizedBox(height: 10),
-                  getItem('C', writing.correction),
-                ],
-              )
-          ),
-        ],
+    if (widget.isMyWritings) {
+      return MyWidget().getRoundedContainer(
+        widget: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                MyWidget().getRoundedContainer(
+                    widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white),
+                    radius: 20,
+                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 13),
+                    bgColor: statusColors[status]),
+                const SizedBox(width: 10),
+                Expanded(
+                    child: MyWidget().getTextWidget(
+                        text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
+                Text(MyDateFormat().getDateFormat(writing.dateWriting)),
+              ],
+            ),
+            const Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                getItem('Q', writing.questionTitle),
+                const SizedBox(height: 15),
+                getItem('A', writing.userWriting),
+                const SizedBox(height: 15),
+                getItem('C', writing.correction),
+              ],
+            ),
+          ],
+        ),
       );
     } else {
-      return Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(writing.userEmail),
-            ],
-          ),
-          MyWidget().getWhiteContainer(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  getItem('A', writing.userWriting),
-                  const SizedBox(height: 10),
-                  getItem('C', writing.correction),
-                ],
-              )
-          ),
-        ],
+      return MyWidget().getRoundedContainer(
+        widget: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(writing.userEmail),
+              ],
+            ),
+            const Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                getItem('A', writing.userWriting),
+                const SizedBox(height: 10),
+                getItem('C', writing.correction),
+              ],
+            ),
+          ],
+        ),
       );
     }
   }
@@ -114,6 +147,7 @@ class _WritingListState extends State<WritingList> {
   @override
   Widget build(BuildContext context) {
     bool isMyWritings = widget.isMyWritings;
+    writings = [];
 
     if (isMyWritings) {
       field = 'userEmail';
@@ -138,19 +172,23 @@ class _WritingListState extends State<WritingList> {
         appBar: MyWidget().getAppbar(title: isMyWritings ? MyStrings.myWritings : MyStrings.viewOtherUsersWriting),
         body: GetBuilder<WritingController>(
           builder: (_) {
-
-            return Column(
-              children: [
-                ListView.builder(
-                  itemCount: writings.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 40),
-                      child: getWritingList(index),
-                    );
-                  },
-                )
-              ],
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: writings.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: getWritingList(index),
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
             );
           },
         ),

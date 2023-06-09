@@ -48,14 +48,14 @@ class MyStrings {
   static const String send = 'Send';
   static const String correction = 'Correction';
   static const String iveReadTheFollowing = 'I\'ve read the following';
-  static const String writingComment = 'Your writing will be corrected by a Korean teacher. \nPlease provide answers within the character limit. \nYou can expect a response within 24 hours, although it may take longer if there are many requests. \nYou can make up to 3 requests, and once a response is completed, you can make another one. \nThe following cases are not eligible for correction: \n - Non-Korean writing \n - Irrelevant or personal questions \n - Writing that is hard to understand the meaning. \n(It is recommended practicing based on what you have learned)';
-  static const String wantRequestCorrection = 'Do you want to request correction?';
+  static const String writingComment = 'Your writing will be corrected by a Korean teacher. \nPlease provide answers within the character limit. \nYou can expect a response within 24 hours, although it may take longer if there are many requests. \nYou\'ll be notified when the correction is completed. (Only for users who have enabled notifications.) \nYou can make up to 3 requests, and once a response is completed, you can make another one. \nThe following cases are not eligible for correction: \n - Non-Korean writing \n - Irrelevant or personal questions \n - Writing that is hard to understand the meaning. \n(It is recommended practicing based on what you have learned)';
+  static const String wantRequestCorrection = 'Do you want to request a correction?';
   static const String cancel = 'Cancel';
-  static const String writingStatus0 = 'submitted';
-  static const String writingStatus1 = 'corrected';
-  static const String writingStatus2 = 'perfect writing';
-  static const String writingStatus3 = 'uncorrectable';
-  static const String writingStatus4 = 'canceled';
+  static const String writingStatus0 = 'Submitted';
+  static const String writingStatus1 = 'Corrected';
+  static const String writingStatus2 = 'Perfect';
+  static const String writingStatus3 = 'Uncorrectable';
+  static const String requestedCorrection = 'Requested a correction';
 
 
 

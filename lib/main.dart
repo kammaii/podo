@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/main_frame.dart';
-import 'package:podo/screens/profile/user.dart' as user;
+import 'package:podo/screens/profile/user_info.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -59,7 +58,8 @@ class MyApp extends StatelessWidget {
       homeWidget = const MainFrame();
       user.User().getUser();
     } else {
-      homeWidget = Login();
+      //homeWidget = Login();
+      homeWidget = const MainFrame();
     }
 
 

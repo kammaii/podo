@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
+import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_question.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -34,7 +36,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    future = Database().getDocs(collection: 'Lessons/$lessonId/LessonWritings', orderBy: 'orderId');
+    future = Database().getDocs(collection: 'Lessons/$lessonId/WritingQuestions', orderBy: 'orderId', descending: false);
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -58,6 +60,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
         animationController.forward();
       } else {
         animationController.reverse();
+        textEditController.text = '';
+        FocusScope.of(context).unfocus();
       }
     });
   }
@@ -73,12 +77,18 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                 onPressed: () {
                   Get.back();
                 },
-                style: ElevatedButton.styleFrom(primary: MyColors.pink),
+                style: ElevatedButton.styleFrom(backgroundColor: MyColors.pink),
                 child: const Text(MyStrings.cancel),
               ),
               ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(primary: MyColors.purple),
+                onPressed: () {
+                  Writing writing = Writing(selectedQuestion!);
+                  writing.userWriting = textEditController.text;
+                  Get.back();
+                  toggleVisibility();
+                  Database().setDoc(collection: 'Writings', doc: writing, completeMention: MyStrings.requestedCorrection);
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
                 child: const Text(MyStrings.send),
               ),
             ],
@@ -150,7 +160,9 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                         MyWidget().getTextWidget(
                             text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
                         TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(WritingList(true));
+                            },
                             child: const Text(MyStrings.myWritings,
                                 style: TextStyle(
                                   color: MyColors.purple,
@@ -191,8 +203,6 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                 onTap: () {
                   if (isVisible) {
                     toggleVisibility();
-                    textEditController.text = '';
-                    FocusScope.of(context).unfocus();
                   }
                 },
                 child: Container(

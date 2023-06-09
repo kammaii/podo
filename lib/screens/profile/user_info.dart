@@ -16,7 +16,8 @@ class User {
     return _instance;
   }
 
-  late String email;
+  //late String email;
+  String email = 'gabmanpark@gmail.com';
   late String name;
   late String image;
   late String language;
