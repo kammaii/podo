@@ -35,6 +35,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   final int docsLimit = 12; //todo: 20 개 이상으로 변경
   final scrollController = ScrollController();
   late int cardsLength;
+  DocumentSnapshot? lastSnapshot;
+
 
   @override
   void initState() {
@@ -51,15 +53,22 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   }
 
   loadFlashcards({bool isContinue = false}) async {
-    List<dynamic> snapshots =
-        await Database().getDocs(collection: ref, orderBy: 'date', limit: docsLimit, isContinue: isContinue);
-    for (dynamic snapshot in snapshots) {
-      FlashCard card = FlashCard.fromJson(snapshot);
-      controller.cards.add(card);
-      controller.isChecked.add(false);
-      if (card.audio != null) {
-        playStopIcons[card.id] = PlayStopIcon(this);
+    Query query = FirebaseFirestore.instance.collection(ref).orderBy('date', descending: true).limit(docsLimit);
+    if(isContinue) {
+      query = query.startAfterDocument(lastSnapshot!);
+    }
+    List<dynamic> snapshots = await Database().getDocs(query: query);
+
+    if(snapshots.isNotEmpty) {
+      for (dynamic snapshot in snapshots) {
+        FlashCard card = FlashCard.fromJson(snapshot.data() as Map<String, dynamic>);
+        controller.cards.add(card);
+        controller.isChecked.add(false);
+        if (card.audio != null) {
+          playStopIcons[card.id] = PlayStopIcon(this);
+        }
       }
+      lastSnapshot = snapshots.last;
     }
     controller.update();
   }
@@ -211,11 +220,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                       text: MyStrings.review,
                       bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
                       fontColor: Colors.white,
-                      f: () {
-                        controller.cards.isNotEmpty
-                            ? Get.to(const FlashCardReview(), arguments: controller.cards)
-                            : null;
-                      },
+                      f: onReviewBtn,
+                      hasNullFunction: true,
                     );
                   },
                 ),
@@ -225,6 +231,16 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
         ),
       ),
     );
+  }
+
+  Function? onReviewBtn() {
+    if (controller.cards.isNotEmpty) {
+      return () {
+        Get.to(const FlashCardReview(), arguments: controller.cards);
+      };
+    } else {
+      return null;
+    }
   }
 
   void setPlayStopIcon(int index, {required bool isForward}) {

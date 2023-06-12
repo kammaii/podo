@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
@@ -358,16 +359,20 @@ class _LessonFrameState extends State<LessonFrame> {
   void initState() {
     super.initState();
     isLoading = true;
+    final Query query = FirebaseFirestore.instance
+        .collection('Lessons/${lesson.id}/LessonCards')
+        .orderBy('orderId');
+
     Future.wait([
-      Database().getDocs(collection: 'Lessons/${lesson.id}/LessonCards', orderBy: 'orderId', descending: false),
+      Database().getDocs(query: query),
       CloudStorage().getLessonAudios(lessonId: lesson.id),
-    ]).then((value) {
+    ]).then((snapshots) {
       setState(() {
-        for(dynamic map in value[0]) {
-          cards.add(LessonCard.fromJson(map));
+        for(dynamic snapshot in snapshots[0]) {
+          cards.add(LessonCard.fromJson(snapshot.data() as Map<String, dynamic>));
         }
-        for(dynamic map in value[1]) {
-          audios.addAll(map);
+        for(dynamic snapshot in snapshots[1]) {
+          audios.addAll(snapshot);
         }
         isLoading = false;
       });

@@ -118,55 +118,22 @@ class MyWidget {
     required Color bgColor,
     required Color fontColor,
     required Function f,
-    double? horizontalPadding,
     double innerVerticalPadding = 13,
     int? podoCount,
     double textSize = 20,
-  }) {
-    if (horizontalPadding == null) {
-      return roundBtnWidget(
-        text: text,
-        bgColor: bgColor,
-        fontColor: fontColor,
-        f: f,
-        innerVerticalPadding: innerVerticalPadding,
-        textSize: textSize,
-      );
-    } else {
-      return Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: roundBtnWidget(
-                text: text,
-                bgColor: bgColor,
-                fontColor: fontColor,
-                f: f,
-                innerVerticalPadding: innerVerticalPadding,
-              ),
-            ),
-          )
-        ],
-      );
-    }
-  }
-
-  Widget roundBtnWidget({
-    required String text,
-    required Color bgColor,
-    required Color fontColor,
-    required Function f,
-    required double innerVerticalPadding,
-    double? textSize,
+    bool hasNullFunction = false,
   }) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
-          primary: bgColor),
-      onPressed: f(),
+          backgroundColor: bgColor),
+      onPressed: hasNullFunction
+          ? f()
+          : () {
+              f();
+            },
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: innerVerticalPadding),
         child: Text(

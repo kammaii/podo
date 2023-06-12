@@ -73,12 +73,14 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
     controller.update();
   }
 
-  void onNextBtn() {
-    reviewedCards.add(cards[0].id);
-    prefs.setString(REVIEWED_DATE, today);
-    prefs.setStringList(REVIEWED_CARDS, reviewedCards);
-    cards.removeAt(0);
-    controller.update();
+  Function onNextBtn() {
+    return () {
+      reviewedCards.add(cards[0].id);
+      prefs.setString(REVIEWED_DATE, today);
+      prefs.setStringList(REVIEWED_CARDS, reviewedCards);
+      cards.removeAt(0);
+      controller.update();
+    };
   }
 
   @override
@@ -222,14 +224,22 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 30),
-                          child: MyWidget().getRoundBtnWidget(
-                            text: MyStrings.next,
-                            bgColor: MyColors.purple,
-                            fontColor: Colors.white,
-                            f: () {
-                              onNextBtn();
-                            },
-                            horizontalPadding: 20,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: MyWidget().getRoundBtnWidget(
+                                    text: MyStrings.next,
+                                    bgColor: MyColors.purple,
+                                    fontColor: Colors.white,
+                                    f: () {
+                                      onNextBtn();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       ],

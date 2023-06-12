@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,9 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    future = Database().getDocs(collection: 'Lessons/$lessonId/WritingQuestions', orderBy: 'orderId', descending: false);
+    final Query query =
+        FirebaseFirestore.instance.collection('Lessons/$lessonId/WritingQuestions').orderBy('orderId');
+    future = Database().getDocs(query: query);
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -180,7 +183,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                         questions = [];
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                           for (dynamic snapshot in snapshot.data) {
-                            questions.add(WritingQuestion.fromJson(snapshot));
+                            questions.add(WritingQuestion.fromJson(snapshot.data() as Map<String, dynamic>));
                           }
                           return ListView.builder(
                             itemCount: questions.length,
@@ -266,6 +269,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               bgColor: MyColors.purple,
                               fontColor: Colors.white,
                               f: onSendBtn,
+                              hasNullFunction: true,
                             ),
                             const SizedBox(height: 10),
                             GestureDetector(

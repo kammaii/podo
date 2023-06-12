@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -70,6 +71,11 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
 
   @override
   Widget build(BuildContext context) {
+    final Query query = FirebaseFirestore.instance
+        .collection(LESSON_COURSES)
+        .where(IS_BEGINNER_MODE, isEqualTo: modeToggle[0])
+        .orderBy(ORDER_ID);
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -108,17 +114,12 @@ class _LessonCourseMainState extends State<LessonCourseMain> {
               ),
               Expanded(
                 child: FutureBuilder(
-                  future: Database().getDocs(
-                      collection: LESSON_COURSES,
-                      field: IS_BEGINNER_MODE,
-                      equalTo: modeToggle[0],
-                      orderBy: ORDER_ID,
-                      descending: false),
+                  future: Database().getDocs(query: query),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                       courses = [];
                       for (dynamic snapshot in snapshot.data) {
-                        courses.add(LessonCourse.fromJson(snapshot));
+                        courses.add(LessonCourse.fromJson(snapshot.data() as Map<String, dynamic>));
                       }
                       if (courses.isEmpty) {
                         return const Center(

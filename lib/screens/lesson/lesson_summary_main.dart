@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -21,13 +22,16 @@ class LessonSummaryMain extends StatelessWidget {
   Widget build(BuildContext context) {
     Lesson lesson = Get.arguments;
     summaries = [];
+    final Query query = FirebaseFirestore.instance
+        .collection('Lessons/${lesson.id}/LessonSummaries')
+        .orderBy('orderId', descending: true);
 
     return FutureBuilder(
-        future: Database().getDocs(collection: 'Lessons/${lesson.id}/LessonSummaries', orderBy: 'orderId'),
+        future: Database().getDocs(query: query),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
             for (dynamic snapshot in snapshot.data) {
-              summaries.add(LessonSummary.fromJson(snapshot));
+              summaries.add(LessonSummary.fromJson(snapshot.data() as Map<String, dynamic>));
             }
             return Scaffold(
               floatingActionButton: Column(

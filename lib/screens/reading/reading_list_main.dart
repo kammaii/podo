@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -109,6 +110,11 @@ class _ReadingListMainState extends State<ReadingListMain> {
 
   @override
   Widget build(BuildContext context) {
+    final Query query = FirebaseFirestore.instance
+        .collection(READINGS)
+        .where(CATEGORY, isEqualTo: categories[selectedCategory])
+        .orderBy(ORDER_ID);
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -145,17 +151,12 @@ class _ReadingListMainState extends State<ReadingListMain> {
               const SizedBox(height: 20),
               Expanded(
                 child: FutureBuilder(
-                  future: Database().getDocs(
-                      collection: READINGS,
-                      field: CATEGORY,
-                      equalTo: categories[selectedCategory],
-                      orderBy: ORDER_ID,
-                      descending: false),
+                  future: Database().getDocs(query: query),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                       readings = [];
                       for (dynamic snapshot in snapshot.data) {
-                        readings.add(Reading.fromJson(snapshot));
+                        readings.add(Reading.fromJson(snapshot.data() as Map<String, dynamic>));
                       }
                       if (readings.isEmpty) {
                         return Center(

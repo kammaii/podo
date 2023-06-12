@@ -90,12 +90,20 @@ class _SubscribeState extends State<Subscribe> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  MyWidget().getRoundBtnWidget(
-                    text: MyStrings.subscribe,
-                    bgColor: MyColors.purple,
-                    fontColor: Colors.white,
-                    f: () {},
-                    horizontalPadding: 10,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: MyWidget().getRoundBtnWidget(
+                            text: MyStrings.subscribe,
+                            bgColor: MyColors.purple,
+                            fontColor: Colors.white,
+                            f: () {},
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Container(
                     color: MyColors.purpleLight,

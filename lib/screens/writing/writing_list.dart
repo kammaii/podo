@@ -35,33 +35,38 @@ class _WritingListState extends State<WritingList> {
     MyStrings.writingStatus3
   ];
   List<Color> statusColors = [MyColors.green, MyColors.purple, MyColors.mustard, MyColors.red];
+  DocumentSnapshot? lastSnapshot;
 
   loadWritings({bool isContinue = false}) async {
-    List<dynamic> snapshots;
+    final ref = FirebaseFirestore.instance.collection('Writings');
+    Query query;
 
     if (widget.isMyWritings) {
-      snapshots = await Database().getDocs(
-          collection: 'Writings',
-          field: 'userEmail',
-          equalTo: User().email,
-          orderBy: 'dateWriting',
-          limit: docsLimit,
-          isContinue: isContinue);
+      query = ref
+          .where('userEmail', isEqualTo: User().email)
+          .orderBy('dateWriting', descending: true)
+          .limit(docsLimit);
     } else {
-      Query query = FirebaseFirestore.instance
-          .collection('Writings')
+      query = ref
           .where('questionId', isEqualTo: questionId!)
           .where('userEmail', isNotEqualTo: User().email)
           .where('status', whereIn: [1, 2])
           .orderBy('dateWriting', descending: true)
           .limit(docsLimit);
-      snapshots = await Database().getDocsWithQuery(query: query);
-      //todo: getDocs 이렇게 수정하기
     }
 
-    for (dynamic snapshot in snapshots) {
-      Writing writing = Writing.fromJson(snapshot);
-      writings.add(writing);
+    if (isContinue) {
+      query = query.startAfterDocument(lastSnapshot!);
+    }
+
+    List<dynamic> snapshots = await Database().getDocs(query: query);
+
+    if (snapshots.isNotEmpty) {
+      for (dynamic snapshot in snapshots) {
+        Writing writing = Writing.fromJson(snapshot.data() as Map<String, dynamic>);
+        writings.add(writing);
+      }
+      lastSnapshot = snapshots.last;
     }
     controller.update();
   }
@@ -148,6 +153,7 @@ class _WritingListState extends State<WritingList> {
   Widget build(BuildContext context) {
     bool isMyWritings = widget.isMyWritings;
     writings = [];
+    lastSnapshot = null;
 
     if (isMyWritings) {
       field = 'userEmail';
