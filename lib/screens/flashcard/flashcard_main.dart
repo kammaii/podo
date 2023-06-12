@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_Stop_icon.dart';
@@ -36,30 +35,32 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   final scrollController = ScrollController();
   late int cardsLength;
   DocumentSnapshot? lastSnapshot;
-
+  bool isLoaded = false;
 
   @override
   void initState() {
     super.initState();
     controller.init();
-    loadFlashcards();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadFlashcards();
+    });
     scrollController.addListener(() {
       if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-        LoadingController.to.isLoading = true;
         loadFlashcards(isContinue: true);
-        LoadingController.to.isLoading = false;
       }
     });
   }
 
   loadFlashcards({bool isContinue = false}) async {
     Query query = FirebaseFirestore.instance.collection(ref).orderBy('date', descending: true).limit(docsLimit);
-    if(isContinue) {
+    if (isContinue) {
       query = query.startAfterDocument(lastSnapshot!);
     }
+    LoadingController.to.isLoading = true;
     List<dynamic> snapshots = await Database().getDocs(query: query);
+    LoadingController.to.isLoading = false;
 
-    if(snapshots.isNotEmpty) {
+    if (snapshots.isNotEmpty) {
       for (dynamic snapshot in snapshots) {
         FlashCard card = FlashCard.fromJson(snapshot.data() as Map<String, dynamic>);
         controller.cards.add(card);
@@ -70,6 +71,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
       }
       lastSnapshot = snapshots.last;
     }
+    isLoaded = true;
     controller.update();
   }
 
@@ -116,94 +118,90 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                   Expanded(
                     child: GetBuilder<FlashCardController>(
                       builder: (_) {
-                        if (controller.cards.isNotEmpty) {
-                          cardsLength = controller.cards.length;
+                        print(isLoaded);
+                        cardsLength = controller.cards.length;
 
-                          if (searchText.isNotEmpty) {
-                            cardsSearch = [];
-                            for (FlashCard card in controller.cards) {
-                              if (searchText.isNotEmpty &&
-                                  (card.front.toLowerCase().contains(searchText) ||
-                                      card.back.toLowerCase().contains(searchText))) {
-                                cardsSearch.add(card);
-                              }
+                        if (searchText.isNotEmpty) {
+                          cardsSearch = [];
+                          for (FlashCard card in controller.cards) {
+                            if (searchText.isNotEmpty &&
+                                (card.front.toLowerCase().contains(searchText) ||
+                                    card.back.toLowerCase().contains(searchText))) {
+                              cardsSearch.add(card);
                             }
-                            cardsLength = cardsSearch.length;
                           }
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    animationWidget(MyWidget().getCheckBox(
-                                        value: controller.isCheckedAll,
-                                        onChanged: (value) {
-                                          controller.isCheckedAllClicked(value!);
-                                        })),
-                                    Row(
-                                      children: [
-                                        animationWidget(IconButton(
-                                            onPressed: () {
-                                              List<String> ids = [];
-                                              for (int i = 0; i < controller.isChecked.length; i++) {
-                                                controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
-                                              }
-                                              if (ids.isNotEmpty) {
-                                                setState(() {
-                                                  Future<void> runBatch;
-                                                  if (ids.length > 1) {
-                                                    runBatch = Database().deleteDocs(collection: ref, ids: ids);
-                                                  } else {
-                                                    runBatch =
-                                                        Database().deleteDoc(collection: ref, docId: ids[0]);
-                                                  }
-                                                  runBatch
-                                                      .then((value) => Get.snackbar(MyStrings.deleteSucceed, ''))
-                                                      .onError((error, stackTrace) =>
-                                                          Get.snackbar(MyStrings.deleteFailed, ''));
-                                                });
-                                              }
-                                            },
-                                            icon: const Icon(
-                                              Icons.delete,
-                                              color: MyColors.red,
-                                            ))),
-                                        const SizedBox(width: 20),
-                                        MyWidget().getTextWidget(
-                                            text: '$cardsLength ${MyStrings.cards}',
-                                            size: 15,
-                                            color: Colors.black),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _focusNode.unfocus();
-                                    },
-                                    onLongPress: () {
-                                      controller.isLongClicked = !controller.isLongClicked;
-                                      controller.update();
-                                    },
-                                    child: ListView.builder(
-                                      controller: scrollController,
-                                      padding: const EdgeInsets.only(top: 10, bottom: 80),
-                                      itemCount: cardsLength,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return getFlashCardItem(index);
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards));
+                          cardsLength = cardsSearch.length;
                         }
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  animationWidget(MyWidget().getCheckBox(
+                                      value: controller.isCheckedAll,
+                                      onChanged: (value) {
+                                        controller.isCheckedAllClicked(value!);
+                                      })),
+                                  Row(
+                                    children: [
+                                      animationWidget(IconButton(
+                                          onPressed: () {
+                                            List<String> ids = [];
+                                            for (int i = 0; i < controller.isChecked.length; i++) {
+                                              controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
+                                            }
+                                            if (ids.isNotEmpty) {
+                                              setState(() {
+                                                Future<void> runBatch;
+                                                if (ids.length > 1) {
+                                                  runBatch = Database().deleteDocs(collection: ref, ids: ids);
+                                                } else {
+                                                  runBatch = Database().deleteDoc(collection: ref, docId: ids[0]);
+                                                }
+                                                runBatch
+                                                    .then((value) => Get.snackbar(MyStrings.deleteSucceed, ''))
+                                                    .onError((error, stackTrace) =>
+                                                        Get.snackbar(MyStrings.deleteFailed, ''));
+                                              });
+                                            }
+                                          },
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: MyColors.red,
+                                          ))),
+                                      const SizedBox(width: 20),
+                                      MyWidget().getTextWidget(
+                                          text: '$cardsLength ${MyStrings.cards}', size: 15, color: Colors.black),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                child: isLoaded && cardsLength <= 0
+                                    ? Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards))
+                                    : GestureDetector(
+                                        onTap: () {
+                                          _focusNode.unfocus();
+                                        },
+                                        onLongPress: () {
+                                          controller.isLongClicked = !controller.isLongClicked;
+                                          controller.update();
+                                        },
+                                        child: ListView.builder(
+                                          controller: scrollController,
+                                          padding: const EdgeInsets.only(top: 10, bottom: 80),
+                                          itemCount: cardsLength,
+                                          itemBuilder: (BuildContext context, int index) {
+                                            return getFlashCardItem(index);
+                                          },
+                                        ),
+                                      ),
+                              ),
+                            ],
+                          ),
+                        );
                       },
                     ),
                   )

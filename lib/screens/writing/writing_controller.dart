@@ -4,7 +4,9 @@ import 'package:podo/values/my_strings.dart';
 
 class WritingController extends GetxController {
   late bool isChecked;
-
+  late RxInt leftRequestCount = 0.obs;
+  int maxRequestCount = 3;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {

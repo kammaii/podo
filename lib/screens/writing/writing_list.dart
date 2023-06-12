@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:html/parser.dart' as htmlParser;
+import 'package:animated_icon/animated_icon.dart';
 
 class WritingList extends StatefulWidget {
   WritingList(this.isMyWritings, {Key? key}) : super(key: key);
@@ -25,8 +29,6 @@ class _WritingListState extends State<WritingList> {
   final controller = Get.find<WritingController>();
   final scrollController = ScrollController();
   final docsLimit = 10;
-  late String field;
-  late String equalTo;
   String? questionId = Get.arguments;
   List<String> statusList = [
     MyStrings.writingStatus0,
@@ -34,8 +36,9 @@ class _WritingListState extends State<WritingList> {
     MyStrings.writingStatus2,
     MyStrings.writingStatus3
   ];
-  List<Color> statusColors = [MyColors.green, MyColors.purple, MyColors.mustard, MyColors.red];
+  List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
+  bool isLoaded = false;
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
@@ -49,7 +52,7 @@ class _WritingListState extends State<WritingList> {
     } else {
       query = ref
           .where('questionId', isEqualTo: questionId!)
-          .where('userEmail', isNotEqualTo: User().email)
+          .where('userEmail', isEqualTo: User().email) //todo: isNotEqualTo 로 변경하기
           .where('status', whereIn: [1, 2])
           .orderBy('dateWriting', descending: true)
           .limit(docsLimit);
@@ -59,7 +62,9 @@ class _WritingListState extends State<WritingList> {
       query = query.startAfterDocument(lastSnapshot!);
     }
 
+    controller.isLoading.value = true;
     List<dynamic> snapshots = await Database().getDocs(query: query);
+    controller.isLoading.value = false;
 
     if (snapshots.isNotEmpty) {
       for (dynamic snapshot in snapshots) {
@@ -68,15 +73,48 @@ class _WritingListState extends State<WritingList> {
       }
       lastSnapshot = snapshots.last;
     }
+    isLoaded = true;
     controller.update();
   }
 
-  Widget getItem(String title, String content) {
+  Widget getItem(String title, String content, {Writing? writing}) {
+    content = '<p>$content</p>';
     return Row(
       children: [
         MyWidget().getTextWidget(text: '$title. ', isBold: true),
         const SizedBox(width: 15),
-        Expanded(child: MyWidget().getTextWidget(text: content, isKorean: true, height: 1.5)),
+        Expanded(
+          child: Html(
+            data: content,
+            style: {
+              'p': Style(
+                  fontFamily: 'KoreanFont', fontSize: const FontSize(15), lineHeight: LineHeight.number(1.5)),
+            },
+          ),
+        ),
+        Visibility(
+          visible: writing != null && writing.status == 1 && title.contains('C') ||
+              writing != null && writing.status == 2 && title.contains('A'),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              AnimateIcon(
+                onTap: () {
+                  String extractedText = htmlParser.parse(content).body!.text;
+                  FlashCard flashCard = FlashCard();
+                  flashCard.front = extractedText;
+                  flashCard.back = '';
+                  Database().setFlashcard(flashCard: flashCard);
+                },
+                iconType: IconType.toggleIcon,
+                animateIcon: AnimateIcons.heart,
+                height: 20,
+                width: 20,
+                color: MyColors.purple,
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
@@ -101,7 +139,33 @@ class _WritingListState extends State<WritingList> {
                 Expanded(
                     child: MyWidget().getTextWidget(
                         text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
-                Text(MyDateFormat().getDateFormat(writing.dateWriting)),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.keyboard_double_arrow_left_rounded, size: 13, color: MyColors.grey),
+                        const SizedBox(width: 5),
+                        MyWidget().getTextWidget(
+                            text: MyDateFormat().getDateFormat(writing.dateWriting),
+                            size: 12,
+                            color: MyColors.grey),
+                      ],
+                    ),
+                    writing.dateReply != null
+                        ? Row(
+                            children: [
+                              const Icon(Icons.keyboard_double_arrow_right_rounded,
+                                  size: 13, color: MyColors.grey),
+                              const SizedBox(width: 5),
+                              MyWidget().getTextWidget(
+                                  text: MyDateFormat().getDateFormat(writing.dateReply!),
+                                  size: 12,
+                                  color: MyColors.grey),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
               ],
             ),
             const Divider(),
@@ -109,10 +173,8 @@ class _WritingListState extends State<WritingList> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 getItem('Q', writing.questionTitle),
-                const SizedBox(height: 15),
-                getItem('A', writing.userWriting),
-                const SizedBox(height: 15),
-                getItem('C', writing.correction),
+                getItem('A', writing.userWriting, writing: writing),
+                getItem('C', writing.correction, writing: writing),
               ],
             ),
           ],
@@ -125,7 +187,7 @@ class _WritingListState extends State<WritingList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(writing.userEmail),
+                MyWidget().getTextWidget(text: writing.userEmail.split('@')[0], color: MyColors.grey),
               ],
             ),
             const Divider(),
@@ -154,17 +216,10 @@ class _WritingListState extends State<WritingList> {
     bool isMyWritings = widget.isMyWritings;
     writings = [];
     lastSnapshot = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadWritings();
+    });
 
-    if (isMyWritings) {
-      field = 'userEmail';
-      equalTo = User().email;
-    } else {
-      field = 'questionId';
-      equalTo = questionId!;
-      //todo: 해당 유저의 글 제외 / status 가 1,2 인 것만
-    }
-
-    loadWritings();
     scrollController.addListener(() {
       if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
         LoadingController.to.isLoading = true;
@@ -173,30 +228,54 @@ class _WritingListState extends State<WritingList> {
       }
     });
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: MyWidget().getAppbar(title: isMyWritings ? MyStrings.myWritings : MyStrings.viewOtherUsersWriting),
-        body: GetBuilder<WritingController>(
-          builder: (_) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: writings.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 30),
-                          child: getWritingList(index),
-                        );
-                      },
-                    ),
-                  )
-                ],
-              ),
-            );
-          },
+    return Scaffold(
+      appBar: MyWidget().getAppbar(title: isMyWritings ? MyStrings.myWritings : MyStrings.viewOtherUsersWriting),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            GetBuilder<WritingController>(
+              builder: (_) {
+                return Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: isLoaded && writings.isEmpty
+                            ? Center(
+                              child: MyWidget().getTextWidget(
+                                text: MyStrings.noWritings,
+                                color: MyColors.purple,
+                                size: 20,
+                                isBold: true,
+                              ),
+                            )
+                            : ListView.builder(
+                                itemCount: writings.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 30),
+                                    child: getWritingList(index),
+                                  );
+                                },
+                              ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+            Obx(() => Offstage(
+                  offstage: !controller.isLoading.value,
+                  child: Stack(
+                    children: const [
+                      Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                      Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    ],
+                  ),
+                ))
+          ],
         ),
       ),
     );

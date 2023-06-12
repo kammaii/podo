@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/screens/writing/writing_list.dart';
@@ -28,18 +29,26 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   late Animation<Offset> animationOffset;
   bool isVisible = false;
   Radius borderRadius = const Radius.circular(20);
-  late Future future;
+  late Future<List<dynamic>> futures;
   WritingQuestion? selectedQuestion;
   final controller = Get.put(WritingController());
   int maxLength = 50;
   final textEditController = TextEditingController();
+  int maxRequestCount = 3;
+  int? requestCount;
 
   @override
   void initState() {
     super.initState();
-    final Query query =
-        FirebaseFirestore.instance.collection('Lessons/$lessonId/WritingQuestions').orderBy('orderId');
-    future = Database().getDocs(query: query);
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final Query questionQuery = firestore.collection('Lessons/$lessonId/WritingQuestions').orderBy('orderId');
+    final Query countQuery =
+        firestore.collection('Writings').where('userEmail', isEqualTo: User().email).where('status', isEqualTo: 0);
+    futures = Future.wait([
+      Database().getDocs(query: questionQuery),
+      countQuery.count().get(),
+    ]);
+
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -89,7 +98,13 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                   writing.userWriting = textEditController.text;
                   Get.back();
                   toggleVisibility();
-                  Database().setDoc(collection: 'Writings', doc: writing, completeMention: MyStrings.requestedCorrection);
+                  Database().setDoc(
+                      collection: 'Writings',
+                      doc: writing,
+                      thenFn: (value) {
+                        Get.snackbar(MyStrings.requestedCorrection, '');
+                        controller.leftRequestCount.value--;
+                      });
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
                 child: const Text(MyStrings.send),
@@ -112,8 +127,26 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
       color: Colors.white,
       child: InkWell(
         onTap: () {
-          toggleVisibility();
-          selectedQuestion = question;
+          if (controller.leftRequestCount.value > 0) {
+            toggleVisibility();
+            selectedQuestion = question;
+          } else {
+            Get.dialog(
+              AlertDialog(
+                title: const Text(MyStrings.requestNotAvailableTitle),
+                content: const Text(MyStrings.requestNotAvailableContent),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
+                    child: const Text(MyStrings.ok),
+                  ),
+                ],
+              ),
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -145,14 +178,30 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: MyWidget().getAppbar(title: MyStrings.writing),
-        body: Stack(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: MyWidget().getAppbar(
+        title: MyStrings.writing,
+        actions: [
+          Row(
+            children: [
+              Transform.scale(
+                scale: 0.5,
+                child: Image.asset('assets/images/podo.png'),
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(right: 20, top: 10),
+                  child: Obx(() =>
+                      MyWidget().getTextWidget(text: 'x ${controller.leftRequestCount}', color: MyColors.purple))),
+            ],
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
                   Padding(
@@ -178,13 +227,16 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                   ),
                   Expanded(
                     child: FutureBuilder(
-                      future: future,
+                      future: futures,
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         questions = [];
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                          for (dynamic snapshot in snapshot.data) {
+                          for (dynamic snapshot in snapshot.data[0]) {
                             questions.add(WritingQuestion.fromJson(snapshot.data() as Map<String, dynamic>));
                           }
+                          WidgetsBinding.instance!.addPostFrameCallback((_) {
+                            controller.leftRequestCount.value = maxRequestCount - snapshot.data[1].count as int;
+                          });
                           return ListView.builder(
                             itemCount: questions.length,
                             itemBuilder: (BuildContext context, int index) {
@@ -235,17 +287,16 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 TextButton(
-                                  onPressed: () {},
-                                  child: TextButton(
-                                      onPressed: () {},
-                                      child: const Text(MyStrings.viewOtherUsersWriting,
-                                          style: TextStyle(
-                                            color: MyColors.purple,
-                                            decoration: TextDecoration.underline,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ))),
-                                ),
+                                    onPressed: () {
+                                      Get.to(WritingList(false), arguments: selectedQuestion!.id);
+                                    },
+                                    child: const Text(MyStrings.viewOtherUsersWriting,
+                                        style: TextStyle(
+                                          color: MyColors.purple,
+                                          decoration: TextDecoration.underline,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ))),
                               ],
                             ),
                             const SizedBox(height: 20),

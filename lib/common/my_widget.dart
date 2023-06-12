@@ -39,7 +39,7 @@ class MyWidget {
     );
   }
 
-  AppBar getAppbar({required String title}) {
+  AppBar getAppbar({required String title, List<Widget>? actions}) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -56,6 +56,7 @@ class MyWidget {
           color: MyColors.purple,
         ),
       ),
+      actions: actions,
     );
   }
 

@@ -16,10 +16,10 @@ class LessonFinish extends StatelessWidget {
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: MyColors.purpleLight,
-        body: Column(
+    return Scaffold(
+      backgroundColor: MyColors.purpleLight,
+      body: SafeArea(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TextLiquidFill(

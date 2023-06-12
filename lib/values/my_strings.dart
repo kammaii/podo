@@ -56,8 +56,10 @@ class MyStrings {
   static const String writingStatus2 = 'Perfect';
   static const String writingStatus3 = 'Uncorrectable';
   static const String requestedCorrection = 'Requested a correction';
-
-
+  static const String requestNotAvailableTitle = 'All correction requests have been used.';
+  static const String requestNotAvailableContent = 'Please wait a moment until your correction is completed.';
+  static const String ok = 'OK';
+  static const String noWritings = 'No writings';
 
 
 

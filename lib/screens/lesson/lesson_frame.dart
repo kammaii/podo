@@ -381,12 +381,12 @@ class _LessonFrameState extends State<LessonFrame> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: MyWidget().getAppbar(title: lesson.title[KO]),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
+    return Scaffold(
+      appBar: MyWidget().getAppbar(title: lesson.title[KO]),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+            child: Column(
                 children: [
                   LinearPercentIndicator(
                     animateFromLastPercent: true,
@@ -486,7 +486,7 @@ class _LessonFrameState extends State<LessonFrame> {
                   ),
                 ],
               ),
-      ),
+          ),
     );
   }
 

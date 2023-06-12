@@ -85,20 +85,20 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: const Icon(Icons.arrow_back_ios_rounded),
-            color: MyColors.purple,
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: const Icon(Icons.arrow_back_ios_rounded),
+          color: MyColors.purple,
         ),
-        body: FutureBuilder(
+      ),
+      body: SafeArea(
+        child: FutureBuilder(
           future: SharedPreferences.getInstance(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             DateTime now = DateTime.now();
