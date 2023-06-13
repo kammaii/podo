@@ -1,3 +1,4 @@
+import 'package:animated_icon/animated_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -180,7 +181,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                   const SizedBox(width: 20),
                   const Text('|'),
                   const SizedBox(width: 20),
-                  letterContainer('W'),
+                  letterContainer('V'),
                   const SizedBox(width: 10),
                   Text('${reading.content[KO].length}'),
                 ],
@@ -239,7 +240,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.only(left: 10),
-              child: MyWidget().getTextWidget(text: (index+1).toString(), color: MyColors.purple, isBold: true),
+              child: MyWidget().getTextWidget(text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
             Material(
               child: IconButton(

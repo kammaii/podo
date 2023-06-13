@@ -119,15 +119,17 @@ class MyWidget {
     required Color bgColor,
     required Color fontColor,
     required Function f,
-    double innerVerticalPadding = 13,
+    double verticalPadding = 13,
+    double horizontalPadding = 10,
     int? podoCount,
     double textSize = 20,
     bool hasNullFunction = false,
+    double borderRadius = 30,
   }) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           backgroundColor: bgColor),
       onPressed: hasNullFunction
@@ -136,11 +138,8 @@ class MyWidget {
               f();
             },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: innerVerticalPadding),
-        child: Text(
-          text,
-          style: TextStyle(fontSize: textSize, color: fontColor),
-        ),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+        child: MyWidget().getTextWidget(text: text, size: textSize, color: fontColor),
       ),
     );
   }

@@ -17,7 +17,7 @@ class ReadingListMain extends StatefulWidget {
 
 class _ReadingListMainState extends State<ReadingListMain> {
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
-  final categories = ['culture', 'food', 'travel', 'story book'];
+  final categories = ['All', 'About Korea', 'Entertainment', 'Daily life', 'Story book'];
   final cardBorderRadius = 8.0;
   int selectedCategory = 0;
   final KO = 'ko';
@@ -110,14 +110,17 @@ class _ReadingListMainState extends State<ReadingListMain> {
 
   @override
   Widget build(BuildContext context) {
-    final Query query = FirebaseFirestore.instance
-        .collection(READINGS)
-        .where(CATEGORY, isEqualTo: categories[selectedCategory])
-        .orderBy(ORDER_ID);
+    final CollectionReference ref = FirebaseFirestore.instance.collection(READINGS);
+    Query query;
+    if (selectedCategory == 0) {
+      query = ref.orderBy(ORDER_ID);
+    } else {
+      query = ref.where(CATEGORY, isEqualTo: categories[selectedCategory]).orderBy(ORDER_ID);
+    }
 
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
@@ -137,11 +140,15 @@ class _ReadingListMainState extends State<ReadingListMain> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: selectedCategory == index ? MyColors.purple : MyColors.navy,
-                            borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            color: selectedCategory == index ? MyColors.purple : Colors.white,
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                          child: MyWidget().getTextWidget(text: categories[index], color: Colors.white, size: 17),
+                          child: MyWidget().getTextWidget(
+                            text: categories[index],
+                            color: selectedCategory == index ? Colors.white : MyColors.navy,
+                            size: 18,
+                          ),
                         ),
                       ),
                     );

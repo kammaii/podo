@@ -135,7 +135,7 @@ class _ProfileState extends State<Profile> {
                                           bgColor: MyColors.purple,
                                           fontColor: Colors.white,
                                           f: () {},
-                                          innerVerticalPadding: 10,
+                                          verticalPadding: 10,
                                         )
                                       ],
                                     ),
@@ -167,7 +167,7 @@ class _ProfileState extends State<Profile> {
                                             f: () {
                                               //todo: 로그아웃
                                             },
-                                            innerVerticalPadding: 10,
+                                            verticalPadding: 10,
                                           )),
                                           const SizedBox(
                                             width: 10,
@@ -182,7 +182,7 @@ class _ProfileState extends State<Profile> {
                                                 closePanels();
                                               });
                                             },
-                                            innerVerticalPadding: 10,
+                                            verticalPadding: 10,
                                           )),
                                         ],
                                       ),
@@ -244,7 +244,7 @@ class _ProfileState extends State<Profile> {
                                                 ),
                                               );
                                             },
-                                            innerVerticalPadding: 10,
+                                            verticalPadding: 10,
                                           )),
                                           const SizedBox(
                                             width: 10,
@@ -259,7 +259,7 @@ class _ProfileState extends State<Profile> {
                                                 closePanels();
                                               });
                                             },
-                                            innerVerticalPadding: 10,
+                                            verticalPadding: 10,
                                           )),
                                         ],
                                       ),

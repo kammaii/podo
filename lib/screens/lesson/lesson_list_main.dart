@@ -176,7 +176,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                 f: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const Subscribe()));
                 },
-                innerVerticalPadding: 8,
+                verticalPadding: 8,
               )
             ],
           ),
