@@ -30,4 +30,19 @@ class LessonCourse {
     lessons = json[LESSONS];
     isReleased = json[ISRELEASED];
   }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> map = {
+      ID: id,
+      ORDERID: orderId,
+      TITLE: title,
+      DESCRIPTION: description,
+      ISBEGINNERMODE: isBeginnerMode,
+      LESSONS: lessons,
+      ISRELEASED: isReleased
+    };
+    map[IMAGE] = image ?? null;
+    map[TAG] = tag ?? null;
+    return map;
+  }
 }
