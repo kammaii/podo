@@ -107,9 +107,9 @@ class _WritingListState extends State<WritingList> {
                   Database().setFlashcard(flashCard: flashCard);
                 },
                 iconType: IconType.toggleIcon,
-                animateIcon: AnimateIcons.heart,
-                height: 20,
-                width: 20,
+                animateIcon: AnimateIcons.favoriteFolder,
+                height: 25,
+                width: 25,
                 color: MyColors.purple,
               ),
             ],

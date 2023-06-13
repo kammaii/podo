@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
@@ -11,7 +12,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
 class LessonListMain extends StatefulWidget {
-  const LessonListMain({Key? key}) : super(key: key);
+  LessonListMain({Key? key, required this.course}) : super(key: key);
+
+  late LessonCourse course;
 
   @override
   _LessonListMainState createState() => _LessonListMainState();
@@ -21,7 +24,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
-  LessonCourse course = Get.arguments;
+  late LessonCourse course;
   String language = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
   String sampleImage = 'assets/images/course_hangul.png';
   String nextLesson = '~아/어요'; //todo: userInfo 에서  completeLessons 참고하기
@@ -32,6 +35,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
+  LessonCourseController controller = Get.find<LessonCourseController>();
 
   @override
   void dispose() {
@@ -194,10 +198,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
     return SliverAppBar(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_rounded),
+        icon: const Icon(Icons.menu),
         color: MyColors.purple,
         onPressed: () {
-          Navigator.pop(context);
+          controller.setVisibility(true);
         },
       ),
       expandedHeight: sliverAppBarHeight,
@@ -242,7 +246,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   sliverList() {
     return SliverPadding(
-      padding: const EdgeInsets.only(top: 60.0),
+      padding: const EdgeInsets.only(top: 20.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
@@ -256,79 +260,17 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    course = widget.course;
     lessonIndex = -1;
-    double topMargin = sliverAppBarHeight - 30.0;
-    double topMarginPlayBtn = sliverAppBarHeight - 25.0;
-
-    if (scrollController.hasClients) {
-      topMargin -= scrollController.offset;
-      if (sliverAppBarHeight - scrollController.offset >= 34) {
-        topMarginPlayBtn -= scrollController.offset;
-      } else {
-        topMarginPlayBtn = 9.0;
-      }
-    }
 
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              controller: scrollController,
-              slivers: [
-                sliverAppBar(),
-                sliverList(),
-              ],
-            ),
-            Positioned(
-              width: MediaQuery.of(context).size.width,
-              top: topMargin,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 30.0),
-                padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
-                decoration: const BoxDecoration(
-                  color: MyColors.navy,
-                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                ),
-                child: Row(
-                  children: [
-                    Column(
-                      children: [
-                        MyWidget().getTextWidget(
-                          text: MyStrings.nextLesson,
-                          size: 15,
-                          color: Colors.white,
-                          isBold: true,
-                        ),
-                        MyWidget().getTextWidget(
-                          text: nextLesson,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: topMarginPlayBtn,
-              right: 60.0,
-              child: FloatingActionButton(
-                elevation: 0,
-                backgroundColor: Colors.white,
-                child: const Icon(
-                  Icons.play_arrow_rounded,
-                  color: MyColors.navy,
-                  size: 50.0,
-                ),
-                onPressed: () {
-                  //todo: nextLesson start
-                },
-              ),
-            )
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          controller: scrollController,
+          slivers: [
+            sliverAppBar(),
+            sliverList(),
           ],
         ),
       ),

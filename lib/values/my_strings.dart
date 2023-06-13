@@ -14,6 +14,7 @@ class MyStrings {
   static const String scratch = 'scratch';
   static const String takeQuiz = 'Let\'s take a quiz.';
   static const String practice3Times = 'Practice it at least 3 times';
+  static const String imListening = 'I\'m listening';
   static const String normal = 'normal';
   static const String speedDown = 'x0.8';
   static const String failedUserTitle = 'Failed to load user information.';

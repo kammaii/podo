@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
+import 'package:podo/screens/lesson/lesson_complete.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/screens/writing/writing_main.dart';
@@ -56,7 +57,8 @@ class LessonSummaryMain extends StatelessWidget {
                   FloatingActionButton(
                     heroTag: 'learningBtn',
                     onPressed: () {
-                      Get.to(LessonFrame(), arguments: lesson);
+                      //Get.to(LessonFrame(), arguments: lesson);
+                      Get.to(const LessonComplete(), arguments: lesson);
                     },
                     backgroundColor: MyColors.pink,
                     child: const Icon(Icons.play_arrow_rounded, size: 40),

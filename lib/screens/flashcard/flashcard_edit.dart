@@ -15,6 +15,17 @@ class FlashCardEdit extends StatelessWidget {
   late String front;
   late String back;
 
+  Function? onSaveBtn() {
+    if (isCorrected) {
+      return () {
+        Database().updateFlashcard(id: card.id, front: front, back: back);
+      };
+    } else {
+      return null;
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     card = Get.arguments;
@@ -83,19 +94,28 @@ class FlashCardEdit extends StatelessWidget {
             ),
             GetBuilder<FlashCardController>(
               builder: (controller) {
-                bool isCorrected = false;
+                isCorrected = false;
                 if(front != card.front || back != card.back) {
                   isCorrected = true;
                 }
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: MyWidget().getRoundBtnWidget(
-                    text: MyStrings.save,
-                    bgColor: isCorrected ? MyColors.purple : MyColors.grey,
-                    fontColor: Colors.white,
-                    f: () {
-                      isCorrected ? Database().updateFlashcard(id: card.id, front: front, back: back) : null;
-                    },
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: MyWidget().getRoundBtnWidget(
+                            text: MyStrings.save,
+                            verticalPadding: 10,
+                            bgColor: MyColors.purple,
+                            hasNullFunction: true,
+                            fontColor: Colors.white,
+                            f: onSaveBtn,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },

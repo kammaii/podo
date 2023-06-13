@@ -1,3 +1,4 @@
+import 'package:animated_icon/animated_icon.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,9 @@ import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
-import 'package:podo/screens/lesson/lesson_finish.dart';
+import 'package:podo/screens/lesson/lesson_complete.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'dart:math';
 import 'package:podo/values/my_colors.dart';
@@ -23,7 +25,7 @@ class LessonFrame extends StatefulWidget {
   State<LessonFrame> createState() => _LessonFrameState();
 }
 
-class _LessonFrameState extends State<LessonFrame> {
+class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStateMixin {
   final lesson = Get.arguments;
   int thisIndex = 0;
   ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
@@ -36,6 +38,7 @@ class _LessonFrameState extends State<LessonFrame> {
   final EX4 = 'ex4';
   final AUDIO = 'audio';
   final FILE_NAME = 'fileName';
+  final SPEAKING = 'speaking';
   String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
   bool isLoading = true;
   List<LessonCard> cards = [];
@@ -43,9 +46,13 @@ class _LessonFrameState extends State<LessonFrame> {
   bool isScratchTextVisible = true;
   List<String> examples = [];
   late String answer;
+  int selectedAnswer = -1;
   Color quizBorderColor = Colors.white;
   SwiperController swiperController = SwiperController();
   Map<String, String> audios = {};
+  late AnimationController animationController;
+  late Animation<Offset> animationOffset;
+  late Widget bottomWidget;
 
   Widget getCards(int index) {
     LessonCard card = cards[index];
@@ -97,8 +104,9 @@ class _LessonFrameState extends State<LessonFrame> {
                   data: card.content[fo],
                   style: {
                     'p': Style(
-                      fontSize: const FontSize(18),
-                    )
+                        fontFamily: 'EnglishFont',
+                        fontSize: const FontSize(15),
+                        lineHeight: LineHeight.number(1.5)),
                   },
                 ),
               ),
@@ -124,11 +132,30 @@ class _LessonFrameState extends State<LessonFrame> {
                 children: [
                   Column(
                     children: [
-                      topBtns(index),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          AnimateIcon(
+                            onTap: () {
+                              FlashCard flashcard = FlashCard();
+                              flashcard.front = card.content[KO];
+                              flashcard.back = card.content[fo];
+                              flashcard.audio = 'LessonAudios_${lesson.id}_${card.content[AUDIO]}';
+                              Database().setFlashcard(flashCard: flashcard);
+                            },
+                            iconType: IconType.animatedOnTap,
+                            animateIcon: AnimateIcons.favoriteFolder,
+                            color: MyColors.purple,
+                            height: 28,
+                            width: 28,
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 10),
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: MyWidget().getTextWidget(
-                            text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
+                        child: MyWidget()
+                            .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
                       const SizedBox(height: 10),
                       FittedBox(
@@ -158,7 +185,7 @@ class _LessonFrameState extends State<LessonFrame> {
           children: [
             Row(
               children: [
-                const Icon(Icons.speaker_phone_outlined, size: 18),
+                const Icon(Icons.emoji_emotions_outlined, size: 18),
                 const SizedBox(width: 8),
                 MyWidget().getTextWidget(text: MyStrings.speakInKorean),
               ],
@@ -183,9 +210,7 @@ class _LessonFrameState extends State<LessonFrame> {
                           color: MyColors.grey,
                           onScratchEnd: () {
                             setState(() {
-                              scratchKey[index]!
-                                  .currentState!
-                                  .reset(duration: const Duration(milliseconds: 500));
+                              scratchKey[index]!.currentState!.reset(duration: const Duration(milliseconds: 500));
                               scrollPhysics = const AlwaysScrollableScrollPhysics();
                               isScratchTextVisible = true;
                             });
@@ -269,75 +294,87 @@ class _LessonFrameState extends State<LessonFrame> {
         break;
 
       case MyStrings.quiz:
+        if(index == thisIndex) {
+
+        }
         if (examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
           examples.shuffle(Random());
         }
-        widget = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.question_mark_rounded, size: 18),
-                const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.takeQuiz),
-              ],
-            ),
-            const SizedBox(height: 50),
-            MyWidget().getTextWidget(text: card.content[KO], size: 15, color: Colors.black),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: examples.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        if (examples[index] == answer) {
-                          quizBorderColor = MyColors.purple;
-                          Future.delayed(const Duration(seconds: 1), () {
-                            swiperController.move(thisIndex + 1);
-                            quizBorderColor = Colors.white;
-                          });
-                        } else {
-                          quizBorderColor = MyColors.red;
-                          Future.delayed(const Duration(seconds: 1), () {
-                            setState(() {
+        widget = Listener(
+          onPointerDown: (event) {
+            setState(() {
+              scrollPhysics = const NeverScrollableScrollPhysics();
+            });
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.question_mark_rounded, size: 18),
+                  const SizedBox(width: 8),
+                  MyWidget().getTextWidget(text: MyStrings.takeQuiz),
+                ],
+              ),
+              const SizedBox(height: 50),
+              MyWidget().getTextWidget(text: card.content[KO], size: 15, color: Colors.black),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: examples.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedAnswer = index;
+                          if (examples[index] == answer) {
+                            scrollPhysics = const AlwaysScrollableScrollPhysics();
+                            quizBorderColor = MyColors.purple;
+                            Future.delayed(const Duration(seconds: 1), () {
+                              swiperController.move(thisIndex + 1);
                               quizBorderColor = Colors.white;
                             });
-                          });
-                        }
-                        //todo: 효과음 재생
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: quizBorderColor),
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 0.5,
-                                blurRadius: 3,
-                                offset: const Offset(0, 2),
-                              )
-                            ]),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                          child: MyWidget()
-                              .getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
+                          } else {
+                            quizBorderColor = MyColors.red;
+                            Future.delayed(const Duration(seconds: 1), () {
+                              setState(() {
+                                quizBorderColor = Colors.white;
+                              });
+                            });
+                          }
+                          //todo: 효과음 재생
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: selectedAnswer == index ? quizBorderColor : Colors.white),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 0.5,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            child:
+                                MyWidget().getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
         break;
 
@@ -355,23 +392,120 @@ class _LessonFrameState extends State<LessonFrame> {
     );
   }
 
+  toggleBottomAudioWidget(bool isForward) {
+    if (isForward) {
+      controller.update();
+      animationController.forward();
+    } else {
+      animationController.reverse();
+    }
+  }
+
+  void animationListener() {
+    bottomWidget = const SizedBox.shrink();
+  }
+
+  setBottomWidget() {
+    animationController.removeListener(animationListener);
+    LessonCard card = cards[thisIndex];
+    if (card.content.containsKey(AUDIO)) {
+      bottomWidget = Column(
+        children: [
+          MyWidget().getTextWidget(
+            text: MyStrings.practice3Times,
+            size: 15,
+            color: MyColors.grey,
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              getSpeedBtn(isNormal: true),
+              const SizedBox(width: 20),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircularPercentIndicator(
+                    radius: 30,
+                    lineWidth: 4,
+                    percent: controller.audioProgress,
+                    animateFromLastPercent: true,
+                    progressColor: MyColors.purple,
+                  ),
+                  IconButton(
+                    iconSize: 60,
+                    onPressed: () {
+                      controller.playAudio();
+                    },
+                    icon: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: MyColors.purple,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 20),
+              getSpeedBtn(isNormal: false),
+            ],
+          )
+        ],
+      );
+      toggleBottomAudioWidget(true);
+    } else if (card.type == SPEAKING) {
+      //todo: 클로바 실행
+      bottomWidget = Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          MyWidget().getTextWidget(
+            text: MyStrings.imListening,
+            size: 15,
+            color: MyColors.grey,
+          ),
+          const SizedBox(height: 20),
+          AnimateIcon(
+            onTap: () {},
+            iconType: IconType.continueAnimation,
+            animateIcon: AnimateIcons.activity,
+            color: MyColors.purple,
+            height: 70,
+            width: 70,
+          ),
+        ],
+      );
+      toggleBottomAudioWidget(true);
+    } else {
+      animationController.addListener(animationListener);
+      toggleBottomAudioWidget(false);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     isLoading = true;
-    final Query query = FirebaseFirestore.instance
-        .collection('Lessons/${lesson.id}/LessonCards')
-        .orderBy('orderId');
+    bottomWidget = const SizedBox.shrink();
+
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    animationOffset = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(animationController);
+
+    final Query query =
+        FirebaseFirestore.instance.collection('Lessons/${lesson.id}/LessonCards').orderBy('orderId');
 
     Future.wait([
       Database().getDocs(query: query),
       CloudStorage().getLessonAudios(lessonId: lesson.id),
     ]).then((snapshots) {
       setState(() {
-        for(dynamic snapshot in snapshots[0]) {
+        for (dynamic snapshot in snapshots[0]) {
           cards.add(LessonCard.fromJson(snapshot.data() as Map<String, dynamic>));
         }
-        for(dynamic snapshot in snapshots[1]) {
+        for (dynamic snapshot in snapshots[1]) {
           audios.addAll(snapshot);
         }
         isLoading = false;
@@ -381,112 +515,86 @@ class _LessonFrameState extends State<LessonFrame> {
 
   @override
   Widget build(BuildContext context) {
+    if(!isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setBottomWidget();
+      });
+    }
+
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: lesson.title[KO]),
+      appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
-            child: Column(
+              child: Stack(
                 children: [
-                  LinearPercentIndicator(
-                    animateFromLastPercent: true,
-                    animation: true,
-                    lineHeight: 3.0,
-                    percent: thisIndex / cards.length,
-                    backgroundColor: MyColors.navyLight,
-                    progressColor: MyColors.purple,
-                  ),
-                  Expanded(
-                    child: Swiper(
-                      controller: swiperController,
-                      itemBuilder: (context, index) {
-                        if (index < cards.length) {
-                          return getCards(index);
-                        } else {
-                          return const SizedBox.shrink();
-                        }
-                      },
-                      loop: false,
-                      itemCount: cards.length + 1,
-                      viewportFraction: 0.8,
-                      scale: 0.8,
-                      physics: scrollPhysics,
-                      onIndexChanged: (index) {
-                        if (index >= cards.length) {
-                          Get.to(const LessonFinish());
-                          return;
-                        } else {
-                          setState(() {
-                            thisIndex = index;
-                            PlayAudio().player.stop();
-                            if(cards[thisIndex].content.containsKey(AUDIO)) {
-                              String fileName = cards[thisIndex].content[AUDIO];
-                              if(audios.containsKey(fileName)) {
-                                controller.setAudioUrlAndPlay(url: audios[fileName]!);
-                              }
+                  Column(
+                    children: [
+                      LinearPercentIndicator(
+                        animateFromLastPercent: true,
+                        animation: true,
+                        lineHeight: 3.0,
+                        percent: thisIndex / cards.length,
+                        backgroundColor: MyColors.navyLight,
+                        progressColor: MyColors.purple,
+                      ),
+                      Expanded(
+                        child: Swiper(
+                          controller: swiperController,
+                          itemBuilder: (context, index) {
+                            if (index < cards.length) {
+                              return getCards(index);
+                            } else {
+                              return const SizedBox.shrink();
                             }
-                          });
-                        }
-                      },
-                    ),
+                          },
+                          loop: false,
+                          itemCount: cards.length + 1,
+                          viewportFraction: 0.8,
+                          scale: 0.8,
+                          physics: scrollPhysics,
+                          onIndexChanged: (index) {
+                            if (index >= cards.length) {
+                              Get.to(const LessonComplete());
+                              return;
+                            } else {
+                              setState(() {
+                                thisIndex = index;
+                                PlayAudio().player.stop();
+                                if (cards[thisIndex].content.containsKey(AUDIO)) {
+                                  String fileName = cards[thisIndex].content[AUDIO];
+                                  if (audios.containsKey(fileName)) {
+                                    controller.setAudioUrlAndPlay(url: audios[fileName]!);
+                                  }
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 170),
+                    ],
                   ),
-                  SizedBox(
-                    height: 170,
-                    child: Visibility(
-                      visible: cards[thisIndex].type == 'repeat',
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10, bottom: 30),
-                        child: Column(
-                          children: [
-                            MyWidget().getTextWidget(
-                              text: MyStrings.practice3Times,
-                              size: 15,
-                              color: MyColors.grey,
-                            ),
-                            const SizedBox(height: 20),
-                            GetBuilder<LessonController>(
-                              builder: (controller) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    getSpeedBtn(isNormal: true),
-                                    const SizedBox(width: 20),
-                                    Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        CircularPercentIndicator(
-                                          radius: 30,
-                                          lineWidth: 4,
-                                          percent: controller.audioProgress,
-                                          animateFromLastPercent: true,
-                                          progressColor: MyColors.purple,
-                                        ),
-                                        IconButton(
-                                          iconSize: 60,
-                                          onPressed: () {
-                                            controller.playAudio();
-                                          },
-                                          icon: const Icon(
-                                            Icons.play_arrow_rounded,
-                                            color: MyColors.purple,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(width: 20),
-                                    getSpeedBtn(isNormal: false),
-                                  ],
-                                );
-                              },
-                            )
-                          ],
+                  Positioned(
+                    bottom: 0,
+                    child: SlideTransition(
+                      position: animationOffset,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: GetBuilder<LessonController>(
+                            builder: (_) {
+                              return bottomWidget;
+                            },
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-          ),
+            ),
     );
   }
 
@@ -520,73 +628,6 @@ class _LessonFrameState extends State<LessonFrame> {
               text: isNormal ? MyStrings.normal : MyStrings.speedDown, color: MyColors.purple, isBold: true),
         ),
       ),
-    );
-  }
-
-  Icon getResponseIcon(IconData iconData) {
-    return Icon(
-      iconData,
-      size: 50,
-      color: MyColors.purple,
-    );
-  }
-
-  Widget topBtns(int index) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          onPressed: () {
-            // LessonCard card = cards[index];
-            // _controller.setFavorite(index, !card.isFavorite!);
-            // card.isFavorite!
-            //     ? UserInfo().addFavorite(card.uniqueId)
-            //     : UserInfo().removeFavorite(card.uniqueId);
-          },
-          icon: const Icon(
-            Icons.star_rounded,
-            //cards[index].isFavorite! ? Icons.star_rounded : Icons.star_outline_rounded,
-            color: MyColors.purple,
-            size: 30,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget bottomDirection(String text, {bool hasCircleProgress = false}) {
-    return Column(
-      children: [
-        const Divider(
-          color: MyColors.grey,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            MyWidget().getTextWidget(
-              text: text,
-              size: 15,
-              color: MyColors.grey,
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            hasCircleProgress
-                ? GetBuilder<LessonController>(builder: (controller) {
-                    return CircularPercentIndicator(
-                      radius: 10,
-                      lineWidth: 3,
-                      percent: 0.5,
-                      //_controller.audioProgress,
-                      progressColor: MyColors.purple,
-                      animation: true,
-                      animateFromLastPercent: true,
-                    );
-                  })
-                : const SizedBox.shrink(),
-          ],
-        ),
-      ],
     );
   }
 }

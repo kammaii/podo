@@ -39,7 +39,7 @@ class MyWidget {
     );
   }
 
-  AppBar getAppbar({required String title, List<Widget>? actions}) {
+  AppBar getAppbar({required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true}) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -50,11 +50,12 @@ class MyWidget {
         icon: const Icon(Icons.arrow_back_ios_rounded),
         color: MyColors.purple,
       ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: MyColors.purple,
-        ),
+      title: MyWidget().getTextWidget(
+        text: title,
+        color: MyColors.purple,
+        isKorean: isKorean,
+        isBold: isBold,
+        size: 18,
       ),
       actions: actions,
     );
