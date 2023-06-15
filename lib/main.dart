@@ -16,40 +16,58 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Get any initial links : When the app is just opened by clicking the deepLink.
-  final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
-
   // auth emulator init
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  runApp(MyApp(initialLink: initialLink));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key, this.initialLink}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
-  PendingDynamicLinkData? initialLink;
   User? currentUser;
   bool isVerified = false;
 
-  void runDeepLink(BuildContext context, PendingDynamicLinkData dynamicLinkData) async {
-    FirebaseAuth.instance.currentUser!.reload();
+  void runDeepLink(Uri deepLink) async {
+    await FirebaseAuth.instance.currentUser!.reload();
     currentUser = FirebaseAuth.instance.currentUser;
+
     print(
-        'dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, DynamicLink: $dynamicLinkData');
-    Uri uri = Uri.parse(dynamicLinkData.link.toString());
+      'dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, deepLink: $deepLink');
+    Uri uri = Uri.parse(deepLink.toString());
     String mode = uri.queryParameters['mode']!;
 
     if (mode == 'verifyEmail' && currentUser!.emailVerified) {
-      await user.User().initUserWithEmail(context);
-      Get.snackbar(MyStrings.welcome, '');
+      await user.User().initUserWithEmail();
       Get.to(const MainFrame());
+      Get.snackbar(MyStrings.welcome, '');
     } else {
       Get.to(Login());
     }
   }
 
+  void initDynamicLinks() async {
+    // DynamicLink listener : When the app is already running.
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+      final deepLink = dynamicLinkData.link;
+      if (deepLink != null) {
+        runDeepLink(deepLink);
+      }
+    }).onError((error) {
+      print('ERROR on DynamicLinkListener: $error');
+    });
+
+    // Get any initial links : When the app is just opened by clicking the deepLink.
+    final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
+    final deepLink = data?.link;
+    if (deepLink != null) {
+      runDeepLink(deepLink);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    initDynamicLinks();
+
     currentUser = FirebaseAuth.instance.currentUser;
     currentUser != null && currentUser!.emailVerified ? isVerified = true : isVerified = false;
 
@@ -58,24 +76,9 @@ class MyApp extends StatelessWidget {
       homeWidget = const MainFrame();
       user.User().getUser();
     } else {
-      //homeWidget = Login();
-      homeWidget = const MainFrame();
+      homeWidget = Login();
+      //homeWidget = const MainFrame();
     }
-
-
-    if (initialLink != null) {
-      // Dynamic listener : When the app is just opened.
-      runDeepLink(context, initialLink!);
-      print('InitialLink: $initialLink');
-    }
-
-    // DynamicLink listener : When the app is already running.
-    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
-      runDeepLink(context, dynamicLinkData);
-    }).onError((error) {
-      print('ERROR on DynamicLinkListener: $error');
-    });
-
 
     return GetMaterialApp(
       title: 'Podo Korean app',

@@ -44,18 +44,37 @@ class Database {
     }).catchError((e) => print(e));
   }
 
+  Future<void> setUser({required User user}) async {
+    final ref = firestore.collection('Users').doc(user.email);
+    await ref.set(user.toJson()).then((value) {
+      print('UserInfo is saved');
+    }).catchError((e) => Get.snackbar(MyStrings.setError, e));
+  }
+
+  Future<void> updateDoc(
+      {required String collection, required String docId, required String key, required dynamic value}) async {
+    final ref = firestore.collection(collection).doc(docId);
+    ref.update({key: value}).then((val) => print('Update succeed: $key $value'),
+        onError: (e) => print('Update error: $e'));
+  }
+
   Future<void> setDoc({required String collection, required dynamic doc, Function(dynamic)? thenFn}) async {
     final ref = firestore.collection(collection).doc(doc.id);
-    if(thenFn != null) {
+    if (thenFn != null) {
       await ref.set(doc.toJson()).then(thenFn).catchError((e) => Get.snackbar(MyStrings.setError, e));
-    }else {
+    } else {
       await ref.set(doc.toJson()).catchError((e) => Get.snackbar(MyStrings.setError, e));
     }
   }
 
   Future<dynamic> getDoc({required String collection, required String docId}) async {
+    dynamic document;
     final ref = firestore.collection(collection).doc(docId);
-    return await ref.get().then((value) => print('$collection/$docId is loaded'));
+    await ref.get().then((DocumentSnapshot snapshot) {
+      print('$collection/$docId is loaded');
+      document = snapshot;
+    });
+    return document;
   }
 
   Future<List<dynamic>> getDocs({required Query query}) async {

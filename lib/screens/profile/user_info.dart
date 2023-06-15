@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/cupertino.dart';
@@ -16,8 +18,7 @@ class User {
     return _instance;
   }
 
-  //late String email;
-  String email = 'gabmanpark@gmail.com';
+  late String email;
   late String name;
   late String image;
   late String language;
@@ -25,8 +26,8 @@ class User {
   late DateTime dateSignUp;
   late DateTime dateSignIn;
   late List<Premium>? premiumRecord;
-  late Map<String, List<String>> lessonRecord;
-  late Map<String, List<String>> readingRecord;
+  late Map<String, dynamic> lessonRecord;
+  late Map<String, dynamic> readingRecord;
   String? fcmToken;
   String? fcmState;
   late int status;
@@ -55,15 +56,17 @@ class User {
     image = json[IMAGE];
     language = json[LANGUAGE];
     isBeginnerMode = json[IS_BEGINNER_MODE];
-    dateSignUp = json[DATE_SIGN_UP];
-    dateSignIn = json[DATE_SIGN_IN];
+    Timestamp dateSignUpStamp = json[DATE_SIGN_UP];
+    dateSignUp = dateSignUpStamp.toDate();
+    Timestamp dateSignInStamp = json[DATE_SIGN_IN];
+    dateSignIn = dateSignInStamp.toDate();
     premiumRecord = json[PREMIUM_RECORD];
     lessonRecord = json[LESSON_RECORD];
     readingRecord = json[READING_RECORD];
     if(json[FCM_TOKEN] != null) {
       fcmToken = json[FCM_TOKEN];
     }
-    if(json[FCM_STATE != null]) {
+    if(json[FCM_STATE] != null) {
       fcmState = json[FCM_STATE];
     }
     status = json[STATUS];
@@ -76,8 +79,8 @@ class User {
       IMAGE: image,
       LANGUAGE: language,
       IS_BEGINNER_MODE: isBeginnerMode,
-      DATE_SIGN_UP: dateSignUp,
-      DATE_SIGN_IN: dateSignIn,
+      DATE_SIGN_UP: Timestamp.fromDate(dateSignUp),
+      DATE_SIGN_IN: Timestamp.fromDate(dateSignIn),
       LESSON_RECORD: lessonRecord,
       READING_RECORD: readingRecord,
       STATUS: status,
@@ -91,12 +94,13 @@ class User {
     return map;
   }
 
-  Future<void> initUserWithEmail(BuildContext context) async {
+  Future<void> initUserWithEmail() async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
     email = user.email!;
     name = user.displayName ?? '-';
     image = user.photoURL ?? '';
-    language = Localizations.localeOf(context).languageCode;
+    Locale locale = window.locale;
+    language = locale.languageCode;
     if(!Languages().fos.contains(language)) {
       language = 'en';
     }
@@ -107,11 +111,13 @@ class User {
     lessonRecord = {};
     readingRecord = {};
     status = 0;
-    Database().setDoc(collection: 'Users', doc: email);
+    Database().setUser(user: this);
   }
+
 
   void getUser() async {
     email = auth.FirebaseAuth.instance.currentUser!.email!;
+    await Database().updateDoc(collection: 'Users', docId: email, key: 'dateSignIn', value: DateTime.now());
     DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: email);
     if (snapshot.exists) {
       User.fromJson(snapshot.data()!);
