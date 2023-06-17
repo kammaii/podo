@@ -18,13 +18,10 @@ class User {
     return _instance;
   }
 
+  late String id;
   late String email;
   late String name;
-  late String image;
   late String language;
-  late bool isBeginnerMode;
-  late DateTime dateSignUp;
-  late DateTime dateSignIn;
   late List<Premium>? premiumRecord;
   late Map<String, dynamic> lessonRecord;
   late Map<String, dynamic> readingRecord;
@@ -34,15 +31,13 @@ class User {
 
   User.init() {
     debugPrint('User init');
+    getUser();
   }
 
+  static const String ID = 'id';
   static const String EMAIL = 'email';
   static const String NAME = 'name';
-  static const String IMAGE = 'image';
   static const String LANGUAGE = 'language';
-  static const String IS_BEGINNER_MODE = 'isBeginnerMode';
-  static const String DATE_SIGN_UP = 'dataSignUp';
-  static const String DATE_SIGN_IN = 'dateSignIn';
   static const String PREMIUM_RECORD = 'premiumRecord';
   static const String LESSON_RECORD = 'lessonRecord';
   static const String READING_RECORD = 'readingRecord';
@@ -51,15 +46,10 @@ class User {
   static const String STATUS = 'status';
 
   User.fromJson(Map<String, dynamic> json) {
+    id = json[ID];
     email = json[EMAIL];
     name = json[NAME];
-    image = json[IMAGE];
     language = json[LANGUAGE];
-    isBeginnerMode = json[IS_BEGINNER_MODE];
-    Timestamp dateSignUpStamp = json[DATE_SIGN_UP];
-    dateSignUp = dateSignUpStamp.toDate();
-    Timestamp dateSignInStamp = json[DATE_SIGN_IN];
-    dateSignIn = dateSignInStamp.toDate();
     premiumRecord = json[PREMIUM_RECORD];
     lessonRecord = json[LESSON_RECORD];
     readingRecord = json[READING_RECORD];
@@ -70,17 +60,16 @@ class User {
       fcmState = json[FCM_STATE];
     }
     status = json[STATUS];
+    print('HERE: $status');
+
   }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
+      ID: id,
       EMAIL: email,
       NAME: name,
-      IMAGE: image,
       LANGUAGE: language,
-      IS_BEGINNER_MODE: isBeginnerMode,
-      DATE_SIGN_UP: Timestamp.fromDate(dateSignUp),
-      DATE_SIGN_IN: Timestamp.fromDate(dateSignIn),
       LESSON_RECORD: lessonRecord,
       READING_RECORD: readingRecord,
       STATUS: status,
@@ -94,33 +83,30 @@ class User {
     return map;
   }
 
-  Future<void> initUserWithEmail() async {
+  Future<void> initNewUserOnDB() async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
-    email = user.email!;
-    name = user.displayName ?? '-';
-    image = user.photoURL ?? '';
+    id = user.uid!;
+    email = user.email ?? '';
+    name = user.displayName ?? '';
     Locale locale = window.locale;
     language = locale.languageCode;
     if(!Languages().fos.contains(language)) {
       language = 'en';
     }
-    isBeginnerMode = true;
-    dateSignUp = DateTime.now();
-    dateSignIn = DateTime.now();
     premiumRecord = [];
     lessonRecord = {};
     readingRecord = {};
     status = 0;
-    Database().setUser(user: this);
+    Database().setDoc(collection: 'Users', doc: this);
   }
 
 
   void getUser() async {
-    email = auth.FirebaseAuth.instance.currentUser!.email!;
-    await Database().updateDoc(collection: 'Users', docId: email, key: 'dateSignIn', value: DateTime.now());
-    DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: email);
+    id = auth.FirebaseAuth.instance.currentUser!.uid!;
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: id);
     if (snapshot.exists) {
       User.fromJson(snapshot.data()!);
+      print('STATE: $status');
     } else {
       Get.dialog(AlertDialog(
         title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),
@@ -129,11 +115,4 @@ class User {
     }
   }
 
-  void setUserEmail(String email) {
-    this.email = email;
-  }
-
-  void changeUserName(String name) {
-    this.name = name;
-  }
 }

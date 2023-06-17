@@ -43,7 +43,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final Query questionQuery = firestore.collection('Lessons/$lessonId/WritingQuestions').orderBy('orderId');
     final Query countQuery =
-        firestore.collection('Writings').where('userEmail', isEqualTo: User().email).where('status', isEqualTo: 0);
+        firestore.collection('Writings').where('userId', isEqualTo: User().id).where('status', isEqualTo: 0);
     futures = Future.wait([
       Database().getDocs(query: questionQuery),
       countQuery.count().get(),
@@ -311,14 +311,11 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               controller: textEditController,
                               maxLength: maxLength,
                               hint: MyStrings.writeYourAnswerInKorean,
-                              fontSize: 15,
                             ),
                             const SizedBox(height: 30),
                             MyWidget().getRoundBtnWidget(
                               text: MyStrings.correction,
                               textSize: 15,
-                              bgColor: MyColors.purple,
-                              fontColor: Colors.white,
                               f: onSendBtn,
                               hasNullFunction: true,
                             ),

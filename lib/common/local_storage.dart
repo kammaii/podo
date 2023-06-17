@@ -15,9 +15,10 @@ class LocalStorage {
 
   LocalStorage.init() {
     print('LocalStorage 초기화');
+    getPrefs();
   }
 
-  Future<void> init() async {
+  Future<void> getPrefs() async {
     prefs = await SharedPreferences.getInstance();
     isInit = true;
   }

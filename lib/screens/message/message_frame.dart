@@ -273,8 +273,6 @@ class MessageFrame extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: MyWidget().getRoundBtnWidget(
                     text: MyStrings.send,
-                    bgColor: MyColors.purple,
-                    fontColor: Colors.white,
                     f: () {
                       //todo: DB에 저장할 때 correction 과 question 경로를 다르게 할 것
                       List<String> requests = [];
@@ -478,7 +476,7 @@ class TextFieldItem extends GetxController {
           child: Row(
             children: [
               Expanded(
-                  child: MyWidget().getTextFieldWidget(hint: hint, fontSize: 15, controller: controller)),
+                  child: MyWidget().getTextFieldWidget(hint: hint, controller: controller)),
               const SizedBox(width: 10),
               hasRemoveBtn
                   ? IconButton(

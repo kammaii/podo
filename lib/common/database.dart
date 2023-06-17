@@ -19,7 +19,7 @@ class Database {
   }
 
   Future<void> setFlashcard({required FlashCard flashCard}) async {
-    final collection = 'Users/${User().email}/FlashCards';
+    final collection = 'Users/${User().id}/FlashCards';
     final ref = firestore.collection(collection).where('front', isEqualTo: flashCard.front);
     QuerySnapshot snapshot = await ref.get();
     if (snapshot.docs.isEmpty) {
@@ -35,20 +35,13 @@ class Database {
   }
 
   Future<void> updateFlashcard({required String id, required String front, required String back}) async {
-    final collection = 'Users/${User().email}/FlashCards';
+    final collection = 'Users/${User().id}/FlashCards';
     DocumentReference ref = firestore.collection(collection).doc(id);
     return await ref.update({'front': front, 'back': back}).then((value) {
       Get.find<FlashCardController>().updateCard(id: id, front: front, back: back);
       Get.back();
       Get.snackbar(MyStrings.flashcardUpdated, '', snackPosition: SnackPosition.BOTTOM);
     }).catchError((e) => print(e));
-  }
-
-  Future<void> setUser({required User user}) async {
-    final ref = firestore.collection('Users').doc(user.email);
-    await ref.set(user.toJson()).then((value) {
-      print('UserInfo is saved');
-    }).catchError((e) => Get.snackbar(MyStrings.setError, e));
   }
 
   Future<void> updateDoc(
@@ -63,7 +56,7 @@ class Database {
     if (thenFn != null) {
       await ref.set(doc.toJson()).then(thenFn).catchError((e) => Get.snackbar(MyStrings.setError, e));
     } else {
-      await ref.set(doc.toJson()).catchError((e) => Get.snackbar(MyStrings.setError, e));
+      await ref.set(doc.toJson()).then((value) => print('setDoc completed')).catchError((e) => Get.snackbar(MyStrings.setError, e));
     }
   }
 

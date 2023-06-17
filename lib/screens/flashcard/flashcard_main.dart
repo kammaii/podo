@@ -25,7 +25,7 @@ class FlashCardMain extends StatefulWidget {
 class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
-  final ref = 'Users/${User().email}/FlashCards';
+  final ref = 'Users/${User().id}/FlashCards';
   List<FlashCard> cardsSearch = [];
   final controller = Get.put(FlashCardController());
   final duration = const Duration(milliseconds: 200);
@@ -217,7 +217,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                     return MyWidget().getRoundBtnWidget(
                       text: MyStrings.review,
                       bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
-                      fontColor: Colors.white,
                       f: onReviewBtn,
                       hasNullFunction: true,
                     );

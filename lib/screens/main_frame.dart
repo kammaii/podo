@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_list_main.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/profile/profile.dart';
+import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -131,20 +133,28 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     ).animate(animationController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.loadCourses();
+      Get.snackbar(
+        MyStrings.welcome,
+        MyStrings.welcomeMessage,
+        colorText: MyColors.purple,
+        backgroundColor: Colors.white,
+        icon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Image.asset('assets/images/podo.png'),
+        ),
+        duration: const Duration(seconds: 3),
+      );
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return GetBuilder<LessonCourseController>(
       builder: (_) {
         modeToggle[0] ? courses = controller.courses[0] : courses = controller.courses[1];
         WidgetsBinding.instance.addPostFrameCallback((_) {
           setCourseVisibility();
         });
-
 
         return Scaffold(
           body: Stack(
@@ -255,4 +265,3 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     );
   }
 }
-

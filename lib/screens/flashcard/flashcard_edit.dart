@@ -108,9 +108,7 @@ class FlashCardEdit extends StatelessWidget {
                           child: MyWidget().getRoundBtnWidget(
                             text: MyStrings.save,
                             verticalPadding: 10,
-                            bgColor: MyColors.purple,
                             hasNullFunction: true,
-                            fontColor: Colors.white,
                             f: onSaveBtn,
                           ),
                         ),

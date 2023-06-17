@@ -392,6 +392,54 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.5"
+  google_identity_services_web:
+    dependency: transitive
+    description:
+      name: google_identity_services_web
+      sha256: "7940fdc3b1035db4d65d387c1bdd6f9574deaa6777411569c05ecc25672efacd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
+  google_sign_in:
+    dependency: "direct main"
+    description:
+      name: google_sign_in
+      sha256: aab6fdc41374014494f9e9026b9859e7309639d50a0bf4a2a412467a5ae4abc6
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.4"
+  google_sign_in_android:
+    dependency: transitive
+    description:
+      name: google_sign_in_android
+      sha256: f58a17ac07d783d000786a6c313fa4a0d2ee599a346d69b24fc48fb378d5d150
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.16"
+  google_sign_in_ios:
+    dependency: transitive
+    description:
+      name: google_sign_in_ios
+      sha256: "6ec0e13a4c5c646471b9f6a25ceb3ae76d339889d4c0f79b729bf0714215a63e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.6.2"
+  google_sign_in_platform_interface:
+    dependency: transitive
+    description:
+      name: google_sign_in_platform_interface
+      sha256: e69553c0fc6a76216e9d06a8c3767e291ad9be42171f879aab7ab708569d4393
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
+  google_sign_in_web:
+    dependency: transitive
+    description:
+      name: google_sign_in_web
+      sha256: "69b9ce0e760945ff52337921a8b5871592b74c92f85e7632293310701eea68cc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.12.0+2"
   html:
     dependency: "direct main"
     description:
@@ -464,6 +512,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: "623a88c9594aa774443aa3eb2d41807a48486b5613e67599fb4c41c0ad47c340"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   lottie:
     dependency: transitive
     description:
@@ -472,6 +528,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  mailer:
+    dependency: "direct main"
+    description:
+      name: mailer
+      sha256: "57f6dd1496699999a7bfd0aa6be0645384f477f4823e16d4321c40a434346382"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.1"
   marquee:
     dependency: "direct main"
     description:
@@ -504,6 +568,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.0"
+  mime:
+    dependency: transitive
+    description:
+      name: mime
+      sha256: e4ff8e8564c03f255408decd16e7899da1733852a9110a58fe6d1b817684a63e
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   nested:
     dependency: transitive
     description:
@@ -1038,5 +1110,5 @@ packages:
     source: hosted
     version: "5.4.1"
 sdks:
-  dart: ">=2.18.0 <3.0.0"
+  dart: ">=2.19.0 <3.0.0"
   flutter: ">=3.3.1"

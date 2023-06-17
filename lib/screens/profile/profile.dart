@@ -1,11 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/items/profile_item.dart';
+import 'package:podo/common/database.dart';
+import 'package:podo/screens/profile/profile_item.dart';
+import 'package:podo/screens/profile/user_info.dart' as user;
 import 'package:podo/screens/subscribe/subscribe.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:podo/screens/profile/feedback.dart' as fb;
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -15,17 +20,35 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  String image = 'assets/images/logo.png';
-  String userId = 'User Id';
   List<ProfileItem> items = [
     ProfileItem(Icons.account_circle_rounded, MyStrings.editProfile),
     ProfileItem(Icons.feedback_outlined, MyStrings.feedback),
     ProfileItem(Icons.logout_rounded, MyStrings.logOut),
     ProfileItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
   ];
+  List<String> userTier = ['New', 'Basic', 'Premium'];
+  FirebaseAuth auth = FirebaseAuth.instance;
+  String signupDate = '';
+  String userId = '';
+  String userEmail = '';
+  String userName = '';
+  User? currentUser;
+  String feedback = '';
 
   @override
   Widget build(BuildContext context) {
+    feedback = '';
+    currentUser = auth.currentUser;
+    if (currentUser != null) {
+      DateTime? date = auth.currentUser?.metadata.lastSignInTime;
+      userId = currentUser!.uid ?? '';
+      userEmail = currentUser!.email ?? '';
+      userName = currentUser!.displayName ?? '';
+      if (date != null) {
+        signupDate = MyDateFormat().getDateFormat(date);
+      }
+    }
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -34,58 +57,55 @@ class _ProfileState extends State<Profile> {
             children: [
               Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          MyWidget().getTextWidget(
-                            text: MyStrings.podoPremium,
-                            size: 20,
-                            color: Colors.white,
-                            isBold: true,
-                          ),
-                          const SizedBox(height: 15),
-                          MyWidget().getRoundBtnWidget(
-                            text: MyStrings.startFreeTrial,
-                            bgColor: MyColors.purple,
-                            fontColor: Colors.white,
-                            f: () {
-                              Get.to(const Subscribe());
-                            },
-                          )
-                        ],
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(const Subscribe());
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Center(
+                        child: MyWidget().getTextWidget(
+                          text: MyStrings.subscribePodo,
+                          size: 20,
+                          color: Colors.white,
+                          isBold: true,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
                 ],
+              ),
+              const SizedBox(
+                height: 20,
               ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyWidget().getCircleImageWidget(
-                        image: image,
-                        size: 100,
-                      ),
-                      const SizedBox(height: 10),
                       MyWidget().getTextWidget(
-                        text: userId,
-                        size: 25,
-                        color: Colors.black,
+                        text: MyStrings.profile,
+                        size: 20,
+                        color: MyColors.purple,
                         isBold: true,
+                      ),
+                      //todo: status 값 가져오기
+                      // MyWidget().getTextWidget(
+                      //   text: userTier[user.User().status],
+                      //   color: MyColors.grey,
+                      // ),
+                      MyWidget().getTextWidget(
+                        text: 'Sign up: $signupDate',
+                        color: MyColors.grey,
                       ),
                       const SizedBox(height: 30),
                       ExpansionPanelList(
                         expansionCallback: (index, isExpanded) {
                           setState(() {
+                            feedback = '';
                             closePanels();
                             items[index].isExpanded = !isExpanded;
                           });
@@ -94,13 +114,60 @@ class _ProfileState extends State<Profile> {
                           // Edit Profile
                           getExpansionPanel(
                               items[0],
-                              Column(
-                                children: [
-                                  getTextField(MyStrings.name),
-                                  getTextField(MyStrings.email),
-                                  getTextField(MyStrings.password),
-                                  getTextField(MyStrings.passwordConfirm),
-                                ],
+                              Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: MyWidget().getTextWidget(
+                                        text: MyStrings.name,
+                                        size: 15,
+                                        color: Colors.black,
+                                        isBold: true,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: MyWidget().getTextFieldWidget(
+                                            controller: TextEditingController(text: userName),
+                                            onChanged: (text) {
+                                              userName = text;
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        MyWidget().getRoundBtnWidget(
+                                          text: MyStrings.edit,
+                                          verticalPadding: 8,
+                                          horizontalPadding: 3,
+                                          f: () async {
+                                            try {
+                                              if (currentUser != null) {
+                                                currentUser!.updateDisplayName(userName);
+                                                await Database().updateDoc(
+                                                    collection: 'Users',
+                                                    docId: currentUser!.uid,
+                                                    key: 'name',
+                                                    value: userName);
+                                                MyWidget().showSnackbar(title: MyStrings.profileChanged);
+                                              }
+                                            } catch (e) {
+                                              MyWidget()
+                                                  .showSnackbar(title: MyStrings.error, message: e.toString());
+                                            }
+                                            setState(() {
+                                              closePanels();
+                                            });
+                                          },
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               )),
 
                           // Feedback
@@ -124,18 +191,40 @@ class _ProfileState extends State<Profile> {
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Expanded(
-                                          child: MyWidget()
-                                              .getTextFieldWidget(hint: MyStrings.feedbackHint, fontSize: 15),
+                                          child: MyWidget().getTextFieldWidget(
+                                              hint: MyStrings.feedbackHint,
+                                              controller: TextEditingController(text: feedback),
+                                              onChanged: (text) {
+                                                feedback = text;
+                                              }),
                                         ),
                                         const SizedBox(
                                           width: 10,
                                         ),
                                         MyWidget().getRoundBtnWidget(
                                           text: MyStrings.send,
-                                          bgColor: MyColors.purple,
-                                          fontColor: Colors.white,
-                                          f: () {},
-                                          verticalPadding: 10,
+                                          verticalPadding: 8,
+                                          horizontalPadding: 3,
+                                          textSize: 15,
+                                          f: () async {
+                                            try {
+                                              if (feedback.isNotEmpty) {
+                                                fb.Feedback userFeedback = fb.Feedback();
+                                                userFeedback.userId = userId;
+                                                userFeedback.email = userEmail;
+                                                userFeedback.message = feedback;
+                                                await Database()
+                                                    .setDoc(collection: 'Feedbacks', doc: userFeedback);
+                                                MyWidget().showSnackbar(title: MyStrings.thanksFeedback);
+                                              }
+                                            } catch (e) {
+                                              MyWidget()
+                                                  .showSnackbar(title: MyStrings.error, message: e.toString());
+                                            }
+                                            setState(() {
+                                              closePanels();
+                                            });
+                                          },
                                         )
                                       ],
                                     ),
@@ -162,10 +251,10 @@ class _ProfileState extends State<Profile> {
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
                                             text: MyStrings.yes,
-                                            bgColor: MyColors.purple,
-                                            fontColor: Colors.white,
-                                            f: () {
-                                              //todo: 로그아웃
+                                            textSize: 15,
+                                            f: () async {
+                                              await auth.signOut();
+                                              print('User logged out');
                                             },
                                             verticalPadding: 10,
                                           )),
@@ -175,6 +264,7 @@ class _ProfileState extends State<Profile> {
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
                                             text: MyStrings.cancel,
+                                            textSize: 15,
                                             bgColor: MyColors.red,
                                             fontColor: Colors.white,
                                             f: () {
@@ -198,8 +288,7 @@ class _ProfileState extends State<Profile> {
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    MyWidget().getTextWidget(
-                                        text: MyStrings.removeDetail, size: 15, color: MyColors.purple),
+                                    MyWidget().getTextWidget(text: MyStrings.removeDetail, color: MyColors.red),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       child: Row(
@@ -207,34 +296,78 @@ class _ProfileState extends State<Profile> {
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
                                             text: MyStrings.yes,
-                                            bgColor: MyColors.purple,
-                                            fontColor: Colors.white,
+                                            textSize: 15,
                                             f: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) => CupertinoAlertDialog(
+                                              Get.dialog(
+                                                AlertDialog(
                                                   title: MyWidget().getTextWidget(
                                                     text: MyStrings.areYouSure,
-                                                    size: 18,
+                                                    size: 20,
                                                     color: Colors.black,
                                                   ),
                                                   content: MyWidget().getTextWidget(
                                                     text: MyStrings.removeDetail2,
-                                                    size: 15,
                                                     color: MyColors.red,
-                                                    isBold: true,
                                                   ),
                                                   actions: [
-                                                    CupertinoDialogAction(
-                                                      child: const Text(MyStrings.yes),
+                                                    TextButton(
+                                                      child: MyWidget().getTextWidget(text: MyStrings.yes),
                                                       onPressed: () {
-                                                        //todo: 계정삭제
+                                                        User? user = auth.currentUser;
+                                                        if (user != null) {
+                                                          String providerId = '';
+                                                          for (UserInfo providerData in user.providerData) {
+                                                            providerId = providerData.providerId;
+                                                          }
+                                                          print('PROVIDER: $providerId');
+                                                          switch (providerId) {
+                                                            case 'password':
+                                                              String password = '';
+                                                              Get.back();
+                                                              Get.dialog(AlertDialog(
+                                                                title: MyWidget().getTextFieldWidget(
+                                                                    hint: MyStrings.passwordAgain,
+                                                                    onChanged: (value) {
+                                                                      password = value;
+                                                                    }),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    child: const Text(MyStrings.send),
+                                                                    onPressed: () async {
+                                                                      Get.back();
+                                                                      try {
+                                                                        await user.reauthenticateWithCredential(
+                                                                          EmailAuthProvider.credential(
+                                                                              email: user.email!,
+                                                                              password: password),
+                                                                        );
+                                                                        await Database().deleteDoc(
+                                                                            collection: 'Users',
+                                                                            docId: auth.currentUser!.uid);
+                                                                        await user.delete();
+                                                                        print('User deleted');
+                                                                      } catch (e) {
+                                                                        showErrorSnackbar(e);
+                                                                      }
+                                                                    },
+                                                                  )
+                                                                ],
+                                                              ));
+                                                              break;
+
+                                                            case 'google.com':
+                                                              break;
+
+                                                            case 'apple.com':
+                                                              break;
+                                                          }
+                                                        }
                                                       },
                                                     ),
-                                                    CupertinoDialogAction(
-                                                      child: const Text(MyStrings.cancel),
+                                                    TextButton(
+                                                      child: MyWidget().getTextWidget(text: MyStrings.cancel),
                                                       onPressed: () {
-                                                        Navigator.pop(context);
+                                                        Get.back();
                                                         setState(() {
                                                           closePanels();
                                                         });
@@ -252,6 +385,7 @@ class _ProfileState extends State<Profile> {
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
                                             text: MyStrings.cancel,
+                                            textSize: 15,
                                             bgColor: MyColors.red,
                                             fontColor: Colors.white,
                                             f: () {
@@ -269,6 +403,7 @@ class _ProfileState extends State<Profile> {
                               )),
                         ],
                       ),
+                      const SizedBox(height: 50),
                     ],
                   ),
                 ),
@@ -285,9 +420,25 @@ class _ProfileState extends State<Profile> {
       item.isExpanded = false;
     }
   }
+
+  void showErrorSnackbar(Object e) {
+    Get.snackbar(
+      'Error',
+      e.toString(),
+      colorText: Colors.white,
+      backgroundColor: MyColors.red,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 5),
+    );
+    print('ERROR: $e');
+  }
 }
 
-Widget getTextField(String title) {
+Widget getTextField(
+    {required String title,
+    required String inputText,
+    required Function(String) onChanged,
+    required Function onClicked}) {
   return Padding(
     padding: const EdgeInsets.all(10),
     child: Column(
@@ -303,7 +454,19 @@ Widget getTextField(String title) {
           ),
         ),
         const SizedBox(height: 5),
-        MyWidget().getTextFieldWidget(hint: '', fontSize: 15),
+        Row(
+          children: [
+            Expanded(
+              child: MyWidget().getTextFieldWidget(
+                controller: TextEditingController(text: inputText),
+                onChanged: onChanged,
+              ),
+            ),
+            const SizedBox(width: 10),
+            MyWidget()
+                .getRoundBtnWidget(text: MyStrings.edit, f: onClicked, verticalPadding: 8, horizontalPadding: 3)
+          ],
+        ),
       ],
     ),
   );

@@ -213,8 +213,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 index == length - 1
                     ? MyWidget().getRoundBtnWidget(
                         text: MyStrings.complete,
-                        bgColor: MyColors.purple,
-                        fontColor: Colors.white,
                         f: () {
                           LocalStorage().prefs.remove(reading.id);
                           Get.back();

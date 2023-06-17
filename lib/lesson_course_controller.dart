@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -25,7 +24,6 @@ class LessonCourseController extends GetxController {
     }
     courses[0].sort((a,b) => a.orderId.compareTo(b.orderId));
     courses[1].sort((a,b) => a.orderId.compareTo(b.orderId));
-    await LocalStorage().init();
     if(LocalStorage().getLessonCourse() == null) {
       isVisible = true;
     }

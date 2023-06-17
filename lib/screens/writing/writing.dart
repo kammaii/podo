@@ -8,7 +8,7 @@ class Writing {
   late String questionId;
   late String questionTitle;
   late int questionLevel;
-  late String userEmail;
+  late String userId;
   late String userWriting;
   late String correction;
   late DateTime dateWriting;
@@ -20,7 +20,7 @@ class Writing {
     questionId = question.id;
     questionTitle = question.title['ko'];
     questionLevel = question.level;
-    userEmail = User().email;
+    userId = User().id;
     correction = '';
     dateWriting = DateTime.now();
     status = 0;
@@ -30,7 +30,7 @@ class Writing {
   static const String QUESTIONID = 'questionId';
   static const String QUESTIONTITLE = 'questionTitle';
   static const String QUESTIONLEVEL = 'questionLevel';
-  static const String USEREMAIL = 'userEmail';
+  static const String USERID = 'userId';
   static const String USERWRITING = 'userWriting';
   static const String CORRECTION = 'correction';
   static const String DATEWRITING = 'dateWriting';
@@ -42,7 +42,7 @@ class Writing {
     questionId = json[QUESTIONID];
     questionTitle = json[QUESTIONTITLE];
     questionLevel = json[QUESTIONLEVEL];
-    userEmail = json[USEREMAIL];
+    userId = json[USERID];
     userWriting = json[USERWRITING];
     correction = json[CORRECTION];
     Timestamp writingStamp = json[DATEWRITING];
@@ -60,7 +60,7 @@ class Writing {
       QUESTIONID: questionId,
       QUESTIONTITLE: questionTitle,
       QUESTIONLEVEL: questionLevel,
-      USEREMAIL: userEmail,
+      USERID: userId,
       USERWRITING: userWriting,
       CORRECTION: correction,
       DATEWRITING: Timestamp.fromDate(dateWriting),

@@ -117,8 +117,8 @@ class MyWidget {
 
   Widget getRoundBtnWidget({
     required String text,
-    required Color bgColor,
-    required Color fontColor,
+    Color bgColor = MyColors.purple,
+    Color fontColor = Colors.white,
     required Function f,
     double verticalPadding = 13,
     double horizontalPadding = 10,
@@ -167,8 +167,8 @@ class MyWidget {
   }
 
   Widget getTextFieldWidget({
-    required String hint,
-    required double fontSize,
+    String hint = '',
+    double fontSize = 15,
     TextEditingController? controller,
     int? maxLines,
     int? maxLength,
@@ -222,6 +222,21 @@ class MyWidget {
         borderRadius: BorderRadius.circular(radius),
       ),
       child: widget,
+    );
+  }
+
+  showSnackbar({
+    String title = '',
+    String message = '',
+    Color bgColor = Colors.white,
+    Color textColor = MyColors.purple,
+  }) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: bgColor,
+      colorText: textColor,
+      duration: const Duration(seconds: 5),
     );
   }
 }

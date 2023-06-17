@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/main_frame.dart';
-import 'package:podo/screens/profile/user_info.dart' as user;
+import 'package:podo/screens/profile/user_info.dart' as user_info;
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
+
 import 'firebase_options.dart';
 
 void main() async {
@@ -25,23 +25,16 @@ class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
   User? currentUser;
-  bool isVerified = false;
 
   void runDeepLink(Uri deepLink) async {
     await FirebaseAuth.instance.currentUser!.reload();
     currentUser = FirebaseAuth.instance.currentUser;
-
-    print(
-      'dynamic link listening: verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}, deepLink: $deepLink');
     Uri uri = Uri.parse(deepLink.toString());
     String mode = uri.queryParameters['mode']!;
 
     if (mode == 'verifyEmail' && currentUser!.emailVerified) {
-      await user.User().initUserWithEmail();
+      await user_info.User().initNewUserOnDB();
       Get.to(const MainFrame());
-      Get.snackbar(MyStrings.welcome, '');
-    } else {
-      Get.to(Login());
     }
   }
 
@@ -66,24 +59,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     initDynamicLinks();
 
-    currentUser = FirebaseAuth.instance.currentUser;
-    currentUser != null && currentUser!.emailVerified ? isVerified = true : isVerified = false;
-
-    Widget homeWidget;
-    if (currentUser != null && isVerified) {
-      homeWidget = const MainFrame();
-      user.User().getUser();
-    } else {
-      homeWidget = Login();
-      //homeWidget = const MainFrame();
-    }
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if(user != null) {
+        if(user.emailVerified) {
+          print('AUTH STATE CHANGES: Email Verified');
+          user_info.User();
+          Get.to(const MainFrame());
+        } else {
+          print('AUTH STATE CHANGES: Email not Verified');
+          Get.to(Login());
+        }
+      } else {
+        print('AUTH STATE CHANGES: User is null');
+        Get.to(Login());
+      }
+    });
 
     return GetMaterialApp(
       title: 'Podo Korean app',
       theme: ThemeData(primaryColor: MyColors.purple),
-      home: homeWidget,
+      home: const Center(child: CircularProgressIndicator()),
     );
   }
 }

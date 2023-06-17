@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -6,79 +7,24 @@ import 'package:get/get.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 // apple OAuth callback : https://podo-49335.firebaseapp.com/__/auth/handler
 
 class Login extends StatelessWidget {
   final _auth = FirebaseAuth.instance;
 
-  Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
-
-  // Future<String?> _loginUser(LoginData data) {
-  //   return Future.delayed(loginTime).then((_) {
-  //     if (!mockUsers.containsKey(data.name)) {
-  //       return 'User not exists';
-  //     }
-  //     if (mockUsers[data.name] != data.password) {
-  //       return 'Password does not match';
-  //     }
-  //     return null;
-  //   });
-  // }
-
-  Future<String?> _logIn(LoginData data) {
-    return Future.delayed(loginTime).then((_) {
-      return 'Login Succeed';
-    });
-  }
   Future<void> _sendEmailVerificationLink(String email) async {
-    await _auth.currentUser?.sendEmailVerification(
-      ActionCodeSettings(
-        url: 'https://newpodo.page.link/?mode=verifyEmail',
-        androidPackageName: 'net.awesomekorean.newpodo',
-        androidInstallApp: true,
-        androidMinimumVersion: '12',
-        iOSBundleId: 'net.awesomekorean.newpodo',
-        handleCodeInApp: false,
-        dynamicLinkDomain: 'newpodo.page.link',
-      )
-    );
+    await _auth.currentUser?.sendEmailVerification(ActionCodeSettings(
+      url: 'https://newpodo.page.link/?mode=verifyEmail',
+      androidPackageName: 'net.awesomekorean.newpodo',
+      androidInstallApp: true,
+      androidMinimumVersion: '12',
+      iOSBundleId: 'net.awesomekorean.newpodo',
+      handleCodeInApp: false,
+      dynamicLinkDomain: 'newpodo.page.link',
+    ));
     print('EMAIL SENT');
-  }
-
-  Future<String?> _signUpWithEmail(SignupData data) async {
-    try {
-      String email = data.name.toString();
-      await _auth.createUserWithEmailAndPassword(email: email, password: data.password.toString());
-      print('USER CREATED');
-
-      final user = _auth.currentUser;
-      if (user != null && !user.emailVerified) {
-        print('USER: $user');
-        await _sendEmailVerificationLink(user.email!);
-        Get.dialog(const AlertDialog(
-          title: Text(MyStrings.verificationEmailTitle),
-          content: Text(MyStrings.verificationEmailContent),
-        ));
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      } else {
-        print('ERRORRR: $e');
-      }
-    } catch (e) {
-      print(e);
-    }
-    return 'Signup Succeed';
-  }
-
-  Future<String?> _recover(String data) {
-    return Future.delayed(loginTime).then((_) {
-      return 'Recover Succeed';
-    });
   }
 
   @override
@@ -96,33 +42,85 @@ class Login extends StatelessWidget {
           LoginProvider(
             icon: FontAwesomeIcons.google,
             callback: () async {
-              print('start google sign in');
-              return null;
+              try {
+                final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+                final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+                final credential = GoogleAuthProvider.credential(
+                  accessToken: googleAuth?.accessToken,
+                  idToken: googleAuth?.idToken,
+                );
+                await _auth.signInWithCredential(credential);
+                return null;
+              } catch (e) {
+                print('ERROR: $e');
+                return e.toString();
+              }
             },
           ),
+
           LoginProvider(
             icon: FontAwesomeIcons.apple,
             callback: () async {
-              print('start apple sign in');
-              return null;
+              final appleProvider = AppleAuthProvider();
+              if (kIsWeb) {
+                await FirebaseAuth.instance.signInWithPopup(appleProvider);
+              } else {
+                await FirebaseAuth.instance.signInWithProvider(appleProvider);
+              }
             },
           )
         ],
-        onSignup: (signupData) {
-          print('signupData : $signupData');
-          return _signUpWithEmail(signupData);
+        onSignup: (data) async {
+          try {
+            String email = data.name.toString();
+            await _auth.createUserWithEmailAndPassword(email: email, password: data.password.toString());
+            print('USER CREATED');
+
+            final user = _auth.currentUser;
+            if (user != null && !user.emailVerified) {
+              print('USER: $user');
+              await _sendEmailVerificationLink(user.email!);
+              Get.dialog(Stack(
+                children: const [
+                  Offstage(
+                    offstage: false,
+                    child: Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                  ),
+                  AlertDialog(
+                    title: Text(MyStrings.verificationEmailTitle),
+                    content: Text(MyStrings.verificationEmailContent),
+                  ),
+                ],
+              ));
+              return null;
+            }
+          } on FirebaseAuthException catch (e) {
+            if (e.code == 'weak-password') {
+              print('The password provided is too weak.');
+            } else if (e.code == 'email-already-in-use') {
+              print('The account already exists for that email.');
+            } else {
+              print('ERRORRR: $e');
+            }
+            return e.toString();
+          }
+          return null;
         },
-        onLogin: (loginData) {
-          String email = loginData.name;
-          String password = loginData.password;
-          print(email);
-          print(password);
-          print('verified? : ${FirebaseAuth.instance.currentUser!.emailVerified}');
-          return _logIn(loginData);
+        onLogin: (data) async {
+          try {
+            await _auth.signInWithEmailAndPassword(email: data.name, password: data.password);
+            return null;
+          } catch (e) {
+            return e.toString();
+          }
         },
-        onRecoverPassword: (name) {
-          print('recover password');
-          return _recover(name);
+        onRecoverPassword: (name) async {
+          try {
+            await _auth.sendPasswordResetEmail(email: name);
+            return null;
+          } catch (e) {
+            return e.toString();
+          }
         },
         onSubmitAnimationCompleted: () {
           print('onSubmitAnimationCompleted');

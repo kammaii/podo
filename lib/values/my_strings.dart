@@ -61,6 +61,24 @@ class MyStrings {
   static const String requestNotAvailableContent = 'Please wait a moment until your correction is completed.';
   static const String ok = 'OK';
   static const String noWritings = 'No writings';
+  static const String name = 'Name';
+  static const String email = 'Email';
+  static const String password = 'Password';
+  static const String passwordConfirm = 'Confirm Password';
+  static const String feedback = 'Feedback';
+  static const String logOut = 'Log out';
+  static const String logOutDetail = 'Do you want to log out?';
+  static const String removeAccount = 'Remove Account';
+  static const String removeDetail = 'Do you want to remove your account? \n(If you have been logged in for a long time, you may be prompted to re-login.)';
+  static const String removeDetail2 = 'Your account cannot be recovered.';
+  static const String passwordAgain = 'Please input your password';
+  static const String areYouSure = 'Are you sure?';
+  static const String feedbackDetail = 'Please send us your awesome idea.';
+  static const String feedbackHint = 'Write it here';
+  static const String edit = 'edit';
+  static const String profileChanged = 'Your profile has been changed';
+  static const String error = 'Error';
+  static const String thanksFeedback = 'Thank you for your feedback';
 
 
 
@@ -86,7 +104,8 @@ class MyStrings {
   static const String home = 'home';
   static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
-  static const String podoPremium = 'Podo PREMIUM';
+  static const String profile = 'Profile';
+  static const String subscribePodo = 'Subscribe Podo';
   static const String freeTrial = 'Free trial for 3 days';
   static const String freeTrialDetail = 'You can cancel your subscription at any time during the free trial.';
   static const String unlockLessons = 'Unlock every lessons';
@@ -94,19 +113,6 @@ class MyStrings {
   static const String getPodoCoins = 'Get 5 coins every day';
   static const String getPodoCoinsDetail = 'Podo coin is used for correctings sentence or requesting questions. (Unused coins won\'t be carried forward to the next day.)';
   static const String editProfile = 'Edit Profile';
-  static const String name = 'Name';
-  static const String email = 'Email';
-  static const String password = 'Password';
-  static const String passwordConfirm = 'Confirm Password';
-  static const String feedback = 'Feedback';
-  static const String logOut = 'Log out';
-  static const String logOutDetail = 'Do you want to log out?';
-  static const String removeAccount = 'Remove Account';
-  static const String removeDetail = 'Do you want to remove your account?';
-  static const String removeDetail2 = 'Your account cannot be recovered.';
-  static const String areYouSure = 'Are you sure?';
-  static const String feedbackDetail = 'Please send us your awesome idea.';
-  static const String feedbackHint = 'Write it here';
   static const String bestValue = 'Best Value';
   static const String monthly = 'Monthly Plan';
   static const String yearly = 'Yearly Plan';
@@ -146,6 +152,7 @@ class MyStrings {
   static const String unlockWritingTopics = 'Unlock the writing topics by completing the lessons.';
   static const String selectQuestion = 'Select a question';
   static const String welcome = 'Welcome to podo';
+  static const String welcomeMessage = '만나서 반가워요!';
 
 
   // used only in the code

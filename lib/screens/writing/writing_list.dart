@@ -46,13 +46,13 @@ class _WritingListState extends State<WritingList> {
 
     if (widget.isMyWritings) {
       query = ref
-          .where('userEmail', isEqualTo: User().email)
+          .where('userId', isEqualTo: User().id)
           .orderBy('dateWriting', descending: true)
           .limit(docsLimit);
     } else {
       query = ref
           .where('questionId', isEqualTo: questionId!)
-          .where('userEmail', isEqualTo: User().email) //todo: isNotEqualTo 로 변경하기
+          .where('userId', isNotEqualTo: User().id)
           .where('status', whereIn: [1, 2])
           .orderBy('dateWriting', descending: true)
           .limit(docsLimit);
@@ -187,7 +187,7 @@ class _WritingListState extends State<WritingList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyWidget().getTextWidget(text: writing.userEmail.split('@')[0], color: MyColors.grey),
+                MyWidget().getTextWidget(text: 'User name', color: MyColors.grey),
               ],
             ),
             const Divider(),
