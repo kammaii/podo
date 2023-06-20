@@ -1,16 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/common/database.dart';
-import 'package:podo/screens/profile/profile_item.dart';
-import 'package:podo/screens/profile/user_info.dart' as user;
-import 'package:podo/screens/subscribe/subscribe.dart';
+import 'package:podo/screens/premium/premium_main.dart';
+import 'package:podo/screens/profile/feedback.dart' as fb;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:podo/screens/profile/feedback.dart' as fb;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+
+class ProfileItem {
+  late IconData icon;
+  late String title;
+  bool isExpanded = false;
+
+  ProfileItem(this.icon, this.title);
+}
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -59,20 +66,27 @@ class _ProfileState extends State<Profile> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Get.to(const Subscribe());
+                      Get.to(PremiumMain());
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),
                       decoration: BoxDecoration(
                           gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
                           borderRadius: BorderRadius.circular(30)),
-                      child: Center(
-                        child: MyWidget().getTextWidget(
-                          text: MyStrings.subscribePodo,
-                          size: 20,
-                          color: Colors.white,
-                          isBold: true,
-                        ),
+                      child: Row(
+                        children: [
+                          const Icon(FontAwesomeIcons.crown, color: Colors.white),
+                          Expanded(
+                            child: Center(
+                              child: MyWidget().getTextWidget(
+                                text: MyStrings.getPremium,
+                                size: 20,
+                                color: Colors.white,
+                                isBold: true,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

@@ -5,7 +5,7 @@ import 'package:podo/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
-import 'package:podo/screens/subscribe/subscribe.dart';
+import 'package:podo/screens/premium/premium_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -176,7 +176,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               MyWidget().getRoundBtnWidget(
                 text: MyStrings.startFreeTrial,
                 f: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Subscribe()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PremiumMain()));
                 },
                 verticalPadding: 8,
               )

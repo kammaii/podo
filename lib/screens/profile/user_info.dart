@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/cupertino.dart';
@@ -7,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/profile/premium.dart';
+import 'package:podo/screens/premium/premium.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/common/database.dart';
 
@@ -85,7 +84,7 @@ class User {
 
   Future<void> initNewUserOnDB() async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
-    id = user.uid!;
+    id = user.uid;
     email = user.email ?? '';
     name = user.displayName ?? '';
     Locale locale = window.locale;

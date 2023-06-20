@@ -47,7 +47,7 @@ class _SubscribeState extends State<Subscribe> {
                   Padding(
                     padding: const EdgeInsets.only(top: 30, bottom: 20),
                     child: MyWidget().getTextWidget(
-                      text: MyStrings.subscribePodo,
+                      text: MyStrings.getPremium,
                       size: 25,
                       color: MyColors.purple,
                       isBold: true,
@@ -96,7 +96,7 @@ class _SubscribeState extends State<Subscribe> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: MyWidget().getRoundBtnWidget(
-                            text: MyStrings.subscribe,
+                            text: 'MyStrings.getPremium',
                             f: () {},
                           ),
                         ),
@@ -107,10 +107,9 @@ class _SubscribeState extends State<Subscribe> {
                     color: MyColors.purpleLight,
                     padding: const EdgeInsets.all(8),
                     child: MyWidget().getTextWidget(
-                      text: MyStrings.subscribeCondition,
+                      text: MyStrings.premiumDetail,
                       size: 15,
                       color: MyColors.grey,
-                      isTextAlignCenter: true,
                     ),
                   ),
                 ],

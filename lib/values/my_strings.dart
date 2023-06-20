@@ -105,7 +105,7 @@ class MyStrings {
   static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
   static const String profile = 'Profile';
-  static const String subscribePodo = 'Subscribe Podo';
+  static const String getPremium = 'Get Podo Premium';
   static const String freeTrial = 'Free trial for 3 days';
   static const String freeTrialDetail = 'You can cancel your subscription at any time during the free trial.';
   static const String unlockLessons = 'Unlock every lessons';
@@ -116,8 +116,9 @@ class MyStrings {
   static const String bestValue = 'Best Value';
   static const String monthly = 'Monthly Plan';
   static const String yearly = 'Yearly Plan';
-  static const String subscribe = 'Subscribe';
-  static const String subscribeCondition = 'Subscription is automatically renewed.';
+  static const String premiumDetail = 'Premium is automatically renewed every 2 months. Premium can be canceled at any time up to 24 hours before the renewal. The price can be changed without prior notice. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
+  static const String hassleFree = 'A hassle-free short period!';
+  static const String twoMonths = '2 Months';
   static const String restoringPurchases = 'Restoring purchases';
   static const String tagCorrection = '#correction';
   static const String tagQuestion = '#question';
@@ -153,6 +154,18 @@ class MyStrings {
   static const String selectQuestion = 'Select a question';
   static const String welcome = 'Welcome to podo';
   static const String welcomeMessage = '만나서 반가워요!';
+  static const String premiumComment = 'Podo strives to truly enhance your Korean language skills.';
+  static const String lesson = 'Lesson';
+  static const String writingCorrection = 'Writing Correction';
+  static const String reading = 'Reading';
+  static const String flashcard = 'Flashcard';
+  static const String cloudMessage = 'Cloud Message';
+  static const String adFree = 'Ad-free';
+  static const String few = 'few';
+  static const String all = 'all';
+  static const String limit20 = 'limit:20';
+  static const String unlimited = 'unlimited';
+
 
 
   // used only in the code
