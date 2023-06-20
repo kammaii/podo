@@ -278,7 +278,6 @@ class MessageFrame extends StatelessWidget {
                         requests.add(item.controller.text);
                       }
                     },
-                    podoCount: podoCount,
                   ),
                 )
               ],

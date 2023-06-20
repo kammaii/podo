@@ -66,7 +66,7 @@ class _ProfileState extends State<Profile> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Get.to(PremiumMain());
+                      Get.toNamed('/premiumMain');
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),

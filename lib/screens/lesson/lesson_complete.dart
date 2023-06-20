@@ -1,20 +1,58 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:confetti/confetti.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/lesson/lesson.dart';
+import 'package:podo/screens/lesson/lesson_course.dart';
+import 'package:podo/screens/profile/user_info.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class LessonComplete extends StatelessWidget {
   const LessonComplete({Key? key}) : super(key: key);
 
+  Widget getBtn(String title, IconData icon, Function() fn) {
+    return Row(children: [
+      Expanded(
+          child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: const BorderSide(color: MyColors.purple),
+            ),
+            backgroundColor: Colors.white),
+        onPressed: fn,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 13),
+          child: Row(
+            children: [
+              Icon(icon, color: MyColors.purple),
+              const SizedBox(width: 30),
+              Expanded(
+                  child: Center(child: MyWidget().getTextWidget(text: title, size: 20, color: MyColors.purple))),
+            ],
+          ),
+        ),
+      ))
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    double percent = 0.5;
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
+    final lesson = Get.arguments;
+    String date = MyDateFormat().getDateFormat(DateTime.now());
+    final lessonRecord = User().lessonRecord;
+    if(!lessonRecord[date].contains(lesson.id)) {
+      lessonRecord[date].add(lesson.id);
+      Database().updateDoc(collection: 'Users', docId: User().id, key: 'lessonRecord', value: lessonRecord);
+    }
 
     return Scaffold(
       backgroundColor: MyColors.purpleLight,
@@ -35,7 +73,18 @@ class LessonComplete extends StatelessWidget {
                 child: Image.asset('assets/images/bubble_bottom.png', fit: BoxFit.fill),
               ),
             ),
-
+            ConfettiWidget(
+              confettiController: controller,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: true,
+              gravity: 0.05,
+              colors: const [
+                MyColors.pink,
+                MyColors.mustardLight,
+                MyColors.navyLight,
+                MyColors.greenLight,
+              ],
+            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -56,52 +105,57 @@ class LessonComplete extends StatelessWidget {
                   height: 20,
                 ),
                 MyWidget().getTextWidget(
-                  text: MyStrings.beginnerLevel,
+                  text: MyStrings.lessonComplete,
                   size: 20,
                   color: MyColors.purple,
                 ),
+                const SizedBox(height: 20),
                 Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CircularPercentIndicator(
-                        animation: true,
-                        animationDuration: 1200,
-                        circularStrokeCap: CircularStrokeCap.round,
-                        radius: 150.0,
-                        lineWidth: 10.0,
-                        percent: percent,
-                        center: MyWidget().getTextWidget(
-                          text: '${(percent * 100).toInt().toString()}%',
-                          size: 30,
-                          color: MyColors.purple,
-                          isBold: true,
-                        ),
-                        progressColor: MyColors.purple,
-                      ),
-                      ConfettiWidget(
-                        confettiController: controller,
-                        blastDirectionality: BlastDirectionality.explosive,
-                        shouldLoop: true,
-                        gravity: 0.05,
-                        colors: const [
-                          MyColors.pink,
-                          MyColors.mustardLight,
-                          MyColors.navyLight,
-                          MyColors.greenLight,
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 40),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      getCircleBtn(const Icon(FontAwesomeIcons.fileLines), MyStrings.summary),
-                      getCircleBtn(const Icon(Icons.home_rounded), MyStrings.home),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        getBtn(MyStrings.summary, CupertinoIcons.doc_text, () {
+                          Get.until((route) => Get.currentRoute == '/lessonSummaryMain');
+                        }),
+                        const SizedBox(height: 20),
+                        getBtn(MyStrings.writing, CupertinoIcons.pen, () {
+                          Get.offNamedUntil('/writingMain', ModalRoute.withName('/lessonSummaryMain'),
+                              arguments: lesson.id);
+                        }),
+                        const SizedBox(height: 20),
+                        getBtn(MyStrings.nextLesson, CupertinoIcons.arrow_right, () {
+                          LessonCourse course = LocalStorage().getLessonCourse()!;
+                          List<dynamic> lessons = course.lessons;
+                          int thisIndex = -1;
+                          for (int i = 0; i < lessons.length; i++) {
+                            print('$i : ${lessons[i] is String}');
+                            if (lessons[i] is! String &&
+                                lesson.id == Lesson.fromJson(lessons[i] as Map<String, dynamic>).id) {
+                              thisIndex = i;
+                              break;
+                            }
+                          }
+
+                          if (thisIndex != -1 && thisIndex < lessons.length - 1) {
+                            int nextIndex = thisIndex + 1;
+                            if (lessons[nextIndex] is String) {
+                              nextIndex++;
+                            }
+                            Get.offNamedUntil('/lessonSummaryMain', ModalRoute.withName('/'),
+                                arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
+                          } else {
+                            Get.until((route) => Get.currentRoute == '/');
+                            MyWidget().showSnackbar(title: MyStrings.lastLesson);
+                          }
+                        }),
+                        const SizedBox(height: 20),
+                        getBtn(MyStrings.goToMain, CupertinoIcons.home, () {
+                          Get.until((route) => Get.currentRoute == '/');
+                        }),
+                      ],
+                    ),
                   ),
                 )
               ],

@@ -122,7 +122,6 @@ class MyWidget {
     required Function f,
     double verticalPadding = 13,
     double horizontalPadding = 10,
-    int? podoCount,
     double textSize = 20,
     bool hasNullFunction = false,
     double borderRadius = 30,

@@ -32,12 +32,12 @@ class PremiumMain extends StatelessWidget {
     return Scaffold(
       appBar: MyWidget().getAppbar(title: ''),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15, bottom: 50, top: 20),
                   child: Column(
                     children: [
                       Row(
@@ -96,7 +96,10 @@ class PremiumMain extends StatelessWidget {
                   ),
                 ),
               ),
-              GestureDetector(
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: GestureDetector(
                 onTap: (){},
                 child: Row(
                   children: [
@@ -122,15 +125,15 @@ class PremiumMain extends StatelessWidget {
                               )),
                               const SizedBox(width: 20),
                               MyWidget().getTextWidget(text: '\$10', color: Colors.white, size: 18, isBold: true),
-
                             ],
                           )),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            TextButton(onPressed: (){}, child: const Text(MyStrings.purchaseRestoration))
+          ],
         ),
       ),
     );

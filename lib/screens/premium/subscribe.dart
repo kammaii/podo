@@ -74,7 +74,7 @@ class _SubscribeState extends State<Subscribe> {
                           getPlan(selector[1], false, MyStrings.monthly, '000 dollar', '000 dollar'),
                           TextButton(
                             child: MyWidget().getTextWidget(
-                              text: MyStrings.restoringPurchases,
+                              text: MyStrings.purchaseRestoration,
                               size: 15,
                               color: MyColors.purple,
                             ),

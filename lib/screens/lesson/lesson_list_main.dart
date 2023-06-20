@@ -95,7 +95,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                       color: Colors.white,
                       child: InkWell(
                         onTap: () {
-                          Get.to(LessonSummaryMain(), arguments: lesson);
+                          Get.toNamed('/lessonSummaryMain', arguments: lesson);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10),

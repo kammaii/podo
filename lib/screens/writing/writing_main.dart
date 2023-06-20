@@ -213,7 +213,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                             text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
                         TextButton(
                             onPressed: () {
-                              Get.to(WritingList(true));
+                              Get.toNamed('/myWritingList');
                             },
                             child: const Text(MyStrings.myWritings,
                                 style: TextStyle(
@@ -288,7 +288,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               children: [
                                 TextButton(
                                     onPressed: () {
-                                      Get.to(WritingList(false), arguments: selectedQuestion!.id);
+                                      Get.toNamed('/otherWritingList', arguments: selectedQuestion!.id);
                                     },
                                     child: const Text(MyStrings.viewOtherUsersWriting,
                                         style: TextStyle(

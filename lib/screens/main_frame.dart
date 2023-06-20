@@ -141,7 +141,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Image.asset('assets/images/podo.png'),
         ),
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 2),
       );
     });
   }

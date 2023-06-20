@@ -555,7 +555,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           physics: scrollPhysics,
                           onIndexChanged: (index) {
                             if (index >= cards.length) {
-                              Get.to(const LessonComplete());
+                              Get.toNamed('/lessonComplete', arguments: lesson);
                               return;
                             } else {
                               setState(() {

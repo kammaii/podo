@@ -209,18 +209,24 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30),
-              child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              child: Align(
                 alignment: Alignment.bottomCenter,
-                child: GetBuilder<FlashCardController>(
-                  builder: (_) {
-                    return MyWidget().getRoundBtnWidget(
-                      text: MyStrings.review,
-                      bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
-                      f: onReviewBtn,
-                      hasNullFunction: true,
-                    );
-                  },
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GetBuilder<FlashCardController>(
+                        builder: (_) {
+                          return MyWidget().getRoundBtnWidget(
+                            text: MyStrings.review,
+                            bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
+                            f: onReviewBtn,
+                            hasNullFunction: true,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -233,7 +239,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   Function? onReviewBtn() {
     if (controller.cards.isNotEmpty) {
       return () {
-        Get.to(const FlashCardReview(), arguments: controller.cards);
+        Get.toNamed('/flashcardReview', arguments: controller.cards);
       };
     } else {
       return null;
@@ -269,7 +275,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
         Expanded(
           child: GestureDetector(
             onTap: () {
-              Get.to(FlashCardEdit(), arguments: card);
+              Get.toNamed('/flashcardEdit', arguments: card);
             },
             child: Row(
               children: [

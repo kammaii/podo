@@ -1,16 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
-import 'package:podo/screens/lesson/lesson_complete.dart';
-import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
-import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonSummaryMain extends StatelessWidget {
   LessonSummaryMain({Key? key}) : super(key: key);
@@ -25,7 +22,7 @@ class LessonSummaryMain extends StatelessWidget {
     summaries = [];
     final Query query = FirebaseFirestore.instance
         .collection('Lessons/${lesson.id}/LessonSummaries')
-        .orderBy('orderId', descending: true);
+        .orderBy('orderId', descending: false);
 
     return FutureBuilder(
         future: Database().getDocs(query: query),
@@ -41,7 +38,7 @@ class LessonSummaryMain extends StatelessWidget {
                   FloatingActionButton(
                     heroTag: 'wiringBtn',
                     onPressed: () {
-                      Get.to(WritingMain(), arguments: lesson.id);
+                      Get.toNamed('/writingMain', arguments: lesson.id);
                     },
                     backgroundColor: MyColors.green,
                     child: const Icon(FontAwesomeIcons.penToSquare, size: 25),
@@ -57,8 +54,7 @@ class LessonSummaryMain extends StatelessWidget {
                   FloatingActionButton(
                     heroTag: 'learningBtn',
                     onPressed: () {
-                      //Get.to(LessonFrame(), arguments: lesson);
-                      Get.to(const LessonComplete(), arguments: lesson);
+                      Get.toNamed('/lessonFrame', arguments: lesson);
                     },
                     backgroundColor: MyColors.pink,
                     child: const Icon(Icons.play_arrow_rounded, size: 40),

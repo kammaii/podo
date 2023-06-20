@@ -6,7 +6,6 @@ class MyStrings {
   static const String int = 'Int.';
   static const String lessonLoadError = 'Error: Failed to load lessons. Please contact the developer for assistance.';
   static const String lessons = 'lessons';
-  static const String nextLesson = 'Next lesson';
   static const String newExpression = 'New expression';
   static const String listenAndRepeat = 'Listen and repeat';
   static const String speakInKorean = 'Speak in Korean';
@@ -79,6 +78,39 @@ class MyStrings {
   static const String profileChanged = 'Your profile has been changed';
   static const String error = 'Error';
   static const String thanksFeedback = 'Thank you for your feedback';
+  static const String congratulations = 'Congratulations';
+  static const String lessonComplete = 'Lesson Complete!';
+  static const String profile = 'Profile';
+  static const String getPremium = 'Get Podo Premium';
+  static const String home = 'home';
+  static const String editProfile = 'Edit Profile';
+  static const String premiumDetail = 'Premium is automatically renewed every 2 months. Premium can be canceled at any time up to 24 hours before the renewal. The price can be changed without prior notice. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
+  static const String hassleFree = 'A hassle-free short period!';
+  static const String twoMonths = '2 Months';
+  static const String purchaseRestoration = 'Purchase restoration';
+  static const String lessonSummary = 'Lesson Summary';
+  static const String writing = 'Writing';
+  static const String myWritings = 'My writings';
+  static const String unlockWritingTopics = 'Unlock the writing topics by completing the lessons.';
+  static const String welcome = 'Welcome to podo';
+  static const String welcomeMessage = '만나서 반가워요!';
+  static const String premiumComment = 'Podo strives to truly enhance your Korean language skills.';
+  static const String lesson = 'Lesson';
+  static const String writingCorrection = 'Writing Correction';
+  static const String reading = 'Reading';
+  static const String flashcard = 'Flashcard';
+  static const String cloudMessage = 'Cloud Message';
+  static const String adFree = 'Ad-free';
+  static const String few = 'few';
+  static const String all = 'all';
+  static const String limit20 = 'limit:20';
+  static const String unlimited = 'unlimited';
+  static const String summary = 'Summary';
+  static const String nextLesson = 'Next lesson';
+  static const String goToMain = 'Go to Main';
+  static const String lastLesson = 'This is the last lesson.';
+
+
 
 
 
@@ -99,27 +131,17 @@ class MyStrings {
   static const String howToGetCoins = 'How to get coins?';
   static const String title = 'title';
   static const String expression = 'Expression';
-  static const String congratulations = 'Congratulations';
-  static const String beginnerLevel = 'Beginner level';
-  static const String home = 'home';
   static const String messageInfo = 'Here\'s a place where you can communicate with Korean teacher Danny. You can ask for correction of Korean sentences and questions related to Korean.';
   static const String messageSearchHint = 'Search your message';
-  static const String profile = 'Profile';
-  static const String getPremium = 'Get Podo Premium';
   static const String freeTrial = 'Free trial for 3 days';
   static const String freeTrialDetail = 'You can cancel your subscription at any time during the free trial.';
   static const String unlockLessons = 'Unlock every lessons';
   static const String unlockLessonsDetail = 'Improve your Korean skills with lessons made by native Korean teacher.';
   static const String getPodoCoins = 'Get 5 coins every day';
   static const String getPodoCoinsDetail = 'Podo coin is used for correctings sentence or requesting questions. (Unused coins won\'t be carried forward to the next day.)';
-  static const String editProfile = 'Edit Profile';
   static const String bestValue = 'Best Value';
   static const String monthly = 'Monthly Plan';
   static const String yearly = 'Yearly Plan';
-  static const String premiumDetail = 'Premium is automatically renewed every 2 months. Premium can be canceled at any time up to 24 hours before the renewal. The price can be changed without prior notice. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
-  static const String hassleFree = 'A hassle-free short period!';
-  static const String twoMonths = '2 Months';
-  static const String restoringPurchases = 'Restoring purchases';
   static const String tagCorrection = '#correction';
   static const String tagQuestion = '#question';
   static const String tagNotice = '#notice';
@@ -146,26 +168,8 @@ class MyStrings {
   static const String makeReservation = 'Make a reservation';
   static const String iAgree = 'I agree';
   static const String learning = 'Learning';
-  static const String lessonSummary = 'Lesson Summary';
-  static const String writing = 'Writing';
   static const String writingTopics = 'Writing Topics';
-  static const String myWritings = 'My writings';
-  static const String unlockWritingTopics = 'Unlock the writing topics by completing the lessons.';
   static const String selectQuestion = 'Select a question';
-  static const String welcome = 'Welcome to podo';
-  static const String welcomeMessage = '만나서 반가워요!';
-  static const String premiumComment = 'Podo strives to truly enhance your Korean language skills.';
-  static const String lesson = 'Lesson';
-  static const String writingCorrection = 'Writing Correction';
-  static const String reading = 'Reading';
-  static const String flashcard = 'Flashcard';
-  static const String cloudMessage = 'Cloud Message';
-  static const String adFree = 'Ad-free';
-  static const String few = 'few';
-  static const String all = 'all';
-  static const String limit20 = 'limit:20';
-  static const String unlimited = 'unlimited';
-
 
 
   // used only in the code
@@ -174,11 +178,9 @@ class MyStrings {
   static const String repeat = 'repeat';
   static const String speaking = 'speaking';
   static const String quiz = 'quiz';
-  static const String summary = 'summary';
   static const String mention = 'mention';
   static const String tip = 'tip';
   static const String listening = 'listening';
-
   static const String tagInfo = '#info';
   static const String tagQuiz = '#quiz';
   static const String tagLiveLesson = '#liveLesson';
