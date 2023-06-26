@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
-import 'package:podo/screens/profile/user_info.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_strings.dart';
 
 class Database {

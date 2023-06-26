@@ -10,10 +10,10 @@ class LessonCourseController extends GetxController {
   List<List<LessonCourse>> courses = [[],[]];
 
 
-  loadCourses() async {
-    courses = [[],[]];
+  Future<void> loadCourses() async {
     final Query query = FirebaseFirestore.instance.collection('LessonCourses');
     List<dynamic> snapshots = await Database().getDocs(query: query);
+    courses = [[],[]];
     for(dynamic snapshot in snapshots) {
       LessonCourse course = LessonCourse.fromJson(snapshot.data() as Map<String, dynamic>);
       if(course.isBeginnerMode) {
@@ -27,7 +27,6 @@ class LessonCourseController extends GetxController {
     if(LocalStorage().getLessonCourse() == null) {
       isVisible = true;
     }
-    update();
   }
 
   setVisibility(bool isVisible) {

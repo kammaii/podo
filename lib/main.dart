@@ -3,15 +3,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/local_storage.dart';
+import 'package:podo/lesson_course_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/login/login.dart';
+import 'package:podo/screens/login/logo.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/premium/premium_main.dart';
-import 'package:podo/screens/profile/user_info.dart' as user_info;
+import 'package:podo/screens/profile/user.dart' as user;
 import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
@@ -33,17 +36,19 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
-  User? currentUser;
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   void runDeepLink(Uri deepLink) async {
-    await FirebaseAuth.instance.currentUser!.reload();
-    currentUser = FirebaseAuth.instance.currentUser;
     Uri uri = Uri.parse(deepLink.toString());
     String mode = uri.queryParameters['mode']!;
+    await FirebaseAuth.instance.currentUser!.reload();
+    currentUser = FirebaseAuth.instance.currentUser;
 
-    if (mode == 'verifyEmail' && currentUser!.emailVerified) {
-      await user_info.User().initNewUserOnDB();
-      Get.to(const MainFrame());
+    if (mode == 'verifyEmail') {
+      if(currentUser != null && currentUser!.emailVerified) {
+        await user.User().initNewUserOnDB();
+        getInitData(isNewUser: true);
+      }
     }
   }
 
@@ -51,9 +56,7 @@ class MyApp extends StatelessWidget {
     // DynamicLink listener : When the app is already running.
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
       final deepLink = dynamicLinkData.link;
-      if (deepLink != null) {
-        runDeepLink(deepLink);
-      }
+      runDeepLink(deepLink);
     }).onError((error) {
       print('ERROR on DynamicLinkListener: $error');
     });
@@ -66,17 +69,30 @@ class MyApp extends StatelessWidget {
     }
   }
 
+  getInitData({bool isNewUser = false}) async {
+    if(!isNewUser) {
+      await user.User().getUser();
+    }
+    await LocalStorage().getPrefs();
+    final courseController = Get.put(LessonCourseController());
+    await courseController.loadCourses();
+    Get.toNamed('/');
+  }
+
   @override
   Widget build(BuildContext context) {
+    String initialRoute = '/login';
+    if (currentUser != null && currentUser!.emailVerified == true) {
+      initialRoute = '/logo';
+    }
 
     initDynamicLinks();
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if(user != null) {
-        if(user.emailVerified) {
+      if (user != null) {
+        if (user.emailVerified) {
           print('AUTH STATE CHANGES: Email Verified');
-          user_info.User();
-          Get.toNamed('/');
+          getInitData();
         } else {
           print('AUTH STATE CHANGES: Email not Verified');
           Get.toNamed('/login');
@@ -90,9 +106,10 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Podo Korean app',
       theme: ThemeData(primaryColor: MyColors.purple),
-      initialRoute: '/',
+      initialRoute: initialRoute,
       getPages: [
         GetPage(name: '/', page: () => const MainFrame()),
+        GetPage(name: '/logo', page: () => Logo()),
         GetPage(name: '/login', page: () => Login()),
         GetPage(name: '/lessonSummaryMain', page: () => LessonSummaryMain()),
         GetPage(name: '/lessonFrame', page: () => LessonFrame()),

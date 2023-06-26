@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/items/message.dart';
 import 'package:podo/items/notice.dart';
-import 'package:podo/screens/profile/user_info.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/screens/message/message_frame.dart';
 
 class MessageStateManager extends GetxController {

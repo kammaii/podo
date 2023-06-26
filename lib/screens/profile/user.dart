@@ -11,7 +11,8 @@ import 'package:podo/values/my_strings.dart';
 import 'package:podo/common/database.dart';
 
 class User {
-  static final User _instance = User.init();
+  User._init();
+  static final User _instance = User._init();
 
   factory User() {
     return _instance;
@@ -20,6 +21,8 @@ class User {
   late String id;
   late String email;
   late String name;
+  late DateTime dateSignUp;
+  late DateTime dateSignIn;
   late String language;
   late List<Premium>? premiumRecord;
   late Map<String, dynamic> lessonRecord;
@@ -28,14 +31,11 @@ class User {
   String? fcmState;
   late int status;
 
-  User.init() {
-    debugPrint('User init');
-    getUser();
-  }
-
   static const String ID = 'id';
   static const String EMAIL = 'email';
   static const String NAME = 'name';
+  static const String DATESIGNUP = 'dateSignUp';
+  static const String DATESIGNIN = 'dateSignIn';
   static const String LANGUAGE = 'language';
   static const String PREMIUM_RECORD = 'premiumRecord';
   static const String LESSON_RECORD = 'lessonRecord';
@@ -44,30 +44,13 @@ class User {
   static const String FCM_STATE = 'fcmState';
   static const String STATUS = 'status';
 
-  User.fromJson(Map<String, dynamic> json) {
-    id = json[ID];
-    email = json[EMAIL];
-    name = json[NAME];
-    language = json[LANGUAGE];
-    premiumRecord = json[PREMIUM_RECORD];
-    lessonRecord = json[LESSON_RECORD];
-    readingRecord = json[READING_RECORD];
-    if(json[FCM_TOKEN] != null) {
-      fcmToken = json[FCM_TOKEN];
-    }
-    if(json[FCM_STATE] != null) {
-      fcmState = json[FCM_STATE];
-    }
-    status = json[STATUS];
-    print('HERE: $status');
-
-  }
-
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
       ID: id,
       EMAIL: email,
       NAME: name,
+      DATESIGNUP: dateSignUp,
+      DATESIGNIN: dateSignIn,
       LANGUAGE: language,
       LESSON_RECORD: lessonRecord,
       READING_RECORD: readingRecord,
@@ -87,6 +70,8 @@ class User {
     id = user.uid;
     email = user.email ?? '';
     name = user.displayName ?? '';
+    dateSignUp = DateTime.now();
+    dateSignIn = DateTime.now();
     Locale locale = window.locale;
     language = locale.languageCode;
     if(!Languages().fos.contains(language)) {
@@ -100,12 +85,30 @@ class User {
   }
 
 
-  void getUser() async {
-    id = auth.FirebaseAuth.instance.currentUser!.uid!;
+  Future<void> getUser() async {
+    id = auth.FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: id);
     if (snapshot.exists) {
-      User.fromJson(snapshot.data()!);
-      print('STATE: $status');
+      final json = snapshot.data()!;
+      id = json[ID];
+      email = json[EMAIL];
+      name = json[NAME];
+      Timestamp stamp = json[DATESIGNUP];
+      dateSignUp = stamp.toDate();
+      dateSignIn = DateTime.now();
+      Database().updateDoc(collection: 'Users', docId: id, key: 'dateSignIn', value: DateTime.now());
+      language = json[LANGUAGE];
+      premiumRecord = json[PREMIUM_RECORD];
+      lessonRecord = json[LESSON_RECORD];
+      readingRecord = json[READING_RECORD];
+      if(json[FCM_TOKEN] != null) {
+        fcmToken = json[FCM_TOKEN];
+      }
+      if(json[FCM_STATE] != null) {
+        fcmState = json[FCM_STATE];
+      }
+      status = json[STATUS];
+
     } else {
       Get.dialog(AlertDialog(
         title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),

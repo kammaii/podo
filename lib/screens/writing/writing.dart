@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:podo/screens/profile/user_info.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/screens/writing/writing_question.dart';
 import 'package:uuid/uuid.dart';
 

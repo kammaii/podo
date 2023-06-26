@@ -25,7 +25,7 @@ class MainFrame extends StatefulWidget {
 List<Widget> _buildScreens() {
   LessonCourse? course = LocalStorage().getLessonCourse();
   return [
-    course != null ? LessonListMain(course: course) : const Center(child: CircularProgressIndicator()),
+    course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
     ReadingListMain(),
     const FlashCardMain(),
     const Profile(),
@@ -58,7 +58,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
   late AnimationController animationController;
   late Animation<Offset> animationOffset;
-  final controller = Get.put(LessonCourseController());
+  final controller = Get.find<LessonCourseController>();
   List<LessonCourse> courses = [];
   late PersistentTabController _controller;
 
@@ -131,7 +131,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       end: Offset.zero,
     ).animate(animationController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadCourses();
       Get.snackbar(
         MyStrings.welcome,
         MyStrings.welcomeMessage,
@@ -151,9 +150,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     return GetBuilder<LessonCourseController>(
       builder: (_) {
         modeToggle[0] ? courses = controller.courses[0] : courses = controller.courses[1];
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          setCourseVisibility();
-        });
+        setCourseVisibility();
 
         return Scaffold(
           body: Stack(
