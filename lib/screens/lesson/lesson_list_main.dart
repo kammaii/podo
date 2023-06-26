@@ -6,6 +6,8 @@ import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/premium/premium_main.dart';
+import 'package:podo/screens/profile/history.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,13 +27,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
   late LessonCourse course;
-  String language = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  String language = User().language;
   String sampleImage = 'assets/images/course_hangul.png';
-  String nextLesson = '~아/어요'; //todo: userInfo 에서  completeLessons 참고하기
   final KO = 'ko';
   final LESSON = 'Lesson';
   int lessonIndex = -1;
-  bool isCompleted = true; //todo: userInfo 에서 가져오기
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
@@ -69,10 +69,21 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   Widget lessonListWidget(dynamic lessonMap) {
     late Lesson lesson;
+    bool isCompleted = false;
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
-      lesson.type == LESSON ? lessonIndex++ : null;
+      if(lesson.type == LESSON) {
+        lessonIndex++;
+        for(dynamic historyJson in User().lessonHistory) {
+          History history = History.fromJson(historyJson);
+          if(history.itemId == lesson.id) {
+            isCompleted = true;
+            break;
+          }
+        }
+      }
     }
+
     return Column(
       children: [
         lessonMap is String

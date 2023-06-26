@@ -109,7 +109,7 @@ class MyStrings {
   static const String nextLesson = 'Next lesson';
   static const String goToMain = 'Go to Main';
   static const String lastLesson = 'This is the last lesson.';
-
+  static const String exitApp = 'Would you like to exit the app?';
 
 
 

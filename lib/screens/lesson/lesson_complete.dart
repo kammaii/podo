@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
-import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:podo/screens/profile/history.dart';
 
 class LessonComplete extends StatelessWidget {
   const LessonComplete({Key? key}) : super(key: key);
@@ -42,17 +42,22 @@ class LessonComplete extends StatelessWidget {
     ]);
   }
 
+  setHistory(String lessonId) async {
+    History history = History();
+    history.item = 'lesson';
+    history.itemId = lessonId;
+    final lessonHistory = User().lessonHistory;
+    lessonHistory.add(history.toJson());
+    await Database().updateDoc(collection: 'Users', docId: User().id, key: 'lessonHistory', value: lessonHistory);
+    User().lessonHistory.add(history);
+  }
+
   @override
   Widget build(BuildContext context) {
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
     final lesson = Get.arguments;
-    String date = MyDateFormat().getDateFormat(DateTime.now());
-    final lessonRecord = User().lessonRecord;
-    if(!lessonRecord[date].contains(lesson.id)) {
-      lessonRecord[date].add(lesson.id);
-      Database().updateDoc(collection: 'Users', docId: User().id, key: 'lessonRecord', value: lessonRecord);
-    }
+    setHistory(lesson.id);
 
     return Scaffold(
       backgroundColor: MyColors.purpleLight,

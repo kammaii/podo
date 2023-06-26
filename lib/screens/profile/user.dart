@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/premium/premium.dart';
+import 'package:podo/screens/profile/history.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/common/database.dart';
 
@@ -25,8 +26,8 @@ class User {
   late DateTime dateSignIn;
   late String language;
   late List<Premium>? premiumRecord;
-  late Map<String, dynamic> lessonRecord;
-  late Map<String, dynamic> readingRecord;
+  late List<dynamic> lessonHistory;
+  late List<dynamic> readingHistory;
   String? fcmToken;
   String? fcmState;
   late int status;
@@ -38,8 +39,8 @@ class User {
   static const String DATESIGNIN = 'dateSignIn';
   static const String LANGUAGE = 'language';
   static const String PREMIUM_RECORD = 'premiumRecord';
-  static const String LESSON_RECORD = 'lessonRecord';
-  static const String READING_RECORD = 'readingRecord';
+  static const String LESSON_HISTORY = 'lessonHistory';
+  static const String READING_HISTORY = 'readingHistory';
   static const String FCM_TOKEN = 'fcmToken';
   static const String FCM_STATE = 'fcmState';
   static const String STATUS = 'status';
@@ -52,8 +53,8 @@ class User {
       DATESIGNUP: dateSignUp,
       DATESIGNIN: dateSignIn,
       LANGUAGE: language,
-      LESSON_RECORD: lessonRecord,
-      READING_RECORD: readingRecord,
+      LESSON_HISTORY: lessonHistory,
+      READING_HISTORY: readingHistory,
       STATUS: status,
     };
     if(fcmToken != null) {
@@ -78,8 +79,8 @@ class User {
       language = 'en';
     }
     premiumRecord = [];
-    lessonRecord = {};
-    readingRecord = {};
+    lessonHistory = [];
+    readingHistory = [];
     status = 0;
     Database().setDoc(collection: 'Users', doc: this);
   }
@@ -99,8 +100,8 @@ class User {
       Database().updateDoc(collection: 'Users', docId: id, key: 'dateSignIn', value: DateTime.now());
       language = json[LANGUAGE];
       premiumRecord = json[PREMIUM_RECORD];
-      lessonRecord = json[LESSON_RECORD];
-      readingRecord = json[READING_RECORD];
+      lessonHistory = json[LESSON_HISTORY];
+      readingHistory = json[READING_HISTORY];
       if(json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
       }

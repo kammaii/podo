@@ -152,109 +152,131 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
         modeToggle[0] ? courses = controller.courses[0] : courses = controller.courses[1];
         setCourseVisibility();
 
-        return Scaffold(
-          body: Stack(
-            children: [
-              PersistentTabView(
-                context,
-                controller: _controller,
-                screens: _buildScreens(),
-                items: _navBarsItems(),
-                confineInSafeArea: true,
-                backgroundColor: Colors.white,
-                // Default is Colors.white.
-                handleAndroidBackButtonPress: true,
-                // Default is true.
-                resizeToAvoidBottomInset: true,
-                // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-                stateManagement: true,
-                // Default is true.
-                hideNavigationBarWhenKeyboardShows: true,
-                // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-                decoration: NavBarDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  colorBehindNavBar: Colors.white,
+        return WillPopScope(
+          onWillPop: () async {
+            bool isExit = false;
+            await Get.dialog(AlertDialog(
+              title: const Text(MyStrings.exitApp),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Get.back();
+                      isExit = true;
+                    },
+                    child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.navy))),
+                TextButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: const Text(MyStrings.no, style: TextStyle(color: MyColors.purple))),
+              ],
+            ));
+            return isExit;
+          },
+          child: Scaffold(
+            body: Stack(
+              children: [
+                PersistentTabView(
+                  context,
+                  controller: _controller,
+                  screens: _buildScreens(),
+                  items: _navBarsItems(),
+                  confineInSafeArea: true,
+                  backgroundColor: Colors.white,
+                  // Default is Colors.white.
+                  handleAndroidBackButtonPress: true,
+                  // Default is true.
+                  resizeToAvoidBottomInset: true,
+                  // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+                  stateManagement: true,
+                  // Default is true.
+                  hideNavigationBarWhenKeyboardShows: true,
+                  // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+                  decoration: NavBarDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    colorBehindNavBar: Colors.white,
+                  ),
+                  popAllScreensOnTapOfSelectedTab: true,
+                  popActionScreens: PopActionScreensType.all,
+                  itemAnimationProperties: const ItemAnimationProperties(
+                    // Navigation Bar's items animation properties.
+                    duration: Duration(milliseconds: 200),
+                    curve: Curves.ease,
+                  ),
+                  screenTransitionAnimation: const ScreenTransitionAnimation(
+                    // Screen transition animation on change of selected tab.
+                    animateTabTransition: true,
+                    curve: Curves.ease,
+                    duration: Duration(milliseconds: 200),
+                  ),
+                  navBarStyle: NavBarStyle.style3, // Choose the nav bar style with this property.
                 ),
-                popAllScreensOnTapOfSelectedTab: true,
-                popActionScreens: PopActionScreensType.all,
-                itemAnimationProperties: const ItemAnimationProperties(
-                  // Navigation Bar's items animation properties.
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.ease,
+                Offstage(
+                  offstage: !controller.isVisible,
+                  child: const Opacity(opacity: 0, child: ModalBarrier(dismissible: false, color: Colors.white)),
                 ),
-                screenTransitionAnimation: const ScreenTransitionAnimation(
-                  // Screen transition animation on change of selected tab.
-                  animateTabTransition: true,
-                  curve: Curves.ease,
-                  duration: Duration(milliseconds: 200),
-                ),
-                navBarStyle: NavBarStyle.style3, // Choose the nav bar style with this property.
-              ),
-              Offstage(
-                offstage: !controller.isVisible,
-                child: const Opacity(opacity: 0, child: ModalBarrier(dismissible: false, color: Colors.white)),
-              ),
-              Positioned(
-                bottom: 0,
-                child: SlideTransition(
-                  position: animationOffset,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    child: SafeArea(
-                      child: Container(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  MyWidget().getTextWidget(
-                                    text: MyStrings.selectCourse,
-                                    size: 20,
-                                    color: MyColors.purple,
-                                    isBold: true,
-                                  ),
-                                  ToggleButtons(
-                                    isSelected: modeToggle,
-                                    onPressed: (int index) {
-                                      modeToggle[0] = 0 == index;
-                                      modeToggle[1] = 1 == index;
-                                      controller.update();
-                                    },
-                                    constraints: const BoxConstraints(minHeight: 35, minWidth: 45),
-                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                    selectedBorderColor: MyColors.purple,
-                                    selectedColor: Colors.white,
-                                    fillColor: MyColors.purple,
-                                    color: MyColors.purple,
-                                    children: const [
-                                      Text(MyStrings.beg),
-                                      Text(MyStrings.int),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Expanded(
-                                child: ListView.builder(
-                                  itemCount: courses.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    LessonCourse course = courses[index];
-                                    return getLessonCourseList(lessonCourse: course);
-                                  },
+                Positioned(
+                  bottom: 0,
+                  child: SlideTransition(
+                    position: animationOffset,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: SafeArea(
+                        child: Container(
+                          color: MyColors.purpleLight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    MyWidget().getTextWidget(
+                                      text: MyStrings.selectCourse,
+                                      size: 20,
+                                      color: MyColors.purple,
+                                      isBold: true,
+                                    ),
+                                    ToggleButtons(
+                                      isSelected: modeToggle,
+                                      onPressed: (int index) {
+                                        modeToggle[0] = 0 == index;
+                                        modeToggle[1] = 1 == index;
+                                        controller.update();
+                                      },
+                                      constraints: const BoxConstraints(minHeight: 35, minWidth: 45),
+                                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                      selectedBorderColor: MyColors.purple,
+                                      selectedColor: Colors.white,
+                                      fillColor: MyColors.purple,
+                                      color: MyColors.purple,
+                                      children: const [
+                                        Text(MyStrings.beg),
+                                        Text(MyStrings.int),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: courses.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      LessonCourse course = courses[index];
+                                      return getLessonCourseList(lessonCourse: course);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

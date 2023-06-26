@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
     await LocalStorage().getPrefs();
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
-    Get.toNamed('/');
+    Get.offNamed('/');
   }
 
   @override
