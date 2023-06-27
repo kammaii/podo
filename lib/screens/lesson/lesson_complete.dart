@@ -43,9 +43,7 @@ class LessonComplete extends StatelessWidget {
   }
 
   setHistory(String lessonId) async {
-    History history = History();
-    history.item = 'lesson';
-    history.itemId = lessonId;
+    History history = History(item: 'lesson', itemId: lessonId);
     final lessonHistory = User().lessonHistory;
     lessonHistory.add(history.toJson());
     await Database().updateDoc(collection: 'Users', docId: User().id, key: 'lessonHistory', value: lessonHistory);

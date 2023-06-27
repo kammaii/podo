@@ -28,6 +28,7 @@ class User {
   late List<Premium>? premiumRecord;
   late List<dynamic> lessonHistory;
   late List<dynamic> readingHistory;
+  late List<dynamic> cloudMessageHistory;
   String? fcmToken;
   String? fcmState;
   late int status;
@@ -41,6 +42,7 @@ class User {
   static const String PREMIUM_RECORD = 'premiumRecord';
   static const String LESSON_HISTORY = 'lessonHistory';
   static const String READING_HISTORY = 'readingHistory';
+  static const String CLOUD_MESSAGE_HISTORY = 'cloudMessageHistory';
   static const String FCM_TOKEN = 'fcmToken';
   static const String FCM_STATE = 'fcmState';
   static const String STATUS = 'status';
@@ -55,6 +57,7 @@ class User {
       LANGUAGE: language,
       LESSON_HISTORY: lessonHistory,
       READING_HISTORY: readingHistory,
+      CLOUD_MESSAGE_HISTORY: cloudMessageHistory,
       STATUS: status,
     };
     if(fcmToken != null) {
@@ -81,6 +84,7 @@ class User {
     premiumRecord = [];
     lessonHistory = [];
     readingHistory = [];
+    cloudMessageHistory = [];
     status = 0;
     Database().setDoc(collection: 'Users', doc: this);
   }
@@ -102,6 +106,7 @@ class User {
       premiumRecord = json[PREMIUM_RECORD];
       lessonHistory = json[LESSON_HISTORY];
       readingHistory = json[READING_HISTORY];
+      cloudMessageHistory = json[CLOUD_MESSAGE_HISTORY];
       if(json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
       }

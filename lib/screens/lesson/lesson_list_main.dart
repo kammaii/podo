@@ -5,13 +5,14 @@ import 'package:podo/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
+import 'package:podo/screens/message/cloud_message.dart';
+import 'package:podo/screens/message/cloud_message_controller.dart';
 import 'package:podo/screens/premium/premium_main.dart';
 import 'package:podo/screens/profile/history.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 
 class LessonListMain extends StatefulWidget {
   LessonListMain({Key? key, required this.course}) : super(key: key);
@@ -72,11 +73,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     bool isCompleted = false;
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
-      if(lesson.type == LESSON) {
+      if (lesson.type == LESSON) {
         lessonIndex++;
-        for(dynamic historyJson in User().lessonHistory) {
+        for (dynamic historyJson in User().lessonHistory) {
           History history = History.fromJson(historyJson);
-          if(history.itemId == lesson.id) {
+          if (history.itemId == lesson.id) {
             isCompleted = true;
             break;
           }
@@ -116,8 +117,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                               Row(
                                 children: [
                                   MyWidget().getTextWidget(
-                                    text:
-                                        lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
+                                    text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
                                     color: MyColors.grey,
                                   ),
                                   const SizedBox(width: 10),
@@ -200,8 +200,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   sliverAppBar() {
     int lessonCount = 0;
-    for(dynamic lesson in course.lessons) {
-      if(lesson is Map) {
+    for (dynamic lesson in course.lessons) {
+      if (lesson is Map) {
         lessonCount++;
       }
     }
@@ -226,7 +226,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       flexibleSpace: Stack(
         children: [
           Container(
-            color: MyColors.navyLight,
+            color: MyColors.purpleLight,
           ),
           Positioned(
             top: -50,
@@ -271,15 +271,81 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   Widget build(BuildContext context) {
     course = widget.course;
     lessonIndex = -1;
+    final cloudController = Get.put(CloudMessageController());
+    if (User().cloudMessageHistory.contains(CloudMessage().id)) {
+      cloudController.setHasReplied(true);
+    }
 
     return Scaffold(
       body: SafeArea(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          controller: scrollController,
-          slivers: [
-            sliverAppBar(),
-            sliverList(),
+        child: Column(
+          children: [
+            Visibility(
+              visible: CloudMessage().isInDate != null && CloudMessage().isInDate!,
+              child: InkWell(
+                onTap: () {
+                  Get.toNamed('cloudMessageMain');
+                },
+                child: Container(
+                  color: MyColors.greenLight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Row(
+                      children: [
+                        Image.asset('assets/images/podo.png', height: 40, width: 40),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              MyWidget().getTextWidget(
+                                  text: CloudMessage().title?[KO] ?? '',
+                                  isKorean: true,
+                                  size: 18,
+                                  color: MyColors.purple,
+                                  maxLine: 1),
+                              const SizedBox(height: 5),
+                              MyWidget().getTextWidget(
+                                  text: CloudMessage().title?[User().language] ?? '',
+                                  color: MyColors.grey,
+                                  size: 13,
+                                  maxLine: 1),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Center(
+                          child: Obx(
+                            () => MyWidget().getRoundedContainer(
+                              radius: 30,
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
+                              widget: MyWidget().getTextWidget(
+                                  text: cloudController.hasReplied.value ? MyStrings.replied : MyStrings.replyPodo,
+                                  color: Colors.white,
+                                  size: 13),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                color: MyColors.purpleLight,
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  controller: scrollController,
+                  slivers: [
+                    sliverAppBar(),
+                    sliverList(),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
+import 'package:podo/screens/message/cloud_message.dart';
+import 'package:podo/screens/message/cloud_reply.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:podo/screens/profile/history.dart';
 
 class Database {
   static final Database _instance = Database.init();
@@ -96,6 +99,23 @@ class Database {
       batch.delete(ref);
     }
     await batch.commit().then((value) => print('Documents are delete')).catchError((e) => print('ERROR: $e'));
+  }
+
+  Future<void> sendReplyBatch({required CloudReply reply, required Function(dynamic) thenFn}) async {
+    final batch = firestore.batch();
+    String cloudMsgId = CloudMessage().id!;
+
+    final setRef = firestore.collection('CloudMessages/$cloudMsgId/Replies').doc(reply.id);
+    batch.set(setRef, reply.toJson());
+
+    final updateRef = firestore.collection('Users').doc(User().id);
+    List<dynamic> cloudMessageHistory = User().cloudMessageHistory;
+    History history = History(item: 'cloudMessage', itemId: cloudMsgId);
+    history.content = reply.reply;
+    cloudMessageHistory.add(history.toJson());
+    batch.update(updateRef, {'cloudMessageHistory': cloudMessageHistory});
+
+    await batch.commit().then(thenFn).onError((error, stackTrace) => print('Batch error: $error'));
   }
 
 // Future<List<dynamic>> getListFieldFromDb(

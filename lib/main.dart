@@ -13,6 +13,8 @@ import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/login/logo.dart';
 import 'package:podo/screens/main_frame.dart';
+import 'package:podo/screens/message/cloud_message.dart';
+import 'package:podo/screens/message/cloud_message_main.dart';
 import 'package:podo/screens/premium/premium_main.dart';
 import 'package:podo/screens/profile/user.dart' as user;
 import 'package:podo/screens/reading/reading_frame.dart';
@@ -44,11 +46,16 @@ class MyApp extends StatelessWidget {
     await FirebaseAuth.instance.currentUser!.reload();
     currentUser = FirebaseAuth.instance.currentUser;
 
-    if (mode == 'verifyEmail') {
-      if(currentUser != null && currentUser!.emailVerified) {
-        await user.User().initNewUserOnDB();
-        getInitData(isNewUser: true);
-      }
+    switch(mode) {
+      case 'verifyEmail' :
+        if(currentUser != null && currentUser!.emailVerified) {
+          await user.User().initNewUserOnDB();
+          getInitData(isNewUser: true);
+        }
+        break;
+
+      case 'cloudMessage' :
+        break;
     }
   }
 
@@ -76,6 +83,7 @@ class MyApp extends StatelessWidget {
     await LocalStorage().getPrefs();
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
+    await CloudMessage().getCloudMessage();
     Get.offNamed('/');
   }
 
@@ -121,6 +129,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/flashcardEdit', page: () => FlashCardEdit()),
         GetPage(name: '/flashcardReview', page: () => const FlashCardReview()),
         GetPage(name: '/premiumMain', page: () => PremiumMain()),
+        GetPage(name: '/cloudMessageMain', page: () => CloudMessageMain()),
       ],
     );
   }

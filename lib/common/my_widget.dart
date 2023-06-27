@@ -172,9 +172,11 @@ class MyWidget {
     int? maxLines,
     int? maxLength,
     Function(String)? onChanged,
+    bool enabled = true,
   }) {
     return TextField(
       controller: controller,
+      enabled: enabled,
       maxLines: maxLines,
       maxLength: maxLength,
       cursorColor: Colors.black,

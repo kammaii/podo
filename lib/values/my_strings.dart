@@ -110,6 +110,13 @@ class MyStrings {
   static const String goToMain = 'Go to Main';
   static const String lastLesson = 'This is the last lesson.';
   static const String exitApp = 'Would you like to exit the app?';
+  static const String bestReplies = 'Best Replies';
+  static const String replyPodo = 'Reply to Podo';
+  static const String replied = 'Replied';
+  static const String howToUse = 'How to use it?';
+  static const String replyDetail = '- You can only reply once per message. \n\n- Your and other users\' replies may be posted in the \'Best Replies\' section after review by a native teacher. \n\n- You can read \'Best Replies\' until the message is expired.';
+  static const String expired = 'expired';
+  static const String sendReply = 'Would you like to send a reply?';
 
 
 
