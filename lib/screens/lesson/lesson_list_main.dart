@@ -272,8 +272,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     course = widget.course;
     lessonIndex = -1;
     final cloudController = Get.put(CloudMessageController());
-    if (User().cloudMessageHistory.contains(CloudMessage().id)) {
-      cloudController.setHasReplied(true);
+    for(dynamic snapshot in User().cloudMessageHistory) {
+      History history = History.fromJson(snapshot);
+      if (history.itemId == CloudMessage().id) {
+        cloudController.setHasReplied(true);
+        break;
+      }
     }
 
     return Scaffold(

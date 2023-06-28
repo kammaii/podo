@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
@@ -67,15 +68,21 @@ class CloudMessageMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String? reply;
-    if(hasReplied) {
-      for(dynamic snapshot in User().cloudMessageHistory) {
+    if (hasReplied) {
+      for (dynamic snapshot in User().cloudMessageHistory) {
         History history = History.fromJson(snapshot);
-        if(history.itemId == CloudMessage().id) {
+        if (history.itemId == CloudMessage().id) {
           reply = history.content;
           break;
         }
       }
     }
+    Query query = FirebaseFirestore.instance
+        .collection('CloudMessages/${CloudMessage().id}/Replies')
+        .where('isSelected', isEqualTo: true)
+        .orderBy('date', descending: true);
+
+
     return Scaffold(
       appBar: MyWidget().getAppbar(title: CloudMessage().title![KO], isKorean: true, actions: [
         IconButton(
@@ -91,40 +98,103 @@ class CloudMessageMain extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: Column(
-                  children: [
-                    CloudMessage().content != null
-                        ? Column(
-                            children: [
-                              Column(
-                                children: [
-                                  Html(
-                                    data: CloudMessage().content,
-                                    style: {
-                                      'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
-                                      'p': Style(
-                                          fontFamily: 'EnglishFont',
-                                          fontSize: const FontSize(18),
-                                          lineHeight: LineHeight.number(1.5)),
-                                    },
-                                  ),
-                                  const Divider(),
-                                ],
-                              ),
-                            ],
-                          )
-                        : const SizedBox.shrink(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        MyWidget().getTextWidget(text: MyStrings.bestReplies, color: MyColors.purple, size: 20),
-                      ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              child: Column(
+                children: [
+                  CloudMessage().content != null
+                      ? Column(
+                          children: [
+                            Column(
+                              children: [
+                                Html(
+                                  data: CloudMessage().content,
+                                  style: {
+                                    'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
+                                    'p': Style(
+                                        fontFamily: 'EnglishFont',
+                                        fontSize: const FontSize(18),
+                                        lineHeight: LineHeight.number(1.5)),
+                                  },
+                                ),
+                                const Divider(),
+                              ],
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.thumb_up_off_alt, color: MyColors.purple),
+                      const SizedBox(width: 10),
+                      MyWidget().getTextWidget(text: MyStrings.bestReplies, color: MyColors.purple, size: 20),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: Database().getDocs(query: query),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                          List<CloudReply> replies = [];
+                          for (dynamic snapshot in snapshot.data) {
+                            replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
+
+                          }
+                          if (replies.isEmpty) {
+                            return Center(
+                                child: MyWidget().getTextWidget(
+                                    text: MyStrings.noBestReply,
+                                    color: MyColors.purple,
+                                    size: 20,
+                                    isTextAlignCenter: true));
+                          } else {
+                            return ListView.builder(
+                              itemCount: replies.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                CloudReply reply = replies[index];
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            color: Colors.white,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: MyWidget().getTextWidget(text: reply.reply, isKorean: true, size: 16),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: MyWidget().getTextWidget(text: reply.userName, color: MyColors.grey),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        } else if (snapshot.hasError) {
+                          return Text('에러: ${snapshot.error}');
+                        } else {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             Align(

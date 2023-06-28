@@ -117,6 +117,7 @@ class MyStrings {
   static const String replyDetail = '- You can only reply once per message. \n\n- Your and other users\' replies may be posted in the \'Best Replies\' section after review by a native teacher. \n\n- You can read \'Best Replies\' until the message is expired.';
   static const String expired = 'expired';
   static const String sendReply = 'Would you like to send a reply?';
+  static const String noBestReply = 'There is no selected best reply yet.';
 
 
 
