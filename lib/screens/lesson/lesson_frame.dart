@@ -1,21 +1,20 @@
+import 'dart:math';
 import 'package:animated_icon/animated_icon.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
-import 'package:podo/screens/lesson/lesson_complete.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
-import 'dart:math';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:scratcher/scratcher.dart';
 
 class LessonFrame extends StatefulWidget {
@@ -137,11 +136,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         children: [
                           AnimateIcon(
                             onTap: () {
-                              FlashCard flashcard = FlashCard();
-                              flashcard.front = card.content[KO];
-                              flashcard.back = card.content[fo];
-                              flashcard.audio = 'LessonAudios_${lesson.id}_${card.content[AUDIO]}';
-                              Database().setFlashcard(flashCard: flashcard);
+                              FlashCard().addFlashcard(front: card.content[KO], back: card.content[fo], audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}');
                             },
                             iconType: IconType.animatedOnTap,
                             animateIcon: AnimateIcons.favoriteFolder,
@@ -555,7 +550,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           physics: scrollPhysics,
                           onIndexChanged: (index) {
                             if (index >= cards.length) {
-                              Get.toNamed('/lessonComplete', arguments: lesson);
+                              Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
                               return;
                             } else {
                               setState(() {

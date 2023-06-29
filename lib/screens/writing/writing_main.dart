@@ -7,7 +7,6 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
-import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_question.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -213,7 +212,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                             text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
                         TextButton(
                             onPressed: () {
-                              Get.toNamed('/myWritingList');
+                              Get.toNamed(MyStrings.routeMyWritingList);
                             },
                             child: const Text(MyStrings.myWritings,
                                 style: TextStyle(
@@ -288,7 +287,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               children: [
                                 TextButton(
                                     onPressed: () {
-                                      Get.toNamed('/otherWritingList', arguments: selectedQuestion!.id);
+                                      Get.toNamed(MyStrings.routeOtherWritingList, arguments: selectedQuestion!.id);
                                     },
                                     child: const Text(MyStrings.viewOtherUsersWriting,
                                         style: TextStyle(

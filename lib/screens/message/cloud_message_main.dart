@@ -6,6 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
 import 'package:podo/screens/message/cloud_reply.dart';
@@ -156,32 +157,57 @@ class CloudMessageMain extends StatelessWidget {
                               itemCount: replies.length,
                               itemBuilder: (BuildContext context, int index) {
                                 CloudReply reply = replies[index];
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            color: Colors.white,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: MyWidget().getTextWidget(text: reply.reply, isKorean: true, size: 16),
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          color: Colors.white,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      width: 6,
+                                                      height: 6,
+                                                      decoration: BoxDecoration(
+                                                        color: index % 2 == 0 ? MyColors.navyLight : MyColors.pink,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(child: MyWidget().getTextWidget(text: reply.reply, isKorean: true, size: 16, height: 1.5)),
+                                                    const SizedBox(width: 10),
+                                                    IconButton(
+                                                      icon: const Icon(Icons.star_outline_rounded, color: MyColors.purple),
+                                                      onPressed: () {
+                                                        FlashCard().addFlashcard(front: reply.reply, back: '');
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(right: 10, top: 5),
+                                                      child: MyWidget().getTextWidget(text: reply.userName.isEmpty ? MyStrings.unNamed : reply.userName, color: MyColors.grey),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: MyWidget().getTextWidget(text: reply.userName, color: MyColors.grey),
-                                    ),
-                                    const SizedBox(height: 20),
-                                  ],
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
                             );

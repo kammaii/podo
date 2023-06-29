@@ -9,6 +9,7 @@ class Writing {
   late String questionTitle;
   late int questionLevel;
   late String userId;
+  String? userName;
   late String userWriting;
   late String correction;
   late DateTime dateWriting;
@@ -21,6 +22,7 @@ class Writing {
     questionTitle = question.title['ko'];
     questionLevel = question.level;
     userId = User().id;
+    userName = User().name;
     correction = '';
     dateWriting = DateTime.now();
     status = 0;
@@ -31,6 +33,7 @@ class Writing {
   static const String QUESTIONTITLE = 'questionTitle';
   static const String QUESTIONLEVEL = 'questionLevel';
   static const String USERID = 'userId';
+  static const String USERNAME = 'userName';
   static const String USERWRITING = 'userWriting';
   static const String CORRECTION = 'correction';
   static const String DATEWRITING = 'dateWriting';
@@ -43,6 +46,7 @@ class Writing {
     questionTitle = json[QUESTIONTITLE];
     questionLevel = json[QUESTIONLEVEL];
     userId = json[USERID];
+    userName = json[USERNAME];
     userWriting = json[USERWRITING];
     correction = json[CORRECTION];
     Timestamp writingStamp = json[DATEWRITING];
@@ -61,6 +65,7 @@ class Writing {
       QUESTIONTITLE: questionTitle,
       QUESTIONLEVEL: questionLevel,
       USERID: userId,
+      USERNAME: userName,
       USERWRITING: userWriting,
       CORRECTION: correction,
       DATEWRITING: Timestamp.fromDate(dateWriting),

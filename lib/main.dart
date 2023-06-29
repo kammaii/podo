@@ -21,6 +21,7 @@ import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 
 import 'firebase_options.dart';
 
@@ -117,19 +118,19 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
       getPages: [
         GetPage(name: '/', page: () => const MainFrame()),
-        GetPage(name: '/logo', page: () => Logo()),
-        GetPage(name: '/login', page: () => Login()),
-        GetPage(name: '/lessonSummaryMain', page: () => LessonSummaryMain()),
-        GetPage(name: '/lessonFrame', page: () => LessonFrame()),
-        GetPage(name: '/lessonComplete', page: () => const LessonComplete()),
-        GetPage(name: '/writingMain', page: () => WritingMain()),
-        GetPage(name: '/myWritingList', page: () => WritingList(true)),
-        GetPage(name: '/otherWritingList', page: () => WritingList(false)),
-        GetPage(name: '/readingFrame', page: () => const ReadingFrame()),
-        GetPage(name: '/flashcardEdit', page: () => FlashCardEdit()),
-        GetPage(name: '/flashcardReview', page: () => const FlashCardReview()),
-        GetPage(name: '/premiumMain', page: () => PremiumMain()),
-        GetPage(name: '/cloudMessageMain', page: () => CloudMessageMain()),
+        GetPage(name: MyStrings.routeLogo, page: () => Logo()),
+        GetPage(name: MyStrings.routeLogin, page: () => Login()),
+        GetPage(name: MyStrings.routeLessonSummaryMain, page: () => LessonSummaryMain()),
+        GetPage(name: MyStrings.routeLessonFrame, page: () => LessonFrame()),
+        GetPage(name: MyStrings.routeLessonComplete, page: () => const LessonComplete()),
+        GetPage(name: MyStrings.routeWritingMain, page: () => WritingMain()),
+        GetPage(name: MyStrings.routeMyWritingList, page: () => WritingList(true)),
+        GetPage(name: MyStrings.routeOtherWritingList, page: () => WritingList(false)),
+        GetPage(name: MyStrings.routeReadingFrame, page: () => const ReadingFrame()),
+        GetPage(name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
+        GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),
+        GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
+        GetPage(name: MyStrings.routeCloudMessageMain, page: () => CloudMessageMain()),
       ],
     );
   }

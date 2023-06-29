@@ -1,7 +1,6 @@
 import 'package:animated_icon/animated_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
@@ -241,14 +240,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               child: MyWidget().getTextWidget(text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
             Material(
-              child: IconButton(
-                icon: const Icon(Icons.star_outline_rounded, color: MyColors.purple),
-                onPressed: () {
-                  FlashCard flashcard = FlashCard();
-                  flashcard.front = contentKo;
-                  flashcard.back = reading.content[fo][index];
-                  flashcard.audio = 'ReadingAudios_${reading.id}_$index';
-                  Database().setFlashcard(flashCard: flashcard);
+              child: AnimateIcon(
+                iconType: IconType.toggleIcon,
+                animateIcon: AnimateIcons.favoriteFolder,
+                height: 25,
+                width: 25,
+                color: MyColors.purple,
+                onTap: () {
+                  FlashCard().addFlashcard(front: contentKo, back: reading.content[fo][index], audio: 'ReadingAudios_${reading.id}_$index');
                 },
               ),
             ),

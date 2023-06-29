@@ -54,7 +54,6 @@ class _WritingListState extends State<WritingList> {
           .where('questionId', isEqualTo: questionId!)
           .where('userId', isNotEqualTo: User().id)
           .where('status', whereIn: [1, 2])
-          .orderBy('dateWriting', descending: true)
           .limit(docsLimit);
     }
 
@@ -101,10 +100,7 @@ class _WritingListState extends State<WritingList> {
               AnimateIcon(
                 onTap: () {
                   String extractedText = htmlParser.parse(content).body!.text;
-                  FlashCard flashCard = FlashCard();
-                  flashCard.front = extractedText;
-                  flashCard.back = '';
-                  Database().setFlashcard(flashCard: flashCard);
+                  FlashCard().addFlashcard(front: extractedText, back: '');
                 },
                 iconType: IconType.toggleIcon,
                 animateIcon: AnimateIcons.favoriteFolder,
@@ -187,7 +183,7 @@ class _WritingListState extends State<WritingList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyWidget().getTextWidget(text: 'User name', color: MyColors.grey),
+                MyWidget().getTextWidget(text: writing.userName ?? MyStrings.unNamed, color: MyColors.grey),
               ],
             ),
             const Divider(),

@@ -38,7 +38,7 @@ class LessonSummaryMain extends StatelessWidget {
                   FloatingActionButton(
                     heroTag: 'wiringBtn',
                     onPressed: () {
-                      Get.toNamed('/writingMain', arguments: lesson.id);
+                      Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
                     },
                     backgroundColor: MyColors.green,
                     child: const Icon(FontAwesomeIcons.penToSquare, size: 25),
@@ -54,7 +54,7 @@ class LessonSummaryMain extends StatelessWidget {
                   FloatingActionButton(
                     heroTag: 'learningBtn',
                     onPressed: () {
-                      Get.toNamed('/lessonFrame', arguments: lesson);
+                      Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                     },
                     backgroundColor: MyColors.pink,
                     child: const Icon(Icons.play_arrow_rounded, size: 40),

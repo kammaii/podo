@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:podo/common/database.dart';
 import 'package:uuid/uuid.dart';
 
 class FlashCard {
@@ -36,5 +37,14 @@ class FlashCard {
     map[AUDIO] = audio ?? null;
     map[DATE] = Timestamp.now();
     return map;
+  }
+
+
+  void addFlashcard({required String front, required String back, String? audio}) {
+    FlashCard flashCard = FlashCard();
+    flashCard.front = front;
+    flashCard.back = back;
+    flashCard.audio = audio;
+    Database().setFlashcard(flashCard: flashCard);
   }
 }

@@ -118,6 +118,7 @@ class MyStrings {
   static const String expired = 'expired';
   static const String sendReply = 'Would you like to send a reply?';
   static const String noBestReply = 'There is no selected best reply yet.';
+  static const String unNamed = 'Unnamed';
 
 
 
@@ -181,6 +182,21 @@ class MyStrings {
 
 
   // used only in the code
+  static const String routeLogo = '/logo';
+  static const String routeLogin = '/login';
+  static const String routeLessonSummaryMain = '/lessonSummaryMain';
+  static const String routeLessonFrame = '/lessonFrame';
+  static const String routeLessonComplete = '/lessonComplete';
+  static const String routeWritingMain = '/writingMain';
+  static const String routeMyWritingList = '/myWritingList';
+  static const String routeOtherWritingList = '/otherWritingList';
+  static const String routeReadingFrame = '/readingFrame';
+  static const String routeFlashcardEdit = '/flashcardEdit';
+  static const String routeFlashcardReview = '/flashcardReview';
+  static const String routePremiumMain = '/premiumMain';
+  static const String routeCloudMessageMain = '/cloudMessageMain';
+
+
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String repeat = 'repeat';

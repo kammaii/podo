@@ -4,7 +4,6 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
-import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
 import 'package:podo/screens/premium/premium_main.dart';
@@ -107,7 +106,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                       color: Colors.white,
                       child: InkWell(
                         onTap: () {
-                          Get.toNamed('/lessonSummaryMain', arguments: lesson);
+                          Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(10),
@@ -288,10 +287,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               visible: CloudMessage().isInDate != null && CloudMessage().isInDate!,
               child: InkWell(
                 onTap: () {
-                  Get.toNamed('cloudMessageMain');
+                  Get.toNamed(MyStrings.routeCloudMessageMain);
                 },
                 child: Container(
-                  color: MyColors.greenLight,
+                  color: MyColors.navyLight,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     child: Row(

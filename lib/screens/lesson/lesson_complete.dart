@@ -120,11 +120,11 @@ class LessonComplete extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         getBtn(MyStrings.summary, CupertinoIcons.doc_text, () {
-                          Get.until((route) => Get.currentRoute == '/lessonSummaryMain');
+                          Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
                         }),
                         const SizedBox(height: 20),
                         getBtn(MyStrings.writing, CupertinoIcons.pen, () {
-                          Get.offNamedUntil('/writingMain', ModalRoute.withName('/lessonSummaryMain'),
+                          Get.offNamedUntil(MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
                               arguments: lesson.id);
                         }),
                         const SizedBox(height: 20),
@@ -146,7 +146,7 @@ class LessonComplete extends StatelessWidget {
                             if (lessons[nextIndex] is String) {
                               nextIndex++;
                             }
-                            Get.offNamedUntil('/lessonSummaryMain', ModalRoute.withName('/'),
+                            Get.offNamedUntil(MyStrings.routeLessonSummaryMain, ModalRoute.withName('/'),
                                 arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
                           } else {
                             Get.until((route) => Get.currentRoute == '/');

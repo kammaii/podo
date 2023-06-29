@@ -8,8 +8,6 @@ import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
-import 'package:podo/screens/flashcard/flashcard_edit.dart';
-import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
@@ -239,7 +237,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   Function? onReviewBtn() {
     if (controller.cards.isNotEmpty) {
       return () {
-        Get.toNamed('/flashcardReview', arguments: controller.cards);
+        Get.toNamed(MyStrings.routeFlashcardReview, arguments: controller.cards);
       };
     } else {
       return null;
@@ -275,7 +273,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
         Expanded(
           child: GestureDetector(
             onTap: () {
-              Get.toNamed('/flashcardEdit', arguments: card);
+              Get.toNamed(MyStrings.routeFlashcardEdit, arguments: card);
             },
             child: Row(
               children: [
