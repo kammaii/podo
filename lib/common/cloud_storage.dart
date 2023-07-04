@@ -38,8 +38,8 @@ class CloudStorage {
     return url;
   }
 
-  Future<String> getReadingAudio({required String folderRef, required int index}) async {
-    final ref = storage.ref().child("ReadingAudios/$folderRef/${index.toString()}.mp3");
+  Future<String> getReadingAudio({required String fileRef}) async {
+    final ref = storage.ref().child(fileRef);
     String url = await ref.getDownloadURL();
     return url;
   }

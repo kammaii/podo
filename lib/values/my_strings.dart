@@ -31,7 +31,8 @@ class MyStrings {
   static const String today = 'Today';
   static const String flashCardReviewCompleted= 'Congratulations! You have completed your flashcard reviews for today.';
   static const String reviewAgainTomorrow = 'I\'ll review again tomorrow';
-  static const String noReading = 'There is no reading available on the category.';
+  static const String noReadingTitle = 'There is no reading title available on the category.';
+  static const String noReading = 'Failed to load reading material. Please try again.';
   static const String complete = 'complete';
   static const String continueReading = 'Would you like to continue reading?';
   static const String yes = 'Yes';

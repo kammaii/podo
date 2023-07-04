@@ -1,11 +1,17 @@
 import 'package:animated_icon/animated_icon.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
+import 'package:podo/screens/profile/history.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/screens/reading/reading.dart';
+import 'package:podo/screens/reading/reading_controller.dart';
+import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -20,8 +26,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
-  Reading reading = Get.arguments;
-  String fo = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  ReadingTitle readingTitle = Get.arguments;
+  String fo = User().language;
   String sampleImage = 'assets/images/course_hangul.png';
   final KO = 'ko';
   final cardBorderRadius = 8.0;
@@ -30,14 +36,17 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   late Animation<double> animation;
   double currentScrollPercent = 0;
   double scrollPosition = 0;
+  late List<Reading> readings;
+  late Future future;
+  final controller = Get.put(ReadingController());
 
   @override
   void dispose() {
     super.dispose();
     if (currentScrollPercent > 0.1 && currentScrollPercent < 0.9) {
-      LocalStorage().prefs.setDouble(reading.id, scrollPosition);
+      LocalStorage().prefs.setDouble(readingTitle.id, scrollPosition);
     } else {
-      LocalStorage().prefs.remove(reading.id);
+      LocalStorage().prefs.remove(readingTitle.id);
     }
     scrollController.dispose();
     PlayAudio().reset();
@@ -46,6 +55,9 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
+    final Query query = FirebaseFirestore.instance.collection('ReadingTitles/${readingTitle.id}/Readings').orderBy('orderId');
+    future = Database().getDocs(query: query);
+    readings = [];
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -75,8 +87,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           }
         }));
 
-    double? position = LocalStorage().prefs.getDouble(reading.id);
-    print(position);
+    double? position = LocalStorage().prefs.getDouble(readingTitle.id);
     if (position != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.dialog(AlertDialog(
@@ -120,6 +131,12 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   sliverAppBar() {
+    int wordsLength = 0;
+    for(Reading reading in readings){
+      int length = reading.words[KO].length;
+      wordsLength = wordsLength + length;
+    }
+
     return SliverAppBar(
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_rounded),
@@ -133,7 +150,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       pinned: true,
       stretch: true,
       title: MyWidget().getTextWidget(
-        text: '${reading.title[KO]}',
+        text: '${readingTitle.title[KO]}',
         size: 18,
         color: Colors.white,
         isBold: true,
@@ -147,7 +164,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             top: -50,
             right: -30,
             child: Hero(
-              tag: 'readingImage:${reading.id}',
+              tag: 'readingImage:${readingTitle.id}',
               child: FadeTransition(
                 opacity: animation,
                 child: Image.asset(
@@ -176,13 +193,13 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 children: [
                   letterContainer('S'),
                   const SizedBox(width: 10),
-                  Text('${reading.content[KO].length}'),
+                  Text('${readings.length}'),
                   const SizedBox(width: 20),
                   const Text('|'),
                   const SizedBox(width: 20),
                   letterContainer('V'),
                   const SizedBox(width: 10),
-                  Text('${reading.content[KO].length}'),
+                  Text('$wordsLength'),
                 ],
               ),
               expandedTitleScale: 1.0,
@@ -194,7 +211,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   sliverList() {
-    int length = reading.content[KO].length;
+    int length = readings.length;
     return SliverPadding(
       padding: const EdgeInsets.all(10),
       sliver: SliverList(
@@ -207,15 +224,21 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 partWords(index),
                 const SizedBox(height: 30),
                 partContentFo(index),
-                const Divider(),
+                Obx(() {
+                  return controller.getIsExpanded(index) ? const SizedBox.shrink() : const Divider();
+                }),
                 const SizedBox(height: 30),
                 index == length - 1
                     ? MyWidget().getRoundBtnWidget(
                         text: MyStrings.complete,
-                        f: () {
-                          LocalStorage().prefs.remove(reading.id);
+                        f: () async {
+                          LocalStorage().prefs.remove(readingTitle.id);
                           Get.back();
-                          //todo: User().readingRecord 에 추가
+                          History history = History(item: 'reading', itemId: readingTitle.id);
+                          final readingHistory = User().readingHistory;
+                          readingHistory.add(history.toJson());
+                          await Database().updateDoc(collection: 'Users', docId: User().id, key: 'readingHistory', value: readingHistory);
+                          User().readingHistory.add(history);
                         })
                     : const SizedBox.shrink(),
               ],
@@ -228,7 +251,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   Widget partContentKo(int index) {
-    final contentKo = reading.content[KO][index];
+    Reading reading = readings[index];
+    final contentKo = reading.content[KO];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -247,7 +271,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 width: 25,
                 color: MyColors.purple,
                 onTap: () {
-                  FlashCard().addFlashcard(front: contentKo, back: reading.content[fo][index], audio: 'ReadingAudios_${reading.id}_$index');
+                  FlashCard().addFlashcard(front: contentKo, back: reading.content[fo][index], audio: 'ReadingAudios_${readingTitle.id}_${reading.id}');
                 },
               ),
             ),
@@ -255,7 +279,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               child: IconButton(
                 icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
                 onPressed: () {
-                  PlayAudio().playReading(readingId: reading.id, index: index);
+                  PlayAudio().playReading(readingTitleId: readingTitle.id, readingId: reading.id);
                 },
               ),
             ),
@@ -274,8 +298,12 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   Widget partContentFo(int index) {
-    final contentFo = reading.content[fo][index];
+    final contentFo = readings[index].content[fo];
+    controller.initIsExpanded(readings.length);
     return ExpansionTile(
+      onExpansionChanged: (value) {
+        controller.setIsExpanded(index, value);
+      },
       leading: const Icon(Icons.g_translate_rounded),
       iconColor: MyColors.purple,
       title: const Text(''),
@@ -288,33 +316,9 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   Widget partWords(int index) {
-    final wordList = reading.words[KO];
-    final contentKo = reading.content[KO][index];
-    List<String> wordKoList = [];
-    List<String> wordFoList = [];
-
-    for (int i = 0; i < wordList.length; i++) {
-      String word = wordList[i];
-
-      String insideText = '';
-      String outsideText = '';
-
-      int startIdx = word.indexOf('(');
-      int endIdx = word.indexOf(')');
-
-      if (startIdx != -1 && endIdx != -1 && startIdx < endIdx) {
-        insideText = word.substring(startIdx + 1, endIdx);
-        outsideText = word.substring(0, startIdx) + word.substring(endIdx + 1);
-      } else {
-        insideText = word;
-        outsideText = word;
-      }
-
-      if (contentKo.contains(outsideText)) {
-        wordKoList.add(insideText);
-        wordFoList.add(reading.words[fo][i]);
-      }
-    }
+    Reading reading = readings[index];
+    List<dynamic> wordKoList = reading.words[KO];
+    List<dynamic> wordFoList = reading.words[fo];
 
     return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
@@ -344,17 +348,42 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
         child: Container(
           color: MyColors.purpleLight,
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            controller: scrollController,
-            slivers: [
-              sliverAppBar(),
-              sliverList(),
-            ],
+          child: FutureBuilder(
+            future: future,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if(snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                readings = [];
+                for(dynamic snapshot in snapshot.data) {
+                  readings.add(Reading.fromJson(snapshot.data() as Map<String, dynamic>));
+                }
+                if(readings.isEmpty) {
+                  return Center(
+                    child: MyWidget().getTextWidget(
+                      text: MyStrings.noReading,
+                      color: MyColors.purple,
+                      size: 20,
+                      isTextAlignCenter: true,
+                    ),
+                  );
+                } else {
+                  return CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    controller: scrollController,
+                    slivers: [
+                      sliverAppBar(),
+                      sliverList(),
+                    ],
+                  );
+                }
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
           ),
         ),
       ),

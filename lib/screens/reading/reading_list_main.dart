@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/reading/reading.dart';
+import 'package:podo/screens/profile/history.dart';
+import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -20,14 +22,23 @@ class _ReadingListMainState extends State<ReadingListMain> {
   final cardBorderRadius = 8.0;
   int selectedCategory = 0;
   final KO = 'ko';
-  final READINGS = 'Readings';
+  final READING_TITLES = 'ReadingTitles';
   final CATEGORY = 'category';
   final ORDER_ID = 'orderId';
-  String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
-  late List<Reading> readings;
-  String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  String fo = User().language;
+  late List<ReadingTitle> readingTitles;
 
-  Widget getListItem({required Reading reading}) {
+  Widget getListItem({required ReadingTitle readingTitle}) {
+    bool isCompleted = false;
+    for (dynamic historyJson in User().readingHistory) {
+      History history = History.fromJson(historyJson);
+      if (history.itemId == readingTitle.id) {
+        isCompleted = true;
+        break;
+      }
+    }
+
+
     return Stack(
       children: [
         Card(
@@ -37,7 +48,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
           color: Colors.white,
           child: InkWell(
             onTap: () {
-              Get.toNamed(MyStrings.routeReadingFrame, arguments: reading);
+              Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
             },
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -47,7 +58,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                     width: 80,
                     height: 80,
                     child: Hero(
-                      tag: 'readingImage:${reading.id}',
+                      tag: 'readingImage:${readingTitle.id}',
                       child: Image.asset('assets/images/course_hangul.png'),
                     ),
                   ),
@@ -60,24 +71,27 @@ class _ReadingListMainState extends State<ReadingListMain> {
                           Transform.scale(
                             alignment: Alignment.bottomLeft,
                             scale: 0.8,
-                            child: Image.asset('assets/images/${rockets[reading.level]}.png'),
+                            child: Image.asset('assets/images/${rockets[readingTitle.level]}.png'),
                           ),
-                          const Icon(
-                            Icons.check_circle,
-                            color: MyColors.green,
-                            size: 20,
-                          ),
+                          const SizedBox(width: 10),
+                          isCompleted
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: MyColors.green,
+                                  size: 20,
+                                )
+                              : const SizedBox.shrink(),
                         ],
                       ),
                       const SizedBox(height: 10),
                       MyWidget().getTextWidget(
-                        text: reading.title[KO] ?? '',
+                        text: readingTitle.title[KO] ?? '',
                         size: 20,
                         color: MyColors.navy,
                       ),
                       const SizedBox(height: 10),
                       MyWidget().getTextWidget(
-                        text: reading.title[fo] ?? '',
+                        text: readingTitle.title[fo] ?? '',
                         color: MyColors.grey,
                       ),
                     ],
@@ -87,7 +101,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
             ),
           ),
         ),
-        reading.tag.isNotEmpty
+        readingTitle.tag.isNotEmpty
             ? Positioned(
                 top: 5,
                 right: 4,
@@ -100,7 +114,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                       ),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    child: Text(reading.tag, style: const TextStyle(color: MyColors.red))),
+                    child: Text(readingTitle.tag, style: const TextStyle(color: MyColors.red))),
               )
             : const SizedBox.shrink(),
       ],
@@ -109,12 +123,12 @@ class _ReadingListMainState extends State<ReadingListMain> {
 
   @override
   Widget build(BuildContext context) {
-    final CollectionReference ref = FirebaseFirestore.instance.collection(READINGS);
+    final CollectionReference ref = FirebaseFirestore.instance.collection(READING_TITLES);
     Query query;
     if (selectedCategory == 0) {
-      query = ref.orderBy(ORDER_ID);
+      query = ref.orderBy(ORDER_ID, descending: true);
     } else {
-      query = ref.where(CATEGORY, isEqualTo: categories[selectedCategory]).orderBy(ORDER_ID);
+      query = ref.where(CATEGORY, isEqualTo: categories[selectedCategory]).orderBy(ORDER_ID, descending: true);
     }
 
     return Scaffold(
@@ -160,23 +174,23 @@ class _ReadingListMainState extends State<ReadingListMain> {
                   future: Database().getDocs(query: query),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                      readings = [];
+                      readingTitles = [];
                       for (dynamic snapshot in snapshot.data) {
-                        readings.add(Reading.fromJson(snapshot.data() as Map<String, dynamic>));
+                        readingTitles.add(ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>));
                       }
-                      if (readings.isEmpty) {
+                      if (readingTitles.isEmpty) {
                         return Center(
                             child: MyWidget().getTextWidget(
-                                text: MyStrings.noReading,
+                                text: MyStrings.noReadingTitle,
                                 color: MyColors.purple,
                                 size: 20,
                                 isTextAlignCenter: true));
                       } else {
                         return ListView.builder(
-                          itemCount: readings.length,
+                          itemCount: readingTitles.length,
                           itemBuilder: (BuildContext context, int index) {
-                            Reading reading = readings[index];
-                            return getListItem(reading: reading);
+                            ReadingTitle readingTitle = readingTitles[index];
+                            return getListItem(readingTitle: readingTitle);
                           },
                         );
                       }

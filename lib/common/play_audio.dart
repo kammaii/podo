@@ -42,8 +42,8 @@ class PlayAudio {
     }
   }
 
-  void playReading({required String readingId, required int index}) async {
-    String url = await CloudStorage().getReadingAudio(folderRef: readingId, index: index);
+  void playReading({required String readingTitleId, required String readingId}) async {
+    String url = await CloudStorage().getReadingAudio(fileRef: 'ReadingAudios/$readingTitleId/$readingId.mp3');
     await player.setUrl(url);
     await player.play();
   }
