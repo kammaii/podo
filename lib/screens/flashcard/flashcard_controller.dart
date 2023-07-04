@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 
 class FlashCardController extends GetxController {
@@ -7,10 +9,14 @@ class FlashCardController extends GetxController {
   late bool isLongClicked;
   bool isShuffleChecked = false;
   List<FlashCard> cards = [];
+  RxBool isViewAllClicked = false.obs;
+  Map<String, PlayStopIcon> playStopIcons = {};
+
+
 
   init() {
-    cards = [];
-    isChecked = [];
+    cards = LocalStorage().flashcards;
+    isChecked = List.generate(cards.length, (index) => false);
     isCheckedAll = false;
     isLongClicked = false;
   }

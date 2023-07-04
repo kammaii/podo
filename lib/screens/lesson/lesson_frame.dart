@@ -2,12 +2,14 @@ import 'dart:math';
 import 'package:animated_icon/animated_icon.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
@@ -115,6 +117,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.repeat:
+        controller.hasFlashcard.value = LocalStorage().hasFlashcard(itemId: card.id);
+
         widget = Column(
           children: [
             Row(
@@ -131,21 +135,31 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                 children: [
                   Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          AnimateIcon(
-                            onTap: () {
-                              FlashCard().addFlashcard(front: card.content[KO], back: card.content[fo], audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}');
-                            },
-                            iconType: IconType.animatedOnTap,
-                            animateIcon: AnimateIcons.favoriteFolder,
-                            color: MyColors.purple,
-                            height: 28,
-                            width: 28,
-                          )
-                        ],
-                      ),
+                      Obx(() => Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    if (controller.hasFlashcard.value) {
+                                      FlashCard().removeFlashcard(itemId: card.id);
+                                      controller.hasFlashcard.value = false;
+                                    } else {
+                                      FlashCard().addFlashcard(
+                                          itemId: card.id,
+                                          front: card.content[KO],
+                                          back: card.content[fo],
+                                          audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}');
+                                      controller.hasFlashcard.value = true;
+                                    }
+                                  },
+                                  icon: Icon(
+                                    controller.hasFlashcard.value
+                                        ? CupertinoIcons.heart_fill
+                                        : CupertinoIcons.heart,
+                                    color: MyColors.purple,
+                                  ))
+                            ],
+                          )),
                       const SizedBox(height: 10),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -289,9 +303,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.quiz:
-        if(index == thisIndex) {
-
-        }
+        if (index == thisIndex) {}
         if (examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
@@ -510,7 +522,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    if(!isLoading) {
+    if (!isLoading) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setBottomWidget();
       });

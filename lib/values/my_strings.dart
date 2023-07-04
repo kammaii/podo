@@ -23,14 +23,13 @@ class MyStrings {
   static const String noFlashCards = 'No flashcards';
   static const String cards = 'cards';
   static const String search = 'search';
-  static const String deleteSucceed = 'Deleted successfully';
-  static const String deleteFailed = 'Failed to delete. If the problem persist, please contact the developer.';
   static const String review = 'Review';
   static const String next = 'Next';
   static const String shuffle = 'Shuffle';
   static const String today = 'Today';
   static const String flashCardReviewCompleted= 'Congratulations! You have completed your flashcard reviews for today.';
   static const String reviewAgainTomorrow = 'I\'ll review again tomorrow';
+  static const String wantReviewMore = 'I want to do more review';
   static const String noReadingTitle = 'There is no reading title available on the category.';
   static const String noReading = 'Failed to load reading material. Please try again.';
   static const String complete = 'complete';
@@ -42,7 +41,6 @@ class MyStrings {
   static const String haveFlashcard = 'You already have this flash card.';
   static const String flashcardEdit = 'Flashcard Edit';
   static const String save = 'save';
-  static const String flashcardUpdated = 'Flashcard has been updated.';
   static const String viewAll = 'View all';
   static const String viewOtherUsersWriting = 'View other user\'s writing';
   static const String writeYourAnswerInKorean = 'Write your answer in Korean';
@@ -120,6 +118,7 @@ class MyStrings {
   static const String sendReply = 'Would you like to send a reply?';
   static const String noBestReply = 'There is no selected best reply yet.';
   static const String unNamed = 'Unnamed';
+  static const String wantRemoveFlashcard = 'Do you want to remove flashcard(s)?';
 
 
 

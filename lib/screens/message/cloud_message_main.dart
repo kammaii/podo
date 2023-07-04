@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/message/cloud_message.dart';
@@ -20,7 +21,8 @@ class CloudMessageMain extends StatelessWidget {
 
   final KO = 'ko';
   final replyController = TextEditingController();
-  bool hasReplied = Get.find<CloudMessageController>().hasReplied.value;
+  late bool hasReplied;
+  final controller = Get.find<CloudMessageController>();
 
   Stream<String> getTimeLeftStream(DateTime dateEnd) {
     StreamController<String> controller = StreamController();
@@ -68,6 +70,7 @@ class CloudMessageMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    hasReplied = controller.hasReplied.value;
     String? reply;
     if (hasReplied) {
       for (dynamic snapshot in User().cloudMessageHistory) {
@@ -141,10 +144,8 @@ class CloudMessageMain extends StatelessWidget {
                           List<CloudReply> replies = [];
                           for (dynamic snapshot in snapshot.data) {
                             replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                            replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                            replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
-
                           }
+                          controller.hasFlashcard.value = List.generate(replies.length, (index) => false);
                           if (replies.isEmpty) {
                             return Center(
                                 child: MyWidget().getTextWidget(
@@ -157,6 +158,8 @@ class CloudMessageMain extends StatelessWidget {
                               itemCount: replies.length,
                               itemBuilder: (BuildContext context, int index) {
                                 CloudReply reply = replies[index];
+                                controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: reply.id);
+
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: Row(
@@ -184,12 +187,24 @@ class CloudMessageMain extends StatelessWidget {
                                                     const SizedBox(width: 10),
                                                     Expanded(child: MyWidget().getTextWidget(text: reply.reply, isKorean: true, size: 16, height: 1.5)),
                                                     const SizedBox(width: 10),
-                                                    IconButton(
-                                                      icon: const Icon(Icons.star_outline_rounded, color: MyColors.purple),
-                                                      onPressed: () {
-                                                        FlashCard().addFlashcard(front: reply.reply, back: '');
-                                                      },
-                                                    ),
+                                                    Obx(() => IconButton(
+                                                        onPressed: () {
+                                                          if (controller.hasFlashcard[index]) {
+                                                            FlashCard().removeFlashcard(itemId: reply.id);
+                                                            controller.hasFlashcard[index] = false;
+                                                          } else {
+                                                            FlashCard().addFlashcard(
+                                                                itemId: reply.id,
+                                                                front: reply.reply);
+                                                            controller.hasFlashcard[index] = true;
+                                                          }
+                                                        },
+                                                        icon: Icon(
+                                                          controller.hasFlashcard[index]
+                                                              ? CupertinoIcons.heart_fill
+                                                              : CupertinoIcons.heart,
+                                                          color: MyColors.purple,
+                                                        ))),
                                                   ],
                                                 ),
                                                 Row(

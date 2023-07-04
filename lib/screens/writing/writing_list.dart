@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
@@ -71,13 +73,27 @@ class _WritingListState extends State<WritingList> {
         writings.add(writing);
       }
       lastSnapshot = snapshots.last;
+      controller.hasFlashcard.value = List.generate(writings.length, (index) => false);
     }
     isLoaded = true;
     controller.update();
   }
 
-  Widget getItem(String title, String content, {Writing? writing}) {
+  Widget getItem(int index, {required String title}) {
+    Writing writing = writings[index];
+    controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: writing.id);
+
+    String content = '';
+    if(title == 'Q') {
+      content = writing.questionTitle;
+    } else if (title == 'A') {
+      content = writing.userWriting;
+    } else if (title == 'C') {
+      content = writing.correction;
+    }
     content = '<p>$content</p>';
+    String extractedText = htmlParser.parse(content).body!.text;
+
     return Row(
       children: [
         MyWidget().getTextWidget(text: '$title. ', isBold: true),
@@ -92,24 +108,25 @@ class _WritingListState extends State<WritingList> {
           ),
         ),
         Visibility(
-          visible: writing != null && writing.status == 1 && title.contains('C') ||
-              writing != null && writing.status == 2 && title.contains('A'),
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-              AnimateIcon(
-                onTap: () {
-                  String extractedText = htmlParser.parse(content).body!.text;
-                  FlashCard().addFlashcard(front: extractedText, back: '');
-                },
-                iconType: IconType.toggleIcon,
-                animateIcon: AnimateIcons.favoriteFolder,
-                height: 25,
-                width: 25,
+          visible: writing.status == 1 && title.contains('C') || writing.status == 2 && title.contains('A'),
+          child: Obx(() => IconButton(
+              onPressed: () {
+                if (controller.hasFlashcard[index]) {
+                  FlashCard().removeFlashcard(itemId: writing.id);
+                  controller.hasFlashcard[index] = false;
+                } else {
+                  FlashCard().addFlashcard(
+                      itemId: writing.id,
+                      front: extractedText);
+                  controller.hasFlashcard[index] = true;
+                }
+              },
+              icon: Icon(
+                controller.hasFlashcard[index]
+                    ? CupertinoIcons.heart_fill
+                    : CupertinoIcons.heart,
                 color: MyColors.purple,
-              ),
-            ],
-          ),
+              ))),
         )
       ],
     );
@@ -168,9 +185,9 @@ class _WritingListState extends State<WritingList> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                getItem('Q', writing.questionTitle),
-                getItem('A', writing.userWriting, writing: writing),
-                getItem('C', writing.correction, writing: writing),
+                getItem(index, title: 'Q'),
+                getItem(index, title: 'A'),
+                getItem(index, title: 'C'),
               ],
             ),
           ],
@@ -190,9 +207,9 @@ class _WritingListState extends State<WritingList> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                getItem('A', writing.userWriting),
+                getItem(index, title: 'A'),
                 const SizedBox(height: 10),
-                getItem('C', writing.correction),
+                getItem(index, title: 'C'),
               ],
             ),
           ],

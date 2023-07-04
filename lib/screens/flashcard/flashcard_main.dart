@@ -2,14 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/common/play_stop_icon.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
-import 'package:podo/screens/loading_controller.dart';
-import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -23,54 +20,18 @@ class FlashCardMain extends StatefulWidget {
 class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
-  final ref = 'Users/${User().id}/FlashCards';
   List<FlashCard> cardsSearch = [];
   final controller = Get.put(FlashCardController());
   final duration = const Duration(milliseconds: 200);
   String searchText = '';
   Map<String, PlayStopIcon> playStopIcons = {};
-  final int docsLimit = 12; //todo: 20 개 이상으로 변경
-  final scrollController = ScrollController();
   late int cardsLength;
   DocumentSnapshot? lastSnapshot;
-  bool isLoaded = false;
 
   @override
   void initState() {
     super.initState();
     controller.init();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadFlashcards();
-    });
-    scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-        loadFlashcards(isContinue: true);
-      }
-    });
-  }
-
-  loadFlashcards({bool isContinue = false}) async {
-    Query query = FirebaseFirestore.instance.collection(ref).orderBy('date', descending: true).limit(docsLimit);
-    if (isContinue) {
-      query = query.startAfterDocument(lastSnapshot!);
-    }
-    LoadingController.to.isLoading = true;
-    List<dynamic> snapshots = await Database().getDocs(query: query);
-    LoadingController.to.isLoading = false;
-
-    if (snapshots.isNotEmpty) {
-      for (dynamic snapshot in snapshots) {
-        FlashCard card = FlashCard.fromJson(snapshot.data() as Map<String, dynamic>);
-        controller.cards.add(card);
-        controller.isChecked.add(false);
-        if (card.audio != null) {
-          playStopIcons[card.id] = PlayStopIcon(this);
-        }
-      }
-      lastSnapshot = snapshots.last;
-    }
-    isLoaded = true;
-    controller.update();
   }
 
   @override
@@ -78,7 +39,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
     super.dispose();
     _focusNode.dispose();
     searchController.dispose();
-    scrollController.dispose();
   }
 
   Widget animationWidget(Widget child) {
@@ -116,7 +76,12 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                   Expanded(
                     child: GetBuilder<FlashCardController>(
                       builder: (_) {
-                        print(isLoaded);
+                        for (FlashCard card in controller.cards) {
+                          if (card.audio != null) {
+                            playStopIcons[card.id] = PlayStopIcon(this);
+                          }
+                        }
+
                         cardsLength = controller.cards.length;
 
                         if (searchText.isNotEmpty) {
@@ -146,24 +111,17 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                     children: [
                                       animationWidget(IconButton(
                                           onPressed: () {
-                                            List<String> ids = [];
-                                            for (int i = 0; i < controller.isChecked.length; i++) {
-                                              controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
-                                            }
-                                            if (ids.isNotEmpty) {
-                                              setState(() {
-                                                Future<void> runBatch;
-                                                if (ids.length > 1) {
-                                                  runBatch = Database().deleteDocs(collection: ref, ids: ids);
-                                                } else {
-                                                  runBatch = Database().deleteDoc(collection: ref, docId: ids[0]);
-                                                }
-                                                runBatch
-                                                    .then((value) => Get.snackbar(MyStrings.deleteSucceed, ''))
-                                                    .onError((error, stackTrace) =>
-                                                        Get.snackbar(MyStrings.deleteFailed, ''));
-                                              });
-                                            }
+                                            MyWidget().showDialog(
+                                                content: MyStrings.wantRemoveFlashcard,
+                                                f: () {
+                                                  List<String> ids = [];
+                                                  for (int i = 0; i < controller.isChecked.length; i++) {
+                                                    controller.isChecked[i]
+                                                        ? ids.add(controller.cards[i].id)
+                                                        : null;
+                                                  }
+                                                  FlashCard().removeFlashcards(ids: ids);
+                                                });
                                           },
                                           icon: const Icon(
                                             Icons.delete,
@@ -177,7 +135,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                 ],
                               ),
                               Expanded(
-                                child: isLoaded && cardsLength <= 0
+                                child: cardsLength <= 0
                                     ? Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards))
                                     : GestureDetector(
                                         onTap: () {
@@ -188,7 +146,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                           controller.update();
                                         },
                                         child: ListView.builder(
-                                          controller: scrollController,
                                           padding: const EdgeInsets.only(top: 10, bottom: 80),
                                           itemCount: cardsLength,
                                           itemBuilder: (BuildContext context, int index) {
@@ -237,7 +194,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   Function? onReviewBtn() {
     if (controller.cards.isNotEmpty) {
       return () {
-        Get.toNamed(MyStrings.routeFlashcardReview, arguments: controller.cards);
+        Get.toNamed(MyStrings.routeFlashcardReview);
       };
     } else {
       return null;
@@ -273,6 +230,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
         Expanded(
           child: GestureDetector(
             onTap: () {
+              _focusNode.unfocus();
               Get.toNamed(MyStrings.routeFlashcardEdit, arguments: card);
             },
             child: Row(

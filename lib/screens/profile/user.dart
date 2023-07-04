@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/premium/premium.dart';
-import 'package:podo/screens/profile/history.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/common/database.dart';
 

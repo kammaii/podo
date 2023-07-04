@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/common/play_stop_icon.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:scratcher/scratcher.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FlashCardReview extends StatefulWidget {
   const FlashCardReview({Key? key}) : super(key: key);
@@ -20,67 +20,56 @@ class FlashCardReview extends StatefulWidget {
 }
 
 class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderStateMixin {
-  List<FlashCard> allCards = Get.arguments;
+  late List<FlashCard> allCards;
   late List<FlashCard> cards;
   final controller = Get.find<FlashCardController>();
-  final REVIEWED_DATE = 'reviewedDate';
-  final REVIEWED_CARDS = 'reviewedCards';
-  late SharedPreferences prefs;
-  late List<String> reviewedCards;
   late String today;
-  bool isViewAllClicked = false;
   late PlayStopIcon playStopIcon;
-  late FlashCard card;
+  bool isPlay = false;
 
   @override
   void initState() {
     super.initState();
+    DateTime now = DateTime.now();
+    today = '${now.year}-${now.month}-${now.day}';
+    allCards = LocalStorage().flashcards;
+    cards = allCards.where((card) => (card.dateReview != today)).toList();
     playStopIcon = PlayStopIcon(this, size: 50);
   }
 
   @override
   void dispose() {
     super.dispose();
+    LocalStorage().setFlashcards();
     setPlayStopIcon(isForward: false);
   }
 
   void setPlayStopIcon({required bool isForward}) {
     if (isForward) {
-      PlayAudio().playFlashcard(card.audio, addStreamCompleted: (event) {
+      PlayAudio().playFlashcard(cards[0].audio, addStreamCompleted: (event) {
         if (event.processingState == ProcessingState.completed) {
           setPlayStopIcon(isForward: false);
           PlayAudio().stream.cancel();
         }
       });
       playStopIcon.clickIcon(isForward: true);
-      card.isPlay = true;
+      isPlay = true;
     } else {
       PlayAudio().stop();
       playStopIcon.clickIcon(isForward: false);
-      card.isPlay = false;
+      isPlay = false;
     }
   }
 
   void checkShuffle(bool? value) {
-    PlayAudio().stop();
     setPlayStopIcon(isForward: false);
     controller.isShuffleChecked = value!;
     if (value) {
       cards.shuffle();
     } else {
-      cards = allCards.where((card) => !reviewedCards.contains(card.id)).toList();
+      cards = allCards.where((card) => (card.dateReview != today)).toList();
     }
     controller.update();
-  }
-
-  Function onNextBtn() {
-    return () {
-      reviewedCards.add(cards[0].id);
-      prefs.setString(REVIEWED_DATE, today);
-      prefs.setStringList(REVIEWED_CARDS, reviewedCards);
-      cards.removeAt(0);
-      controller.update();
-    };
   }
 
   @override
@@ -98,175 +87,163 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
         ),
       ),
       body: SafeArea(
-        child: FutureBuilder(
-          future: SharedPreferences.getInstance(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            DateTime now = DateTime.now();
-            today = '${now.year}-${now.month}-${now.day}';
-
-            if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-              prefs = snapshot.data;
-              String? prefsDate = prefs.getString(REVIEWED_DATE);
-              List<String>? prefsCards = prefs.getStringList(REVIEWED_CARDS);
-              if (prefsDate != null && prefsDate == today) {
-                prefsCards != null ? reviewedCards = [...prefsCards] : reviewedCards = [];
-                cards = allCards.where((card) => !reviewedCards.contains(card.id)).toList();
-              } else {
-                reviewedCards = [];
-                cards = [...allCards];
-              }
-              return GetBuilder<FlashCardController>(
-                builder: (_) {
-                  if (cards.isNotEmpty) {
-                    card = cards[0];
-                    setPlayStopIcon(isForward: true);
-                    return Column(
-                      children: [
-                        LinearPercentIndicator(
-                          animateFromLastPercent: true,
-                          animation: true,
-                          lineHeight: 3.0,
-                          percent: reviewedCards.length / allCards.length,
-                          backgroundColor: MyColors.navyLight,
-                          progressColor: MyColors.purple,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                MyWidget().getCheckBox(
-                                    value: controller.isShuffleChecked,
-                                    onChanged: (value) {
-                                      checkShuffle(value);
-                                    }),
-                                MyWidget().getTextWidget(text: MyStrings.shuffle),
-                              ],
-                            ),
-                            MyWidget().getTextWidget(
-                                text: '${MyStrings.today} ${reviewedCards.length} / ${allCards.length}   '),
-                          ],
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration:
-                                  BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
-                              child: Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Expanded(
-                                      child: Center(
-                                        child: MyWidget().getTextWidget(
-                                          text: card.front,
-                                          size: 20,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    const Divider(height: 20),
-                                    Expanded(
-                                      child: Center(
-                                        child: isViewAllClicked
-                                            ? Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                                child: MyWidget().getTextWidget(
-                                                  text: card.back,
-                                                  size: 20,
-                                                  color: MyColors.grey,
-                                                ))
-                                            : Scratcher(
-                                                color: MyColors.grey,
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                                  child: MyWidget().getTextWidget(
-                                                    text: card.back,
-                                                    size: 20,
-                                                    color: MyColors.grey,
-                                                  ),
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTapDown: (_) {
-                                        isViewAllClicked = true;
-                                        controller.update();
-                                      },
-                                      onTapUp: (_) {
-                                        isViewAllClicked = false;
-                                        controller.update();
-                                      },
-                                      child: MyWidget()
-                                          .getTextWidget(text: MyStrings.viewAll, color: MyColors.grey, size: 13),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Opacity(
-                          opacity: card.audio == null ? 0 : 1,
-                          child: GestureDetector(
-                            onTap: () {
-                              if (card.isPlay) {
-                                setPlayStopIcon(isForward: false);
-                              } else {
-                                setPlayStopIcon(isForward: true);
-                              }
-                            },
-                            child: playStopIcon.icon,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 30),
-                          child: Row(
+        child: GetBuilder<FlashCardController>(
+          builder: (_) {
+            if (cards.isNotEmpty) {
+              FlashCard card = cards[0];
+              setPlayStopIcon(isForward: true);
+              return Column(
+                children: [
+                  LinearPercentIndicator(
+                    animateFromLastPercent: true,
+                    animation: true,
+                    lineHeight: 3.0,
+                    percent: (allCards.length - cards.length) / allCards.length,
+                    backgroundColor: MyColors.navyLight,
+                    progressColor: MyColors.purple,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          MyWidget().getCheckBox(
+                              value: controller.isShuffleChecked,
+                              onChanged: (value) {
+                                checkShuffle(value);
+                              }),
+                          MyWidget().getTextWidget(text: MyStrings.shuffle),
+                        ],
+                      ),
+                      MyWidget().getTextWidget(text: '${MyStrings.today} ${allCards.length - cards.length} / ${allCards.length}   '),
+                    ],
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: MyWidget().getRoundBtnWidget(
-                                    text: MyStrings.next,
-                                    f: () {
-                                      onNextBtn();
-                                    },
+                                child: Center(
+                                  child: MyWidget().getTextWidget(
+                                    text: card.front,
+                                    size: 20,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
+                              const Divider(height: 20),
+                              Expanded(
+                                child: Obx(
+                                  () => Center(
+                                    child: controller.isViewAllClicked.value
+                                        ? Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                            child: MyWidget().getTextWidget(
+                                              text: card.back,
+                                              size: 20,
+                                              color: MyColors.grey,
+                                            ))
+                                        : Scratcher(
+                                            color: MyColors.grey,
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                              child: MyWidget().getTextWidget(
+                                                text: card.back,
+                                                size: 20,
+                                                color: MyColors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTapDown: (_) {
+                                  controller.isViewAllClicked.value = true;
+                                },
+                                onTapUp: (_) {
+                                  controller.isViewAllClicked.value = false;
+                                },
+                                child: MyWidget()
+                                    .getTextWidget(text: MyStrings.viewAll, color: MyColors.grey, size: 13),
+                              ),
                             ],
                           ),
-                        )
-                      ],
-                    );
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MyWidget().getTextWidget(
-                              text: MyStrings.flashCardReviewCompleted,
-                              isTextAlignCenter: true,
-                              color: MyColors.purple,
-                              size: 20),
-                          const SizedBox(height: 30),
-                          MyWidget().getRoundBtnWidget(
-                              text: MyStrings.reviewAgainTomorrow,
-                              f: () {
-                                Get.back();
-                              })
-                        ],
+                        ),
                       ),
-                    );
-                  }
-                },
+                    ),
+                  ),
+                  Opacity(
+                    opacity: card.audio == null ? 0 : 1,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (isPlay) {
+                          setPlayStopIcon(isForward: false);
+                        } else {
+                          setPlayStopIcon(isForward: true);
+                        }
+                      },
+                      child: playStopIcon.icon,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 30),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: MyWidget().getRoundBtnWidget(
+                              text: MyStrings.next,
+                              f: () {
+                                setPlayStopIcon(isForward: false);
+                                FlashCard? reviewedCard = allCards.firstWhere((card) => card.id == cards[0].id);
+                                reviewedCard.dateReview = today;
+                                cards.removeAt(0);
+                                controller.update();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               );
             } else {
-              return const Center(child: CircularProgressIndicator());
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    MyWidget().getTextWidget(
+                        text: MyStrings.flashCardReviewCompleted,
+                        isTextAlignCenter: true,
+                        color: MyColors.purple,
+                        size: 20),
+                    const SizedBox(height: 30),
+                    MyWidget().getRoundBtnWidget(
+                        text: MyStrings.reviewAgainTomorrow,
+                        f: () {
+                          Get.back();
+                        }),
+                    const SizedBox(height: 10),
+                    MyWidget().getRoundBtnWidget(
+                        text: MyStrings.wantReviewMore,
+                        bgColor: MyColors.pink,
+                        f: () {
+                          cards = [...allCards];
+                          controller.update();
+                        })
+                  ],
+                ),
+              );
             }
           },
         ),

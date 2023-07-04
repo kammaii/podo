@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/lesson_course_controller.dart';
+import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';

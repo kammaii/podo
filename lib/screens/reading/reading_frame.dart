@@ -1,5 +1,6 @@
 import 'package:animated_icon/animated_icon.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -253,6 +254,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   Widget partContentKo(int index) {
     Reading reading = readings[index];
     final contentKo = reading.content[KO];
+    controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: reading.id);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -263,18 +266,26 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               padding: const EdgeInsets.only(left: 10),
               child: MyWidget().getTextWidget(text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
-            Material(
-              child: AnimateIcon(
-                iconType: IconType.toggleIcon,
-                animateIcon: AnimateIcons.favoriteFolder,
-                height: 25,
-                width: 25,
-                color: MyColors.purple,
-                onTap: () {
-                  FlashCard().addFlashcard(front: contentKo, back: reading.content[fo][index], audio: 'ReadingAudios_${readingTitle.id}_${reading.id}');
+            Obx(() => IconButton(
+                onPressed: () {
+                  if (controller.hasFlashcard[index]) {
+                    FlashCard().removeFlashcard(itemId: reading.id);
+                    controller.hasFlashcard[index] = false;
+                  } else {
+                    FlashCard().addFlashcard(
+                        itemId: reading.id,
+                        front: reading.content[KO],
+                        back: reading.content[fo],
+                        audio: 'ReadingAudios_${readingTitle.id}_${reading.id}');
+                    controller.hasFlashcard[index] = true;
+                  }
                 },
-              ),
-            ),
+                icon: Icon(
+                  controller.hasFlashcard[index]
+                      ? CupertinoIcons.heart_fill
+                      : CupertinoIcons.heart,
+                  color: MyColors.purple,
+                ))),
             Material(
               child: IconButton(
                 icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
@@ -361,6 +372,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 for(dynamic snapshot in snapshot.data) {
                   readings.add(Reading.fromJson(snapshot.data() as Map<String, dynamic>));
                 }
+                controller.hasFlashcard.value = List.generate(readings.length, (index) => false);
                 if(readings.isEmpty) {
                   return Center(
                     child: MyWidget().getTextWidget(

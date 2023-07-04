@@ -61,11 +61,10 @@ class MyWidget {
     );
   }
 
-  Widget getSearchWidget(
-      {required FocusNode focusNode,
-      required TextEditingController controller,
-      required String hint,
-      required Function(String?) onChanged}) {
+  Widget getSearchWidget({required FocusNode focusNode,
+    required TextEditingController controller,
+    required String hint,
+    required Function(String?) onChanged}) {
     return TextField(
       focusNode: focusNode,
       decoration: InputDecoration(
@@ -135,8 +134,8 @@ class MyWidget {
       onPressed: hasNullFunction
           ? f()
           : () {
-              f();
-            },
+        f();
+      },
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
         child: MyWidget().getTextWidget(text: text, size: textSize, color: fontColor),
@@ -173,8 +172,10 @@ class MyWidget {
     int? maxLength,
     Function(String)? onChanged,
     bool enabled = true,
+    FocusNode? focusNode,
   }) {
     return TextField(
+      focusNode: focusNode,
       controller: controller,
       enabled: enabled,
       maxLines: maxLines,
@@ -224,6 +225,21 @@ class MyWidget {
       ),
       child: widget,
     );
+  }
+
+  showDialog({required String content, required Function f}) {
+    Get.dialog(AlertDialog(
+      title: Image.asset('assets/images/podo.png', width: 50, height: 50),
+      content: MyWidget().getTextWidget(text: content),
+      actions: [
+        TextButton(onPressed: () {
+          f();
+        }, child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.purple))),
+        TextButton(onPressed: () {
+          Get.back();
+        }, child: const Text(MyStrings.no, style: TextStyle(color: MyColors.red))),
+      ],
+    ));
   }
 
   showSnackbar({

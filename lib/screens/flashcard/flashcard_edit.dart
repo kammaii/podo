@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
@@ -14,17 +13,23 @@ class FlashCardEdit extends StatelessWidget {
   bool isCorrected = false;
   late String front;
   late String back;
+  final FocusNode _focusNodeFront = FocusNode();
+  final FocusNode _focusNodeBack = FocusNode();
 
   Function? onSaveBtn() {
     if (isCorrected) {
       return () {
-        Database().updateFlashcard(id: card.id, front: front, back: back);
+        _focusNodeFront.unfocus();
+        _focusNodeBack.unfocus();
+        card.front = front;
+        card.back = back;
+        Get.back();
+        FlashCard().updateFlashcard(card: card);
       };
     } else {
       return null;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -60,30 +65,30 @@ class FlashCardEdit extends StatelessWidget {
                         Expanded(
                           child: Center(
                             child: MyWidget().getTextFieldWidget(
-                              controller: TextEditingController(text: front),
-                              hint: 'front',
-                              fontSize: 20,
-                              maxLines: 5,
-                              onChanged: (text) {
-                                front = text;
-                                Get.find<FlashCardController>().update();
-                              }
-                            ),
+                                focusNode: _focusNodeFront,
+                                controller: TextEditingController(text: front),
+                                hint: 'front',
+                                fontSize: 20,
+                                maxLines: 5,
+                                onChanged: (text) {
+                                  front = text;
+                                  Get.find<FlashCardController>().update();
+                                }),
                           ),
                         ),
                         const Divider(height: 10),
                         Expanded(
                           child: Center(
                             child: MyWidget().getTextFieldWidget(
-                              controller: TextEditingController(text: back),
-                              hint: 'back',
-                              fontSize: 20,
-                              maxLines: 5,
-                              onChanged: (text) {
-                                back = text;
-                                Get.find<FlashCardController>().update();
-                              }
-                            ),
+                                focusNode: _focusNodeBack,
+                                controller: TextEditingController(text: back),
+                                hint: 'back',
+                                fontSize: 20,
+                                maxLines: 5,
+                                onChanged: (text) {
+                                  back = text;
+                                  Get.find<FlashCardController>().update();
+                                }),
                           ),
                         ),
                       ],
@@ -95,7 +100,7 @@ class FlashCardEdit extends StatelessWidget {
             GetBuilder<FlashCardController>(
               builder: (controller) {
                 isCorrected = false;
-                if(front != card.front || back != card.back) {
+                if (front != card.front || back != card.back) {
                   isCorrected = true;
                 }
                 return Padding(

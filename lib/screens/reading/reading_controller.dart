@@ -4,6 +4,7 @@ import 'package:podo/values/my_strings.dart';
 
 class ReadingController extends GetxController {
   RxList<bool>? isExpanded;
+  RxList<bool> hasFlashcard = <bool>[].obs;
 
   initIsExpanded(int length) {
     isExpanded ??= List.generate(length, (index) => false).obs;

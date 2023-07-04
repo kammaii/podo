@@ -1,12 +1,24 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:podo/common/database.dart';
+import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
+import 'package:podo/screens/profile/history.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage.init();
   late final SharedPreferences prefs;
   final LESSON_COURSE = 'lessonCourse';
+  final FLASHCARDS = 'flashcards';
+  final HISTORIES = 'histories';
+  final REF_FLASHCARD = 'Users/${User().id}/FlashCards';
   bool isInit = false;
+  List<FlashCard> flashcards = [];
+  List<History> histories = [];
+  late final collectionRef;
+
 
   factory LocalStorage() {
     return _instance;
@@ -17,9 +29,10 @@ class LocalStorage {
   }
 
   Future<void> getPrefs() async {
-    if(!isInit) {
-      prefs = await SharedPreferences.getInstance();
+    if (!isInit) {
       isInit = true;
+      prefs = await SharedPreferences.getInstance();
+      await getFlashcards();
     }
   }
 
@@ -34,5 +47,92 @@ class LocalStorage {
     } else {
       return null;
     }
+  }
+
+  bool hasFlashcard({required String itemId}) {
+    return flashcards.any((flashcard) => flashcard.itemId == itemId);
+  }
+
+  void setFlashcards() {
+    List<String> flashcardsString = flashcards.map((e) => jsonEncode(e.toJson(isLocal: true))).toList();
+    prefs.setStringList(FLASHCARDS, flashcardsString);
+  }
+
+  void convertLocalFlashcards(List<String> localFlashcards) {
+    flashcards = localFlashcards.map((e) => FlashCard.fromJson(jsonDecode(e), isLocal: true)).toList();
+    flashcards.sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  void downloadFlashcards() async {
+    Query query = collectionRef.orderBy('date', descending: true);
+    List<dynamic> snapshots = await Database().getDocs(query: query);
+    flashcards.clear();
+    for (dynamic snapshot in snapshots) {
+      flashcards.add(FlashCard.fromJson(snapshot.data() as Map<String, dynamic>));
+    }
+    setFlashcards();
+    print('플래시카드 다운로드');
+  }
+
+  void uploadFlashcards() async {
+    for (final card in flashcards) {
+      await Database().setDoc(collection: REF_FLASHCARD, doc: card);
+    }
+    print('플래시카드 업로드');
+  }
+
+  Future<void> getFlashcards() async {
+    collectionRef = FirebaseFirestore.instance.collection(REF_FLASHCARD);
+    List<String>? localFlashcards = prefs.getStringList(FLASHCARDS);
+    flashcards = [];
+    DateTime? dateOnDB;
+    Query query = collectionRef.orderBy('date', descending: true).limit(1);
+    List<dynamic> snapshots = await Database().getDocs(query: query);
+    if(snapshots.isNotEmpty) {
+      dateOnDB = FlashCard.fromJson(snapshots.first.data() as Map<String, dynamic>).date;
+    }
+
+    // 로컬: null && DB: null  ||  로컬 date == DB date -> return;
+    // 로컬: null && DB: !null -> DB 에서 다운로드
+    if (localFlashcards == null && dateOnDB != null) {
+      downloadFlashcards();
+    }
+
+    // 로컬: !null && DB: !null -> Date 비교
+    if (localFlashcards != null && dateOnDB != null) {
+      convertLocalFlashcards(localFlashcards);
+      int compareDate = flashcards.first.date.compareTo(dateOnDB);
+      print('LOCALTIME: ${flashcards.first.date}');
+      print('DBTIME: $dateOnDB');
+
+
+      // 로컬 < DB -> DB 에서 다운로드
+      print('COMPARE: $compareDate');
+      if (compareDate < 0) {
+        downloadFlashcards();
+
+        // 로컬 > DB -> 로컬을 DB에 업로드
+      } else if (compareDate > 0) {
+        uploadFlashcards();
+      }
+    }
+
+    // 로컬: !null && DB == null -> 로컬을 DB에 업로드
+    if (localFlashcards != null && dateOnDB == null) {
+      convertLocalFlashcards(localFlashcards);
+      uploadFlashcards();
+    }
+    return;
+  }
+
+  List<History> getHistories() {
+    List<String>? json = prefs.getStringList(HISTORIES);
+    histories = [];
+    if (json != null) {
+      for (dynamic snapshot in json) {
+        histories.add(History.fromJson(jsonDecode(snapshot)));
+      }
+    }
+    return histories;
   }
 }
