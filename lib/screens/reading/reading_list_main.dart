@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/profile/history.dart';
 import 'package:podo/screens/profile/user.dart';
@@ -29,15 +30,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
   late List<ReadingTitle> readingTitles;
 
   Widget getListItem({required ReadingTitle readingTitle}) {
-    bool isCompleted = false;
-    for (dynamic historyJson in User().readingHistory) {
-      History history = History.fromJson(historyJson);
-      if (history.itemId == readingTitle.id) {
-        isCompleted = true;
-        break;
-      }
-    }
-
+    bool isCompleted = LocalStorage().hasHistory(itemId: readingTitle.id);
 
     return Stack(
       children: [

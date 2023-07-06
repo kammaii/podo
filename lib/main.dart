@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
     await CloudMessage().getCloudMessage();
-    Get.offNamed('/');
+    Get.toNamed('/');
   }
 
   @override
@@ -105,11 +105,11 @@ class MyApp extends StatelessWidget {
           getInitData();
         } else {
           print('AUTH STATE CHANGES: Email not Verified');
-          Get.toNamed('/login');
+          Get.offAllNamed('/login');
         }
       } else {
         print('AUTH STATE CHANGES: User is null');
-        Get.toNamed('/login');
+        Get.offAllNamed('/login');
       }
     });
 

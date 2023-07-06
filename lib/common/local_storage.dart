@@ -14,10 +14,13 @@ class LocalStorage {
   final FLASHCARDS = 'flashcards';
   final HISTORIES = 'histories';
   final REF_FLASHCARD = 'Users/${User().id}/FlashCards';
+  final REF_HISTORY = 'Users/${User().id}/Histories';
   bool isInit = false;
   List<FlashCard> flashcards = [];
   List<History> histories = [];
-  late final collectionRef;
+  late final flashcardRef;
+  late final historyRef;
+
 
 
   factory LocalStorage() {
@@ -33,6 +36,7 @@ class LocalStorage {
       isInit = true;
       prefs = await SharedPreferences.getInstance();
       await getFlashcards();
+      await getHistories();
     }
   }
 
@@ -64,7 +68,7 @@ class LocalStorage {
   }
 
   void downloadFlashcards() async {
-    Query query = collectionRef.orderBy('date', descending: true);
+    Query query = flashcardRef.orderBy('date', descending: true);
     List<dynamic> snapshots = await Database().getDocs(query: query);
     flashcards.clear();
     for (dynamic snapshot in snapshots) {
@@ -82,11 +86,11 @@ class LocalStorage {
   }
 
   Future<void> getFlashcards() async {
-    collectionRef = FirebaseFirestore.instance.collection(REF_FLASHCARD);
+    flashcardRef = FirebaseFirestore.instance.collection(REF_FLASHCARD);
     List<String>? localFlashcards = prefs.getStringList(FLASHCARDS);
     flashcards = [];
     DateTime? dateOnDB;
-    Query query = collectionRef.orderBy('date', descending: true).limit(1);
+    Query query = flashcardRef.orderBy('date', descending: true).limit(1);
     List<dynamic> snapshots = await Database().getDocs(query: query);
     if(snapshots.isNotEmpty) {
       dateOnDB = FlashCard.fromJson(snapshots.first.data() as Map<String, dynamic>).date;
@@ -102,12 +106,8 @@ class LocalStorage {
     if (localFlashcards != null && dateOnDB != null) {
       convertLocalFlashcards(localFlashcards);
       int compareDate = flashcards.first.date.compareTo(dateOnDB);
-      print('LOCALTIME: ${flashcards.first.date}');
-      print('DBTIME: $dateOnDB');
-
 
       // 로컬 < DB -> DB 에서 다운로드
-      print('COMPARE: $compareDate');
       if (compareDate < 0) {
         downloadFlashcards();
 
@@ -125,14 +125,68 @@ class LocalStorage {
     return;
   }
 
-  List<History> getHistories() {
-    List<String>? json = prefs.getStringList(HISTORIES);
+
+  bool hasHistory({required String itemId}) {
+    return histories.any((flashcard) => flashcard.itemId == itemId);
+  }
+
+  void convertLocalHistories(List<String> localHistories) {
+    histories = localHistories.map((e) => History.fromJson(jsonDecode(e), isLocal: true)).toList();
+  }
+
+  void setHistories() {
+    List<String> historiesString = histories.map((e) => jsonEncode(e.toJson(isLocal: true))).toList();
+    prefs.setStringList(HISTORIES, historiesString);
+  }
+
+  void downloadHistories() async {
+    Query query = historyRef.orderBy('date', descending: true);
+    List<dynamic> snapshots = await Database().getDocs(query: query);
+    histories.clear();
+    for (dynamic snapshot in snapshots) {
+      histories.add(History.fromJson(snapshot.data() as Map<String, dynamic>));
+    }
+    setHistories();
+    print('히스토리 다운로드');
+  }
+
+  void uploadHistories() async {
+    for (final history in histories) {
+      await Database().setDoc(collection: REF_HISTORY, doc: history);
+    }
+    print('히스토리 업로드');
+  }
+
+  Future<void> getHistories() async {
+    historyRef = FirebaseFirestore.instance.collection(REF_HISTORY);
+    List<String>? localHistories = prefs.getStringList(HISTORIES);
     histories = [];
-    if (json != null) {
-      for (dynamic snapshot in json) {
-        histories.add(History.fromJson(jsonDecode(snapshot)));
+    DateTime? dateOnDB;
+    Query query = historyRef.orderBy('date', descending:true).limit(1);
+    List<dynamic> snapshots = await Database().getDocs(query: query);
+    if(snapshots.isNotEmpty) {
+      dateOnDB = History.fromJson(snapshots.first.data() as Map<String, dynamic>).date;
+    }
+
+    if(localHistories == null && dateOnDB != null) {
+      downloadHistories();
+    }
+
+    if(localHistories != null && dateOnDB != null) {
+      convertLocalHistories(localHistories);
+      int compareDate = histories.first.date.compareTo(dateOnDB);
+
+      if(compareDate < 0) {
+        downloadHistories();
+      } else if (compareDate > 0) {
+        uploadHistories();
       }
     }
-    return histories;
+
+    if(localHistories != null && dateOnDB == null) {
+      convertLocalHistories(localHistories);
+      uploadHistories();
+    }
+    return;
   }
 }

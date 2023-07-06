@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
@@ -74,13 +75,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
       if (lesson.type == LESSON) {
         lessonIndex++;
-        for (dynamic historyJson in User().lessonHistory) {
-          History history = History.fromJson(historyJson);
-          if (history.itemId == lesson.id) {
-            isCompleted = true;
-            break;
-          }
-        }
+        isCompleted = LocalStorage().hasHistory(itemId: lesson.id);
       }
     }
 
@@ -271,12 +266,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     course = widget.course;
     lessonIndex = -1;
     final cloudController = Get.put(CloudMessageController());
-    for(dynamic snapshot in User().cloudMessageHistory) {
-      History history = History.fromJson(snapshot);
-      if (history.itemId == CloudMessage().id) {
-        cloudController.setHasReplied(true);
-        break;
-      }
+    if(CloudMessage().id != null) {
+      bool hasReplied = LocalStorage().hasHistory(itemId: CloudMessage().id!);
+      cloudController.setHasReplied(hasReplied);
     }
 
     return Scaffold(

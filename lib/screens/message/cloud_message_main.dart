@@ -73,19 +73,13 @@ class CloudMessageMain extends StatelessWidget {
     hasReplied = controller.hasReplied.value;
     String? reply;
     if (hasReplied) {
-      for (dynamic snapshot in User().cloudMessageHistory) {
-        History history = History.fromJson(snapshot);
-        if (history.itemId == CloudMessage().id) {
-          reply = history.content;
-          break;
-        }
-      }
+      History history = LocalStorage().histories.firstWhere((history) => history.itemId == CloudMessage().id);
+      reply = history.content;
     }
     Query query = FirebaseFirestore.instance
         .collection('CloudMessages/${CloudMessage().id}/Replies')
         .where('isSelected', isEqualTo: true)
         .orderBy('date', descending: true);
-
 
     return Scaffold(
       appBar: MyWidget().getAppbar(title: CloudMessage().title![KO], isKorean: true, actions: [
@@ -185,7 +179,12 @@ class CloudMessageMain extends StatelessWidget {
                                                       ),
                                                     ),
                                                     const SizedBox(width: 10),
-                                                    Expanded(child: MyWidget().getTextWidget(text: reply.reply, isKorean: true, size: 16, height: 1.5)),
+                                                    Expanded(
+                                                        child: MyWidget().getTextWidget(
+                                                            text: reply.reply,
+                                                            isKorean: true,
+                                                            size: 16,
+                                                            height: 1.5)),
                                                     const SizedBox(width: 10),
                                                     Obx(() => IconButton(
                                                         onPressed: () {
@@ -194,8 +193,7 @@ class CloudMessageMain extends StatelessWidget {
                                                             controller.hasFlashcard[index] = false;
                                                           } else {
                                                             FlashCard().addFlashcard(
-                                                                itemId: reply.id,
-                                                                front: reply.reply);
+                                                                itemId: reply.id, front: reply.reply);
                                                             controller.hasFlashcard[index] = true;
                                                           }
                                                         },
@@ -212,7 +210,11 @@ class CloudMessageMain extends StatelessWidget {
                                                   children: [
                                                     Padding(
                                                       padding: const EdgeInsets.only(right: 10, top: 5),
-                                                      child: MyWidget().getTextWidget(text: reply.userName.isEmpty ? MyStrings.unNamed : reply.userName, color: MyColors.grey),
+                                                      child: MyWidget().getTextWidget(
+                                                          text: reply.userName.isEmpty
+                                                              ? MyStrings.unNamed
+                                                              : reply.userName,
+                                                          color: MyColors.grey),
                                                     ),
                                                   ],
                                                 ),
@@ -276,31 +278,21 @@ class CloudMessageMain extends StatelessWidget {
                             ignoring: hasReplied,
                             child: IconButton(
                                 onPressed: () {
-                                  Get.dialog(AlertDialog(
-                                    title: MyWidget().getTextWidget(text: MyStrings.sendReply, size: 18),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Get.back();
-                                          },
-                                          child:
-                                              MyWidget().getTextWidget(text: MyStrings.no, color: MyColors.grey)),
-                                      TextButton(
-                                          onPressed: () {
-                                            Get.back();
-                                            CloudReply reply = CloudReply(replyController.text);
-                                            Database().sendReplyBatch(
-                                                reply: reply,
-                                                thenFn: (value) {
-                                                  print('Cloud reply completed');
-                                                  Get.back();
-                                                  Get.find<CloudMessageController>().setHasReplied(true);
-                                                });
-                                          },
-                                          child: MyWidget()
-                                              .getTextWidget(text: MyStrings.yes, color: MyColors.purple)),
-                                    ],
-                                  ));
+                                  MyWidget().showDialog(
+                                      content: MyStrings.sendReply,
+                                      f: () async {
+                                        Get.back();
+                                        CloudReply reply = CloudReply(replyController.text);
+                                        await Database().setDoc(
+                                            collection: 'CloudMessages/${CloudMessage().id}/Replies',
+                                            doc: reply,
+                                            thenFn: (value) {
+                                              print('Cloud reply completed');
+                                              Get.back();
+                                              Get.find<CloudMessageController>().setHasReplied(true);
+                                            });
+                                        History().addHistory(item: 'cloudMessage', itemId: CloudMessage().id!, content: replyController.text);
+                                      });
                                 },
                                 icon: Icon(Icons.send, color: hasReplied ? MyColors.grey : MyColors.purple)),
                           ),

@@ -232,14 +232,11 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 index == length - 1
                     ? MyWidget().getRoundBtnWidget(
                         text: MyStrings.complete,
-                        f: () async {
+                        f: () {
+                          History().addHistory(item: 'reading', itemId: readingTitle.id);
                           LocalStorage().prefs.remove(readingTitle.id);
+                          controller.update();
                           Get.back();
-                          History history = History(item: 'reading', itemId: readingTitle.id);
-                          final readingHistory = User().readingHistory;
-                          readingHistory.add(history.toJson());
-                          await Database().updateDoc(collection: 'Users', docId: User().id, key: 'readingHistory', value: readingHistory);
-                          User().readingHistory.add(history);
                         })
                     : const SizedBox.shrink(),
               ],

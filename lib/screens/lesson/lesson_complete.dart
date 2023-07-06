@@ -42,20 +42,12 @@ class LessonComplete extends StatelessWidget {
     ]);
   }
 
-  setHistory(String lessonId) async {
-    History history = History(item: 'lesson', itemId: lessonId);
-    final lessonHistory = User().lessonHistory;
-    lessonHistory.add(history.toJson());
-    await Database().updateDoc(collection: 'Users', docId: User().id, key: 'lessonHistory', value: lessonHistory);
-    User().lessonHistory.add(history);
-  }
-
   @override
   Widget build(BuildContext context) {
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
     final lesson = Get.arguments;
-    setHistory(lesson.id);
+    History().addHistory(item: 'lesson', itemId: lesson.id);
 
     return Scaffold(
       backgroundColor: MyColors.purpleLight,

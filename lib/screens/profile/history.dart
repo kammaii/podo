@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:uuid/uuid.dart';
 
 class History {
@@ -8,9 +11,10 @@ class History {
   String? content;
   late DateTime date;
 
-  History({required this.item, required this.itemId}) {
+  History() {
     id = const Uuid().v4();
-    date = DateTime.now();
+    DateTime now = DateTime.now();
+    date = now.subtract(Duration(milliseconds: now.millisecond, microseconds: now.microsecond));
   }
 
   static const String ID = 'id';
@@ -19,27 +23,47 @@ class History {
   static const String CONTENT = 'content';
   static const String DATE = 'date';
 
-  History.fromJson(Map<String,dynamic> json) {
+  History.fromJson(Map<String,dynamic> json, {bool isLocal = false}) {
     id = json[ID];
     item = json[ITEM];
     itemId = json[ITEMID];
     if(json[CONTENT] != null) {
       content = json[CONTENT];
     }
-    Timestamp stamp = json[DATE];
-    date = stamp.toDate();
+    if(!isLocal) {
+      Timestamp stamp = json[DATE];
+      date = stamp.toDate();
+    } else {
+      date = DateTime.parse(json[DATE]);
+    }
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({bool isLocal = false}) {
     Map<String, dynamic> map = {
       ID: id,
       ITEM: item,
       ITEMID: itemId,
-      DATE: Timestamp.fromDate(date),
     };
     if(content != null) {
       map[CONTENT] = content;
     }
+    if(!isLocal) {
+      map[DATE] = Timestamp.fromDate(date);
+    } else {
+      map[DATE] = date.toIso8601String();
+    }
     return map;
+  }
+
+  void addHistory({required String item, required String itemId, String? content}) async {
+    History history = History();
+    history.item = item;
+    history.itemId = itemId;
+    history.content = content;
+    print('HISTORY: ${history.toJson()}');
+    await Database().setDoc(collection: 'Users/${User().id}/Histories', doc: history);
+    LocalStorage().histories.insert(0, history);
+    LocalStorage().setHistories();
+    print('히스토리 추가');
   }
 }

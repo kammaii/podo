@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/lesson_course_controller.dart';
-import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_list_main.dart';
@@ -161,7 +161,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
               actions: [
                 TextButton(
                     onPressed: () {
-                      Get.back();
+                      SystemNavigator.pop();
                       isExit = true;
                     },
                     child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.navy))),
