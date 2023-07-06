@@ -3,15 +3,13 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/profile/history.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:podo/screens/profile/history.dart';
 
 class LessonComplete extends StatelessWidget {
   const LessonComplete({Key? key}) : super(key: key);

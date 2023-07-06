@@ -117,8 +117,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.repeat:
-        controller.hasFlashcard.value = LocalStorage().hasFlashcard(itemId: card.id);
-
         widget = Column(
           children: [
             Row(
@@ -140,20 +138,20 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             children: [
                               IconButton(
                                   onPressed: () {
-                                    if (controller.hasFlashcard.value) {
+                                    if (controller.hasFlashcard[card.id]) {
                                       FlashCard().removeFlashcard(itemId: card.id);
-                                      controller.hasFlashcard.value = false;
+                                      controller.hasFlashcard[card.id] = false;
                                     } else {
                                       FlashCard().addFlashcard(
                                           itemId: card.id,
                                           front: card.content[KO],
                                           back: card.content[fo],
                                           audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}');
-                                      controller.hasFlashcard.value = true;
+                                      controller.hasFlashcard[card.id] = true;
                                     }
                                   },
                                   icon: Icon(
-                                    controller.hasFlashcard.value
+                                    controller.hasFlashcard[card.id]
                                         ? CupertinoIcons.heart_fill
                                         : CupertinoIcons.heart,
                                     color: MyColors.purple,
@@ -509,9 +507,15 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       CloudStorage().getLessonAudios(lessonId: lesson.id),
     ]).then((snapshots) {
       setState(() {
+        Map<String, bool> flashcardMap = {};
         for (dynamic snapshot in snapshots[0]) {
-          cards.add(LessonCard.fromJson(snapshot.data() as Map<String, dynamic>));
+          LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
+          if(card.type == MyStrings.repeat) {
+            flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
+          }
+          cards.add(card);
         }
+        controller.hasFlashcard.value = flashcardMap.obs;
         for (dynamic snapshot in snapshots[1]) {
           audios.addAll(snapshot);
         }

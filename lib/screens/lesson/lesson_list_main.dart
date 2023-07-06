@@ -8,7 +8,6 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
 import 'package:podo/screens/premium/premium_main.dart';
-import 'package:podo/screens/profile/history.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
