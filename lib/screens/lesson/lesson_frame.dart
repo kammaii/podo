@@ -30,7 +30,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   final lesson = Get.arguments;
   int thisIndex = 0;
   ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
-  final controller = Get.put(LessonController());
+  final controller = Get.find<LessonController>();
   final KO = 'ko';
   final PRONUN = 'pronun';
   final EX1 = 'ex1';

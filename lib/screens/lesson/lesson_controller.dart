@@ -8,6 +8,7 @@ class LessonController extends GetxController {
   late double audioProgress;
   late List<bool> audioSpeedToggle;
   RxMap<dynamic, dynamic> hasFlashcard = {}.obs;
+  RxMap<dynamic, dynamic> isCompleted = {}.obs;
 
 
 

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/lesson_course_controller.dart';
+import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
+import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
@@ -35,7 +36,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
-  LessonCourseController controller = Get.find<LessonCourseController>();
+  final courseController = Get.find<LessonCourseController>();
+  final lessonController = Get.put(LessonController());
+  List<Lesson> lessons = [];
 
   @override
   void dispose() {
@@ -69,12 +72,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   Widget lessonListWidget(dynamic lessonMap) {
     late Lesson lesson;
-    bool isCompleted = false;
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
       if (lesson.type == LESSON) {
         lessonIndex++;
-        isCompleted = LocalStorage().hasHistory(itemId: lesson.id);
       }
     }
 
@@ -114,12 +115,14 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                     color: MyColors.grey,
                                   ),
                                   const SizedBox(width: 10),
-                                  isCompleted
-                                      ? const Icon(
-                                          Icons.check_circle,
-                                          color: MyColors.green,
-                                        )
-                                      : const SizedBox.shrink(),
+                                  Obx(
+                                    () => lessonController.isCompleted[lesson.id]
+                                        ? const Icon(
+                                            Icons.check_circle,
+                                            color: MyColors.green,
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 10),
@@ -203,7 +206,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         icon: const Icon(Icons.menu),
         color: MyColors.purple,
         onPressed: () {
-          controller.setVisibility(true);
+          courseController.setVisibility(true);
         },
       ),
       expandedHeight: sliverAppBarHeight,
@@ -263,9 +266,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     course = widget.course;
+    Map<String, bool> map = {};
+    for (dynamic lessonMap in course.lessons) {
+      if (lessonMap is Map) {
+        Lesson lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
+        lessons.add(lesson);
+        map[lesson.id] = LocalStorage().hasHistory(itemId: lesson.id);
+      }
+    }
+    lessonController.isCompleted.value = map;
     lessonIndex = -1;
     final cloudController = Get.put(CloudMessageController());
-    if(CloudMessage().id != null) {
+    if (CloudMessage().id != null) {
       bool hasReplied = LocalStorage().hasHistory(itemId: CloudMessage().id!);
       cloudController.setHasReplied(hasReplied);
     }

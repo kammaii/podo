@@ -6,6 +6,7 @@ import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/profile/history.dart';
 import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -28,10 +29,9 @@ class _ReadingListMainState extends State<ReadingListMain> {
   final ORDER_ID = 'orderId';
   String fo = User().language;
   late List<ReadingTitle> readingTitles;
+  final controller = Get.put(ReadingController());
 
   Widget getListItem({required ReadingTitle readingTitle}) {
-    bool isCompleted = LocalStorage().hasHistory(itemId: readingTitle.id);
-
     return Stack(
       children: [
         Card(
@@ -67,13 +67,15 @@ class _ReadingListMainState extends State<ReadingListMain> {
                             child: Image.asset('assets/images/${rockets[readingTitle.level]}.png'),
                           ),
                           const SizedBox(width: 10),
-                          isCompleted
-                              ? const Icon(
-                                  Icons.check_circle,
-                                  color: MyColors.green,
-                                  size: 20,
-                                )
-                              : const SizedBox.shrink(),
+                          Obx(
+                            () => controller.isCompleted[readingTitle.id]
+                                ? const Icon(
+                                    Icons.check_circle,
+                                    color: MyColors.green,
+                                    size: 20,
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -168,9 +170,13 @@ class _ReadingListMainState extends State<ReadingListMain> {
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                       readingTitles = [];
+                      Map<String, bool> isCompletedMap = {};
                       for (dynamic snapshot in snapshot.data) {
-                        readingTitles.add(ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>));
+                        ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
+                        readingTitles.add(title);
+                        isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
                       }
+                      controller.isCompleted.value = isCompletedMap.obs;
                       if (readingTitles.isEmpty) {
                         return Center(
                             child: MyWidget().getTextWidget(

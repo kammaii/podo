@@ -39,7 +39,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   double scrollPosition = 0;
   late List<Reading> readings;
   late Future future;
-  final controller = Get.put(ReadingController());
+  final controller = Get.find<ReadingController>();
 
   @override
   void dispose() {
@@ -235,7 +235,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                         f: () {
                           History().addHistory(item: 'reading', itemId: readingTitle.id);
                           LocalStorage().prefs.remove(readingTitle.id);
-                          controller.update();
+                          controller.isCompleted[readingTitle.id] = true;
                           Get.back();
                         })
                     : const SizedBox.shrink(),

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
+import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/profile/history.dart';
 import 'package:podo/values/my_colors.dart';
@@ -45,7 +46,11 @@ class LessonComplete extends StatelessWidget {
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
     final lesson = Get.arguments;
+    final lessonController = Get.find<LessonController>();
     History().addHistory(item: 'lesson', itemId: lesson.id);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      lessonController.isCompleted[lesson.id] = true;
+    });
 
     return Scaffold(
       backgroundColor: MyColors.purpleLight,
