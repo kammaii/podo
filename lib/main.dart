@@ -3,9 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
-import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
@@ -23,11 +23,12 @@ import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
   User? currentUser = FirebaseAuth.instance.currentUser;
+  late TargetPlatform os;
 
   void runDeepLink(Uri deepLink) async {
     Uri uri = Uri.parse(deepLink.toString());
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
     switch(mode) {
       case 'verifyEmail' :
         if(currentUser != null && currentUser!.emailVerified) {
-          await user.User().initNewUserOnDB();
+          await user.User().makeNewUserOnDB(os);
           getInitData(isNewUser: true);
         }
         break;
@@ -91,6 +93,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    os = Theme.of(context).platform;
     String initialRoute = '/login';
     if (currentUser != null && currentUser!.emailVerified == true) {
       initialRoute = '/logo';

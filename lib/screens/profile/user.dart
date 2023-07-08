@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/ads.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/premium/premium.dart';
@@ -19,6 +20,7 @@ class User {
   }
 
   late String id;
+  late String os;
   late String email;
   late String name;
   late DateTime dateSignUp;
@@ -30,6 +32,7 @@ class User {
   late int status;
 
   static const String ID = 'id';
+  static const String OS = 'os';
   static const String EMAIL = 'email';
   static const String NAME = 'name';
   static const String DATESIGNUP = 'dateSignUp';
@@ -43,6 +46,7 @@ class User {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
       ID: id,
+      OS: os,
       EMAIL: email,
       NAME: name,
       DATESIGNUP: dateSignUp,
@@ -59,9 +63,10 @@ class User {
     return map;
   }
 
-  Future<void> initNewUserOnDB() async {
+  Future<void> makeNewUserOnDB(TargetPlatform platform) async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
     id = user.uid;
+    os = platform.toString().split('.').last;
     email = user.email ?? '';
     name = user.displayName ?? '';
     dateSignUp = DateTime.now();
@@ -83,6 +88,7 @@ class User {
     if (snapshot.exists) {
       final json = snapshot.data()!;
       id = json[ID];
+      os = json[OS];
       email = json[EMAIL];
       name = json[NAME];
       Timestamp stamp = json[DATESIGNUP];
@@ -98,6 +104,9 @@ class User {
         fcmState = json[FCM_STATE];
       }
       status = json[STATUS];
+      if(status == 1) {
+        Ads();
+      }
 
     } else {
       Get.dialog(AlertDialog(

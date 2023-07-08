@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:podo/common/ads.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
+import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
-import 'package:podo/screens/premium/premium_main.dart';
 import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonListMain extends StatefulWidget {
   LessonListMain({Key? key, required this.course}) : super(key: key);
@@ -39,11 +39,21 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final courseController = Get.find<LessonCourseController>();
   final lessonController = Get.put(LessonController());
   List<Lesson> lessons = [];
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
 
   @override
   void dispose() {
     super.dispose();
     scrollController.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (User().status == 1) {
+      _loadAd();
+    }
   }
 
   @override
@@ -70,6 +80,30 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         }));
   }
 
+  Future<void> _loadAd() async {
+    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.of(context).size.width.truncate());
+    if (size == null) {
+      print('Unable to get height of anchored banner.');
+      return;
+    }
+    _bannerAd = BannerAd(
+      size: size,
+      adUnitId: Ads().UNIT_ID[User().os == 'iOS' ? Ads().IOS_BANNER : Ads().ANDROID_BANNER]!,
+      listener: BannerAdListener(onAdFailedToLoad: (Ad ad, LoadAdError e) {
+        print('Failed to load bannerAd : $e');
+        ad.dispose();
+      }, onAdLoaded: (Ad ad) {
+        print('BannerAd is loaded');
+        setState(() {
+          _bannerAd = ad as BannerAd;
+          _isAdLoaded = true;
+        });
+      }),
+      request: const AdRequest(),
+    )..load();
+  }
+
   Widget lessonListWidget(dynamic lessonMap) {
     late Lesson lesson;
     if (lessonMap is Map) {
@@ -90,107 +124,88 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   color: MyColors.navyLight,
                 ),
               )
-            : Stack(
+            : Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(cardBorderRadius),
-                      ),
-                      color: Colors.white,
-                      child: InkWell(
-                        onTap: () {
-                          Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                  Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(cardBorderRadius),
+                          ),
+                          color: Colors.white,
+                          child: InkWell(
+                            onTap: () {
+                              Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  MyWidget().getTextWidget(
-                                    text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
-                                    color: MyColors.grey,
+                                  Row(
+                                    children: [
+                                      MyWidget().getTextWidget(
+                                        text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
+                                        color: MyColors.grey,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Obx(
+                                        () => lessonController.isCompleted[lesson.id]
+                                            ? const Icon(
+                                                Icons.check_circle,
+                                                color: MyColors.green,
+                                              )
+                                            : const SizedBox.shrink(),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 10),
-                                  Obx(
-                                    () => lessonController.isCompleted[lesson.id]
-                                        ? const Icon(
-                                            Icons.check_circle,
-                                            color: MyColors.green,
-                                          )
-                                        : const SizedBox.shrink(),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(
+                                    text: lesson.title[KO],
+                                    size: 20,
+                                    color: MyColors.navy,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(
+                                    text: lesson.title[language],
+                                    color: MyColors.grey,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
-                              MyWidget().getTextWidget(
-                                text: lesson.title[KO],
-                                size: 20,
-                                color: MyColors.navy,
-                              ),
-                              const SizedBox(height: 10),
-                              MyWidget().getTextWidget(
-                                text: lesson.title[language],
-                                color: MyColors.grey,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      lesson.tag != null
+                          ? Positioned(
+                              top: 5,
+                              right: 15,
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                    color: MyColors.pink,
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(cardBorderRadius),
+                                      bottomLeft: Radius.circular(cardBorderRadius),
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                  child: const Text('New', style: TextStyle(color: MyColors.red))))
+                          : const SizedBox.shrink(),
+                    ],
                   ),
-                  lesson.tag != null
-                      ? Positioned(
-                          top: 5,
-                          right: 15,
-                          child: Container(
-                              decoration: BoxDecoration(
-                                color: MyColors.pink,
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(cardBorderRadius),
-                                  bottomLeft: Radius.circular(cardBorderRadius),
-                                ),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                              child: const Text('New', style: TextStyle(color: MyColors.red))))
+                  (_isAdLoaded && lessonIndex >= 0 && lessonIndex % 5 == 0)
+                      ? Container(
+                          color: MyColors.green,
+                          width: _bannerAd!.size.width.toDouble(),
+                          height: _bannerAd!.size.height.toDouble(),
+                          child: AdWidget(ad: _bannerAd!),
+                        )
                       : const SizedBox.shrink(),
                 ],
               ),
       ],
-    );
-  }
-
-  Widget premiumCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(FontAwesomeIcons.crown, color: MyColors.purple),
-              const SizedBox(height: 10),
-              MyWidget().getTextWidget(
-                text: MyStrings.unlockEveryLessons,
-                size: 18,
-                color: Colors.black,
-              ),
-              const SizedBox(height: 10),
-              MyWidget().getRoundBtnWidget(
-                text: MyStrings.startFreeTrial,
-                f: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PremiumMain()));
-                },
-                verticalPadding: 8,
-              )
-            ],
-          ),
-        ),
-      ),
     );
   }
 
