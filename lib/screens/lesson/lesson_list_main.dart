@@ -39,21 +39,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final courseController = Get.find<LessonCourseController>();
   final lessonController = Get.put(LessonController());
   List<Lesson> lessons = [];
-  BannerAd? _bannerAd;
-  bool _isAdLoaded = false;
 
   @override
   void dispose() {
     super.dispose();
     scrollController.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (User().status == 1) {
-      _loadAd();
-    }
   }
 
   @override
@@ -80,30 +70,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         }));
   }
 
-  Future<void> _loadAd() async {
-    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-        MediaQuery.of(context).size.width.truncate());
-    if (size == null) {
-      print('Unable to get height of anchored banner.');
-      return;
-    }
-    _bannerAd = BannerAd(
-      size: size,
-      adUnitId: Ads().UNIT_ID[User().os == 'iOS' ? Ads().IOS_BANNER : Ads().ANDROID_BANNER]!,
-      listener: BannerAdListener(onAdFailedToLoad: (Ad ad, LoadAdError e) {
-        print('Failed to load bannerAd : $e');
-        ad.dispose();
-      }, onAdLoaded: (Ad ad) {
-        print('BannerAd is loaded');
-        setState(() {
-          _bannerAd = ad as BannerAd;
-          _isAdLoaded = true;
-        });
-      }),
-      request: const AdRequest(),
-    )..load();
-  }
-
   Widget lessonListWidget(dynamic lessonMap) {
     late Lesson lesson;
     if (lessonMap is Map) {
@@ -115,96 +81,85 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
     return Column(
       children: [
-        lessonMap is String
-            ? Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 5),
-                child: MyWidget().getTextWidget(
-                  text: lessonMap,
-                  size: 25,
-                  color: MyColors.navyLight,
-                ),
-              )
-            : Column(
-                children: [
-                  Stack(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(cardBorderRadius),
-                          ),
-                          color: Colors.white,
-                          child: InkWell(
-                            onTap: () {
-                              Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      MyWidget().getTextWidget(
-                                        text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
-                                        color: MyColors.grey,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Obx(
-                                        () => lessonController.isCompleted[lesson.id]
-                                            ? const Icon(
-                                                Icons.check_circle,
-                                                color: MyColors.green,
-                                              )
-                                            : const SizedBox.shrink(),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  MyWidget().getTextWidget(
-                                    text: lesson.title[KO],
-                                    size: 20,
-                                    color: MyColors.navy,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  MyWidget().getTextWidget(
-                                    text: lesson.title[language],
-                                    color: MyColors.grey,
-                                  ),
-                                ],
+        if (lessonMap is String)
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 5),
+            child: MyWidget().getTextWidget(
+              text: lessonMap,
+              size: 25,
+              color: MyColors.navyLight,
+            ),
+          )
+        else
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                  ),
+                  color: Colors.white,
+                  child: InkWell(
+                    onTap: () {
+                      Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              MyWidget().getTextWidget(
+                                text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
+                                color: MyColors.grey,
                               ),
+                              const SizedBox(width: 10),
+                              Obx(
+                                () => lessonController.isCompleted[lesson.id]
+                                    ? const Icon(
+                                        Icons.check_circle,
+                                        color: MyColors.green,
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          MyWidget().getTextWidget(
+                            text: lesson.title[KO],
+                            size: 20,
+                            color: MyColors.navy,
+                          ),
+                          const SizedBox(height: 10),
+                          MyWidget().getTextWidget(
+                            text: lesson.title[language],
+                            color: MyColors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              lesson.tag != null
+                  ? Positioned(
+                      top: 5,
+                      right: 15,
+                      child: Container(
+                          decoration: BoxDecoration(
+                            color: MyColors.pink,
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(cardBorderRadius),
+                              bottomLeft: Radius.circular(cardBorderRadius),
                             ),
                           ),
-                        ),
-                      ),
-                      lesson.tag != null
-                          ? Positioned(
-                              top: 5,
-                              right: 15,
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                    color: MyColors.pink,
-                                    borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(cardBorderRadius),
-                                      bottomLeft: Radius.circular(cardBorderRadius),
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                                  child: const Text('New', style: TextStyle(color: MyColors.red))))
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                  (_isAdLoaded && lessonIndex >= 0 && lessonIndex % 5 == 0)
-                      ? Container(
-                          color: MyColors.green,
-                          width: _bannerAd!.size.width.toDouble(),
-                          height: _bannerAd!.size.height.toDouble(),
-                          child: AdWidget(ad: _bannerAd!),
-                        )
-                      : const SizedBox.shrink(),
-                ],
-              ),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          child: const Text('New', style: TextStyle(color: MyColors.red))))
+                  : const SizedBox.shrink(),
+            ],
+          ),
       ],
     );
   }
@@ -367,6 +322,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                 ),
               ),
             ),
+            const SizedBox(height: 5),
+            GetBuilder<LessonController>(
+              builder: (_) {
+                return (User().status == 1 && Ads().isNativeAdLoaded)
+                    ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 13),
+                  child: SizedBox(height:100, child: AdWidget(ad: Ads().nativeAd!)),
+                )
+                    : const SizedBox.shrink();
+              },
+            ),
+            const SizedBox(height: 18),
           ],
         ),
       ),

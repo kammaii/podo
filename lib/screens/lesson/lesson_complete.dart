@@ -3,12 +3,15 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:podo/common/ads.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/profile/history.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -115,42 +118,51 @@ class LessonComplete extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         getBtn(MyStrings.summary, CupertinoIcons.doc_text, () {
-                          Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
+                          showAd(() {
+                            Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
+                          });
                         }),
                         const SizedBox(height: 20),
                         getBtn(MyStrings.writing, CupertinoIcons.pen, () {
-                          Get.offNamedUntil(MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
-                              arguments: lesson.id);
+                          showAd(() {
+                            Get.offNamedUntil(
+                                MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
+                                arguments: lesson.id);
+                          });
                         }),
                         const SizedBox(height: 20),
                         getBtn(MyStrings.nextLesson, CupertinoIcons.arrow_right, () {
-                          LessonCourse course = LocalStorage().getLessonCourse()!;
-                          List<dynamic> lessons = course.lessons;
-                          int thisIndex = -1;
-                          for (int i = 0; i < lessons.length; i++) {
-                            print('$i : ${lessons[i] is String}');
-                            if (lessons[i] is! String &&
-                                lesson.id == Lesson.fromJson(lessons[i] as Map<String, dynamic>).id) {
-                              thisIndex = i;
-                              break;
+                          showAd(() {
+                            LessonCourse course = LocalStorage().getLessonCourse()!;
+                            List<dynamic> lessons = course.lessons;
+                            int thisIndex = -1;
+                            for (int i = 0; i < lessons.length; i++) {
+                              print('$i : ${lessons[i] is String}');
+                              if (lessons[i] is! String &&
+                                  lesson.id == Lesson.fromJson(lessons[i] as Map<String, dynamic>).id) {
+                                thisIndex = i;
+                                break;
+                              }
                             }
-                          }
 
-                          if (thisIndex != -1 && thisIndex < lessons.length - 1) {
-                            int nextIndex = thisIndex + 1;
-                            if (lessons[nextIndex] is String) {
-                              nextIndex++;
+                            if (thisIndex != -1 && thisIndex < lessons.length - 1) {
+                              int nextIndex = thisIndex + 1;
+                              if (lessons[nextIndex] is String) {
+                                nextIndex++;
+                              }
+                              Get.offNamedUntil(MyStrings.routeLessonSummaryMain, ModalRoute.withName('/'),
+                                  arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
+                            } else {
+                              Get.until((route) => Get.currentRoute == '/');
+                              MyWidget().showSnackbar(title: MyStrings.lastLesson);
                             }
-                            Get.offNamedUntil(MyStrings.routeLessonSummaryMain, ModalRoute.withName('/'),
-                                arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
-                          } else {
-                            Get.until((route) => Get.currentRoute == '/');
-                            MyWidget().showSnackbar(title: MyStrings.lastLesson);
-                          }
+                          });
                         }),
                         const SizedBox(height: 20),
                         getBtn(MyStrings.goToMain, CupertinoIcons.home, () {
-                          Get.until((route) => Get.currentRoute == '/');
+                          showAd(() {
+                            Get.until((route) => Get.currentRoute == '/');
+                          });
                         }),
                       ],
                     ),
@@ -163,37 +175,47 @@ class LessonComplete extends StatelessWidget {
       ),
     );
   }
+  void showAd(Function() fn) {
+    if(User().status == 1) {
+      Ads().showInterstitialAd((ad) {
+        fn();
+      });
+    } else {
+      fn();
+    }
+  }
+
+  Widget getCircleBtn(Icon icon, String text) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: MyColors.purple,
+              width: 3,
+            ),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(50),
+            ),
+          ),
+          child: IconButton(
+            icon: icon,
+            iconSize: 40,
+            color: MyColors.purple,
+            onPressed: () {},
+          ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        MyWidget().getTextWidget(
+          text: text,
+          size: 17,
+          color: MyColors.purple,
+        )
+      ],
+    );
+  }
 }
 
-Widget getCircleBtn(Icon icon, String text) {
-  return Column(
-    children: [
-      Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: MyColors.purple,
-            width: 3,
-          ),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(50),
-          ),
-        ),
-        child: IconButton(
-          icon: icon,
-          iconSize: 40,
-          color: MyColors.purple,
-          onPressed: () {},
-        ),
-      ),
-      const SizedBox(
-        height: 5,
-      ),
-      MyWidget().getTextWidget(
-        text: text,
-        size: 17,
-        color: MyColors.purple,
-      )
-    ],
-  );
-}

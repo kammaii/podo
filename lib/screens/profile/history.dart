@@ -56,14 +56,18 @@ class History {
   }
 
   void addHistory({required String item, required String itemId, String? content}) async {
-    History history = History();
-    history.item = item;
-    history.itemId = itemId;
-    history.content = content;
-    print('HISTORY: ${history.toJson()}');
-    await Database().setDoc(collection: 'Users/${User().id}/Histories', doc: history);
-    LocalStorage().histories.insert(0, history);
-    LocalStorage().setHistories();
-    print('히스토리 추가');
+    if(!LocalStorage().hasHistory(itemId: itemId)) {
+      History history = History();
+      history.item = item;
+      history.itemId = itemId;
+      history.content = content;
+      print('HISTORY: ${history.toJson()}');
+      await Database().setDoc(collection: 'Users/${User().id}/Histories', doc: history);
+      LocalStorage().histories.insert(0, history);
+      LocalStorage().setHistories();
+      print('히스토리 추가');
+    } else {
+      print('히스토리 있음');
+    }
   }
 }
