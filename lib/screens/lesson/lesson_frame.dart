@@ -6,7 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -15,6 +17,7 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
+import 'package:podo/screens/profile/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:scratcher/scratcher.dart';
@@ -510,7 +513,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         Map<String, bool> flashcardMap = {};
         for (dynamic snapshot in snapshots[0]) {
           LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
-          if(card.type == MyStrings.repeat) {
+          if (card.type == MyStrings.repeat) {
             flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
           }
           cards.add(card);
@@ -522,6 +525,24 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         isLoading = false;
       });
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (User().status == 1) {
+      _loadAd();
+    }
+  }
+
+  Future<void> _loadAd() async {
+    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.of(context).size.width.truncate());
+    if (size == null) {
+      print('Unable to get height of anchored banner.');
+      return;
+    }
+    AdsController().loadBannerAd(size);
   }
 
   @override
@@ -537,72 +558,88 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
-              child: Stack(
+              child: Column(
                 children: [
-                  Column(
-                    children: [
-                      LinearPercentIndicator(
-                        animateFromLastPercent: true,
-                        animation: true,
-                        lineHeight: 3.0,
-                        percent: thisIndex / cards.length,
-                        backgroundColor: MyColors.navyLight,
-                        progressColor: MyColors.purple,
-                      ),
-                      Expanded(
-                        child: Swiper(
-                          controller: swiperController,
-                          itemBuilder: (context, index) {
-                            if (index < cards.length) {
-                              return getCards(index);
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          },
-                          loop: false,
-                          itemCount: cards.length + 1,
-                          viewportFraction: 0.8,
-                          scale: 0.8,
-                          physics: scrollPhysics,
-                          onIndexChanged: (index) {
-                            if (index >= cards.length) {
-                              Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
-                              return;
-                            } else {
-                              setState(() {
-                                thisIndex = index;
-                                PlayAudio().player.stop();
-                                if (cards[thisIndex].content.containsKey(AUDIO)) {
-                                  String fileName = cards[thisIndex].content[AUDIO];
-                                  if (audios.containsKey(fileName)) {
-                                    controller.setAudioUrlAndPlay(url: audios[fileName]!);
-                                  }
-                                }
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 170),
-                    ],
+                  LinearPercentIndicator(
+                    animateFromLastPercent: true,
+                    animation: true,
+                    lineHeight: 3.0,
+                    percent: thisIndex / cards.length,
+                    backgroundColor: MyColors.navyLight,
+                    progressColor: MyColors.purple,
                   ),
-                  Positioned(
-                    bottom: 0,
-                    child: SlideTransition(
-                      position: animationOffset,
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 30),
-                          child: GetBuilder<LessonController>(
-                            builder: (_) {
-                              return bottomWidget;
-                            },
-                          ),
-                        ),
-                      ),
+                  Expanded(
+                    child: Swiper(
+                      controller: swiperController,
+                      itemBuilder: (context, index) {
+                        if (index < cards.length) {
+                          return getCards(index);
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      },
+                      loop: false,
+                      itemCount: cards.length + 1,
+                      viewportFraction: 0.8,
+                      scale: 0.8,
+                      physics: scrollPhysics,
+                      onIndexChanged: (index) {
+                        if (index >= cards.length) {
+                          Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
+                          return;
+                        } else {
+                          setState(() {
+                            thisIndex = index;
+                            PlayAudio().player.stop();
+                            if (cards[thisIndex].content.containsKey(AUDIO)) {
+                              String fileName = cards[thisIndex].content[AUDIO];
+                              if (audios.containsKey(fileName)) {
+                                controller.setAudioUrlAndPlay(url: audios[fileName]!);
+                              }
+                            }
+                          });
+                        }
+                      },
                     ),
                   ),
+                  SizedBox(
+                    height: 170,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          bottom: 0,
+                          child: SlideTransition(
+                            position: animationOffset,
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 30),
+                                child: GetBuilder<LessonController>(
+                                  builder: (_) {
+                                    return bottomWidget;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  User().status == 1
+                      ? GetBuilder<AdsController>(
+                          builder: (_) {
+                            return AdsController().isBannerAdLoaded
+                                ? Container(
+                                    color: MyColors.purpleLight,
+                                    width: AdsController().bannerAd!.size.width.toDouble(),
+                                    height: AdsController().bannerAd!.size.height.toDouble(),
+                                    child: AdWidget(ad: AdsController().bannerAd!),
+                                  )
+                                : const SizedBox.shrink();
+                          },
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),

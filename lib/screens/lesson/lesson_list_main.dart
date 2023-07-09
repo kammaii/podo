@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:podo/common/ads.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
@@ -322,18 +322,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                 ),
               ),
             ),
-            const SizedBox(height: 5),
-            GetBuilder<LessonController>(
-              builder: (_) {
-                return (User().status == 1 && Ads().isNativeAdLoaded)
-                    ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 13),
-                  child: SizedBox(height:100, child: AdWidget(ad: Ads().nativeAd!)),
-                )
-                    : const SizedBox.shrink();
-              },
-            ),
-            const SizedBox(height: 18),
           ],
         ),
       ),

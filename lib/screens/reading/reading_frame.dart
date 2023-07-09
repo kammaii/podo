@@ -1,8 +1,9 @@
-import 'package:animated_icon/animated_icon.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
@@ -56,7 +57,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    final Query query = FirebaseFirestore.instance.collection('ReadingTitles/${readingTitle.id}/Readings').orderBy('orderId');
+    final Query query =
+        FirebaseFirestore.instance.collection('ReadingTitles/${readingTitle.id}/Readings').orderBy('orderId');
     future = Database().getDocs(query: query);
     readings = [];
     animationController = AnimationController(
@@ -112,6 +114,24 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (User().status == 1) {
+      _loadAd();
+    }
+  }
+
+  Future<void> _loadAd() async {
+    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.of(context).size.width.truncate());
+    if (size == null) {
+      print('Unable to get height of anchored banner.');
+      return;
+    }
+    AdsController().loadBannerAd(size);
+  }
+
   Widget letterContainer(String text) {
     return Container(
       width: 28,
@@ -133,7 +153,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   sliverAppBar() {
     int wordsLength = 0;
-    for(Reading reading in readings){
+    for (Reading reading in readings) {
       int length = reading.words[KO].length;
       wordsLength = wordsLength + length;
     }
@@ -230,14 +250,17 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 }),
                 const SizedBox(height: 30),
                 index == length - 1
-                    ? MyWidget().getRoundBtnWidget(
-                        text: MyStrings.complete,
-                        f: () {
-                          History().addHistory(item: 'reading', itemId: readingTitle.id);
-                          LocalStorage().prefs.remove(readingTitle.id);
-                          controller.isCompleted[readingTitle.id] = true;
-                          Get.back();
-                        })
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        child: MyWidget().getRoundBtnWidget(
+                            text: MyStrings.complete,
+                            f: () {
+                              History().addHistory(item: 'reading', itemId: readingTitle.id);
+                              LocalStorage().prefs.remove(readingTitle.id);
+                              controller.isCompleted[readingTitle.id] = true;
+                              Get.back();
+                            }),
+                      )
                     : const SizedBox.shrink(),
               ],
             );
@@ -278,9 +301,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                   }
                 },
                 icon: Icon(
-                  controller.hasFlashcard[index]
-                      ? CupertinoIcons.heart_fill
-                      : CupertinoIcons.heart,
+                  controller.hasFlashcard[index] ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                   color: MyColors.purple,
                 ))),
             Material(
@@ -356,7 +377,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -364,13 +384,13 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           child: FutureBuilder(
             future: future,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if(snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+              if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                 readings = [];
-                for(dynamic snapshot in snapshot.data) {
+                for (dynamic snapshot in snapshot.data) {
                   readings.add(Reading.fromJson(snapshot.data() as Map<String, dynamic>));
                 }
                 controller.hasFlashcard.value = List.generate(readings.length, (index) => false);
-                if(readings.isEmpty) {
+                if (readings.isEmpty) {
                   return Center(
                     child: MyWidget().getTextWidget(
                       text: MyStrings.noReading,
@@ -380,12 +400,33 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                     ),
                   );
                 } else {
-                  return CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    controller: scrollController,
-                    slivers: [
-                      sliverAppBar(),
-                      sliverList(),
+                  return Stack(
+                    children: [
+                      CustomScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        controller: scrollController,
+                        slivers: [
+                          sliverAppBar(),
+                          sliverList(),
+                        ],
+                      ),
+                      User().status == 1
+                          ? Positioned(
+                              bottom: 0,
+                              child: GetBuilder<AdsController>(
+                                builder: (_) {
+                                  return AdsController().isBannerAdLoaded
+                                      ? Container(
+                                          color: MyColors.purpleLight,
+                                          width: AdsController().bannerAd!.size.width.toDouble(),
+                                          height: AdsController().bannerAd!.size.height.toDouble(),
+                                          child: AdWidget(ad: AdsController().bannerAd!),
+                                        )
+                                      : const SizedBox.shrink();
+                                },
+                              ),
+                            )
+                          : const SizedBox.shrink(),
                     ],
                   );
                 }

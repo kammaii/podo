@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:podo/common/ads.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/premium/premium.dart';
@@ -105,7 +105,7 @@ class User {
       }
       status = json[STATUS];
       if(status == 1) {
-        Ads();
+        Get.put(AdsController());
       }
 
     } else {
