@@ -9,12 +9,16 @@ import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
+import '../my_page/user.dart';
+
 class LessonSummaryMain extends StatelessWidget {
   LessonSummaryMain({Key? key}) : super(key: key);
 
   late List<LessonSummary> summaries;
   final KO = 'ko';
-  String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
+  String fo = User().language;
+  bool isBasicUser = User().status == 1;
+  bool isNewUser = User().status == 0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +39,28 @@ class LessonSummaryMain extends StatelessWidget {
               floatingActionButton: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  FloatingActionButton(
-                    heroTag: 'wiringBtn',
-                    onPressed: () {
-                      Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
-                    },
-                    backgroundColor: MyColors.green,
-                    child: const Icon(FontAwesomeIcons.penToSquare, size: 25),
-                  ),
+                  isNewUser
+                      ? const SizedBox.shrink()
+                      : FloatingActionButton(
+                          heroTag: 'wiringBtn',
+                          onPressed: () {
+                            isBasicUser
+                                ? Get.toNamed(MyStrings.routePremiumMain)
+                                : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
+                          },
+                          backgroundColor: isBasicUser ? MyColors.grey : MyColors.green,
+                          child:
+                              Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: 25),
+                        ),
                   const SizedBox(height: 5),
-                  MyWidget().getTextWidget(
-                    text: MyStrings.writing,
-                    size: 15,
-                    color: MyColors.greenDark,
-                    isBold: true,
-                  ),
+                  isNewUser
+                      ? const SizedBox.shrink()
+                      : MyWidget().getTextWidget(
+                          text: MyStrings.writing,
+                          size: 15,
+                          color: isBasicUser ? MyColors.grey : MyColors.greenDark,
+                          isBold: true,
+                        ),
                   const SizedBox(height: 15),
                   FloatingActionButton(
                     heroTag: 'learningBtn',

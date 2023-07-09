@@ -9,8 +9,8 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
-import 'package:podo/screens/profile/history.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/common/history.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 

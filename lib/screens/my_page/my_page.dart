@@ -4,33 +4,34 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/profile/feedback.dart' as fb;
+import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:podo/screens/my_page/user.dart' as user;
 
 
-class ProfileItem {
+class MyPageItem {
   late IconData icon;
   late String title;
   bool isExpanded = false;
 
-  ProfileItem(this.icon, this.title);
+  MyPageItem(this.icon, this.title);
 }
 
-class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+class MyPage extends StatefulWidget {
+  const MyPage({Key? key}) : super(key: key);
 
   @override
-  _ProfileState createState() => _ProfileState();
+  _MyPageState createState() => _MyPageState();
 }
 
-class _ProfileState extends State<Profile> {
-  List<ProfileItem> items = [
-    ProfileItem(Icons.account_circle_rounded, MyStrings.editProfile),
-    ProfileItem(Icons.feedback_outlined, MyStrings.feedback),
-    ProfileItem(Icons.logout_rounded, MyStrings.logOut),
-    ProfileItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
+class _MyPageState extends State<MyPage> {
+  List<MyPageItem> items = [
+    MyPageItem(Icons.account_circle_rounded, MyStrings.editName),
+    MyPageItem(Icons.feedback_outlined, MyStrings.feedback),
+    MyPageItem(Icons.logout_rounded, MyStrings.logOut),
+    MyPageItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
   ];
   List<String> userTier = ['New', 'Basic', 'Premium'];
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -61,36 +62,33 @@ class _ProfileState extends State<Profile> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed('/premiumMain');
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Row(
-                        children: [
-                          const Icon(FontAwesomeIcons.crown, color: Colors.white),
-                          Expanded(
-                            child: Center(
-                              child: MyWidget().getTextWidget(
-                                text: MyStrings.getPremium,
-                                size: 20,
-                                color: Colors.white,
-                                isBold: true,
-                              ),
-                            ),
+              user.User().status == 1 ?
+              GestureDetector(
+                onTap: () {
+                  Get.toNamed('/premiumMain');
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),
+                  decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                      borderRadius: BorderRadius.circular(30)),
+                  child: Row(
+                    children: [
+                      const Icon(FontAwesomeIcons.crown, color: Colors.white),
+                      Expanded(
+                        child: Center(
+                          child: MyWidget().getTextWidget(
+                            text: MyStrings.getPremium,
+                            size: 20,
+                            color: Colors.white,
+                            isBold: true,
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ) : const SizedBox.shrink(),
               const SizedBox(
                 height: 20,
               ),
@@ -100,16 +98,27 @@ class _ProfileState extends State<Profile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       MyWidget().getTextWidget(
-                        text: MyStrings.profile,
+                        text: MyStrings.myPage,
                         size: 20,
                         color: MyColors.purple,
                         isBold: true,
                       ),
-                      //todo: status 값 가져오기
-                      // MyWidget().getTextWidget(
-                      //   text: userTier[user.User().status],
-                      //   color: MyColors.grey,
-                      // ),
+                      const SizedBox(height: 5),
+                      MyWidget().getTextWidget(
+                        text: user.User().email,
+                        color: MyColors.purple,
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        children: [
+                          MyWidget().getTextWidget(
+                            text: userTier[user.User().status],
+                            color: MyColors.grey,
+                          ),
+                          const SizedBox(width: 10),
+                          //todo: Premium 일 경우 구독 종료일 표시
+                        ],
+                      ),
                       MyWidget().getTextWidget(
                         text: 'Sign up: $signupDate',
                         color: MyColors.grey,
@@ -429,7 +438,7 @@ class _ProfileState extends State<Profile> {
   }
 
   closePanels() {
-    for (ProfileItem item in items) {
+    for (MyPageItem item in items) {
       item.isExpanded = false;
     }
   }
@@ -485,7 +494,7 @@ Widget getTextField(
   );
 }
 
-ExpansionPanel getExpansionPanel(ProfileItem item, Widget body) {
+ExpansionPanel getExpansionPanel(MyPageItem item, Widget body) {
   return ExpansionPanel(
       canTapOnHeader: true,
       isExpanded: item.isExpanded,

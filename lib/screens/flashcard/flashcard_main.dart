@@ -7,6 +7,7 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/play_stop_icon.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -27,6 +28,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   Map<String, PlayStopIcon> playStopIcons = {};
   late int cardsLength;
   DocumentSnapshot? lastSnapshot;
+  bool isBasicUser = User().status == 1;
 
   @override
   void initState() {
@@ -81,7 +83,6 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                             playStopIcons[card.id] = PlayStopIcon(this);
                           }
                         }
-
                         cardsLength = controller.cards.length;
 
                         if (searchText.isNotEmpty) {
@@ -113,7 +114,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                           onPressed: () {
                                             MyWidget().showDialog(
                                                 content: MyStrings.wantRemoveFlashcard,
-                                                f: () {
+                                                yesFn: () {
                                                   List<String> ids = [];
                                                   for (int i = 0; i < controller.isChecked.length; i++) {
                                                     controller.isChecked[i]
@@ -128,8 +129,29 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                             color: MyColors.red,
                                           ))),
                                       const SizedBox(width: 20),
-                                      MyWidget().getTextWidget(
-                                          text: '$cardsLength ${MyStrings.cards}', size: 15, color: Colors.black),
+                                      InkWell(
+                                        onTap: isBasicUser
+                                            ? () {
+                                                Get.toNamed(MyStrings.routePremiumMain);
+                                              }
+                                            : null,
+                                        child: Row(
+                                          children: [
+                                            MyWidget().getTextWidget(
+                                                text: '$cardsLength ${MyStrings.cards}',
+                                                size: 15,
+                                                color: Colors.black),
+                                            isBasicUser
+                                                ? MyWidget().getTextWidget(
+                                                    text: ' (${MyStrings.limit20})',
+                                                    size: 15,
+                                                    color: MyColors.red,
+                                                    isBold: true,
+                                                  )
+                                                : const SizedBox.shrink(),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],

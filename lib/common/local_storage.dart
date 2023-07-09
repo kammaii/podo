@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
-import 'package:podo/screens/profile/history.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/common/history.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {

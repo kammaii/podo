@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,8 @@ import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
 import 'package:podo/screens/message/cloud_reply.dart';
-import 'package:podo/screens/profile/history.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/common/history.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -23,6 +24,7 @@ class CloudMessageMain extends StatelessWidget {
   final replyController = TextEditingController();
   late bool hasReplied;
   final controller = Get.find<CloudMessageController>();
+  bool isBasicUser = User().status == 1;
 
   Stream<String> getTimeLeftStream(DateTime dateEnd) {
     StreamController<String> controller = StreamController();
@@ -80,6 +82,15 @@ class CloudMessageMain extends StatelessWidget {
         .collection('CloudMessages/${CloudMessage().id}/Replies')
         .where('isSelected', isEqualTo: true)
         .orderBy('date', descending: true);
+
+    isBasicUser ?
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      MyWidget().showDialog(
+          content: MyStrings.wantReplyPodo,
+          yesFn: () {
+            Get.toNamed(MyStrings.routePremiumMain);
+          });
+    }) : null;
 
     return Scaffold(
       appBar: MyWidget().getAppbar(title: CloudMessage().title![KO], isKorean: true, actions: [
@@ -193,8 +204,11 @@ class CloudMessageMain extends StatelessWidget {
                                                             controller.hasFlashcard[index] = false;
                                                           } else {
                                                             FlashCard().addFlashcard(
-                                                                itemId: reply.id, front: reply.reply);
-                                                            controller.hasFlashcard[index] = true;
+                                                                itemId: reply.id,
+                                                                front: reply.reply,
+                                                                fn: () {
+                                                                  controller.hasFlashcard[index] = true;
+                                                                });
                                                           }
                                                         },
                                                         icon: Icon(
@@ -280,8 +294,7 @@ class CloudMessageMain extends StatelessWidget {
                                 onPressed: () {
                                   MyWidget().showDialog(
                                       content: MyStrings.sendReply,
-                                      f: () async {
-                                        Get.back();
+                                      yesFn: () async {
                                         CloudReply reply = CloudReply(replyController.text);
                                         await Database().setDoc(
                                             collection: 'CloudMessages/${CloudMessage().id}/Replies',
@@ -291,7 +304,10 @@ class CloudMessageMain extends StatelessWidget {
                                               Get.back();
                                               Get.find<CloudMessageController>().setHasReplied(true);
                                             });
-                                        History().addHistory(item: 'cloudMessage', itemId: CloudMessage().id!, content: replyController.text);
+                                        History().addHistory(
+                                            item: 'cloudMessage',
+                                            itemId: CloudMessage().id!,
+                                            content: replyController.text);
                                       });
                                 },
                                 icon: Icon(Icons.send, color: hasReplied ? MyColors.grey : MyColors.purple)),
@@ -303,6 +319,14 @@ class CloudMessageMain extends StatelessWidget {
                 ],
               ),
             ),
+            isBasicUser
+                ? const Positioned.fill(
+                    child: Blur(
+                      blur: 2.3,
+                      child: SizedBox.shrink(),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ],
         ),
       ),

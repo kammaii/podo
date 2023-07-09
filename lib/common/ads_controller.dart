@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/my_page/user.dart';
 
 // ANDROID_앱ID : ca-app-pub-2526130301535877~2249268822
 // IOS_앱ID : ca-app-pub-2526130301535877~5843284501

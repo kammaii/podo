@@ -17,7 +17,7 @@ import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_main.dart';
 import 'package:podo/screens/premium/premium_main.dart';
-import 'package:podo/screens/profile/user.dart' as user;
+import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';

@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/my_page/user.dart';
+import 'package:podo/values/my_strings.dart';
 import 'package:uuid/uuid.dart';
 
 class FlashCard {
@@ -15,6 +17,7 @@ class FlashCard {
   late DateTime date;
   bool isPlay = false;
   String? dateReview;
+  int limitLength = 5;
 
   static const String ID = 'id';
   static const String ITEM_ID = 'itemId';
@@ -36,7 +39,7 @@ class FlashCard {
     front = json[FRONT];
     back = json[BACK];
     audio = json[AUDIO];
-    if(!isLocal) {
+    if (!isLocal) {
       Timestamp stamp = json[DATE];
       date = stamp.toDate();
     } else {
@@ -45,7 +48,6 @@ class FlashCard {
     }
   }
 
-
   Map<String, dynamic> toJson({bool isLocal = false}) {
     Map<String, dynamic> map = {};
     map[ID] = id;
@@ -53,7 +55,7 @@ class FlashCard {
     map[FRONT] = front;
     map[BACK] = back;
     map[AUDIO] = audio ?? null;
-    if(!isLocal) {
+    if (!isLocal) {
       map[DATE] = Timestamp.fromDate(date);
     } else {
       map[DATE] = date.toIso8601String();
@@ -64,16 +66,29 @@ class FlashCard {
 
   final controller = Get.put(FlashCardController());
 
-  void addFlashcard({required String itemId, required String front, String? back, String? audio}) async {
-    FlashCard flashcard = FlashCard();
-    flashcard.itemId = itemId;
-    flashcard.front = front;
-    flashcard.back = back ?? '';
-    flashcard.audio = audio;
-    await Database().setDoc(collection: 'Users/${User().id}/FlashCards', doc: flashcard);
-    LocalStorage().flashcards.insert(0, flashcard);
-    setAndUpdate();
-    print('플래시카드 추가');
+  void addFlashcard(
+      {required String itemId, required String front, String? back, String? audio, required Function fn}) async {
+    int status = User().status;
+    int length = LocalStorage().flashcards.length;
+    if (status == 2 || (status == 0 && length < limitLength) || (status == 1 && length < limitLength)) {
+      FlashCard flashcard = FlashCard();
+      flashcard.itemId = itemId;
+      flashcard.front = front;
+      flashcard.back = back ?? '';
+      flashcard.audio = audio;
+      await Database().setDoc(collection: 'Users/${User().id}/FlashCards', doc: flashcard).then((value) {
+        fn();
+      });
+      LocalStorage().flashcards.insert(0, flashcard);
+      setAndUpdate();
+      print('플래시카드 추가');
+    } else {
+      MyWidget().showDialog(
+          content: MyStrings.unLimitFlashcard,
+          yesFn: () {
+            Get.toNamed(MyStrings.routePremiumMain);
+          });
+    }
   }
 
   void updateFlashcard({required FlashCard card}) async {
@@ -81,8 +96,8 @@ class FlashCard {
     now = now.subtract(Duration(milliseconds: now.millisecond, microseconds: now.microsecond));
     card.date = now;
     await Database().updateFlashcard(card: card);
-    for(FlashCard flashcard in LocalStorage().flashcards) {
-      if(flashcard.id == card.id) {
+    for (FlashCard flashcard in LocalStorage().flashcards) {
+      if (flashcard.id == card.id) {
         flashcard = card;
         break;
       }
@@ -112,7 +127,6 @@ class FlashCard {
         cards.removeWhere((card) => card.id == ids[0]);
       }
       setAndUpdate();
-      Get.back();
       print('플레시카드(들) 삭제');
     }
   }

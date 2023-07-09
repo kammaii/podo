@@ -11,7 +11,7 @@ import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_list_main.dart';
 import 'package:podo/screens/loading_controller.dart';
-import 'package:podo/screens/profile/profile_main.dart';
+import 'package:podo/screens/my_page/my_page.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -29,7 +29,7 @@ List<Widget> _buildScreens() {
     course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
     ReadingListMain(),
     const FlashCardMain(),
-    const Profile(),
+    const MyPage(),
   ];
 }
 

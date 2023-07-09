@@ -227,17 +227,53 @@ class MyWidget {
     );
   }
 
-  showDialog({required String content, required Function f}) {
+  showDialog({required String content, required Function yesFn}) {
     Get.dialog(AlertDialog(
       title: Image.asset('assets/images/podo.png', width: 50, height: 50),
-      content: MyWidget().getTextWidget(text: content),
-      actions: [
-        TextButton(onPressed: () {
-          f();
-        }, child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.purple))),
-        TextButton(onPressed: () {
-          Get.back();
-        }, child: const Text(MyStrings.no, style: TextStyle(color: MyColors.red))),
+      content: MyWidget().getTextWidget(text: content, isTextAlignCenter: true, size: 16),
+      actionsAlignment: MainAxisAlignment.center,
+      actionsPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+      actions:  [
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    side: const BorderSide(color: MyColors.purple, width: 1),
+                    backgroundColor: Colors.white),
+                onPressed: (){
+                  Get.back();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 13),
+                  child: Text(MyStrings.no, style: TextStyle(color: MyColors.purple)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    side: const BorderSide(color: MyColors.purple, width: 1),
+                    backgroundColor: MyColors.purple),
+                onPressed: (){
+                  Get.back();
+                  yesFn();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 13),
+                  child: Text(MyStrings.yes, style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ),
+          ],
+        )
       ],
     ));
   }

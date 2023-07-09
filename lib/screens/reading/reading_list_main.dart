@@ -4,12 +4,13 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/profile/history.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:blur/blur.dart';
 
 class ReadingListMain extends StatefulWidget {
   ReadingListMain({Key? key}) : super(key: key);
@@ -27,23 +28,28 @@ class _ReadingListMainState extends State<ReadingListMain> {
   final READING_TITLES = 'ReadingTitles';
   final CATEGORY = 'category';
   final ORDER_ID = 'orderId';
+  final IS_FREE = 'isFree';
+  final IS_RELEASED = 'isReleased';
   String fo = User().language;
   late List<ReadingTitle> readingTitles;
   final controller = Get.put(ReadingController());
+  bool isBasicUser = User().status == 1;
 
   Widget getListItem({required ReadingTitle readingTitle}) {
-    return Stack(
-      children: [
-        Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(cardBorderRadius),
-          ),
-          color: Colors.white,
-          child: InkWell(
-            onTap: () {
-              Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
-            },
-            child: Padding(
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+      ),
+      color: Colors.white,
+      child: InkWell(
+        onTap: (isBasicUser && !readingTitle.isFree)
+            ? null
+            : () {
+                Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
+              },
+        child: Stack(
+          children: [
+            Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
@@ -94,36 +100,65 @@ class _ReadingListMainState extends State<ReadingListMain> {
                 ],
               ),
             ),
-          ),
-        ),
-        readingTitle.tag.isNotEmpty
-            ? Positioned(
-                top: 5,
-                right: 4,
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: MyColors.pink,
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(cardBorderRadius),
-                        bottomLeft: Radius.circular(cardBorderRadius),
+            readingTitle.tag.isNotEmpty
+                ? Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.pink,
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(cardBorderRadius),
+                            bottomLeft: Radius.circular(cardBorderRadius),
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        child: Text(readingTitle.tag, style: const TextStyle(color: MyColors.red))),
+                  )
+                : const SizedBox.shrink(),
+            (isBasicUser && !readingTitle.isFree)
+                ? Positioned.fill(
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed(MyStrings.routePremiumMain);
+                      },
+                      child: Stack(
+                        children: const [
+                          Positioned.fill(
+                            child: Blur(
+                              blur: 1.0,
+                              child: SizedBox.shrink(),
+                            ),
+                          ),
+                          Center(
+                            child: Icon(
+                              FontAwesomeIcons.lock,
+                              color: MyColors.grey,
+                              size: 30,
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    child: Text(readingTitle.tag, style: const TextStyle(color: MyColors.red))),
-              )
-            : const SizedBox.shrink(),
-      ],
+                  )
+                : const SizedBox.shrink(),
+          ],
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final CollectionReference ref = FirebaseFirestore.instance.collection(READING_TITLES);
-    Query query;
+    Query query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
     if (selectedCategory == 0) {
-      query = ref.orderBy(ORDER_ID, descending: true);
+      query = query.orderBy(ORDER_ID, descending: true);
     } else {
-      query = ref.where(CATEGORY, isEqualTo: categories[selectedCategory]).orderBy(ORDER_ID, descending: true);
+      query = query.where(CATEGORY, isEqualTo: categories[selectedCategory]).orderBy(ORDER_ID, descending: true);
+    }
+
+    if (User().status == 0) {
+      query = query.where(IS_FREE, isEqualTo: true);
     }
 
     return Scaffold(

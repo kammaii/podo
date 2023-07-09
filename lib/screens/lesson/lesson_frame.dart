@@ -17,7 +17,7 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:scratcher/scratcher.dart';
@@ -149,8 +149,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           itemId: card.id,
                                           front: card.content[KO],
                                           back: card.content[fo],
-                                          audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}');
-                                      controller.hasFlashcard[card.id] = true;
+                                          audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}',
+                                          fn: () {
+                                            controller.hasFlashcard[card.id] = true;
+                                          });
                                     }
                                   },
                                   icon: Icon(

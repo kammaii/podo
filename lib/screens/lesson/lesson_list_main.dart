@@ -10,7 +10,7 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_controller.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -257,7 +257,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         child: Column(
           children: [
             Visibility(
-              visible: CloudMessage().isInDate != null && CloudMessage().isInDate!,
+              visible: User().status != 0 && CloudMessage().isInDate != null && CloudMessage().isInDate!,
               child: InkWell(
                 onTap: () {
                   Get.toNamed(MyStrings.routeCloudMessageMain);

@@ -79,10 +79,10 @@ class MyStrings {
   static const String thanksFeedback = 'Thank you for your feedback';
   static const String congratulations = 'Congratulations';
   static const String lessonComplete = 'Lesson Complete!';
-  static const String profile = 'Profile';
+  static const String myPage = 'My page';
   static const String getPremium = 'Get Podo Premium';
   static const String home = 'home';
-  static const String editProfile = 'Edit Profile';
+  static const String editName = 'Edit name';
   static const String premiumDetail = 'Premium is automatically renewed every 2 months. Premium can be canceled at any time up to 24 hours before the renewal. The price can be changed without prior notice. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
   static const String hassleFree = 'A hassle-free short period!';
   static const String twoMonths = '2 Months';
@@ -90,7 +90,6 @@ class MyStrings {
   static const String lessonSummary = 'Lesson Summary';
   static const String writing = 'Writing';
   static const String myWritings = 'My writings';
-  static const String unlockWritingTopics = 'Unlock the writing topics by completing the lessons.';
   static const String welcome = 'Welcome to podo';
   static const String welcomeMessage = '만나서 반가워요!';
   static const String premiumComment = 'Podo strives to truly enhance your Korean language skills.';
@@ -113,12 +112,14 @@ class MyStrings {
   static const String replyPodo = 'Reply to Podo';
   static const String replied = 'Replied';
   static const String howToUse = 'How to use it?';
-  static const String replyDetail = '- You can only reply once per message. \n\n- Your and other users\' replies may be posted in the \'Best Replies\' section after review by a native teacher. \n\n- You can read \'Best Replies\' until the message is expired.';
+  static const String replyDetail = '- You can only reply once per message. \n\n- Your and other users\' replies may be posted in the \'Best Replies\' section after review by a native teacher. \n\n- You can read and add \'Best Replies\' on your flashcard until the message is expired.';
   static const String expired = 'expired';
   static const String sendReply = 'Would you like to send a reply?';
   static const String noBestReply = 'There is no selected best reply yet.';
   static const String unNamed = 'Unnamed';
   static const String wantRemoveFlashcard = 'Do you want to remove flashcard(s)?';
+  static const String unLimitFlashcard = 'Would you like to subscribe to the app and collect unlimited flashcards?';
+  static const String wantReplyPodo = 'Would you like to subscribe to the app and send a reply to Podo?';
 
 
 

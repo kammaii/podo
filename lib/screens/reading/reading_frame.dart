@@ -9,8 +9,8 @@ import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
-import 'package:podo/screens/profile/history.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/common/history.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
@@ -296,8 +296,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                         itemId: reading.id,
                         front: reading.content[KO],
                         back: reading.content[fo],
-                        audio: 'ReadingAudios_${readingTitle.id}_${reading.id}');
-                    controller.hasFlashcard[index] = true;
+                        audio: 'ReadingAudios_${readingTitle.id}_${reading.id}',
+                        fn: () {
+                          controller.hasFlashcard[index] = true;
+                        });
                   }
                 },
                 icon: Icon(

@@ -9,13 +9,12 @@ import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/loading_controller.dart';
-import 'package:podo/screens/profile/user.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:html/parser.dart' as htmlParser;
-import 'package:animated_icon/animated_icon.dart';
 
 class WritingList extends StatefulWidget {
   WritingList(this.isMyWritings, {Key? key}) : super(key: key);
@@ -47,16 +46,12 @@ class _WritingListState extends State<WritingList> {
     Query query;
 
     if (widget.isMyWritings) {
-      query = ref
-          .where('userId', isEqualTo: User().id)
-          .orderBy('dateWriting', descending: true)
-          .limit(docsLimit);
+      query = ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
     } else {
       query = ref
           .where('questionId', isEqualTo: questionId!)
           .where('userId', isNotEqualTo: User().id)
-          .where('status', whereIn: [1, 2])
-          .limit(docsLimit);
+          .where('status', whereIn: [1, 2]).limit(docsLimit);
     }
 
     if (isContinue) {
@@ -84,7 +79,7 @@ class _WritingListState extends State<WritingList> {
     controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: writing.id);
 
     String content = '';
-    if(title == 'Q') {
+    if (title == 'Q') {
       content = writing.questionTitle;
     } else if (title == 'A') {
       content = writing.userWriting;
@@ -117,14 +112,14 @@ class _WritingListState extends State<WritingList> {
                 } else {
                   FlashCard().addFlashcard(
                       itemId: writing.id,
-                      front: extractedText);
-                  controller.hasFlashcard[index] = true;
+                      front: extractedText,
+                      fn: () {
+                        controller.hasFlashcard[index] = true;
+                      });
                 }
               },
               icon: Icon(
-                controller.hasFlashcard[index]
-                    ? CupertinoIcons.heart_fill
-                    : CupertinoIcons.heart,
+                controller.hasFlashcard[index] ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                 color: MyColors.purple,
               ))),
         )
@@ -255,13 +250,13 @@ class _WritingListState extends State<WritingList> {
                       Expanded(
                         child: isLoaded && writings.isEmpty
                             ? Center(
-                              child: MyWidget().getTextWidget(
-                                text: MyStrings.noWritings,
-                                color: MyColors.purple,
-                                size: 20,
-                                isBold: true,
-                              ),
-                            )
+                                child: MyWidget().getTextWidget(
+                                  text: MyStrings.noWritings,
+                                  color: MyColors.purple,
+                                  size: 20,
+                                  isBold: true,
+                                ),
+                              )
                             : ListView.builder(
                                 itemCount: writings.length,
                                 itemBuilder: (BuildContext context, int index) {
