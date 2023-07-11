@@ -26,6 +26,7 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'firebase_options.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
@@ -87,7 +88,7 @@ class MyApp extends StatelessWidget {
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
     await CloudMessage().getCloudMessage();
-    Get.toNamed('/');
+    Get.toNamed(MyStrings.routeMainFrame);
     String thisOs = os.toString().split('.').last;
     if(thisOs != user.User().os) {
       Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: thisOs);
@@ -124,7 +125,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primaryColor: MyColors.purple),
       initialRoute: initialRoute,
       getPages: [
-        GetPage(name: '/', page: () => const MainFrame()),
+        GetPage(name: '/', page: () => MyApp()),
+        GetPage(name: MyStrings.routeMainFrame, page: () => const MainFrame()),
         GetPage(name: MyStrings.routeLogo, page: () => Logo()),
         GetPage(name: MyStrings.routeLogin, page: () => Login()),
         GetPage(name: MyStrings.routeLessonSummaryMain, page: () => LessonSummaryMain()),

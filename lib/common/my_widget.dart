@@ -88,7 +88,7 @@ class MyWidget {
   }
 
   Text getTextWidget({
-    required String text,
+    required String? text,
     double size = 15,
     Color color = Colors.black,
     bool? isBold,
@@ -99,7 +99,7 @@ class MyWidget {
     int? maxLine,
   }) {
     return Text(
-      text,
+      text ?? '',
       style: TextStyle(
         fontFamily: isKorean ? 'KoreanFont' : 'EnglishFont',
         fontSize: size,

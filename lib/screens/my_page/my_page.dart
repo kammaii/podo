@@ -1,16 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/my_page/feedback.dart' as fb;
+import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:podo/screens/my_page/user.dart' as user;
-
 
 class MyPageItem {
   late IconData icon;
@@ -30,6 +29,7 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   List<MyPageItem> items = [
     MyPageItem(Icons.account_circle_rounded, MyStrings.editName),
+    MyPageItem(Icons.language_rounded, MyStrings.language),
     MyPageItem(Icons.feedback_outlined, MyStrings.feedback),
     MyPageItem(Icons.logout_rounded, MyStrings.logOut),
     MyPageItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
@@ -42,6 +42,15 @@ class _MyPageState extends State<MyPage> {
   String userName = '';
   User? currentUser;
   String feedback = '';
+  List<String> language = [
+    MyStrings.english,
+    MyStrings.spanish,
+    MyStrings.french,
+    MyStrings.german,
+    MyStrings.portuguese,
+    MyStrings.indonesian,
+    MyStrings.russian
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -63,33 +72,34 @@ class _MyPageState extends State<MyPage> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              user.User().status == 1 ?
-              GestureDetector(
-                onTap: () {
-                  Get.toNamed('/premiumMain');
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),
-                  decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Row(
-                    children: [
-                      const Icon(FontAwesomeIcons.crown, color: Colors.white),
-                      Expanded(
-                        child: Center(
-                          child: MyWidget().getTextWidget(
-                            text: MyStrings.getPremium,
-                            size: 20,
-                            color: Colors.white,
-                            isBold: true,
-                          ),
+              user.User().status == 1
+                  ? GestureDetector(
+                      onTap: () {
+                        Get.toNamed('/premiumMain');
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),
+                        decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                            borderRadius: BorderRadius.circular(30)),
+                        child: Row(
+                          children: [
+                            const Icon(FontAwesomeIcons.crown, color: Colors.white),
+                            Expanded(
+                              child: Center(
+                                child: MyWidget().getTextWidget(
+                                  text: MyStrings.getPremium,
+                                  size: 20,
+                                  color: Colors.white,
+                                  isBold: true,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ) : const SizedBox.shrink(),
+                    )
+                  : const SizedBox.shrink(),
               const SizedBox(
                 height: 20,
               ),
@@ -176,7 +186,7 @@ class _MyPageState extends State<MyPage> {
                                                     docId: currentUser!.uid,
                                                     key: 'name',
                                                     value: userName);
-                                                MyWidget().showSnackbar(title: MyStrings.profileChanged);
+                                                MyWidget().showSnackbar(title: MyStrings.nameChanged);
                                               }
                                             } catch (e) {
                                               MyWidget()
@@ -193,9 +203,56 @@ class _MyPageState extends State<MyPage> {
                                 ),
                               )),
 
+                          // Language
+                          getExpansionPanel(
+                            items[1],
+                            ListTile(
+                              title: Column(
+                                children: [
+                                  MyWidget().getTextWidget(
+                                    text: MyStrings.changeLanguageRestart,
+                                    size: 15,
+                                    color: MyColors.purple,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                            side: const BorderSide(color: MyColors.purple, width: 1),
+                                            backgroundColor: Colors.white),
+                                        onPressed: () async {
+                                          String lang = Languages().fos[index];
+                                          user.User().language = lang;
+                                          await Database().updateDoc(
+                                              collection: 'Users',
+                                              docId: user.User().id,
+                                              key: 'language',
+                                              value: lang);
+                                          await auth.signOut();
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 13),
+                                          child: Text(language[index], style: const TextStyle(color: MyColors.purple)),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: language.length,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
                           // Feedback
                           getExpansionPanel(
-                              items[1],
+                              items[2],
                               ListTile(
                                   title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +314,7 @@ class _MyPageState extends State<MyPage> {
 
                           // Logout
                           getExpansionPanel(
-                              items[2],
+                              items[3],
                               ListTile(
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +363,7 @@ class _MyPageState extends State<MyPage> {
 
                           // Remove account
                           getExpansionPanel(
-                              items[3],
+                              items[4],
                               ListTile(
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

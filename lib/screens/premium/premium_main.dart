@@ -1,13 +1,11 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/items/subscribe_items.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class PremiumMain extends StatelessWidget {
   PremiumMain({Key? key}) : super(key: key);
-  late List<SubscribeItem> items;
   late List<bool> selector;
   late int selectedPlan;
 

@@ -149,10 +149,10 @@ class LessonComplete extends StatelessWidget {
                               if (lessons[nextIndex] is String) {
                                 nextIndex++;
                               }
-                              Get.offNamedUntil(MyStrings.routeLessonSummaryMain, ModalRoute.withName('/'),
+                              Get.offNamedUntil(MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
                                   arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
                             } else {
-                              Get.until((route) => Get.currentRoute == '/');
+                              Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
                               MyWidget().showSnackbar(title: MyStrings.lastLesson);
                             }
                           });
@@ -160,7 +160,7 @@ class LessonComplete extends StatelessWidget {
                         const SizedBox(height: 20),
                         getBtn(MyStrings.goToMain, CupertinoIcons.home, () {
                           showAd(() {
-                            Get.until((route) => Get.currentRoute == '/');
+                            Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
                           });
                         }),
                       ],

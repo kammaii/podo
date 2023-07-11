@@ -205,10 +205,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               ),
             ),
           ),
-          const LinearProgressIndicator(
-            value: 0.5,
-            color: MyColors.purple,
-            backgroundColor: MyColors.purpleLight,
+          Obx(() => LinearProgressIndicator(
+              value: lessonController.isCompleted.values.where((value) => value == true).length / lessonController.isCompleted.length,
+              color: MyColors.purple,
+              backgroundColor: MyColors.purpleLight,
+            ),
           )
         ],
       ),

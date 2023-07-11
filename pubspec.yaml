@@ -54,6 +54,9 @@ dependencies:
   mailer: ^6.0.1
   google_mobile_ads: ^2.4.0
   blur: ^3.1.0
+  firebase_messaging: ^14.6.4
+  easy_localization: ^3.0.2
+  firebase_in_app_messaging: ^0.7.3+3
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +84,7 @@ flutter:
   assets:
     - assets/images/
     - assets/audio/
+    - assets/translations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

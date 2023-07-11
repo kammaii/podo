@@ -102,8 +102,6 @@ class LocalStorage {
 
     // 로컬: null && DB: null  ||  로컬 date == DB date -> return;
     // 로컬: null && DB: !null -> DB 에서 다운로드
-    print('LOCAL: $localFlashcards');
-    print('DB: $dateOnDB');
     if (localFlashcards == null && dateOnDB != null) {
       downloadFlashcards();
     }

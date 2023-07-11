@@ -1,9 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
@@ -141,7 +143,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Image.asset('assets/images/podo.png'),
         ),
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 2000),
       );
     });
   }
