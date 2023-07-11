@@ -7,11 +7,15 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:podo/screens/my_page/user.dart' as user;
+
 
 // apple OAuth callback : https://podo-49335.firebaseapp.com/__/auth/handler
 
 class Login extends StatelessWidget {
   final _auth = FirebaseAuth.instance;
+  late TargetPlatform os;
+
 
   Future<void> _sendEmailVerificationLink(String email) async {
     await _auth.currentUser?.sendEmailVerification(ActionCodeSettings(
@@ -23,11 +27,13 @@ class Login extends StatelessWidget {
       handleCodeInApp: false,
       dynamicLinkDomain: 'newpodo.page.link',
     ));
-    print('EMAIL SENT');
+    print('EMAIL SNT');
   }
 
   @override
   Widget build(BuildContext context) {
+    os = Theme.of(context).platform;
+
     return Center(
       child: FlutterLogin(
         logo: 'assets/images/logo.png',
@@ -51,12 +57,11 @@ class Login extends StatelessWidget {
                 await _auth.signInWithCredential(credential);
                 return null;
               } catch (e) {
-                print('ERROR: $e');
-                return e.toString();
+                print('Error: $e');
+                return 'Error: $e';
               }
             },
           ),
-
           LoginProvider(
             icon: FontAwesomeIcons.apple,
             callback: () async {

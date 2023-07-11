@@ -10,16 +10,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage.init();
   late final SharedPreferences prefs;
-  final LESSON_COURSE = 'lessonCourse';
-  final FLASHCARDS = 'flashcards';
-  final HISTORIES = 'histories';
-  final REF_FLASHCARD = 'Users/${User().id}/FlashCards';
-  final REF_HISTORY = 'Users/${User().id}/Histories';
+  late String LESSON_COURSE;
+  late String FLASHCARDS;
+  late String HISTORIES;
+  late String REF_FLASHCARD;
+  late String REF_HISTORY;
   bool isInit = false;
   List<FlashCard> flashcards = [];
   List<History> histories = [];
-  late final flashcardRef;
-  late final historyRef;
+  late CollectionReference flashcardRef;
+  late CollectionReference historyRef;
 
 
 
@@ -35,9 +35,10 @@ class LocalStorage {
     if (!isInit) {
       isInit = true;
       prefs = await SharedPreferences.getInstance();
-      await getFlashcards();
-      await getHistories();
     }
+    // 같은 기기에서 로그 아웃 후 다른 계정으로 로그인 할 때 필요
+    await getFlashcards();
+    await getHistories();
   }
 
   void setLessonCourse(LessonCourse course) {
@@ -45,6 +46,7 @@ class LocalStorage {
   }
 
   LessonCourse? getLessonCourse() {
+    LESSON_COURSE = '${User().id}/lessonCourse';
     String? json = prefs.getString(LESSON_COURSE);
     if (json != null) {
       return LessonCourse.fromJson(jsonDecode(json));
@@ -86,6 +88,8 @@ class LocalStorage {
   }
 
   Future<void> getFlashcards() async {
+    FLASHCARDS = '${User().id}/flashcards';
+    REF_FLASHCARD = 'Users/${User().id}/FlashCards';
     flashcardRef = FirebaseFirestore.instance.collection(REF_FLASHCARD);
     List<String>? localFlashcards = prefs.getStringList(FLASHCARDS);
     flashcards = [];
@@ -98,6 +102,8 @@ class LocalStorage {
 
     // 로컬: null && DB: null  ||  로컬 date == DB date -> return;
     // 로컬: null && DB: !null -> DB 에서 다운로드
+    print('LOCAL: $localFlashcards');
+    print('DB: $dateOnDB');
     if (localFlashcards == null && dateOnDB != null) {
       downloadFlashcards();
     }
@@ -158,6 +164,8 @@ class LocalStorage {
   }
 
   Future<void> getHistories() async {
+    HISTORIES = '${User().id}/histories';
+    REF_HISTORY = 'Users/${User().id}/Histories';
     historyRef = FirebaseFirestore.instance.collection(REF_HISTORY);
     List<String>? localHistories = prefs.getStringList(HISTORIES);
     histories = [];

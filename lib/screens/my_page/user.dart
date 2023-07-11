@@ -63,10 +63,10 @@ class User {
     return map;
   }
 
-  Future<void> makeNewUserOnDB(TargetPlatform platform) async {
+  Future<void> makeNewUserOnDB() async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
     id = user.uid;
-    os = platform.toString().split('.').last;
+    os = '';
     email = user.email ?? '';
     name = user.displayName ?? '';
     dateSignUp = DateTime.now();
@@ -109,10 +109,8 @@ class User {
       }
 
     } else {
-      Get.dialog(AlertDialog(
-        title: MyWidget().getTextWidget(text: MyStrings.failedUserTitle),
-        content: MyWidget().getTextWidget(text: MyStrings.failedUserContent),
-      ));
+      print('신규유저입니다. DB를 생성합니다.');
+      makeNewUserOnDB();
     }
   }
 }

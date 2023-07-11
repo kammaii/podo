@@ -4,6 +4,7 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
   late TargetPlatform os;
 
   void runDeepLink(Uri deepLink) async {
+    print('RUN DEEPLINK');
     Uri uri = Uri.parse(deepLink.toString());
     String mode = uri.queryParameters['mode']!;
     await FirebaseAuth.instance.currentUser!.reload();
@@ -53,8 +55,7 @@ class MyApp extends StatelessWidget {
     switch(mode) {
       case 'verifyEmail' :
         if(currentUser != null && currentUser!.emailVerified) {
-          await user.User().makeNewUserOnDB(os);
-          getInitData(isNewUser: true);
+          getInitData();
         }
         break;
 
@@ -80,15 +81,17 @@ class MyApp extends StatelessWidget {
     }
   }
 
-  getInitData({bool isNewUser = false}) async {
-    if(!isNewUser) {
-      await user.User().getUser();
-    }
+  getInitData() async {
+    await user.User().getUser();
     await LocalStorage().getPrefs();
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
     await CloudMessage().getCloudMessage();
     Get.toNamed('/');
+    String thisOs = os.toString().split('.').last;
+    if(thisOs != user.User().os) {
+      Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: thisOs);
+    }
   }
 
   @override
