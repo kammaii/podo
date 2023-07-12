@@ -335,7 +335,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       onExpansionChanged: (value) {
         controller.setIsExpanded(index, value);
       },
-      leading: const Icon(Icons.g_translate_rounded),
+      leading: const Icon(CupertinoIcons.globe),
       iconColor: MyColors.purple,
       title: const Text(''),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 10),

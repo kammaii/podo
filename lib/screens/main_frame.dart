@@ -14,6 +14,7 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_list_main.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/my_page/my_page.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -58,7 +59,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   final LESSON_COURSES = 'LessonCourses';
   final ORDER_ID = 'orderId';
   final IS_BEGINNER_MODE = 'isBeginnerMode';
-  String setLanguage = 'en'; //todo: 기기 설정에 따라 바뀌게 하기
+  String setLanguage = User().language;
   late AnimationController animationController;
   late Animation<Offset> animationOffset;
   final controller = Get.find<LessonCourseController>();

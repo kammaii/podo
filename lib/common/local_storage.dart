@@ -20,7 +20,7 @@ class LocalStorage {
   List<History> histories = [];
   late CollectionReference flashcardRef;
   late CollectionReference historyRef;
-
+  bool hasPrefs = false;
 
 
   factory LocalStorage() {
@@ -33,12 +33,12 @@ class LocalStorage {
 
   Future<void> getPrefs() async {
     if (!isInit) {
+      !hasPrefs ? prefs = await SharedPreferences.getInstance() : null;
+      hasPrefs = true;
+      await getFlashcards();
+      await getHistories();
       isInit = true;
-      prefs = await SharedPreferences.getInstance();
     }
-    // 같은 기기에서 로그 아웃 후 다른 계정으로 로그인 할 때 필요
-    await getFlashcards();
-    await getHistories();
   }
 
   void setLessonCourse(LessonCourse course) {

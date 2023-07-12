@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
-import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
+import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/login/login.dart';
@@ -17,15 +17,15 @@ import 'package:podo/screens/login/logo.dart';
 import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_main.dart';
-import 'package:podo/screens/premium/premium_main.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
+import 'package:podo/screens/premium/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'firebase_options.dart';
 
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,14 +53,14 @@ class MyApp extends StatelessWidget {
     await FirebaseAuth.instance.currentUser!.reload();
     currentUser = FirebaseAuth.instance.currentUser;
 
-    switch(mode) {
-      case 'verifyEmail' :
-        if(currentUser != null && currentUser!.emailVerified) {
+    switch (mode) {
+      case 'verifyEmail':
+        if (currentUser != null && currentUser!.emailVerified) {
           getInitData();
         }
         break;
 
-      case 'cloudMessage' :
+      case 'cloudMessage':
         break;
     }
   }
@@ -90,7 +90,7 @@ class MyApp extends StatelessWidget {
     await CloudMessage().getCloudMessage();
     Get.toNamed(MyStrings.routeMainFrame);
     String thisOs = os.toString().split('.').last;
-    if(thisOs != user.User().os) {
+    if (thisOs != user.User().os) {
       Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: thisOs);
     }
   }
@@ -98,10 +98,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     os = Theme.of(context).platform;
-    String initialRoute = '/login';
-    if (currentUser != null && currentUser!.emailVerified == true) {
-      initialRoute = '/logo';
-    }
+    String initialRoute = '/logo';
 
     initDynamicLinks();
 
@@ -112,11 +109,11 @@ class MyApp extends StatelessWidget {
           getInitData();
         } else {
           print('AUTH STATE CHANGES: Email not Verified');
-          Get.offAllNamed('/login');
+          Get.offNamedUntil(MyStrings.routeLogin, ModalRoute.withName(MyStrings.routeLogo));
         }
       } else {
         print('AUTH STATE CHANGES: User is null');
-        Get.offAllNamed('/login');
+        Get.offNamedUntil(MyStrings.routeLogin, ModalRoute.withName(MyStrings.routeLogo));
       }
     });
 

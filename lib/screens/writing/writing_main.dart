@@ -23,7 +23,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   List<WritingQuestion> questions = [];
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
   final KO = 'ko';
-  String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
+  String fo = User().language;
   late AnimationController animationController;
   late Animation<Offset> animationOffset;
   bool isVisible = false;

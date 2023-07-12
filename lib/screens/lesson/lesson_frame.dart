@@ -43,7 +43,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   final AUDIO = 'audio';
   final FILE_NAME = 'fileName';
   final SPEAKING = 'speaking';
-  String fo = 'en'; //todo: UserInfo 의 language 로 설정하기
+  String fo = User().language;
   bool isLoading = true;
   List<LessonCard> cards = [];
   Map<int, GlobalKey<ScratcherState>> scratchKey = {};

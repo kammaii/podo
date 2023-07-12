@@ -1,8 +1,13 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+
 
 class PremiumMain extends StatelessWidget {
   PremiumMain({Key? key}) : super(key: key);
@@ -130,7 +135,25 @@ class PremiumMain extends StatelessWidget {
                 ),
               ),
             ),
-            TextButton(onPressed: (){}, child: const Text(MyStrings.purchaseRestoration))
+            TextButton(onPressed: () async {
+              // todo: revenueCat 설정 후 수정
+              // try {
+              //   PurchaserInfo purchaserInfo = await Purchases.purchasePackage(package);
+              //   if (purchaserInfo.entitlements.all["my_entitlement_identifier"].isActive) {
+              //     Purchases.setEmail(User().email);
+              //     Purchases.setDisplayName(User().name);
+              //     Purchases.setPushToken(User().fcmToken ?? '');
+              //     await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
+              //     MyWidget().showSnackbar(title: MyStrings.purchaseTitle, message: MyStrings.purchaseContent);
+              //     Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+              //   }
+              // } on PlatformException catch (e) {
+              //   var errorCode = PurchasesErrorHelper.getErrorCode(e);
+              //   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+              //     showError(e);
+              //   }
+              // }
+            }, child: const Text(MyStrings.purchaseRestoration))
           ],
         ),
       ),

@@ -66,7 +66,6 @@ class MyStrings {
   static const String indonesian = 'Indonesian';
   static const String russian = 'Russian';
   static const String logOut = 'Log out';
-  static const String changeLanguageRestart = 'You need to re-login when changing the language.';
   static const String logOutDetail = 'Do you want to log out?';
   static const String removeAccount = 'Remove Account';
   static const String removeDetail = 'Do you want to remove your account? \n(If you have been logged in for a long time, you may be prompted to re-login.)';
@@ -125,6 +124,8 @@ class MyStrings {
   static const String selectCourse = 'Select a course';
   static const String learning = 'Learning';
   static const String selectQuestion = 'Select a question';
+  static const String purchaseTitle = 'Thank you for subscribing!';
+  static const String purchaseContent = 'Improve your Korean language skills with podo';
 
 
 

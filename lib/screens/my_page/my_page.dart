@@ -1,15 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 class MyPageItem {
   late IconData icon;
@@ -29,7 +33,7 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   List<MyPageItem> items = [
     MyPageItem(Icons.account_circle_rounded, MyStrings.editName),
-    MyPageItem(Icons.language_rounded, MyStrings.language),
+    MyPageItem(CupertinoIcons.globe, MyStrings.language),
     MyPageItem(Icons.feedback_outlined, MyStrings.feedback),
     MyPageItem(Icons.logout_rounded, MyStrings.logOut),
     MyPageItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
@@ -207,45 +211,34 @@ class _MyPageState extends State<MyPage> {
                           getExpansionPanel(
                             items[1],
                             ListTile(
-                              title: Column(
-                                children: [
-                                  MyWidget().getTextWidget(
-                                    text: MyStrings.changeLanguageRestart,
-                                    size: 15,
-                                    color: MyColors.purple,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(30),
-                                            ),
-                                            side: const BorderSide(color: MyColors.purple, width: 1),
-                                            backgroundColor: Colors.white),
-                                        onPressed: () async {
-                                          String lang = Languages().fos[index];
-                                          user.User().language = lang;
-                                          await Database().updateDoc(
-                                              collection: 'Users',
-                                              docId: user.User().id,
-                                              key: 'language',
-                                              value: lang);
-                                          await auth.signOut();
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 13),
-                                          child: Text(language[index], style: const TextStyle(color: MyColors.purple)),
+                              title: ListView.builder(
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
                                         ),
-                                      );
+                                        side: const BorderSide(color: MyColors.purple, width: 1),
+                                        backgroundColor: Colors.white),
+                                    onPressed: () async {
+                                      String lang = Languages().fos[index];
+                                      user.User().language = lang;
+                                      await Database().updateDoc(
+                                          collection: 'Users',
+                                          docId: user.User().id,
+                                          key: 'language',
+                                          value: lang);
+                                      Get.offNamedUntil(
+                                          MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                                     },
-                                    itemCount: language.length,
-                                  ),
-                                ],
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 13),
+                                      child: Text(language[index], style: const TextStyle(color: MyColors.purple)),
+                                    ),
+                                  );
+                                },
+                                itemCount: language.length,
                               ),
                             ),
                           ),
@@ -333,6 +326,7 @@ class _MyPageState extends State<MyPage> {
                                             text: MyStrings.yes,
                                             textSize: 15,
                                             f: () async {
+                                              LocalStorage().isInit = false;
                                               await auth.signOut();
                                               print('User logged out');
                                             },
