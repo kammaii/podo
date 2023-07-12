@@ -30,6 +30,8 @@ class User {
   late String name;
   late DateTime dateSignUp;
   late DateTime dateSignIn;
+  late DateTime? trialStart;
+  late DateTime? trialEnd;
   late String language;
   late List<Premium>? premiumRecord;
   String? fcmToken;
@@ -42,6 +44,8 @@ class User {
   static const String NAME = 'name';
   static const String DATESIGNUP = 'dateSignUp';
   static const String DATESIGNIN = 'dateSignIn';
+  static const String TRIAL_START = 'trialStart';
+  static const String TRIAL_END = 'trialEnd';
   static const String LANGUAGE = 'language';
   static const String PREMIUM_RECORD = 'premiumRecord';
   static const String FCM_TOKEN = 'fcmToken';
@@ -64,6 +68,12 @@ class User {
     }
     if(fcmState != null) {
       map[FCM_STATE] = fcmState;
+    }
+    if(trialStart != null) {
+      map[TRIAL_START] = trialStart;
+    }
+    if(trialEnd != null) {
+      map[TRIAL_END] = trialEnd;
     }
     return map;
   }
@@ -89,10 +99,16 @@ class User {
       if(json[FCM_STATE] != null) {
         fcmState = json[FCM_STATE];
       }
+      if(json[TRIAL_START] != null) {
+        trialStart = json[TRIAL_START];
+      }
+      if(json[TRIAL_END] != null) {
+        trialEnd = json[TRIAL_END];
+      }
       status = json[STATUS];
 
       //todo: RevenueCat 등록 후 수정
-      // if(status != 0) {
+      // if(status == 1 || status == 2) {
       //   try {
       //     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       //     if (customerInfo.entitlements.all[<my_entitlement_identifier>].isActive) {

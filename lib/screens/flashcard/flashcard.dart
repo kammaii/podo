@@ -70,7 +70,7 @@ class FlashCard {
       {required String itemId, required String front, String? back, String? audio, required Function fn}) async {
     int status = User().status;
     int length = LocalStorage().flashcards.length;
-    if (status == 2 || (status == 0 && length < limitLength) || (status == 1 && length < limitLength)) {
+    if (status == 2 || status == 3 || (status == 0 && length < limitLength) || (status == 1 && length < limitLength)) {
       FlashCard flashcard = FlashCard();
       flashcard.itemId = itemId;
       flashcard.front = front;

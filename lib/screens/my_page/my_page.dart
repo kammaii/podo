@@ -38,7 +38,7 @@ class _MyPageState extends State<MyPage> {
     MyPageItem(Icons.logout_rounded, MyStrings.logOut),
     MyPageItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
   ];
-  List<String> userTier = ['New', 'Basic', 'Premium'];
+  List<String> userTier = ['New', 'Basic', 'Premium', 'Trial'];
   FirebaseAuth auth = FirebaseAuth.instance;
   String signupDate = '';
   String userId = '';
