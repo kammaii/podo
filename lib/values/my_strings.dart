@@ -87,7 +87,6 @@ class MyStrings {
   static const String premiumDetail = 'Premium is automatically renewed every 2 months. Premium can be canceled at any time up to 24 hours before the renewal. The price can be changed without prior notice. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
   static const String hassleFree = 'A hassle-free short period!';
   static const String twoMonths = '2 Months';
-  static const String purchaseRestoration = 'Purchase restoration';
   static const String lessonSummary = 'Lesson Summary';
   static const String writing = 'Writing';
   static const String myWritings = 'My writings';
@@ -126,6 +125,10 @@ class MyStrings {
   static const String selectQuestion = 'Select a question';
   static const String purchaseTitle = 'Thank you for subscribing!';
   static const String purchaseContent = 'Improve your Korean language skills with podo';
+  static const String trialComment = 'Enable notification \nand enjoy 10 days free premium! \n\n(No payment information required)';
+  static const String trialActivated = 'The free premium features have been activated.';
+  static const String getFreePremium = 'Get 10 days of free premium!';
+  static const String cool = 'Cool!';
 
 
 

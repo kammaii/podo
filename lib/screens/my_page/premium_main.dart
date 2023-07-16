@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +8,6 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-
 
 class PremiumMain extends StatelessWidget {
   PremiumMain({Key? key}) : super(key: key);
@@ -101,27 +101,46 @@ class PremiumMain extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               child: GestureDetector(
-                onTap: (){},
+                onTap: () {
+                  // todo: revenueCat 설정 후 수정
+                  // try {
+                  //   PurchaserInfo purchaserInfo = await Purchases.purchasePackage(package);
+                  //   if (purchaserInfo.entitlements.all["my_entitlement_identifier"].isActive) {
+                  //     Purchases.setEmail(User().email);
+                  //     Purchases.setDisplayName(User().name);
+                  //     Purchases.setPushToken(User().fcmToken ?? '');
+                  //     await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
+                  //     MyWidget().showSnackbar(title: MyStrings.purchaseTitle, message: MyStrings.purchaseContent);
+                  //     Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                  //   }
+                  // } on PlatformException catch (e) {
+                  //   var errorCode = PurchasesErrorHelper.getErrorCode(e);
+                  //   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+                  //     showError(e);
+                  //   }
+                  // }
+                },
                 child: Row(
                   children: [
                     Expanded(
                       child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
-                            borderRadius: BorderRadius.circular(30)
-                          ),
+                              gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                              borderRadius: BorderRadius.circular(30)),
                           child: Row(
                             children: [
                               const Icon(FontAwesomeIcons.crown, color: Colors.white, size: 30),
                               const SizedBox(width: 20),
-                              Expanded(child: Center(
+                              Expanded(
+                                  child: Center(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    MyWidget().getTextWidget(text: MyStrings.twoMonths, color: Colors.white, size: 18, isBold: true),
+                                    MyWidget().getTextWidget(
+                                        text: MyStrings.twoMonths, color: Colors.white, size: 18, isBold: true),
                                     MyWidget().getTextWidget(text: MyStrings.hassleFree, color: Colors.white)
                                   ],
                                 ),
@@ -135,25 +154,20 @@ class PremiumMain extends StatelessWidget {
                 ),
               ),
             ),
-            TextButton(onPressed: () async {
-              // todo: revenueCat 설정 후 수정
-              // try {
-              //   PurchaserInfo purchaserInfo = await Purchases.purchasePackage(package);
-              //   if (purchaserInfo.entitlements.all["my_entitlement_identifier"].isActive) {
-              //     Purchases.setEmail(User().email);
-              //     Purchases.setDisplayName(User().name);
-              //     Purchases.setPushToken(User().fcmToken ?? '');
-              //     await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-              //     MyWidget().showSnackbar(title: MyStrings.purchaseTitle, message: MyStrings.purchaseContent);
-              //     Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-              //   }
-              // } on PlatformException catch (e) {
-              //   var errorCode = PurchasesErrorHelper.getErrorCode(e);
-              //   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-              //     showError(e);
-              //   }
-              // }
-            }, child: const Text(MyStrings.purchaseRestoration))
+            User().trialStart == null
+                ? TextButton(
+                    onPressed: () async {
+                      FirebaseMessaging messaging = FirebaseMessaging.instance;
+                      NotificationSettings settings = await messaging.requestPermission();
+                      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+                        await User().setTrialAuthorized();
+                        Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                      } else {
+                        await User().setTrialDenied();
+                      }
+                    },
+                    child: const Text(MyStrings.getFreePremium))
+                : const SizedBox.shrink(),
           ],
         ),
       ),

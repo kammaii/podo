@@ -70,6 +70,13 @@ class _MyPageState extends State<MyPage> {
       }
     }
 
+    int userStatus = user.User().status;
+    String? expiredDate;
+    if (userStatus == 3) {
+      expiredDate = MyDateFormat().getDateFormat(user.User().trialEnd!);
+    }
+    //todo: userStatus == 2일 때 revenueCat 에서 expireDate 가져오기
+
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -112,16 +119,20 @@ class _MyPageState extends State<MyPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyWidget().getTextWidget(
-                        text: MyStrings.myPage,
-                        size: 20,
-                        color: MyColors.purple,
-                        isBold: true,
-                      ),
-                      const SizedBox(height: 5),
-                      MyWidget().getTextWidget(
-                        text: user.User().email,
-                        color: MyColors.purple,
+                      Row(
+                        children: [
+                          MyWidget().getTextWidget(
+                            text: MyStrings.myPage,
+                            size: 20,
+                            color: MyColors.purple,
+                            isBold: true,
+                          ),
+                          const SizedBox(width: 20),
+                          MyWidget().getTextWidget(
+                            text: user.User().email,
+                            color: MyColors.purple,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 15),
                       Row(
@@ -130,8 +141,9 @@ class _MyPageState extends State<MyPage> {
                             text: userTier[user.User().status],
                             color: MyColors.grey,
                           ),
-                          const SizedBox(width: 10),
-                          //todo: Premium 일 경우 구독 종료일 표시
+                          expiredDate != null
+                              ? MyWidget().getTextWidget(text: ': ~ $expiredDate', color: MyColors.grey)
+                              : const SizedBox.shrink(),
                         ],
                       ),
                       MyWidget().getTextWidget(

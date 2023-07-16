@@ -22,7 +22,6 @@ class LocalStorage {
   late CollectionReference historyRef;
   bool hasPrefs = false;
 
-
   factory LocalStorage() {
     return _instance;
   }
@@ -33,11 +32,10 @@ class LocalStorage {
 
   Future<void> getPrefs() async {
     if (!isInit) {
-      !hasPrefs ? prefs = await SharedPreferences.getInstance() : null;
-      hasPrefs = true;
+      isInit = true;
+      prefs = await SharedPreferences.getInstance();
       await getFlashcards();
       await getHistories();
-      isInit = true;
     }
   }
 
@@ -96,7 +94,7 @@ class LocalStorage {
     DateTime? dateOnDB;
     Query query = flashcardRef.orderBy('date', descending: true).limit(1);
     List<dynamic> snapshots = await Database().getDocs(query: query);
-    if(snapshots.isNotEmpty) {
+    if (snapshots.isNotEmpty) {
       dateOnDB = FlashCard.fromJson(snapshots.first.data() as Map<String, dynamic>).date;
     }
 
@@ -128,7 +126,6 @@ class LocalStorage {
     }
     return;
   }
-
 
   bool hasHistory({required String itemId}) {
     return histories.any((flashcard) => flashcard.itemId == itemId);
@@ -168,28 +165,28 @@ class LocalStorage {
     List<String>? localHistories = prefs.getStringList(HISTORIES);
     histories = [];
     DateTime? dateOnDB;
-    Query query = historyRef.orderBy('date', descending:true).limit(1);
+    Query query = historyRef.orderBy('date', descending: true).limit(1);
     List<dynamic> snapshots = await Database().getDocs(query: query);
-    if(snapshots.isNotEmpty) {
+    if (snapshots.isNotEmpty) {
       dateOnDB = History.fromJson(snapshots.first.data() as Map<String, dynamic>).date;
     }
 
-    if(localHistories == null && dateOnDB != null) {
+    if (localHistories == null && dateOnDB != null) {
       downloadHistories();
     }
 
-    if(localHistories != null && dateOnDB != null) {
+    if (localHistories != null && dateOnDB != null) {
       convertLocalHistories(localHistories);
       int compareDate = histories.first.date.compareTo(dateOnDB);
 
-      if(compareDate < 0) {
+      if (compareDate < 0) {
         downloadHistories();
       } else if (compareDate > 0) {
         uploadHistories();
       }
     }
 
-    if(localHistories != null && dateOnDB == null) {
+    if (localHistories != null && dateOnDB == null) {
       convertLocalHistories(localHistories);
       uploadHistories();
     }

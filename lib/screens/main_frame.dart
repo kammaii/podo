@@ -50,7 +50,7 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
     _navBarItem('Lessons', const Icon(FontAwesomeIcons.chalkboard)),
     _navBarItem('Reading', const Icon(FontAwesomeIcons.book)),
     _navBarItem('Flashcards', const Icon(CupertinoIcons.heart_fill)),
-    _navBarItem('Settings', const Icon(Icons.settings)),
+    _navBarItem('My page', const Icon(Icons.settings)),
   ];
 }
 
@@ -135,17 +135,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       end: Offset.zero,
     ).animate(animationController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.snackbar(
-        MyStrings.welcome,
-        MyStrings.welcomeMessage,
-        colorText: MyColors.purple,
-        backgroundColor: Colors.white,
-        icon: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Image.asset('assets/images/podo.png'),
-        ),
-        duration: const Duration(milliseconds: 2000),
-      );
+      MyWidget().showSnackbarWithPodo(title: MyStrings.welcome, content: MyStrings.welcomeMessage);
     });
   }
 

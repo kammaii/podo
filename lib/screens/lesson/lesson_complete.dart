@@ -1,5 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:confetti/confetti.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/screens/my_page/user.dart';
+import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -43,6 +45,42 @@ class LessonComplete extends StatelessWidget {
     ]);
   }
 
+  void showMessagePermission() async {
+    Get.dialog(AlertDialog(
+      title: Image.asset('assets/images/podo.png', width: 50, height: 50),
+      content: MyWidget().getTextWidget(text: MyStrings.trialComment, isTextAlignCenter: true, size: 16),
+      actionsAlignment: MainAxisAlignment.center,
+      actionsPadding: const EdgeInsets.all(20),
+      actions:  [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              backgroundColor: MyColors.purple),
+          onPressed: () async {
+            Get.back();
+            FirebaseMessaging messaging = FirebaseMessaging.instance;
+            NotificationSettings settings = await messaging.requestPermission();
+            print(settings.authorizationStatus);
+            if(settings.authorizationStatus == AuthorizationStatus.authorized) {
+              await User().setTrialAuthorized();
+            } else {
+              await User().setTrialDenied();
+            }
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 13),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+              child: Text(MyStrings.cool, style: TextStyle(color: Colors.white)),
+            ),
+          ),
+        ),
+      ],
+    ), barrierDismissible: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
@@ -52,6 +90,9 @@ class LessonComplete extends StatelessWidget {
     History().addHistory(item: 'lesson', itemId: lesson.id);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       lessonController.isCompleted[lesson.id] = true;
+      if(User().status == 0 && User().trialStart == null) {
+        showMessagePermission();
+      }
     });
 
     return Scaffold(
@@ -123,11 +164,13 @@ class LessonComplete extends StatelessWidget {
                         }),
                         const SizedBox(height: 20),
                         getBtn(MyStrings.writing, CupertinoIcons.pen, () {
-                          showAd(() {
+                          if(User().status == 2 || User().status == 3) {
                             Get.offNamedUntil(
                                 MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
                                 arguments: lesson.id);
-                          });
+                          } else {
+                            Get.toNamed(MyStrings.routePremiumMain);
+                          }
                         }),
                         const SizedBox(height: 20),
                         getBtn(MyStrings.nextLesson, CupertinoIcons.arrow_right, () {

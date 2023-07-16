@@ -292,4 +292,18 @@ class MyWidget {
       duration: const Duration(seconds: 5),
     );
   }
+
+  showSnackbarWithPodo({String title = '', String content = ''}) {
+    Get.snackbar(
+      title,
+      content,
+      colorText: MyColors.purple,
+      backgroundColor: Colors.white,
+      icon: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Image.asset('assets/images/podo.png'),
+      ),
+      duration: const Duration(milliseconds: 2000),
+    );
+  }
 }

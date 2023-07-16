@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/fcm_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
@@ -18,14 +20,21 @@ import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/message/cloud_message.dart';
 import 'package:podo/screens/message/cloud_message_main.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
-import 'package:podo/screens/premium/premium_main.dart';
+import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'firebase_options.dart';
+
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: $message");
+  await Firebase.initializeApp();
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,8 +44,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // auth emulator init
-  // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(MyApp());
 }
 
@@ -101,6 +110,7 @@ class MyApp extends StatelessWidget {
     String initialRoute = '/logo';
 
     initDynamicLinks();
+    Get.put(FcmController());
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
@@ -116,6 +126,7 @@ class MyApp extends StatelessWidget {
         Get.offNamedUntil(MyStrings.routeLogin, ModalRoute.withName(MyStrings.routeLogo));
       }
     });
+
 
     return GetMaterialApp(
       title: 'Podo Korean app',

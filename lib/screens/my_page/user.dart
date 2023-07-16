@@ -1,20 +1,13 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/ads_controller.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/premium/premium.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:podo/common/database.dart';
-import 'package:purchases_flutter/models/customer_info_wrapper.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 class User {
   User._init();
@@ -30,12 +23,10 @@ class User {
   late String name;
   late DateTime dateSignUp;
   late DateTime dateSignIn;
-  late DateTime? trialStart;
-  late DateTime? trialEnd;
+  DateTime? trialStart;
+  DateTime? trialEnd;
   late String language;
-  late List<Premium>? premiumRecord;
   String? fcmToken;
-  String? fcmState;
   late int status;
 
   static const String ID = 'id';
@@ -47,9 +38,7 @@ class User {
   static const String TRIAL_START = 'trialStart';
   static const String TRIAL_END = 'trialEnd';
   static const String LANGUAGE = 'language';
-  static const String PREMIUM_RECORD = 'premiumRecord';
   static const String FCM_TOKEN = 'fcmToken';
-  static const String FCM_STATE = 'fcmState';
   static const String STATUS = 'status';
 
   Map<String, dynamic> toJson() {
@@ -65,9 +54,6 @@ class User {
     };
     if(fcmToken != null) {
       map[FCM_TOKEN] = fcmToken;
-    }
-    if(fcmState != null) {
-      map[FCM_STATE] = fcmState;
     }
     if(trialStart != null) {
       map[TRIAL_START] = trialStart;
@@ -92,20 +78,22 @@ class User {
       dateSignIn = DateTime.now();
       Database().updateDoc(collection: 'Users', docId: id, key: 'dateSignIn', value: DateTime.now());
       language = json[LANGUAGE];
-      premiumRecord = json[PREMIUM_RECORD];
       if(json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
       }
-      if(json[FCM_STATE] != null) {
-        fcmState = json[FCM_STATE];
-      }
       if(json[TRIAL_START] != null) {
-        trialStart = json[TRIAL_START];
+        Timestamp stamp = json[TRIAL_START];
+        trialStart = stamp.toDate();
       }
       if(json[TRIAL_END] != null) {
-        trialEnd = json[TRIAL_END];
+        Timestamp stamp = json[TRIAL_END];
+        trialEnd = stamp.toDate();
       }
       status = json[STATUS];
+
+      if(status == 3 && DateTime.now().isAfter(trialEnd!)) {
+        status = 1;
+      }
 
       //todo: RevenueCat 등록 후 수정
       // if(status == 1 || status == 2) {
@@ -127,14 +115,15 @@ class User {
       //       await Purchases.configure(configuration..appUserID = id);
       //     }
       //
-      //     if(json[STATUS] != status) {
-      //       Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
-      //     }
       //
       //   } on PlatformException catch (e) {
       //     print('CustomerInfo Error: $e');
       //   }
       // }
+
+      if (json[STATUS] != status) {
+        Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
+      }
 
       //todo: revenueCat 등록 후 삭제
       if(status == 1) {
@@ -147,7 +136,6 @@ class User {
       makeNewUserOnDB();
     }
   }
-
 
   Future<void> makeNewUserOnDB() async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
@@ -162,8 +150,22 @@ class User {
     if(!Languages().fos.contains(language)) {
       language = 'en';
     }
-    premiumRecord = [];
     status = 0;
     Database().setDoc(collection: 'Users', doc: this);
+  }
+
+  Future<void> setTrialAuthorized() async {
+    status = 3;
+    DateTime now = DateTime.now();
+    trialStart = now;
+    trialEnd = now.add(const Duration(days: 10));
+    fcmToken = await FirebaseMessaging.instance.getToken();
+    await Database().setDoc(collection: 'Users', doc: this);
+    MyWidget().showSnackbarWithPodo(title: MyStrings.congratulations, content: MyStrings.trialActivated);
+  }
+
+  Future<void> setTrialDenied() async {
+    status = 1;
+    await Database().setDoc(collection: 'Users', doc: this);
   }
 }
