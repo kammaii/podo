@@ -93,6 +93,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
               ),
               ElevatedButton(
                 onPressed: () {
+                  //todo: await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
                   Writing writing = Writing(selectedQuestion!);
                   writing.userWriting = textEditController.text;
                   Get.back();

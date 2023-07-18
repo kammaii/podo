@@ -103,7 +103,7 @@ class PremiumMain extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   // todo: revenueCat 설정 후 수정
                   // try {
                   //   PurchaserInfo purchaserInfo = await Purchases.purchasePackage(package);
@@ -121,6 +121,7 @@ class PremiumMain extends StatelessWidget {
                   //     showError(e);
                   //   }
                   // }
+                  //todo: await FirebaseAnalytics.instance.logPurchase();
                 },
                 child: Row(
                   children: [
@@ -160,6 +161,7 @@ class PremiumMain extends StatelessWidget {
                       FirebaseMessaging messaging = FirebaseMessaging.instance;
                       NotificationSettings settings = await messaging.requestPermission();
                       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+                        //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved_after_deny');
                         await User().setTrialAuthorized();
                         Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                       } else {

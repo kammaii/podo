@@ -125,6 +125,12 @@ class User {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
 
+      //todo:
+      // final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+      // await analytics.setUserId(id: id);
+      // await analytics.setUserProperty(name: 'status', value: status.toString());
+
+
       //todo: revenueCat 등록 후 삭제
       if(status == 1) {
         Get.put(AdsController());
@@ -152,6 +158,20 @@ class User {
     }
     status = 0;
     Database().setDoc(collection: 'Users', doc: this);
+    
+    List<String> signInMethods = await auth.FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+    if(signInMethods.isNotEmpty) {
+      String method = 'email';
+      for(String signInMethod in signInMethods) {
+        if(signInMethod == 'google.com') {
+          method = 'google';
+        } else if(signInMethod == 'apple.com') {
+          method = 'apple';
+        }
+      }
+      print('SIgn up method : $method');
+      //todo: await FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
+    }
   }
 
   Future<void> setTrialAuthorized() async {

@@ -46,6 +46,7 @@ class LessonComplete extends StatelessWidget {
   }
 
   void showMessagePermission() async {
+    //todo: await FirebaseAnalytics.instance.logEvent(name: 'first_lesson_complete');
     Get.dialog(AlertDialog(
       title: Image.asset('assets/images/podo.png', width: 50, height: 50),
       content: MyWidget().getTextWidget(text: MyStrings.trialComment, isTextAlignCenter: true, size: 16),
@@ -62,10 +63,13 @@ class LessonComplete extends StatelessWidget {
             Get.back();
             FirebaseMessaging messaging = FirebaseMessaging.instance;
             NotificationSettings settings = await messaging.requestPermission();
-            print(settings.authorizationStatus);
             if(settings.authorizationStatus == AuthorizationStatus.authorized) {
+              //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
               await User().setTrialAuthorized();
+              Get.offNamedUntil(
+                  MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
             } else {
+              //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
               await User().setTrialDenied();
             }
           },

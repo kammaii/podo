@@ -44,7 +44,8 @@ class _ReadingListMainState extends State<ReadingListMain> {
       child: InkWell(
         onTap: (isBasicUser && !readingTitle.isFree)
             ? null
-            : () {
+            : () async {
+                //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
                 Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
               },
         child: Stack(

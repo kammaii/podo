@@ -134,7 +134,6 @@ class Login extends StatelessWidget {
           },
           onSubmitAnimationCompleted: () {
             print('onSubmitAnimationCompleted');
-            //Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MainFrame()));
           },
         ),
       ),

@@ -58,7 +58,7 @@ dependencies:
   easy_localization: ^3.0.2
   firebase_in_app_messaging: ^0.7.3+3
   purchases_flutter: ^4.0.0
-  firebase_analytics: ^10.4.3
+#  firebase_analytics: ^10.4.3
 
 dev_dependencies:
   flutter_test:

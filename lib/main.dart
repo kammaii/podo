@@ -27,7 +27,6 @@ import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'firebase_options.dart';
 
 
@@ -129,10 +128,12 @@ class MyApp extends StatelessWidget {
       }
     });
 
+    //todo: final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
     return GetMaterialApp(
       title: 'Podo Korean app',
       theme: ThemeData(primaryColor: MyColors.purple),
+      //todo: navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
       initialRoute: initialRoute,
       getPages: [
         GetPage(name: '/', page: () => MyApp()),

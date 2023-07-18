@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -148,6 +149,10 @@ class LocalStorage {
       histories.add(History.fromJson(snapshot.data() as Map<String, dynamic>));
     }
     setHistories();
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    if(fcmToken != null) {
+      Database().updateDoc(collection: 'Users', docId: User().id, key: 'fcmToken', value: fcmToken);
+    }
     print('히스토리 다운로드');
   }
 

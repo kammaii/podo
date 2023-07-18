@@ -113,24 +113,20 @@ class CloudMessageMain extends StatelessWidget {
                 children: [
                   CloudMessage().content != null
                       ? Column(
-                          children: [
-                            Column(
-                              children: [
-                                Html(
-                                  data: CloudMessage().content,
-                                  style: {
-                                    'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
-                                    'p': Style(
-                                        fontFamily: 'EnglishFont',
-                                        fontSize: const FontSize(18),
-                                        lineHeight: LineHeight.number(1.5)),
-                                  },
-                                ),
-                                const Divider(),
-                              ],
-                            ),
-                          ],
-                        )
+                        children: [
+                          Html(
+                            data: CloudMessage().content,
+                            style: {
+                              'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
+                              'p': Style(
+                                  fontFamily: 'EnglishFont',
+                                  fontSize: const FontSize(18),
+                                  lineHeight: LineHeight.number(1.5)),
+                            },
+                          ),
+                          const Divider(),
+                        ],
+                      )
                       : const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -295,6 +291,7 @@ class CloudMessageMain extends StatelessWidget {
                                   MyWidget().showDialog(
                                       content: MyStrings.sendReply,
                                       yesFn: () async {
+                                        //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
                                         CloudReply reply = CloudReply(replyController.text);
                                         await Database().setDoc(
                                             collection: 'CloudMessages/${CloudMessage().id}/Replies',

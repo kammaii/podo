@@ -99,7 +99,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   ),
                   color: Colors.white,
                   child: InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
                       Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
                     },
                     child: Padding(
