@@ -30,7 +30,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   Radius borderRadius = const Radius.circular(20);
   late Future<List<dynamic>> futures;
   WritingQuestion? selectedQuestion;
-  final controller = Get.put(WritingController());
+  final controller = Get.find<WritingController>();
   int maxLength = 50;
   final textEditController = TextEditingController();
   int maxRequestCount = 3;
@@ -202,27 +202,12 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        MyWidget().getTextWidget(
-                            text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
-                        TextButton(
-                            onPressed: () {
-                              Get.toNamed(MyStrings.routeMyWritingList);
-                            },
-                            child: const Text(MyStrings.myWritings,
-                                style: TextStyle(
-                                  color: MyColors.purple,
-                                  decoration: TextDecoration.underline,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ))),
-                      ],
-                    ),
+                    child: MyWidget().getTextWidget(
+                        text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
                   ),
                   Expanded(
                     child: FutureBuilder(

@@ -16,6 +16,7 @@ import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/my_page/my_page.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
+import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -31,6 +32,7 @@ List<Widget> _buildScreens() {
   return [
     course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
     ReadingListMain(),
+    WritingList(true),
     const FlashCardMain(),
     const MyPage(),
   ];
@@ -49,6 +51,7 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
   return [
     _navBarItem('Lessons', const Icon(FontAwesomeIcons.chalkboard)),
     _navBarItem('Reading', const Icon(FontAwesomeIcons.book)),
+    _navBarItem('Writing', const Icon(FontAwesomeIcons.pen)),
     _navBarItem('Flashcards', const Icon(CupertinoIcons.heart_fill)),
     _navBarItem('My page', const Icon(Icons.settings)),
   ];

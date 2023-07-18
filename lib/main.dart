@@ -22,6 +22,7 @@ import 'package:podo/screens/message/cloud_message_main.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
+import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
@@ -97,6 +98,7 @@ class MyApp extends StatelessWidget {
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
     await CloudMessage().getCloudMessage();
+    Get.put(WritingController());
     Get.toNamed(MyStrings.routeMainFrame);
     String thisOs = os.toString().split('.').last;
     if (thisOs != user.User().os) {

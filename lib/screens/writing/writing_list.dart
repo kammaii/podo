@@ -69,6 +69,9 @@ class _WritingListState extends State<WritingList> {
       }
       lastSnapshot = snapshots.last;
       controller.hasFlashcard.value = List.generate(writings.length, (index) => false);
+      for (int i = 0; i < writings.length; i++) {
+        controller.hasFlashcard[i] = LocalStorage().hasFlashcard(itemId: writings[i].id);
+      }
     }
     isLoaded = true;
     controller.update();
@@ -76,7 +79,6 @@ class _WritingListState extends State<WritingList> {
 
   Widget getItem(int index, {required String title}) {
     Writing writing = writings[index];
-    controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: writing.id);
 
     String content = '';
     if (title == 'Q') {
@@ -237,52 +239,63 @@ class _WritingListState extends State<WritingList> {
     });
 
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: isMyWritings ? MyStrings.myWritings : MyStrings.viewOtherUsersWriting),
+      appBar: isMyWritings ? null : MyWidget().getAppbar(title: MyStrings.viewOtherUsersWriting),
       body: SafeArea(
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GetBuilder<WritingController>(
-              builder: (_) {
-                return Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: isLoaded && writings.isEmpty
-                            ? Center(
-                                child: MyWidget().getTextWidget(
-                                  text: MyStrings.noWritings,
-                                  color: MyColors.purple,
-                                  size: 20,
-                                  isBold: true,
-                                ),
-                              )
-                            : ListView.builder(
-                                itemCount: writings.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 30),
-                                    child: getWritingList(index),
-                                  );
-                                },
-                              ),
-                      )
-                    ],
-                  ),
-                );
-              },
+            Padding(
+              padding: const EdgeInsets.only(left: 20, top: 15),
+              child: MyWidget().getTextWidget(text: MyStrings.myWritings, color: MyColors.purple, isBold: true, size: 18),
             ),
-            Obx(() => Offstage(
-                  offstage: !controller.isLoading.value,
-                  child: Stack(
-                    children: const [
-                      Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
-                      Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    ],
+            Expanded(
+              child: Stack(
+                children: [
+                  GetBuilder<WritingController>(
+                    builder: (_) {
+                      return Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: isLoaded && writings.isEmpty
+                                  ? Center(
+                                      child: MyWidget().getTextWidget(
+                                        text: MyStrings.noWritings,
+                                        color: MyColors.purple,
+                                        size: 20,
+                                        isBold: true,
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: writings.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 30),
+                                          child: getWritingList(index),
+                                        );
+                                      },
+                                    ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                ))
+                  Obx(() => Offstage(
+                        offstage: !controller.isLoading.value,
+                        child: Stack(
+                          children: const [
+                            Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                            Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          ],
+                        ),
+                      ))
+                ],
+              ),
+            ),
           ],
         ),
       ),
