@@ -100,10 +100,12 @@ class User {
         fcmState = json[FCM_STATE];
       }
       if(json[TRIAL_START] != null) {
-        trialStart = json[TRIAL_START];
+        Timestamp stamp = json[TRIAL_START];
+        trialStart = stamp.toDate();
       }
       if(json[TRIAL_END] != null) {
-        trialEnd = json[TRIAL_END];
+        Timestamp stamp = json[TRIAL_END];
+        trialEnd = stamp.toDate();
       }
       status = json[STATUS];
 
