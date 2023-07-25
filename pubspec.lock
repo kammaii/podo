@@ -465,10 +465,10 @@ packages:
     dependency: transitive
     description:
       name: freezed_annotation
-      sha256: aeac15850ef1b38ee368d4c53ba9a847e900bb2c53a4db3f6881cbb3cb684338
+      sha256: c3fd9336eb55a38cc1bbd79ab17573113a8deccd0ecbbf926cca3c62803b5c2d
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.4.1"
   get:
     dependency: "direct main"
     description:
@@ -841,10 +841,10 @@ packages:
     dependency: "direct main"
     description:
       name: purchases_flutter
-      sha256: "1dfca3209f847f8999c54c475e92cf3211381794b2c7f5aa399f90efe2b40997"
+      sha256: "45bf011b3629460191764b644890e761ac75f8151bdde8345e153edf3eb5e249"
       url: "https://pub.dev"
     source: hosted
-    version: "4.13.0"
+    version: "5.3.0"
   quiver:
     dependency: transitive
     description:

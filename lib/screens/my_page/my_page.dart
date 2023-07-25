@@ -12,8 +12,6 @@ import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 class MyPageItem {
   late IconData icon;
@@ -74,8 +72,9 @@ class _MyPageState extends State<MyPage> {
     String? expiredDate;
     if (userStatus == 3) {
       expiredDate = MyDateFormat().getDateFormat(user.User().trialEnd!);
+    } else if (userStatus == 2) {
+      expiredDate = user.User().expirationDate;
     }
-    //todo: userStatus == 2일 때 revenueCat 에서 expireDate 가져오기
 
     return SafeArea(
       child: Scaffold(

@@ -22,6 +22,7 @@ class LocalStorage {
   late CollectionReference flashcardRef;
   late CollectionReference historyRef;
   bool hasPrefs = false;
+  bool hasWelcome = false;
 
   factory LocalStorage() {
     return _instance;

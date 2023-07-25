@@ -65,21 +65,22 @@ class AdsController extends GetxController{
   void showInterstitialAd(Function(InterstitialAd ad) f) {
     if (_interstitialAd == null) {
       print('Warning: attempt to show interstitial before loaded.');
-      return;
+      _loadInterstitialAds();
+    } else {
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+          onAdShowedFullScreenContent: (InterstitialAd ad) {
+            print('onAdShowedFullScreenContent');
+            _loadInterstitialAds();
+          },
+          onAdDismissedFullScreenContent: f,
+          onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError e) {
+            print('onAdFailedToShowFullScreenContent : $e');
+            ad.dispose();
+            _loadInterstitialAds();
+          });
+      _interstitialAd!.show();
+      _interstitialAd = null;
     }
-    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdShowedFullScreenContent: (InterstitialAd ad) {
-          print('onAdShowedFullScreenContent');
-          _loadInterstitialAds();
-        },
-        onAdDismissedFullScreenContent: f,
-        onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError e) {
-          print('onAdFailedToShowFullScreenContent : $e');
-          ad.dispose();
-          _loadInterstitialAds();
-        });
-    _interstitialAd!.show();
-    _interstitialAd = null;
   }
 
   void loadBannerAd(AdSize size) {

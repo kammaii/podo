@@ -85,8 +85,7 @@ class MyStrings {
   static const String home = 'home';
   static const String editName = 'Edit name';
   static const String premiumDetail = 'Premium is automatically renewed every 2 months. The price can be changed without prior notice. When a subscription is set to automatically renew, it will be renewed at the existing price even if the amount has been increased. However, if the amount has been decreased, it will be renewed at the reduced price. In the case of canceling a subscription and then resubscribing, it will be charged at the updated price. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
-  static const String hassleFree = 'A hassle-free short period!';
-  static const String twoMonths = '2 Months';
+  static const String failedOffering = 'Failed to load purchase information';
   static const String lessonSummary = 'Lesson Summary';
   static const String writing = 'Writing';
   static const String myWritings = 'My writings';

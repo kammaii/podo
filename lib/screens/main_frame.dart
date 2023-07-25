@@ -137,9 +137,12 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(animationController);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      MyWidget().showSnackbarWithPodo(title: MyStrings.welcome, content: MyStrings.welcomeMessage);
-    });
+    if(!LocalStorage().hasWelcome) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        LocalStorage().hasWelcome = true;
+        MyWidget().showSnackbarWithPodo(title: MyStrings.welcome, content: MyStrings.welcomeMessage);
+      });
+    }
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -100,60 +101,89 @@ class PremiumMain extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-              child: GestureDetector(
-                onTap: () async {
-                  // todo: revenueCat 설정 후 수정
-                  // try {
-                  //   PurchaserInfo purchaserInfo = await Purchases.purchasePackage(package);
-                  //   if (purchaserInfo.entitlements.all["my_entitlement_identifier"].isActive) {
-                  //     Purchases.setEmail(User().email);
-                  //     Purchases.setDisplayName(User().name);
-                  //     Purchases.setPushToken(User().fcmToken ?? '');
-                  //     await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-                  //     MyWidget().showSnackbar(title: MyStrings.purchaseTitle, message: MyStrings.purchaseContent);
-                  //     Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-                  //   }
-                  // } on PlatformException catch (e) {
-                  //   var errorCode = PurchasesErrorHelper.getErrorCode(e);
-                  //   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-                  //     showError(e);
-                  //   }
-                  // }
-                  //todo: await FirebaseAnalytics.instance.logPurchase();
-                },
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                          decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
-                              borderRadius: BorderRadius.circular(30)),
-                          child: Row(
-                            children: [
-                              const Icon(FontAwesomeIcons.crown, color: Colors.white, size: 30),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                  child: Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    MyWidget().getTextWidget(
-                                        text: MyStrings.twoMonths, color: Colors.white, size: 18, isBold: true),
-                                    MyWidget().getTextWidget(text: MyStrings.hassleFree, color: Colors.white)
-                                  ],
-                                ),
-                              )),
-                              const SizedBox(width: 20),
-                              MyWidget().getTextWidget(text: '\$10', color: Colors.white, size: 18, isBold: true),
-                            ],
+            FutureBuilder<Offerings>(
+              future: Purchases.getOfferings(),
+              builder: (context, snapshot) {
+                Package? package;
+
+                if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                  final offering = snapshot.data?.current;
+                  package = offering?.availablePackages[0];
+                  print(package);
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    child: GestureDetector(
+                      onTap: () async {
+                        try {
+                          CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
+                          if (purchaserInfo.entitlements.active.isNotEmpty) {
+                            await Purchases.setEmail(User().email);
+                            await Purchases.setDisplayName(User().name);
+                            await Purchases.setPushToken(User().fcmToken ?? '');
+                            // todo:
+                            // String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
+                            // await Purchases.setFirebaseAppInstanceId(appInstanceId!);
+                            await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
+                            MyWidget().showSnackbarWithPodo(title: MyStrings.purchaseTitle, content: MyStrings.purchaseContent);
+                            User().getUser();
+                            Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                          }
+                        } on PlatformException catch (e) {
+                          var errorCode = PurchasesErrorHelper.getErrorCode(e);
+                          if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+                            MyWidget().showSnackbar(title: MyStrings.error, message: errorCode.toString());
+                          }
+                        }
+                        //todo: await FirebaseAnalytics.instance.logPurchase();
+                      },
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+                            decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: offering != null
+                                ? Row(
+                                    children: [
+                                      const Icon(FontAwesomeIcons.crown, color: Colors.white, size: 30),
+                                      const SizedBox(width: 18),
+                                      Expanded(
+                                        child: Center(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              MyWidget().getTextWidget(
+                                                  text: offering.identifier,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                  isBold: true),
+                                              MyWidget().getTextWidget(
+                                                  text: offering.serverDescription, color: Colors.white)
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 18),
+                                      MyWidget().getTextWidget(
+                                          text: offering.availablePackages[0].storeProduct.priceString,
+                                          color: Colors.white,
+                                          size: 18,
+                                          isBold: true),
+                                    ],
+                                  )
+                                : Center(child: MyWidget().getTextWidget(text: MyStrings.failedOffering, color: Colors.white)),
                           )),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
             ),
             User().trialStart == null
                 ? TextButton(
