@@ -100,7 +100,7 @@ class _WritingListState extends State<WritingList> {
             data: content,
             style: {
               'p': Style(
-                  fontFamily: 'KoreanFont', fontSize: const FontSize(15), lineHeight: LineHeight.number(1.5)),
+                  fontFamily: 'KoreanFont', fontSize: FontSize(15), lineHeight: LineHeight.number(1.5)),
             },
           ),
         ),

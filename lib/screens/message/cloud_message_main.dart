@@ -117,10 +117,10 @@ class CloudMessageMain extends StatelessWidget {
                           Html(
                             data: CloudMessage().content,
                             style: {
-                              'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
+                              'div': Style(width: Width(200), height: Height(200), textAlign: TextAlign.center),
                               'p': Style(
                                   fontFamily: 'EnglishFont',
-                                  fontSize: const FontSize(18),
+                                  fontSize: FontSize(18),
                                   lineHeight: LineHeight.number(1.5)),
                             },
                           ),

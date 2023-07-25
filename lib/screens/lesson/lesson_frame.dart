@@ -109,7 +109,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   style: {
                     'p': Style(
                         fontFamily: 'EnglishFont',
-                        fontSize: const FontSize(15),
+                        fontSize: FontSize(15),
                         lineHeight: LineHeight.number(1.5)),
                   },
                 ),
