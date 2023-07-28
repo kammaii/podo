@@ -10,6 +10,7 @@ class Writing {
   late int questionLevel;
   late String userId;
   String? userName;
+  String? fcmToken;
   late String userWriting;
   late String correction;
   late DateTime dateWriting;
@@ -23,6 +24,7 @@ class Writing {
     questionLevel = question.level;
     userId = User().id;
     userName = User().name;
+    fcmToken = User().fcmToken;
     correction = '';
     dateWriting = DateTime.now();
     status = 0;
@@ -34,6 +36,7 @@ class Writing {
   static const String QUESTIONLEVEL = 'questionLevel';
   static const String USERID = 'userId';
   static const String USERNAME = 'userName';
+  static const String FCMTOKEN = 'fcmToken';
   static const String USERWRITING = 'userWriting';
   static const String CORRECTION = 'correction';
   static const String DATEWRITING = 'dateWriting';
@@ -66,6 +69,7 @@ class Writing {
       QUESTIONLEVEL: questionLevel,
       USERID: userId,
       USERNAME: userName,
+      FCMTOKEN: fcmToken,
       USERWRITING: userWriting,
       CORRECTION: correction,
       DATEWRITING: Timestamp.fromDate(dateWriting),

@@ -80,38 +80,20 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        Get.dialog(
-          AlertDialog(
-            title: const Text(MyStrings.wantRequestCorrection),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: MyColors.pink),
-                child: const Text(MyStrings.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  //todo: await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
-                  Writing writing = Writing(selectedQuestion!);
-                  writing.userWriting = textEditController.text;
-                  Get.back();
-                  toggleVisibility();
-                  Database().setDoc(
-                      collection: 'Writings',
-                      doc: writing,
-                      thenFn: (value) {
-                        Get.snackbar(MyStrings.requestedCorrection, '');
-                        controller.leftRequestCount.value--;
-                      });
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
-                child: const Text(MyStrings.send),
-              ),
-            ],
-          ),
-        );
+        MyWidget().showDialog(content: MyStrings.wantRequestCorrection, yesFn: () {
+          //todo: await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
+          Writing writing = Writing(selectedQuestion!);
+          writing.userWriting = textEditController.text;
+          Get.back();
+          toggleVisibility();
+          Database().setDoc(
+              collection: 'Writings',
+              doc: writing,
+              thenFn: (value) {
+                Get.snackbar(MyStrings.requestedCorrection, '');
+                controller.leftRequestCount.value--;
+              });
+        });
       };
     } else {
       return null;
@@ -273,7 +255,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               children: [
                                 TextButton(
                                     onPressed: () {
-                                      Get.toNamed(MyStrings.routeOtherWritingList, arguments: selectedQuestion!.id);
+                                      Get.toNamed(MyStrings.routeOtherWritingList,
+                                          arguments: selectedQuestion!.id);
                                     },
                                     child: const Text(MyStrings.viewOtherUsersWriting,
                                         style: TextStyle(
@@ -290,12 +273,15 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               isKorean: true,
                               size: 20,
                             ),
-                            const SizedBox(height: 20),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 30),
                             MyWidget().getTextFieldWidget(
                               controller: textEditController,
                               maxLength: maxLength,
+                              maxLines: 1,
                               hint: MyStrings.writeYourAnswerInKorean,
+                              onSubmitted: (value) {
+                                FocusScope.of(context).unfocus();
+                              }
                             ),
                             const SizedBox(height: 30),
                             MyWidget().getRoundBtnWidget(

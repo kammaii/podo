@@ -56,9 +56,10 @@ dependencies:
   blur: ^3.1.0
   firebase_messaging: ^14.6.4
   easy_localization: ^3.0.2
-  firebase_in_app_messaging: ^0.7.3+3
+  firebase_in_app_messaging: ^0.7.3+4
   purchases_flutter: ^5.3.0
   sign_in_with_apple: ^5.0.0
+  cupertino_icons: ^1.0.5
 #  firebase_analytics: ^10.4.3
 
 dev_dependencies:

@@ -83,8 +83,14 @@ class _MyPageState extends State<MyPage> {
           child: Column(
             children: [
               user.User().status == 1
-                  ? GestureDetector(
-                      onTap: () {
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(0),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      onPressed: () {
                         Get.toNamed('/premiumMain');
                       },
                       child: Container(
