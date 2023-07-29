@@ -41,13 +41,15 @@ class PremiumMain extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, bottom: 50, top: 20),
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, bottom: 50, top: 20),
                   child: Column(
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset('assets/images/quote_upper.png', color: MyColors.purple),
+                          Image.asset('assets/images/quote_upper.png',
+                              color: MyColors.purple),
                           const SizedBox(width: 5),
                           Expanded(
                               child: MyWidget().getTextWidget(
@@ -56,7 +58,8 @@ class PremiumMain extends StatelessWidget {
                                   isTextAlignCenter: true,
                                   size: 20)),
                           const SizedBox(width: 5),
-                          Image.asset('assets/images/quote_lower.png', color: MyColors.purple),
+                          Image.asset('assets/images/quote_lower.png',
+                              color: MyColors.purple),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -70,27 +73,41 @@ class PremiumMain extends StatelessWidget {
                         rows: <DataRow>[
                           getDataRow(
                               MyStrings.lesson,
-                              const Icon(Icons.check_circle_outline, color: MyColors.green),
-                              const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                              const Icon(Icons.check_circle_outline,
+                                  color: MyColors.green),
+                              const Icon(Icons.check_circle_outline,
+                                  color: MyColors.green)),
                           getDataRow(
                               MyStrings.writingCorrection,
-                              const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                              const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                          getDataRow(MyStrings.reading, MyWidget().getTextWidget(text: MyStrings.few),
+                              const Icon(Icons.remove_circle_outline,
+                                  color: MyColors.red),
+                              const Icon(Icons.check_circle_outline,
+                                  color: MyColors.green)),
+                          getDataRow(
+                              MyStrings.reading,
+                              MyWidget().getTextWidget(text: MyStrings.few),
                               MyWidget().getTextWidget(text: MyStrings.all)),
-                          getDataRow(MyStrings.flashcard, MyWidget().getTextWidget(text: MyStrings.limit20),
-                              MyWidget().getTextWidget(text: MyStrings.unlimited)),
+                          getDataRow(
+                              MyStrings.flashcard,
+                              MyWidget().getTextWidget(text: MyStrings.limit20),
+                              MyWidget()
+                                  .getTextWidget(text: MyStrings.unlimited)),
                           getDataRow(
                               MyStrings.cloudMessage,
-                              const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                              const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                              const Icon(Icons.remove_circle_outline,
+                                  color: MyColors.red),
+                              const Icon(Icons.check_circle_outline,
+                                  color: MyColors.green)),
                           getDataRow(
                               MyStrings.adFree,
-                              const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                              const Icon(Icons.check_circle_outline, color: MyColors.green))
+                              const Icon(Icons.remove_circle_outline,
+                                  color: MyColors.red),
+                              const Icon(Icons.check_circle_outline,
+                                  color: MyColors.green))
                         ],
                       ),
-                      const Divider(height: 30, thickness: 2, color: MyColors.purple),
+                      const Divider(
+                          height: 30, thickness: 2, color: MyColors.purple),
                       MyWidget().getTextWidget(
                         text: MyStrings.premiumDetail,
                         size: 15,
@@ -106,17 +123,20 @@ class PremiumMain extends StatelessWidget {
               builder: (context, snapshot) {
                 Package? package;
 
-                if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                if (snapshot.hasData &&
+                    snapshot.connectionState != ConnectionState.waiting) {
                   final offering = snapshot.data?.current;
                   package = offering?.availablePackages[0];
                   print(package);
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 20),
                     child: GestureDetector(
                       onTap: () async {
                         try {
-                          CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
+                          CustomerInfo purchaserInfo =
+                              await Purchases.purchasePackage(package!);
                           if (purchaserInfo.entitlements.active.isNotEmpty) {
                             await Purchases.setEmail(User().email);
                             await Purchases.setDisplayName(User().name);
@@ -124,15 +144,25 @@ class PremiumMain extends StatelessWidget {
                             // todo:
                             // String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
                             // await Purchases.setFirebaseAppInstanceId(appInstanceId!);
-                            await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-                            MyWidget().showSnackbarWithPodo(title: MyStrings.purchaseTitle, content: MyStrings.purchaseContent);
+                            await Database().updateDoc(
+                                collection: 'Users',
+                                docId: User().id,
+                                key: 'status',
+                                value: 2);
+                            MyWidget().showSnackbarWithPodo(
+                                title: MyStrings.purchaseTitle,
+                                content: MyStrings.purchaseContent);
                             User().getUser();
-                            Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                            Get.offNamedUntil(MyStrings.routeMainFrame,
+                                ModalRoute.withName(MyStrings.routeLogo));
                           }
                         } on PlatformException catch (e) {
                           var errorCode = PurchasesErrorHelper.getErrorCode(e);
-                          if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-                            MyWidget().showSnackbar(title: MyStrings.error, message: errorCode.toString());
+                          if (errorCode !=
+                              PurchasesErrorCode.purchaseCancelledError) {
+                            MyWidget().showSnackbar(
+                                title: MyStrings.error,
+                                message: errorCode.toString());
                           }
                         }
                         //todo: await FirebaseAnalytics.instance.logPurchase();
@@ -141,19 +171,23 @@ class PremiumMain extends StatelessWidget {
                         children: [
                           Expanded(
                               child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 23, vertical: 10),
                             decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                                gradient: const LinearGradient(
+                                    colors: [MyColors.purple, MyColors.green]),
                                 borderRadius: BorderRadius.circular(30)),
                             child: offering != null
                                 ? Row(
                                     children: [
-                                      const Icon(FontAwesomeIcons.crown, color: Colors.white, size: 30),
+                                      const Icon(FontAwesomeIcons.crown,
+                                          color: Colors.white, size: 30),
                                       const SizedBox(width: 18),
                                       Expanded(
                                         child: Center(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               MyWidget().getTextWidget(
                                                   text: offering.identifier,
@@ -161,20 +195,26 @@ class PremiumMain extends StatelessWidget {
                                                   size: 18,
                                                   isBold: true),
                                               MyWidget().getTextWidget(
-                                                  text: offering.serverDescription, color: Colors.white)
+                                                  text: offering
+                                                      .serverDescription,
+                                                  color: Colors.white)
                                             ],
                                           ),
                                         ),
                                       ),
                                       const SizedBox(width: 18),
                                       MyWidget().getTextWidget(
-                                          text: offering.availablePackages[0].storeProduct.priceString,
+                                          text: offering.availablePackages[0]
+                                              .storeProduct.priceString,
                                           color: Colors.white,
                                           size: 18,
                                           isBold: true),
                                     ],
                                   )
-                                : Center(child: MyWidget().getTextWidget(text: MyStrings.failedOffering, color: Colors.white)),
+                                : Center(
+                                    child: MyWidget().getTextWidget(
+                                        text: MyStrings.failedOffering,
+                                        color: Colors.white)),
                           )),
                         ],
                       ),
@@ -189,16 +229,22 @@ class PremiumMain extends StatelessWidget {
                 ? TextButton(
                     onPressed: () async {
                       FirebaseMessaging messaging = FirebaseMessaging.instance;
-                      NotificationSettings settings = await messaging.requestPermission();
-                      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+                      NotificationSettings settings =
+                          await messaging.requestPermission();
+                      if (settings.authorizationStatus ==
+                          AuthorizationStatus.authorized) {
                         //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved_after_deny');
                         await User().setTrialAuthorized();
-                        Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                        Get.offNamedUntil(MyStrings.routeMainFrame,
+                            ModalRoute.withName(MyStrings.routeLogo));
                       } else {
                         await User().setTrialDenied();
                       }
                     },
-                    child: const Text(MyStrings.getFreePremium))
+                    child: MyWidget().getTextWidget(
+                        text: MyStrings.getFreePremium,
+                        isTextAlignCenter: true,
+                        color: MyColors.purple))
                 : const SizedBox.shrink(),
           ],
         ),

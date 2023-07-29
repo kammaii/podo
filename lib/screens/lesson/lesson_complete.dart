@@ -70,6 +70,7 @@ class LessonComplete extends StatelessWidget {
                   MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
             } else {
               //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
+              Get.put(AdsController());
               await User().setTrialDenied();
             }
           },

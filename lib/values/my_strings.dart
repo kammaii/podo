@@ -126,7 +126,7 @@ class MyStrings {
   static const String purchaseContent = 'Improve your Korean language skills with podo';
   static const String trialComment = 'Enable notification \nand enjoy 10 days free premium! \n\n(No payment information required)';
   static const String trialActivated = 'The free premium features have been activated.';
-  static const String getFreePremium = 'Get 10 days of free premium!';
+  static const String getFreePremium = 'Get 10 days of free premium! \n(Permission required for notifications)';
   static const String cool = 'Cool!';
 
 
