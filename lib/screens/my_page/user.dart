@@ -104,12 +104,10 @@ class User {
         await initRevenueCat();
         try {
           CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-          print('ENTITLE: ${customerInfo.entitlements.active}');
           final entitlement = customerInfo.entitlements.active;
           if(entitlement['premium'] != null) {
             expirationDate = entitlement['premium']!.expirationDate.toString().substring(0, 10).replaceAll('-', '.');
           }
-          print('EXPIRE: $expirationDate');
           if (entitlement.isNotEmpty) {
             status = 2;
           } else {

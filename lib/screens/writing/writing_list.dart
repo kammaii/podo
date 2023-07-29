@@ -42,6 +42,7 @@ class _WritingListState extends State<WritingList> {
   bool isLoaded = false;
 
   loadWritings({bool isContinue = false}) async {
+    writings = [];
     final ref = FirebaseFirestore.instance.collection('Writings');
     Query query;
 
@@ -224,7 +225,6 @@ class _WritingListState extends State<WritingList> {
   @override
   Widget build(BuildContext context) {
     bool isMyWritings = widget.isMyWritings;
-    writings = [];
     lastSnapshot = null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadWritings();

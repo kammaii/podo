@@ -173,6 +173,7 @@ class MyWidget {
     Function(String)? onChanged,
     bool enabled = true,
     FocusNode? focusNode,
+    Function(String)? onSubmitted,
   }) {
     return TextField(
       focusNode: focusNode,
@@ -183,6 +184,7 @@ class MyWidget {
       cursorColor: Colors.black,
       style: TextStyle(fontSize: fontSize),
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
       decoration: InputDecoration(
         hintMaxLines: 2,
         filled: true,

@@ -28,61 +28,60 @@ class LessonSummaryMain extends StatelessWidget {
         .collection('Lessons/${lesson.id}/LessonSummaries')
         .orderBy('orderId', descending: false);
 
-    return FutureBuilder(
-        future: Database().getDocs(query: query),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-            for (dynamic snapshot in snapshot.data) {
-              summaries.add(LessonSummary.fromJson(snapshot.data() as Map<String, dynamic>));
-            }
-            return Scaffold(
-              floatingActionButton: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  isNewUser
-                      ? const SizedBox.shrink()
-                      : FloatingActionButton(
-                          heroTag: 'wiringBtn',
-                          onPressed: () {
-                            isBasicUser
-                                ? Get.toNamed(MyStrings.routePremiumMain)
-                                : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
-                          },
-                          backgroundColor: isBasicUser ? MyColors.grey : MyColors.green,
-                          child:
-                              Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: 25),
-                        ),
-                  const SizedBox(height: 5),
-                  isNewUser
-                      ? const SizedBox.shrink()
-                      : MyWidget().getTextWidget(
-                          text: MyStrings.writing,
-                          size: 15,
-                          color: isBasicUser ? MyColors.grey : MyColors.greenDark,
-                          isBold: true,
-                        ),
-                  const SizedBox(height: 15),
-                  FloatingActionButton(
-                    heroTag: 'learningBtn',
-                    onPressed: () {
-                      Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
-                    },
-                    backgroundColor: MyColors.pink,
-                    child: const Icon(Icons.play_arrow_rounded, size: 40),
-                  ),
-                  const SizedBox(height: 5),
-                  MyWidget().getTextWidget(
-                    text: MyStrings.learning,
-                    size: 15,
-                    color: MyColors.wine,
-                    isBold: true,
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-              appBar: MyWidget().getAppbar(title: MyStrings.lessonSummary),
-              body: SafeArea(
-                child: Padding(
+    return Scaffold(
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          isNewUser
+              ? const SizedBox.shrink()
+              : FloatingActionButton(
+                  heroTag: 'wiringBtn',
+                  onPressed: () {
+                    isBasicUser
+                        ? Get.toNamed(MyStrings.routePremiumMain)
+                        : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
+                  },
+                  backgroundColor: isBasicUser ? MyColors.grey : MyColors.green,
+                  child: Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: 25),
+                ),
+          const SizedBox(height: 5),
+          isNewUser
+              ? const SizedBox.shrink()
+              : MyWidget().getTextWidget(
+                  text: MyStrings.writing,
+                  size: 15,
+                  color: isBasicUser ? MyColors.grey : MyColors.greenDark,
+                  isBold: true,
+                ),
+          const SizedBox(height: 15),
+          FloatingActionButton(
+            heroTag: 'learningBtn',
+            onPressed: () {
+              Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+            },
+            backgroundColor: MyColors.pink,
+            child: const Icon(Icons.play_arrow_rounded, size: 40),
+          ),
+          const SizedBox(height: 5),
+          MyWidget().getTextWidget(
+            text: MyStrings.learning,
+            size: 15,
+            color: MyColors.wine,
+            isBold: true,
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+      appBar: MyWidget().getAppbar(title: MyStrings.lessonSummary),
+      body: SafeArea(
+        child: FutureBuilder(
+            future: Database().getDocs(query: query),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                for (dynamic snapshot in snapshot.data) {
+                  summaries.add(LessonSummary.fromJson(snapshot.data() as Map<String, dynamic>));
+                }
+                return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,13 +110,13 @@ class LessonSummaryMain extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-              ),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            }),
+      ),
+    );
   }
 
   Widget getSummary(int index) {
