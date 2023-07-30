@@ -28,6 +28,7 @@ import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'firebase_options.dart';
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 
 
 @pragma('vm:entry-point')
@@ -112,6 +113,8 @@ class MyApp extends StatelessWidget {
 
     initDynamicLinks();
     Get.put(FcmController());
+
+    FirebaseInAppMessaging.instance;
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {

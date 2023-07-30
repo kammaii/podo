@@ -101,7 +101,13 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   child: InkWell(
                     onTap: () async {
                       //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
-                      Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                      if(course.id == courseController.hangulCourseId) {
+                        lessonController.isHangulLesson = true;
+                        Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                      } else {
+                        lessonController.isHangulLesson = false;
+                        Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(10),
@@ -144,8 +150,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               ),
               lesson.tag != null
                   ? Positioned(
-                      top: 5,
-                      right: 15,
+                      top: 4,
+                      right: 14,
                       child: Container(
                           decoration: BoxDecoration(
                             color: MyColors.pink,
@@ -155,7 +161,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                             ),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          child: const Text('New', style: TextStyle(color: MyColors.red))))
+                          child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
                   : const SizedBox.shrink(),
             ],
           ),

@@ -8,6 +8,7 @@ class LessonCourseController extends GetxController {
 
   bool isVisible = false;
   List<List<LessonCourse>> courses = [[],[]];
+  String hangulCourseId = "5e742744-f494-474f-8729-0ec0468fc069";
 
 
   Future<void> loadCourses() async {
@@ -33,5 +34,4 @@ class LessonCourseController extends GetxController {
     this.isVisible = isVisible;
     update();
   }
-
 }

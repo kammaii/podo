@@ -109,7 +109,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   style: {
                     'p': Style(
                         fontFamily: 'EnglishFont',
-                        fontSize: FontSize(15),
+                        fontSize: FontSize(18),
                         lineHeight: LineHeight.number(1.5)),
                   },
                 ),
@@ -170,11 +170,12 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
                       const SizedBox(height: 10),
+                      card.content[PRONUN] != null ?
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: MyWidget().getTextWidget(
                             text: card.content[PRONUN], size: 20, color: Colors.black, isKorean: true),
-                      ),
+                      ) : const SizedBox.shrink(),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -306,85 +307,82 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.quiz:
-        if (index == thisIndex) {}
-        if (examples.isEmpty) {
+        if (index == thisIndex && examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
           examples.shuffle(Random());
         }
-        widget = Listener(
-          onPointerDown: (event) {
-            setState(() {
-              scrollPhysics = const NeverScrollableScrollPhysics();
-            });
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.question_mark_rounded, size: 18),
-                  const SizedBox(width: 8),
-                  MyWidget().getTextWidget(text: MyStrings.takeQuiz),
-                ],
-              ),
-              const SizedBox(height: 50),
-              MyWidget().getTextWidget(text: card.content[KO], size: 15, color: Colors.black),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: examples.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedAnswer = index;
-                          if (examples[index] == answer) {
-                            scrollPhysics = const AlwaysScrollableScrollPhysics();
-                            quizBorderColor = MyColors.purple;
-                            Future.delayed(const Duration(seconds: 1), () {
-                              swiperController.move(thisIndex + 1);
+        String question;
+        if(card.content[KO] == null || card.content[KO].toString().isEmpty) {
+          question = card.content[fo];
+        } else {
+          question = card.content[KO];
+        }
+        widget = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.question_mark_rounded, size: 18),
+                const SizedBox(width: 8),
+                MyWidget().getTextWidget(text: MyStrings.takeQuiz),
+              ],
+            ),
+            const SizedBox(height: 50),
+            MyWidget().getTextWidget(text: question, size: 15, color: Colors.black),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: examples.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedAnswer = index;
+                        if (examples[index] == answer) {
+                          quizBorderColor = MyColors.purple;
+                          Future.delayed(const Duration(seconds: 1), () {
+                            swiperController.move(thisIndex + 1);
+                            quizBorderColor = Colors.white;
+                          });
+                        } else {
+                          quizBorderColor = MyColors.red;
+                          Future.delayed(const Duration(seconds: 1), () {
+                            setState(() {
                               quizBorderColor = Colors.white;
                             });
-                          } else {
-                            quizBorderColor = MyColors.red;
-                            Future.delayed(const Duration(seconds: 1), () {
-                              setState(() {
-                                quizBorderColor = Colors.white;
-                              });
-                            });
-                          }
-                          //todo: 효과음 재생
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: selectedAnswer == index ? quizBorderColor : Colors.white),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 0.5,
-                                  blurRadius: 3,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                            child:
-                                MyWidget().getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
-                          ),
+                          });
+                        }
+                        //todo: 효과음 재생
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: selectedAnswer == index ? quizBorderColor : Colors.white),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 0.5,
+                                blurRadius: 3,
+                                offset: const Offset(0, 2),
+                              )
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          child:
+                              MyWidget().getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         );
         break;
 
@@ -421,10 +419,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     if (card.content.containsKey(AUDIO)) {
       bottomWidget = Column(
         children: [
-          MyWidget().getTextWidget(
-            text: MyStrings.practice3Times,
-            size: 15,
-            color: MyColors.grey,
+          Visibility(
+            visible: card.type == MyStrings.repeat,
+            child: MyWidget().getTextWidget(
+              text: MyStrings.practice3Times,
+              size: 15,
+              color: MyColors.grey,
+            ),
           ),
           const SizedBox(height: 20),
           Row(
@@ -592,6 +593,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         } else {
                           setState(() {
                             thisIndex = index;
+                            examples.clear();
                             PlayAudio().player.stop();
                             if (cards[thisIndex].content.containsKey(AUDIO)) {
                               String fileName = cards[thisIndex].content[AUDIO];

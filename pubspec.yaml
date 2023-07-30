@@ -60,6 +60,7 @@ dependencies:
   purchases_flutter: ^5.3.0
   sign_in_with_apple: ^5.0.0
   cupertino_icons: ^1.0.5
+  firebase_core: ^2.15.0
 #  firebase_analytics: ^10.4.3
 
 dev_dependencies:

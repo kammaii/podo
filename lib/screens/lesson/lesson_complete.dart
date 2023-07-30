@@ -161,22 +161,27 @@ class LessonComplete extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        getBtn(MyStrings.summary, CupertinoIcons.doc_text, () {
-                          showAd(() {
-                            Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
-                          });
-                        }),
-                        const SizedBox(height: 20),
-                        getBtn(MyStrings.writing, CupertinoIcons.pen, () {
-                          if(User().status == 2 || User().status == 3) {
-                            Get.offNamedUntil(
-                                MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
-                                arguments: lesson.id);
-                          } else {
-                            Get.toNamed(MyStrings.routePremiumMain);
-                          }
-                        }),
-                        const SizedBox(height: 20),
+                        !lessonController.isHangulLesson ?
+                        Column(
+                          children: [
+                            getBtn(MyStrings.summary, CupertinoIcons.doc_text, () {
+                              showAd(() {
+                                Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
+                              });
+                            }),
+                            const SizedBox(height: 20),
+                            getBtn(MyStrings.writing, CupertinoIcons.pen, () {
+                              if(User().status == 2 || User().status == 3) {
+                                Get.offNamedUntil(
+                                    MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
+                                    arguments: lesson.id);
+                              } else {
+                                Get.toNamed(MyStrings.routePremiumMain);
+                              }
+                            }),
+                            const SizedBox(height: 20),
+                          ],
+                        ) : const SizedBox.shrink(),
                         getBtn(MyStrings.nextLesson, CupertinoIcons.arrow_right, () {
                           showAd(() {
                             LessonCourse course = LocalStorage().getLessonCourse()!;
