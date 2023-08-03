@@ -42,7 +42,7 @@ dependencies:
   marquee: ^2.2.3
   flutter_spinkit: ^5.1.0
   scratcher: ^2.2.1
-  uuid: ^3.0.6
+  uuid: ^3.0.7
   html: ^0.15.0
   animated_icon: ^0.0.5
   firebase_auth: ^4.2.5
@@ -61,6 +61,7 @@ dependencies:
   sign_in_with_apple: ^5.0.0
   cupertino_icons: ^1.0.5
   firebase_core: ^2.15.0
+  youtube_player_flutter: ^8.1.2
 #  firebase_analytics: ^10.4.3
 
 dev_dependencies:

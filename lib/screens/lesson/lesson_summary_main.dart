@@ -121,8 +121,10 @@ class LessonSummaryMain extends StatelessWidget {
 
   Widget getSummary(int index) {
     LessonSummary summary = summaries[index];
+    double bottomPadding;
+    index == summaries.length - 1 ? bottomPadding = 200 : bottomPadding = 40;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 40),
+      padding: EdgeInsets.only(bottom: bottomPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -144,11 +146,11 @@ class LessonSummaryMain extends StatelessWidget {
               children: [
                 MyWidget().getTextWidget(text: summary.content[fo]),
                 const SizedBox(height: 15),
-                summary.examples != null
+                summary.examples.isNotEmpty
                     ? ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: summary.examples!.length,
+                        itemCount: summary.examples.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
@@ -163,7 +165,7 @@ class LessonSummaryMain extends StatelessWidget {
                                   ),
                                 ),
                                 MyWidget().getTextWidget(
-                                  text: summary.examples![index],
+                                  text: summary.examples[index],
                                   isKorean: true,
                                 ),
                               ],

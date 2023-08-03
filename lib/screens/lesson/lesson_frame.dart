@@ -17,10 +17,12 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
+import 'package:podo/screens/lesson/video_player.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:scratcher/scratcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -106,11 +108,16 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               child: SingleChildScrollView(
                 child: Html(
                   data: card.content[fo],
+                  onLinkTap: (String? url, _, __) {
+                    print('url: $url');
+                    if (url != null) {
+                      String? videoId = YoutubePlayer.convertUrlToId(url);
+                      Get.to(VideoPlayer(videoId!, 'title'));
+                    }
+                  },
                   style: {
                     'p': Style(
-                        fontFamily: 'EnglishFont',
-                        fontSize: FontSize(18),
-                        lineHeight: LineHeight.number(1.5)),
+                        fontFamily: 'EnglishFont', fontSize: FontSize(18), lineHeight: LineHeight.number(1.5)),
                   },
                 ),
               ),
@@ -170,12 +177,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
                       const SizedBox(height: 10),
-                      card.content[PRONUN] != null ?
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: MyWidget().getTextWidget(
-                            text: card.content[PRONUN], size: 20, color: Colors.black, isKorean: true),
-                      ) : const SizedBox.shrink(),
+                      card.content[PRONUN] != null
+                          ? FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: MyWidget().getTextWidget(
+                                  text: '[${card.content[PRONUN]}]', size: 20, color: Colors.black, isKorean: true),
+                            )
+                          : const SizedBox.shrink(),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -313,7 +321,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           examples.shuffle(Random());
         }
         String question;
-        if(card.content[KO] == null || card.content[KO].toString().isEmpty) {
+        if (card.content[KO] == null || card.content[KO].toString().isEmpty) {
           question = card.content[fo];
         } else {
           question = card.content[KO];
@@ -409,87 +417,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
   }
 
-  void animationListener() {
-    bottomWidget = const SizedBox.shrink();
-  }
-
-  setBottomWidget() {
-    animationController.removeListener(animationListener);
-    LessonCard card = cards[thisIndex];
-    if (card.content.containsKey(AUDIO)) {
-      bottomWidget = Column(
-        children: [
-          Visibility(
-            visible: card.type == MyStrings.repeat,
-            child: MyWidget().getTextWidget(
-              text: MyStrings.practice3Times,
-              size: 15,
-              color: MyColors.grey,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              getSpeedBtn(isNormal: true),
-              const SizedBox(width: 20),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircularPercentIndicator(
-                    radius: 30,
-                    lineWidth: 4,
-                    percent: controller.audioProgress,
-                    animateFromLastPercent: true,
-                    progressColor: MyColors.purple,
-                  ),
-                  IconButton(
-                    iconSize: 60,
-                    onPressed: () {
-                      controller.playAudio();
-                    },
-                    icon: const Icon(
-                      Icons.play_arrow_rounded,
-                      color: MyColors.purple,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 20),
-              getSpeedBtn(isNormal: false),
-            ],
-          )
-        ],
-      );
-      toggleBottomAudioWidget(true);
-    } else if (card.type == SPEAKING) {
-      //todo: 클로바 실행
-      bottomWidget = Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          MyWidget().getTextWidget(
-            text: MyStrings.imListening,
-            size: 15,
-            color: MyColors.grey,
-          ),
-          const SizedBox(height: 20),
-          AnimateIcon(
-            onTap: () {},
-            iconType: IconType.continueAnimation,
-            animateIcon: AnimateIcons.activity,
-            color: MyColors.purple,
-            height: 70,
-            width: 70,
-          ),
-        ],
-      );
-      toggleBottomAudioWidget(true);
-    } else {
-      animationController.addListener(animationListener);
-      toggleBottomAudioWidget(false);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -550,11 +477,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    if (!isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setBottomWidget();
-      });
-    }
 
     return Scaffold(
       appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
@@ -620,7 +542,57 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                 padding: const EdgeInsets.only(bottom: 30),
                                 child: GetBuilder<LessonController>(
                                   builder: (_) {
-                                    return bottomWidget;
+                                    LessonCard card = cards[thisIndex];
+                                    if (card.content.containsKey(AUDIO)) {
+                                      toggleBottomAudioWidget(true);
+                                      return Column(
+                                        children: [
+                                          Visibility(
+                                            visible: card.type == MyStrings.repeat,
+                                            child: MyWidget().getTextWidget(
+                                              text: MyStrings.practice3Times,
+                                              size: 15,
+                                              color: MyColors.grey,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              getSpeedBtn(isNormal: true),
+                                              const SizedBox(width: 20),
+                                              Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  CircularPercentIndicator(
+                                                    radius: 30,
+                                                    lineWidth: 4,
+                                                    percent: controller.audioProgress,
+                                                    animateFromLastPercent: true,
+                                                    progressColor: MyColors.purple,
+                                                  ),
+                                                  IconButton(
+                                                    iconSize: 60,
+                                                    onPressed: () {
+                                                      controller.playAudio();
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.play_arrow_rounded,
+                                                      color: MyColors.purple,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(width: 20),
+                                              getSpeedBtn(isNormal: false),
+                                            ],
+                                          )
+                                        ],
+                                      );
+                                    } else {
+                                      toggleBottomAudioWidget(false);
+                                      return const SizedBox.shrink();
+                                    }
                                   },
                                 ),
                               ),

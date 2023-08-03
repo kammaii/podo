@@ -19,7 +19,7 @@ class CloudStorage {
       final result = await storage.ref().child("LessonAudios/${lessonId}").listAll();
       print('Downloading audios');
       for (var file in result.items) {
-        RegExp regex = RegExp(r'^(.+)\.mp3$');
+        RegExp regex = RegExp(r'^(.+)\.m4a$');
         if(regex.firstMatch(file.name) != null) {
           final fileName = regex.firstMatch(file.name)!.group(1);
           String url = await file.getDownloadURL();
