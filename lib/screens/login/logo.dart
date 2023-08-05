@@ -18,7 +18,13 @@ class Logo extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Positioned(top: 20.0, right: 20.0, child: Text('version : $version')),
+              FutureBuilder(
+                future: PackageInfo.fromPlatform(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  print('Snapshot: $snapshot');
+                  return Positioned(top: 20.0, right: 20.0, child: Text('version : ${snapshot.data.version}'));
+                },
+              ),
               Center(child: Image.asset('assets/images/logo.png')),
               Positioned(
                 bottom: 100.0,

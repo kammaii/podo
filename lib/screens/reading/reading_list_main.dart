@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,49 +56,55 @@ class _ReadingListMainState extends State<ReadingListMain> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: Hero(
-                      tag: 'readingImage:${readingTitle.id}',
-                      child: Image.asset('assets/images/course_hangul.png'),
-                    ),
+                  Hero(
+                    tag: 'readingImage:${readingTitle.id}',
+                    child: readingTitle.image != null
+                        ? Image.memory(base64Decode(readingTitle.image!), height: 80, width: 80)
+                        : Image.asset('assets/images/podo.png', height: 50, width: 50),
                   ),
                   const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Transform.scale(
-                            alignment: Alignment.bottomLeft,
-                            scale: 0.8,
-                            child: Image.asset('assets/images/${rockets[readingTitle.level]}.png'),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Transform.scale(
+                              alignment: Alignment.bottomLeft,
+                              scale: 0.8,
+                              child: Image.asset('assets/images/${rockets[readingTitle.level]}.png'),
+                            ),
+                            const SizedBox(width: 10),
+                            Obx(
+                              () => controller.isCompleted[readingTitle.id]
+                                  ? const Icon(
+                                      Icons.check_circle,
+                                      color: MyColors.green,
+                                      size: 20,
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: MyWidget().getTextWidget(
+                            text: readingTitle.title[KO] ?? '',
+                            size: 20,
+                            color: MyColors.navy,
                           ),
-                          const SizedBox(width: 10),
-                          Obx(
-                            () => controller.isCompleted[readingTitle.id]
-                                ? const Icon(
-                                    Icons.check_circle,
-                                    color: MyColors.green,
-                                    size: 20,
-                                  )
-                                : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: 10),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: MyWidget().getTextWidget(
+                            text: readingTitle.title[fo] ?? '',
+                            color: MyColors.grey,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      MyWidget().getTextWidget(
-                        text: readingTitle.title[KO] ?? '',
-                        size: 20,
-                        color: MyColors.navy,
-                      ),
-                      const SizedBox(height: 10),
-                      MyWidget().getTextWidget(
-                        text: readingTitle.title[fo] ?? '',
-                        color: MyColors.grey,
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

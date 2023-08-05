@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   double sliverAppBarStretchOffset = 100.0;
   ReadingTitle readingTitle = Get.arguments;
   String fo = User().language;
-  String sampleImage = 'assets/images/course_hangul.png';
   final KO = 'ko';
   final cardBorderRadius = 8.0;
   bool isImageVisible = true;
@@ -182,16 +183,13 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             color: MyColors.navyLight,
           ),
           Positioned(
-            top: -50,
+            top: 0,
             right: -30,
             child: Hero(
               tag: 'readingImage:${readingTitle.id}',
               child: FadeTransition(
                 opacity: animation,
-                child: Image.asset(
-                  sampleImage,
-                  width: 250,
-                ),
+                child: Image.memory(base64Decode(readingTitle.image!), width: 250),
               ),
             ),
           ),
