@@ -117,7 +117,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   },
                   style: {
                     'p': Style(
-                        fontFamily: 'EnglishFont', fontSize: FontSize(18), lineHeight: LineHeight.number(1.5)),
+                        fontFamily: 'EnglishFont', fontSize: FontSize(17), lineHeight: LineHeight.number(1.3)),
                   },
                 ),
               ),
@@ -176,12 +176,12 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         child: MyWidget()
                             .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       card.content[PRONUN] != null
                           ? FittedBox(
                               fit: BoxFit.scaleDown,
                               child: MyWidget().getTextWidget(
-                                  text: '[${card.content[PRONUN]}]', size: 20, color: Colors.black, isKorean: true),
+                                  text: '[${card.content[PRONUN]}]', size: 18, color: Colors.black, isKorean: true),
                             )
                           : const SizedBox.shrink(),
                       const SizedBox(height: 20),

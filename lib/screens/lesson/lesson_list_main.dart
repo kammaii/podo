@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
@@ -27,7 +29,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   double sliverAppBarStretchOffset = 100.0;
   late LessonCourse course;
   String language = User().language;
-  String sampleImage = 'assets/images/course_hangul.png';
   final KO = 'ko';
   final LESSON = 'Lesson';
   int lessonIndex = -1;
@@ -70,103 +71,110 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   Widget lessonListWidget(dynamic lessonMap) {
     late Lesson lesson;
+    bool isReleased = true;
+
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
+      if (!lesson.isReleased) {
+        isReleased = false;
+      }
       if (lesson.type == LESSON) {
         lessonIndex++;
       }
     }
 
-    return Column(
-      children: [
-        if (lessonMap is String)
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 5),
-            child: MyWidget().getTextWidget(
-              text: lessonMap,
-              size: 25,
-              color: MyColors.navyLight,
-            ),
-          )
-        else
-          Stack(
+    return isReleased
+        ? Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
+              if (lessonMap is String)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 5),
+                  child: MyWidget().getTextWidget(
+                    text: lessonMap,
+                    size: 25,
+                    color: MyColors.navyLight,
                   ),
-                  color: Colors.white,
-                  child: InkWell(
-                    onTap: () async {
-                      //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
-                      if(course.id == courseController.hangulCourseId) {
-                        lessonController.isHangulLesson = true;
-                        Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
-                      } else {
-                        lessonController.isHangulLesson = false;
-                        Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              MyWidget().getTextWidget(
-                                text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
-                                color: MyColors.grey,
-                              ),
-                              const SizedBox(width: 10),
-                              Obx(
-                                () => lessonController.isCompleted[lesson.id]
-                                    ? const Icon(
-                                        Icons.check_circle,
-                                        color: MyColors.green,
-                                      )
-                                    : const SizedBox.shrink(),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          MyWidget().getTextWidget(
-                            text: lesson.title[KO],
-                            size: 20,
-                            color: MyColors.navy,
-                          ),
-                          const SizedBox(height: 10),
-                          MyWidget().getTextWidget(
-                            text: lesson.title[language],
-                            color: MyColors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              lesson.tag != null
-                  ? Positioned(
-                      top: 4,
-                      right: 14,
-                      child: Container(
-                          decoration: BoxDecoration(
-                            color: MyColors.pink,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(cardBorderRadius),
-                              bottomLeft: Radius.circular(cardBorderRadius),
+                )
+              else
+                Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                        ),
+                        color: Colors.white,
+                        child: InkWell(
+                          onTap: () async {
+                            //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                            if (course.id == courseController.hangulCourseId) {
+                              lessonController.isHangulLesson = true;
+                              Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                            } else {
+                              lessonController.isHangulLesson = false;
+                              Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    MyWidget().getTextWidget(
+                                      text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
+                                      color: MyColors.grey,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Obx(
+                                      () => lessonController.isCompleted[lesson.id]
+                                          ? const Icon(
+                                              Icons.check_circle,
+                                              color: MyColors.green,
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                  text: lesson.title[KO],
+                                  size: 20,
+                                  color: MyColors.navy,
+                                ),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                  text: lesson.title[language],
+                                  color: MyColors.grey,
+                                ),
+                              ],
                             ),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
-                  : const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                    lesson.tag != null
+                        ? Positioned(
+                            top: 4,
+                            right: 14,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: MyColors.pink,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(cardBorderRadius),
+                                    bottomLeft: Radius.circular(cardBorderRadius),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
+                        : const SizedBox.shrink(),
+                  ],
+                ),
             ],
-          ),
-      ],
-    );
+          )
+        : const SizedBox.shrink();
   }
 
   sliverAppBar() {
@@ -199,19 +207,22 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           Container(
             color: MyColors.purpleLight,
           ),
-          Positioned(
-            top: -50,
-            right: -30,
-            child: FadeTransition(
-              opacity: animation,
-              child: Image.asset(
-                sampleImage,
-                width: 250,
-              ),
-            ),
-          ),
-          Obx(() => LinearProgressIndicator(
-              value: lessonController.isCompleted.values.where((value) => value == true).length / lessonController.isCompleted.length,
+          course.image != null
+              ? Positioned(
+                  top: -50,
+                  right: -30,
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: course.image != null
+                        ? Image.memory(base64Decode(course.image!), width: 250)
+                        : const SizedBox.shrink(),
+                  ),
+                )
+              : const SizedBox.shrink(),
+          Obx(
+            () => LinearProgressIndicator(
+              value: lessonController.isCompleted.values.where((value) => value == true).length /
+                  lessonController.isCompleted.length,
               color: MyColors.purple,
               backgroundColor: MyColors.purpleLight,
             ),

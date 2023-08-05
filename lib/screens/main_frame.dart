@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +80,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   }
 
   Widget getLessonCourseList({required LessonCourse lessonCourse}) {
-    String sampleImage = 'assets/images/course_hangul.png';
     return Card(
       child: InkWell(
         onTap: () {
@@ -86,19 +87,19 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           controller.setVisibility(false);
         },
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(15),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: Image.asset(sampleImage),
-                  ),
-                  const SizedBox(width: 20),
+                  lessonCourse.image != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: Image.memory(base64Decode(lessonCourse.image!), height: 80, width: 80),
+                        )
+                      : const SizedBox.shrink(),
                   Expanded(
                     child: MyWidget().getTextWidget(
                       text: lessonCourse.title[setLanguage],
@@ -137,7 +138,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(animationController);
-    if(!LocalStorage().hasWelcome) {
+    if (!LocalStorage().hasWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LocalStorage().hasWelcome = true;
         MyWidget().showSnackbarWithPodo(title: MyStrings.welcome, content: MyStrings.welcomeMessage);
