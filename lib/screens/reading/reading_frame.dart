@@ -189,7 +189,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               tag: 'readingImage:${readingTitle.id}',
               child: FadeTransition(
                 opacity: animation,
-                child: Image.memory(base64Decode(readingTitle.image!), width: 250),
+                child: Image.memory(base64Decode(readingTitle.image!), width: 250, gaplessPlayback: true),
               ),
             ),
           ),

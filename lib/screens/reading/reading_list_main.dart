@@ -56,12 +56,12 @@ class _ReadingListMainState extends State<ReadingListMain> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  Hero(
-                    tag: 'readingImage:${readingTitle.id}',
-                    child: readingTitle.image != null
-                        ? Image.memory(base64Decode(readingTitle.image!), height: 80, width: 80)
-                        : Image.asset('assets/images/podo.png', height: 50, width: 50),
-                  ),
+                  readingTitle.image != null
+                      ? Hero(
+                          tag: 'readingImage:${readingTitle.id}',
+                          child: Image.memory(base64Decode(readingTitle.image!),
+                              gaplessPlayback: true, height: 80, width: 80))
+                      : const SizedBox.shrink(),
                   const SizedBox(width: 20),
                   Expanded(
                     child: Column(

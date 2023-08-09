@@ -25,7 +25,7 @@ class LessonListMain extends StatefulWidget {
 
 class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
-  double sliverAppBarHeight = 200.0;
+  double sliverAppBarHeight = 150.0;
   double sliverAppBarStretchOffset = 100.0;
   late LessonCourse course;
   String language = User().language;
@@ -209,12 +209,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           ),
           course.image != null
               ? Positioned(
-                  top: -50,
+                  top: -30,
                   right: -30,
                   child: FadeTransition(
                     opacity: animation,
                     child: course.image != null
-                        ? Image.memory(base64Decode(course.image!), width: 250)
+                        ? Image.memory(base64Decode(course.image!), gaplessPlayback: true, width: 200)
                         : const SizedBox.shrink(),
                   ),
                 )

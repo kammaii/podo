@@ -21,8 +21,11 @@ class Logo extends StatelessWidget {
               FutureBuilder(
                 future: PackageInfo.fromPlatform(),
                 builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  print('Snapshot: $snapshot');
-                  return Positioned(top: 20.0, right: 20.0, child: Text('version : ${snapshot.data.version}'));
+                  if(snapshot.hasData) {
+                    return Positioned(top: 20.0, right: 20.0, child: Text('version : ${snapshot.data.version}'));
+                  } else {
+                    return const SizedBox.shrink();
+                  }
                 },
               ),
               Center(child: Image.asset('assets/images/logo.png')),

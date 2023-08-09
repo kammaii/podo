@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
-import 'package:animated_icon/animated_icon.dart';
+import 'dart:typed_data';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -23,6 +23,7 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:scratcher/scratcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -59,6 +60,17 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   late AnimationController animationController;
   late Animation<Offset> animationOffset;
   late Widget bottomWidget;
+  final Map<String, Uint8List> _imageCache = {};
+
+  Widget _getCachedImage(String base64Str) {
+    if (_imageCache.containsKey(base64Str)) {
+      return Image.memory(_imageCache[base64Str]!, fit: BoxFit.cover);
+    } else {
+      var bytes = base64.decode(base64Str);
+      _imageCache[base64Str] = bytes;
+      return Image.memory(bytes, fit: BoxFit.cover);
+    }
+  }
 
   Widget getCards(int index) {
     LessonCard card = cards[index];
@@ -108,14 +120,24 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               child: SingleChildScrollView(
                 child: Html(
                   data: card.content[fo],
-                  onLinkTap: (String? url, _, __) {
+                  onLinkTap: (String? url, _, __, ___) {
                     print('url: $url');
                     if (url != null) {
                       String? videoId = YoutubePlayer.convertUrlToId(url);
                       Get.to(VideoPlayer(videoId!, 'title'));
                     }
                   },
-                  style: {
+                  customRender: {
+                    "img": (renderContext, child) {
+                      var attributes = renderContext.tree.element!.attributes;
+                      var src = attributes["src"];
+                      if (src != null && src.startsWith("data:image")) {
+                        var base64Str = src.split(",")[1];
+                        return _getCachedImage(base64Str);
+                      }
+                      return child;
+                    },
+                  },                  style: {
                     'p': Style(
                         fontFamily: 'EnglishFont', fontSize: FontSize(17), lineHeight: LineHeight.number(1.3)),
                   },

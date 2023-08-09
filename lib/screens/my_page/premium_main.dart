@@ -85,7 +85,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                   MyStrings.writingCorrection,
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(MyStrings.reading, MyWidget().getTextWidget(text: MyStrings.few),
+                              getDataRow(MyStrings.reading, MyWidget().getTextWidget(text: MyStrings.limited),
                                   MyWidget().getTextWidget(text: MyStrings.all)),
                               getDataRow(MyStrings.flashcard, MyWidget().getTextWidget(text: MyStrings.limit20),
                                   MyWidget().getTextWidget(text: MyStrings.unlimited)),

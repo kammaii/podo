@@ -1,7 +1,7 @@
 class MyStrings {
   // 번역해야 할 것들
   static const String beg = 'Beg.';
-  static const String int = 'Int.';
+  static const String int = 'Inter.';
   static const String lessons = 'lessons';
   static const String newExpression = 'New expression';
   static const String listenAndRepeat = 'Listen and repeat';
@@ -24,8 +24,8 @@ class MyStrings {
   static const String today = 'Today';
   static const String flashCardReviewCompleted= 'Congratulations! You have completed your flashcard reviews for today.';
   static const String reviewAgainTomorrow = 'I\'ll review again tomorrow';
-  static const String wantReviewMore = 'I want to do more review';
-  static const String noReadingTitle = 'There is no reading title available on the category.';
+  static const String wantReviewMore = 'I want to review some more';
+  static const String noReadingTitle = 'There is no reading title available in the category.';
   static const String noReading = 'Failed to load reading material. Please try again.';
   static const String complete = 'complete';
   static const String continueReading = 'Would you like to continue reading?';
@@ -40,7 +40,7 @@ class MyStrings {
   static const String send = 'Send';
   static const String correction = 'Correction';
   static const String iveReadTheFollowing = 'I\'ve read the following';
-  static const String writingComment = 'Your writing will be corrected by a Korean teacher. \nPlease provide answers within the character limit. \nYou can expect a response within 24 hours, although it may take longer if there are many requests. \nYou\'ll be notified when the correction is completed. (Only for users who have enabled notifications.) \nYou can make up to 3 requests, and once a response is completed, you can make another one. \nThe following cases are not eligible for correction: \n - Non-Korean writing \n - Irrelevant or personal questions \n - Writing that is hard to understand the meaning. \n(It is recommended practicing based on what you have learned)';
+  static const String writingComment = 'Your writing will be corrected by a Korean teacher. \nPlease provide answers within the character limit. \nYou can expect a response within 24 hours, although it may take longer if there are many requests. \nYou\'ll be notified when the correction is completed. (Only for users who have enabled notifications.) \nYou can make up to 3 requests, and once a response is completed, you can make another one. \nThe following cases are not eligible for correction: \n - Non-Korean writing \n - Irrelevant or personal questions \n - Writing that is difficult to understand. \n(It is recommended to practice based on what you have learned)';
   static const String wantRequestCorrection = 'Do you want to request a correction?';
   static const String cancel = 'Cancel';
   static const String writingStatus0 = 'Submitted';
@@ -72,7 +72,7 @@ class MyStrings {
   static const String removeDetail2 = 'Your account cannot be recovered.';
   static const String passwordAgain = 'Please input your password';
   static const String areYouSure = 'Are you sure?';
-  static const String feedbackDetail = 'Please send us your awesome idea.';
+  static const String feedbackDetail = 'Please send us your awesome ideas.';
   static const String feedbackHint = 'Write it here';
   static const String edit = 'edit';
   static const String nameChanged = 'Your name has been changed';
@@ -84,7 +84,7 @@ class MyStrings {
   static const String getPremium = 'Get Podo Premium';
   static const String home = 'home';
   static const String editName = 'Edit name';
-  static const String premiumDetail = 'Premium is automatically renewed every 2 months. The price can be changed without prior notice. When a subscription is set to automatically renew, it will be renewed at the existing price even if the amount has been increased. However, if the amount has been decreased, it will be renewed at the reduced price. In the case of canceling a subscription and then resubscribing, it will be charged at the updated price. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
+  static const String premiumDetail = 'Premium is automatically renewed every 2 months. The price can be changed without prior notice. When a subscription is set to automatically renew, it will be renewed at the existing price even if the amount has been increased. However, if the amount has been decreased, it will be renewed at the reduced price. In the case of cancelling a subscription and then resubscribing, it will be charged at the updated price. For any purchase-related issues, please contact us at akorean.help@gmail.com.';
   static const String failedOffering = 'Failed to load purchase information';
   static const String lessonSummary = 'Lesson Summary';
   static const String writing = 'Writing';
@@ -98,7 +98,7 @@ class MyStrings {
   static const String flashcard = 'Flashcard';
   static const String cloudMessage = 'Cloud Message';
   static const String adFree = 'Ad-free';
-  static const String few = 'few';
+  static const String limited = 'limited';
   static const String all = 'all';
   static const String limit20 = 'limit:20';
   static const String unlimited = 'unlimited';
@@ -124,7 +124,7 @@ class MyStrings {
   static const String selectQuestion = 'Select a question';
   static const String purchaseTitle = 'Thank you for subscribing!';
   static const String purchaseContent = 'Improve your Korean language skills with podo';
-  static const String trialComment = 'Enable notification \nand enjoy 10 days free premium! \n\n(No payment information required)';
+  static const String trialComment = 'Enable notifications \nand enjoy 10 days free Premium! \n\n(No payment information required)';
   static const String trialActivated = 'The free premium features have been activated.';
   static const String getFreePremium = 'Get 10 days of free premium!';
   static const String cool = 'Cool!';
