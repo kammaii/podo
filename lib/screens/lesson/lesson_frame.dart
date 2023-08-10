@@ -17,11 +17,9 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
-import 'package:podo/screens/lesson/video_player.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:scratcher/scratcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -35,7 +33,6 @@ class LessonFrame extends StatefulWidget {
 class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStateMixin {
   final lesson = Get.arguments;
   int thisIndex = 0;
-  ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
   final controller = Get.find<LessonController>();
   final KO = 'ko';
   final PRONUN = 'pronun';
@@ -44,13 +41,12 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   final EX3 = 'ex3';
   final EX4 = 'ex4';
   final AUDIO = 'audio';
+  final VIDEO = 'video';
   final FILE_NAME = 'fileName';
   final SPEAKING = 'speaking';
   String fo = User().language;
   bool isLoading = true;
   List<LessonCard> cards = [];
-  Map<int, GlobalKey<ScratcherState>> scratchKey = {};
-  bool isScratchTextVisible = true;
   List<String> examples = [];
   late String answer;
   int selectedAnswer = -1;
@@ -120,13 +116,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               child: SingleChildScrollView(
                 child: Html(
                   data: card.content[fo],
-                  onLinkTap: (String? url, _, __, ___) {
-                    print('url: $url');
-                    if (url != null) {
-                      String? videoId = YoutubePlayer.convertUrlToId(url);
-                      Get.to(VideoPlayer(videoId!, 'title'));
-                    }
-                  },
                   customRender: {
                     "img": (renderContext, child) {
                       var attributes = renderContext.tree.element!.attributes;
@@ -137,9 +126,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       }
                       return child;
                     },
-                  },                  style: {
+                  },
+                  style: {
                     'p': Style(
-                        fontFamily: 'EnglishFont', fontSize: FontSize(17), lineHeight: LineHeight.number(1.3)),
+                        fontFamily: 'EnglishFont', fontSize: const FontSize(17), lineHeight: LineHeight.number(1.3)),
                   },
                 ),
               ),
@@ -203,7 +193,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           ? FittedBox(
                               fit: BoxFit.scaleDown,
                               child: MyWidget().getTextWidget(
-                                  text: '[${card.content[PRONUN]}]', size: 18, color: Colors.black, isKorean: true),
+                                  text: '[${card.content[PRONUN]}]',
+                                  size: 18,
+                                  color: Colors.black,
+                                  isKorean: true),
                             )
                           : const SizedBox.shrink(),
                       const SizedBox(height: 20),
@@ -220,78 +213,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         );
         break;
 
-      case MyStrings.speaking:
-        if (!scratchKey.containsKey(index)) {
-          scratchKey[index] = GlobalKey<ScratcherState>();
-        }
-        widget = Column(
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.emoji_emotions_outlined, size: 18),
-                const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.speakInKorean),
-              ],
-            ),
-            const SizedBox(height: 50),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Listener(
-                    onPointerDown: (event) {
-                      setState(() {
-                        scrollPhysics = const NeverScrollableScrollPhysics();
-                        isScratchTextVisible = false;
-                      });
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Scratcher(
-                          key: scratchKey[index],
-                          color: MyColors.grey,
-                          onScratchEnd: () {
-                            setState(() {
-                              scratchKey[index]!.currentState!.reset(duration: const Duration(milliseconds: 500));
-                              scrollPhysics = const AlwaysScrollableScrollPhysics();
-                              isScratchTextVisible = true;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                            child: MyWidget().getTextWidget(
-                              text: card.content[KO],
-                              size: 30,
-                              color: Colors.black,
-                              isKorean: true,
-                            ),
-                          ),
-                        ),
-                        isScratchTextVisible
-                            ? MyWidget().getTextWidget(
-                                text: MyStrings.scratch,
-                                color: MyColors.grey,
-                                size: 12,
-                              )
-                            : const SizedBox.shrink(),
-                      ],
-                    ),
-                  ),
-                  MyWidget().getTextWidget(
-                    text: card.content[fo],
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-            )
-          ],
-        );
-        break;
-
       case MyStrings.mention:
-        bool hasKo;
-        card.content[KO] == null ? hasKo = false : hasKo = true;
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -301,15 +223,29 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Offstage(
-                    offstage: !hasKo,
-                    child: hasKo
-                        ? Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
-                          )
-                        : const SizedBox.shrink(),
+                    offstage: card.content[KO] == null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
+                    )
                   ),
                   MyWidget().getTextWidget(text: card.content[fo], size: 20),
+                  card.content[VIDEO] != null ?
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: YoutubePlayer(
+                      controller: YoutubePlayerController(
+                        initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
+                        flags: const YoutubePlayerFlags(),
+                      ),
+                      actionsPadding: const EdgeInsets.all(10),
+                      bottomActions: [
+                        CurrentPosition(),
+                        const SizedBox(width: 10),
+                        ProgressBar(isExpanded: true),
+                      ],
+                    ),
+                  ) : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -499,7 +435,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
       body: isLoading
@@ -529,7 +464,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       itemCount: cards.length + 1,
                       viewportFraction: 0.8,
                       scale: 0.8,
-                      physics: scrollPhysics,
                       onIndexChanged: (index) {
                         if (index >= cards.length) {
                           Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -308,8 +309,10 @@ class _MyPageState extends State<MyPage> {
                                                 MyWidget().showSnackbar(title: MyStrings.thanksFeedback);
                                               }
                                             } catch (e) {
-                                              MyWidget()
-                                                  .showSnackbar(title: MyStrings.error, message: e.toString());
+                                              if(e is PlatformException && e.code == "not_available") {
+                                                MyWidget()
+                                                    .showSnackbar(title: MyStrings.error, message: e.toString());
+                                              }
                                             }
                                             setState(() {
                                               closePanels();
