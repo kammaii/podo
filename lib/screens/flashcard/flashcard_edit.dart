@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
@@ -49,7 +50,7 @@ class FlashCardEdit extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios_rounded),
             color: MyColors.purple,
           ),
-          title: const Text(MyStrings.flashcardEdit, style: TextStyle(color: MyColors.purple)),
+          title: Text(tr('flashcardEdit'), style: const TextStyle(color: MyColors.purple)),
         ),
         body: Column(
           children: [
@@ -111,7 +112,7 @@ class FlashCardEdit extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: MyWidget().getRoundBtnWidget(
-                            text: MyStrings.save,
+                            text: tr('save'),
                             verticalPadding: 10,
                             hasNullFunction: true,
                             f: onSaveBtn,

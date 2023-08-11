@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,11 +52,11 @@ PersistentBottomNavBarItem _navBarItem(String title, Icon icon) {
 
 List<PersistentBottomNavBarItem> _navBarsItems() {
   return [
-    _navBarItem('Lessons', const Icon(FontAwesomeIcons.chalkboard)),
-    _navBarItem('Reading', const Icon(FontAwesomeIcons.book)),
-    _navBarItem('Writing', const Icon(FontAwesomeIcons.pen)),
-    _navBarItem('Flashcards', const Icon(CupertinoIcons.heart_fill)),
-    _navBarItem('My page', const Icon(Icons.settings)),
+    _navBarItem(tr('lessons'), const Icon(FontAwesomeIcons.chalkboard)),
+    _navBarItem(tr('reading'), const Icon(FontAwesomeIcons.book)),
+    _navBarItem(tr('writing'), const Icon(FontAwesomeIcons.pen)),
+    _navBarItem(tr('flashcard'), const Icon(CupertinoIcons.heart_fill)),
+    _navBarItem(tr('myPage'), const Icon(Icons.settings)),
   ];
 }
 
@@ -141,7 +142,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     if (!LocalStorage().hasWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LocalStorage().hasWelcome = true;
-        MyWidget().showSnackbarWithPodo(title: MyStrings.welcome, content: MyStrings.welcomeMessage);
+        MyWidget().showSnackbarWithPodo(title: tr('welcome'), content: tr('welcomeMessage'));
       });
     }
   }
@@ -157,19 +158,19 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           onWillPop: () async {
             bool isExit = false;
             await Get.dialog(AlertDialog(
-              title: const Text(MyStrings.exitApp),
+              title: Text(tr('exitApp')),
               actions: [
                 TextButton(
                     onPressed: () {
                       SystemNavigator.pop();
                       isExit = true;
                     },
-                    child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.navy))),
+                    child: Text(tr('yes'), style: const TextStyle(color: MyColors.navy))),
                 TextButton(
                     onPressed: () {
                       Get.back();
                     },
-                    child: const Text(MyStrings.no, style: TextStyle(color: MyColors.purple))),
+                    child: Text(tr('no'), style: const TextStyle(color: MyColors.purple))),
               ],
             ));
             return isExit;
@@ -234,7 +235,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     MyWidget().getTextWidget(
-                                      text: MyStrings.selectCourse,
+                                      text: tr('selectCourse'),
                                       size: 20,
                                       color: MyColors.purple,
                                       isBold: true,

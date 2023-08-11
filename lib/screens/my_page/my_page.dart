@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,11 +32,11 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   List<MyPageItem> items = [
-    MyPageItem(Icons.account_circle_rounded, MyStrings.editName),
-    MyPageItem(CupertinoIcons.globe, MyStrings.language),
-    MyPageItem(Icons.feedback_outlined, MyStrings.feedback),
-    MyPageItem(Icons.logout_rounded, MyStrings.logOut),
-    MyPageItem(Icons.remove_circle_outline_rounded, MyStrings.removeAccount),
+    MyPageItem(Icons.account_circle_rounded, tr('editName')),
+    MyPageItem(CupertinoIcons.globe, tr('language')),
+    MyPageItem(Icons.feedback_outlined, tr('feedback')),
+    MyPageItem(Icons.logout_rounded, tr('logOut')),
+    MyPageItem(Icons.remove_circle_outline_rounded, tr('removeAccount')),
   ];
   List<String> userTier = ['New', 'Basic', 'Premium', 'Trial'];
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -46,13 +47,13 @@ class _MyPageState extends State<MyPage> {
   User? currentUser;
   String feedback = '';
   List<String> language = [
-    MyStrings.english,
-    MyStrings.spanish,
-    MyStrings.french,
-    MyStrings.german,
-    MyStrings.portuguese,
-    MyStrings.indonesian,
-    MyStrings.russian
+    tr('english'),
+    tr('spanish'),
+    tr('french'),
+    tr('german'),
+    tr('portuguese'),
+    tr('indonesian'),
+    tr('russian')
   ];
 
   @override
@@ -105,7 +106,7 @@ class _MyPageState extends State<MyPage> {
                             Expanded(
                               child: Center(
                                 child: MyWidget().getTextWidget(
-                                  text: MyStrings.getPremium,
+                                  text: tr('getPremium'),
                                   size: 20,
                                   color: Colors.white,
                                   isBold: true,
@@ -128,7 +129,7 @@ class _MyPageState extends State<MyPage> {
                       Row(
                         children: [
                           MyWidget().getTextWidget(
-                            text: MyStrings.myPage,
+                            text: tr('myPage'),
                             size: 20,
                             color: MyColors.purple,
                             isBold: true,
@@ -177,7 +178,7 @@ class _MyPageState extends State<MyPage> {
                                     Padding(
                                       padding: const EdgeInsets.only(left: 5),
                                       child: MyWidget().getTextWidget(
-                                        text: MyStrings.name,
+                                        text: tr('name'),
                                         size: 15,
                                         color: Colors.black,
                                         isBold: true,
@@ -196,7 +197,7 @@ class _MyPageState extends State<MyPage> {
                                         ),
                                         const SizedBox(width: 10),
                                         MyWidget().getRoundBtnWidget(
-                                          text: MyStrings.edit,
+                                          text: tr('edit'),
                                           verticalPadding: 8,
                                           horizontalPadding: 3,
                                           f: () async {
@@ -208,11 +209,11 @@ class _MyPageState extends State<MyPage> {
                                                     docId: currentUser!.uid,
                                                     key: 'name',
                                                     value: userName);
-                                                MyWidget().showSnackbar(title: MyStrings.nameChanged);
+                                                MyWidget().showSnackbar(title: tr('nameChanged'));
                                               }
                                             } catch (e) {
                                               MyWidget()
-                                                  .showSnackbar(title: MyStrings.error, message: e.toString());
+                                                  .showSnackbar(title: tr('error'), message: e.toString());
                                             }
                                             setState(() {
                                               closePanels();
@@ -229,34 +230,47 @@ class _MyPageState extends State<MyPage> {
                           getExpansionPanel(
                             items[1],
                             ListTile(
-                              title: ListView.builder(
-                                shrinkWrap: true,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(30),
+                              title: Column(
+                                children: [
+                                  MyWidget().getTextWidget(
+                                    text: tr('shouldRestart'),
+                                    size: 15,
+                                    color: MyColors.purple,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                            side: const BorderSide(color: MyColors.purple, width: 1),
+                                            backgroundColor: Colors.white),
+                                        onPressed: () async {
+                                          String lang = Languages().fos[index];
+                                          user.User().language = lang;
+                                          EasyLocalization.of(context)!.setLocale(Locale(lang));
+                                          await Database().updateDoc(
+                                              collection: 'Users',
+                                              docId: user.User().id,
+                                              key: 'language',
+                                              value: lang);
+                                          MyWidget().showSnackbarWithPodo(title: tr('languageChanged'), content: tr('shouldRestart'), duration: 5000);
+                                          setState(() {
+                                            closePanels();
+                                          });
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 13),
+                                          child: Text(language[index], style: const TextStyle(color: MyColors.purple)),
                                         ),
-                                        side: const BorderSide(color: MyColors.purple, width: 1),
-                                        backgroundColor: Colors.white),
-                                    onPressed: () async {
-                                      String lang = Languages().fos[index];
-                                      user.User().language = lang;
-                                      await Database().updateDoc(
-                                          collection: 'Users',
-                                          docId: user.User().id,
-                                          key: 'language',
-                                          value: lang);
-                                      Get.offNamedUntil(
-                                          MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                                      );
                                     },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 13),
-                                      child: Text(language[index], style: const TextStyle(color: MyColors.purple)),
-                                    ),
-                                  );
-                                },
-                                itemCount: language.length,
+                                    itemCount: language.length,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -269,7 +283,7 @@ class _MyPageState extends State<MyPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   MyWidget().getTextWidget(
-                                    text: MyStrings.feedbackDetail,
+                                    text: tr('feedbackDetail'),
                                     size: 15,
                                     color: MyColors.purple,
                                   ),
@@ -283,7 +297,7 @@ class _MyPageState extends State<MyPage> {
                                       children: [
                                         Expanded(
                                           child: MyWidget().getTextFieldWidget(
-                                              hint: MyStrings.feedbackHint,
+                                              hint: tr('feedbackHint'),
                                               controller: TextEditingController(text: feedback),
                                               onChanged: (text) {
                                                 feedback = text;
@@ -293,7 +307,7 @@ class _MyPageState extends State<MyPage> {
                                           width: 10,
                                         ),
                                         MyWidget().getRoundBtnWidget(
-                                          text: MyStrings.send,
+                                          text: tr('send'),
                                           verticalPadding: 8,
                                           horizontalPadding: 3,
                                           textSize: 15,
@@ -306,12 +320,12 @@ class _MyPageState extends State<MyPage> {
                                                 userFeedback.message = feedback;
                                                 await Database()
                                                     .setDoc(collection: 'Feedbacks', doc: userFeedback);
-                                                MyWidget().showSnackbar(title: MyStrings.thanksFeedback);
+                                                MyWidget().showSnackbar(title: tr('thanksFeedback'));
                                               }
                                             } catch (e) {
                                               if(e is PlatformException && e.code == "not_available") {
                                                 MyWidget()
-                                                    .showSnackbar(title: MyStrings.error, message: e.toString());
+                                                    .showSnackbar(title: tr('error'), message: e.toString());
                                               }
                                             }
                                             setState(() {
@@ -333,7 +347,7 @@ class _MyPageState extends State<MyPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     MyWidget().getTextWidget(
-                                      text: MyStrings.logOutDetail,
+                                      text: tr('logOutDetail'),
                                       size: 15,
                                       color: MyColors.purple,
                                     ),
@@ -343,7 +357,7 @@ class _MyPageState extends State<MyPage> {
                                         children: [
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            text: MyStrings.yes,
+                                            text: tr('yes'),
                                             textSize: 15,
                                             f: () async {
                                               LocalStorage().isInit = false;
@@ -357,7 +371,7 @@ class _MyPageState extends State<MyPage> {
                                           ),
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            text: MyStrings.cancel,
+                                            text: tr('cancel'),
                                             textSize: 15,
                                             bgColor: MyColors.red,
                                             fontColor: Colors.white,
@@ -382,30 +396,30 @@ class _MyPageState extends State<MyPage> {
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    MyWidget().getTextWidget(text: MyStrings.removeDetail, color: MyColors.red),
+                                    MyWidget().getTextWidget(text: tr('removeDetail'), color: MyColors.red),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       child: Row(
                                         children: [
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            text: MyStrings.yes,
+                                            text: tr('yes'),
                                             textSize: 15,
                                             f: () {
                                               Get.dialog(
                                                 AlertDialog(
                                                   title: MyWidget().getTextWidget(
-                                                    text: MyStrings.areYouSure,
+                                                    text: tr('areYouSure'),
                                                     size: 20,
                                                     color: Colors.black,
                                                   ),
                                                   content: MyWidget().getTextWidget(
-                                                    text: MyStrings.removeDetail2,
+                                                    text: tr('removeDetail2'),
                                                     color: MyColors.red,
                                                   ),
                                                   actions: [
                                                     TextButton(
-                                                      child: MyWidget().getTextWidget(text: MyStrings.yes),
+                                                      child: MyWidget().getTextWidget(text: tr('yes')),
                                                       onPressed: () {
                                                         User? user = auth.currentUser;
                                                         if (user != null) {
@@ -420,13 +434,13 @@ class _MyPageState extends State<MyPage> {
                                                               Get.back();
                                                               Get.dialog(AlertDialog(
                                                                 title: MyWidget().getTextFieldWidget(
-                                                                    hint: MyStrings.passwordAgain,
+                                                                    hint: tr('passwordAgain'),
                                                                     onChanged: (value) {
                                                                       password = value;
                                                                     }),
                                                                 actions: [
                                                                   TextButton(
-                                                                    child: const Text(MyStrings.send),
+                                                                    child: Text(tr('send')),
                                                                     onPressed: () async {
                                                                       Get.back();
                                                                       try {
@@ -459,7 +473,7 @@ class _MyPageState extends State<MyPage> {
                                                       },
                                                     ),
                                                     TextButton(
-                                                      child: MyWidget().getTextWidget(text: MyStrings.cancel),
+                                                      child: MyWidget().getTextWidget(text: tr('cancel')),
                                                       onPressed: () {
                                                         Get.back();
                                                         setState(() {
@@ -478,7 +492,7 @@ class _MyPageState extends State<MyPage> {
                                           ),
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
-                                            text: MyStrings.cancel,
+                                            text: tr('cancel'),
                                             textSize: 15,
                                             bgColor: MyColors.red,
                                             fontColor: Colors.white,
@@ -558,7 +572,7 @@ Widget getTextField(
             ),
             const SizedBox(width: 10),
             MyWidget()
-                .getRoundBtnWidget(text: MyStrings.edit, f: onClicked, verticalPadding: 8, horizontalPadding: 3)
+                .getRoundBtnWidget(text: tr('edit'), f: onClicked, verticalPadding: 8, horizontalPadding: 3)
           ],
         ),
       ],

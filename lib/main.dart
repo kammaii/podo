@@ -29,6 +29,9 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'firebase_options.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+
 
 
 @pragma('vm:entry-point')
@@ -40,6 +43,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  await EasyLocalization.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -47,7 +51,20 @@ void main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  runApp(MyApp());
+  runApp(EasyLocalization(
+    supportedLocales: const [
+      Locale('en'),
+      Locale('es'),
+      Locale('fr'),
+      Locale('de'),
+      Locale('pt'),
+      Locale('in'),
+      Locale('ru'),
+    ],
+    path: 'assets/translations',
+    fallbackLocale: const Locale('en'),
+    child: MyApp())
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -155,6 +172,9 @@ class MyApp extends StatelessWidget {
         GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
         GetPage(name: MyStrings.routeCloudMessageMain, page: () => CloudMessageMain()),
       ],
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -69,7 +70,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                   MyWidget().getSearchWidget(
                       focusNode: _focusNode,
                       controller: searchController,
-                      hint: MyStrings.search,
+                      hint: tr('search'),
                       onChanged: (text) {
                         searchText = searchController.text;
                         controller.update();
@@ -113,7 +114,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                       animationWidget(IconButton(
                                           onPressed: () {
                                             MyWidget().showDialog(
-                                                content: MyStrings.wantRemoveFlashcard,
+                                                content: tr('wantRemoveFlashcard'),
                                                 yesFn: () {
                                                   List<String> ids = [];
                                                   for (int i = 0; i < controller.isChecked.length; i++) {
@@ -138,12 +139,12 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                         child: Row(
                                           children: [
                                             MyWidget().getTextWidget(
-                                                text: '$cardsLength ${MyStrings.cards}',
+                                                text: '$cardsLength ${tr('cards')}',
                                                 size: 15,
                                                 color: Colors.black),
                                             isBasicUser
                                                 ? MyWidget().getTextWidget(
-                                                    text: ' (${MyStrings.limit20})',
+                                                    text: ' (${tr('limit20')})',
                                                     size: 15,
                                                     color: MyColors.red,
                                                     isBold: true,
@@ -158,7 +159,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                               ),
                               Expanded(
                                 child: cardsLength <= 0
-                                    ? Center(child: MyWidget().getTextWidget(text: MyStrings.noFlashCards))
+                                    ? Center(child: MyWidget().getTextWidget(text: tr('noFlashCards')))
                                     : GestureDetector(
                                         onTap: () {
                                           _focusNode.unfocus();
@@ -195,7 +196,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                       child: GetBuilder<FlashCardController>(
                         builder: (_) {
                           return MyWidget().getRoundBtnWidget(
-                            text: MyStrings.review,
+                            text: tr('review'),
                             bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
                             f: onReviewBtn,
                             hasNullFunction: true,

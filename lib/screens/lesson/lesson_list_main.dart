@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
@@ -197,7 +198,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       pinned: true,
       stretch: true,
       title: MyWidget().getTextWidget(
-        text: '${course.title[language]} ($lessonCount ${MyStrings.lessons})',
+        text: '${course.title[language]} ($lessonCount ${tr('lessons')})',
         size: 18,
         color: MyColors.purple,
         isBold: true,
@@ -314,7 +315,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
                               widget: MyWidget().getTextWidget(
-                                  text: cloudController.hasReplied.value ? MyStrings.replied : MyStrings.replyPodo,
+                                  text: cloudController.hasReplied.value ? tr('replied') : tr('replyPodo'),
                                   color: Colors.white,
                                   size: 13),
                             ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -112,10 +113,10 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                               onChanged: (value) {
                                 checkShuffle(value);
                               }),
-                          MyWidget().getTextWidget(text: MyStrings.shuffle),
+                          MyWidget().getTextWidget(text: tr('shuffle')),
                         ],
                       ),
-                      MyWidget().getTextWidget(text: '${MyStrings.today} ${allCards.length - cards.length} / ${allCards.length}   '),
+                      MyWidget().getTextWidget(text: '${tr('today')} ${allCards.length - cards.length} / ${allCards.length}   '),
                     ],
                   ),
                   Expanded(
@@ -171,7 +172,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                   controller.isViewAllClicked.value = false;
                                 },
                                 child: MyWidget()
-                                    .getTextWidget(text: MyStrings.viewAll, color: MyColors.grey, size: 13),
+                                    .getTextWidget(text: tr('viewAll'), color: MyColors.grey, size: 13),
                               ),
                             ],
                           ),
@@ -200,7 +201,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: MyWidget().getRoundBtnWidget(
-                              text: MyStrings.next,
+                              text: tr('next'),
                               f: () {
                                 setPlayStopIcon(isForward: false);
                                 FlashCard? reviewedCard = allCards.firstWhere((card) => card.id == cards[0].id);
@@ -223,19 +224,19 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     MyWidget().getTextWidget(
-                        text: MyStrings.flashCardReviewCompleted,
+                        text: tr('flashCardReviewCompleted'),
                         isTextAlignCenter: true,
                         color: MyColors.purple,
                         size: 20),
                     const SizedBox(height: 30),
                     MyWidget().getRoundBtnWidget(
-                        text: MyStrings.reviewAgainTomorrow,
+                        text: tr('reviewAgainTomorrow'),
                         f: () {
                           Get.back();
                         }),
                     const SizedBox(height: 10),
                     MyWidget().getRoundBtnWidget(
-                        text: MyStrings.wantReviewMore,
+                        text: tr('wantReviewMore'),
                         bgColor: MyColors.pink,
                         f: () {
                           cards = [...allCards];

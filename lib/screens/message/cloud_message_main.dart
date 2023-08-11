@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -86,7 +87,7 @@ class CloudMessageMain extends StatelessWidget {
     isBasicUser ?
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       MyWidget().showDialog(
-          content: MyStrings.wantReplyPodo,
+          content: tr('wantReplyPodo'),
           yesFn: () {
             Get.toNamed(MyStrings.routePremiumMain);
           });
@@ -97,8 +98,8 @@ class CloudMessageMain extends StatelessWidget {
         IconButton(
           onPressed: () {
             Get.dialog(AlertDialog(
-              title: MyWidget().getTextWidget(text: MyStrings.howToUse, size: 18),
-              content: MyWidget().getTextWidget(text: MyStrings.replyDetail, color: MyColors.grey),
+              title: MyWidget().getTextWidget(text: tr('howToUse'), size: 18),
+              content: MyWidget().getTextWidget(text: tr('replyDetail'), color: MyColors.grey),
             ));
           },
           icon: const Icon(Icons.info, color: MyColors.purple),
@@ -133,7 +134,7 @@ class CloudMessageMain extends StatelessWidget {
                     children: [
                       const Icon(Icons.thumb_up_off_alt, color: MyColors.purple),
                       const SizedBox(width: 10),
-                      MyWidget().getTextWidget(text: MyStrings.bestReplies, color: MyColors.purple, size: 20),
+                      MyWidget().getTextWidget(text: tr('bestReplies'), color: MyColors.purple, size: 20),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -150,7 +151,7 @@ class CloudMessageMain extends StatelessWidget {
                           if (replies.isEmpty) {
                             return Center(
                                 child: MyWidget().getTextWidget(
-                                    text: MyStrings.noBestReply,
+                                    text: tr('noBestReply'),
                                     color: MyColors.purple,
                                     size: 20,
                                     isTextAlignCenter: true));
@@ -222,7 +223,7 @@ class CloudMessageMain extends StatelessWidget {
                                                       padding: const EdgeInsets.only(right: 10, top: 5),
                                                       child: MyWidget().getTextWidget(
                                                           text: reply.userName.isEmpty
-                                                              ? MyStrings.unNamed
+                                                              ? tr('unNamed')
                                                               : reply.userName,
                                                           color: MyColors.grey),
                                                     ),
@@ -264,7 +265,7 @@ class CloudMessageMain extends StatelessWidget {
                         if (snapshot.hasData) {
                           return MyWidget().getTextWidget(text: snapshot.data!, color: MyColors.purple);
                         } else {
-                          return const Text(MyStrings.expired);
+                          return Text(tr('expired'));
                         }
                       },
                     ),
@@ -278,7 +279,7 @@ class CloudMessageMain extends StatelessWidget {
                         children: [
                           Expanded(
                             child: MyWidget().getTextFieldWidget(
-                              hint: hasReplied ? reply! : MyStrings.replyPodo,
+                              hint: hasReplied ? reply! : tr('replyPodo'),
                               controller: replyController,
                               enabled: !hasReplied,
                             ),
@@ -289,7 +290,7 @@ class CloudMessageMain extends StatelessWidget {
                             child: IconButton(
                                 onPressed: () {
                                   MyWidget().showDialog(
-                                      content: MyStrings.sendReply,
+                                      content: tr('sendReply'),
                                       yesFn: () async {
                                         //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
                                         CloudReply reply = CloudReply(replyController.text);

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -95,20 +96,20 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     if (position != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.dialog(AlertDialog(
-          title: const Text(MyStrings.continueReading),
+          title: Text(tr('continueReading')),
           actions: [
             TextButton(
                 onPressed: () {
                   Get.back();
                 },
-                child: const Text(MyStrings.no, style: TextStyle(color: MyColors.navy))),
+                child: Text(tr('no'), style: const TextStyle(color: MyColors.navy))),
             TextButton(
                 onPressed: () {
                   Get.back();
                   scrollController.animateTo(position,
                       duration: const Duration(milliseconds: 500), curve: Curves.ease);
                 },
-                child: const Text(MyStrings.yes, style: TextStyle(color: MyColors.purple))),
+                child: Text(tr('yes'), style: const TextStyle(color: MyColors.purple))),
           ],
         ));
       });
@@ -251,7 +252,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                     ? Padding(
                         padding: const EdgeInsets.only(bottom: 100),
                         child: MyWidget().getRoundBtnWidget(
-                            text: MyStrings.complete,
+                            text: tr('complete'),
                             f: () {
                               History().addHistory(item: 'reading', itemId: readingTitle.id);
                               LocalStorage().prefs.remove(readingTitle.id);
@@ -393,7 +394,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 if (readings.isEmpty) {
                   return Center(
                     child: MyWidget().getTextWidget(
-                      text: MyStrings.noReading,
+                      text: tr('noReading'),
                       color: MyColors.purple,
                       size: 20,
                       isTextAlignCenter: true,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -48,7 +49,7 @@ class LessonSummaryMain extends StatelessWidget {
           isNewUser
               ? const SizedBox.shrink()
               : MyWidget().getTextWidget(
-                  text: MyStrings.writing,
+                  text: tr('writing'),
                   size: 15,
                   color: isBasicUser ? MyColors.grey : MyColors.greenDark,
                   isBold: true,
@@ -64,7 +65,7 @@ class LessonSummaryMain extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           MyWidget().getTextWidget(
-            text: MyStrings.learning,
+            text: tr('learning'),
             size: 15,
             color: MyColors.wine,
             isBold: true,
@@ -72,7 +73,7 @@ class LessonSummaryMain extends StatelessWidget {
           const SizedBox(height: 10),
         ],
       ),
-      appBar: MyWidget().getAppbar(title: MyStrings.lessonSummary),
+      appBar: MyWidget().getAppbar(title: tr('lessonSummary')),
       body: SafeArea(
         child: FutureBuilder(
             future: Database().getDocs(query: query),

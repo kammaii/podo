@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -191,7 +192,7 @@ class User {
     trialEnd = now.add(const Duration(days: 10));
     fcmToken = await FirebaseMessaging.instance.getToken();
     await Database().setDoc(collection: 'Users', doc: this);
-    MyWidget().showSnackbarWithPodo(title: MyStrings.congratulations, content: MyStrings.trialActivated);
+    MyWidget().showSnackbarWithPodo(title: tr('congratulations'), content: tr('trialActivated'));
   }
 
   Future<void> setTrialDenied() async {

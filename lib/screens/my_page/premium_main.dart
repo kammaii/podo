@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -60,7 +61,7 @@ class _PremiumMainState extends State<PremiumMain> {
                               const SizedBox(width: 5),
                               Expanded(
                                   child: MyWidget().getTextWidget(
-                                      text: MyStrings.premiumComment,
+                                      text: tr('premiumComment'),
                                       color: MyColors.purple,
                                       isTextAlignCenter: true,
                                       size: 20)),
@@ -78,30 +79,30 @@ class _PremiumMainState extends State<PremiumMain> {
                             ],
                             rows: <DataRow>[
                               getDataRow(
-                                  MyStrings.lesson,
+                                  tr('lesson'),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
                               getDataRow(
-                                  MyStrings.writingCorrection,
+                                  tr('writingCorrection'),
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(MyStrings.reading, MyWidget().getTextWidget(text: MyStrings.limited),
-                                  MyWidget().getTextWidget(text: MyStrings.all)),
-                              getDataRow(MyStrings.flashcard, MyWidget().getTextWidget(text: MyStrings.limit20),
-                                  MyWidget().getTextWidget(text: MyStrings.unlimited)),
+                              getDataRow(tr('reading'), MyWidget().getTextWidget(text: tr('limited')),
+                                  MyWidget().getTextWidget(text: tr('all'))),
+                              getDataRow(tr('flashcard'), MyWidget().getTextWidget(text: tr('limit20')),
+                                  MyWidget().getTextWidget(text: tr('unlimited'))),
                               getDataRow(
-                                  MyStrings.cloudMessage,
+                                  tr('podosMsg'),
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
                               getDataRow(
-                                  MyStrings.adFree,
+                                  tr('adFree'),
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green))
                             ],
                           ),
                           const Divider(height: 30, thickness: 2, color: MyColors.purple),
                           MyWidget().getTextWidget(
-                            text: MyStrings.premiumDetail,
+                            text: tr('premiumDetail'),
                             size: 15,
                             color: MyColors.grey,
                           ),
@@ -146,7 +147,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                     await Database()
                                         .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
                                     MyWidget().showSnackbarWithPodo(
-                                        title: MyStrings.purchaseTitle, content: MyStrings.purchaseContent);
+                                        title: tr('purchaseTitle'), content: tr('purchaseContent'));
                                     User().getUser();
                                     Get.offNamedUntil(
                                         MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
@@ -157,7 +158,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                   });
                                   var errorCode = PurchasesErrorHelper.getErrorCode(e);
                                   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-                                    MyWidget().showSnackbar(title: MyStrings.error, message: errorCode.toString());
+                                    MyWidget().showSnackbar(title: tr('error'), message: errorCode.toString());
                                   }
                                 }
                                 //todo: await FirebaseAnalytics.instance.logPurchase();
@@ -201,7 +202,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                           )
                                         : Center(
                                             child: MyWidget().getTextWidget(
-                                                text: MyStrings.failedOffering, color: Colors.white)),
+                                                text: tr('failedOffering'), color: Colors.white)),
                                   )),
                                 ],
                               ),
@@ -235,7 +236,7 @@ class _PremiumMainState extends State<PremiumMain> {
                             await User().setTrialDenied();
                           }
                         },
-                        child: const Text(MyStrings.getFreePremium))
+                        child: Text(tr('getFreePremium')))
                     : const SizedBox.shrink(),
               ],
             ),

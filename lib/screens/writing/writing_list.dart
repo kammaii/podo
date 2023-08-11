@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -32,10 +33,10 @@ class _WritingListState extends State<WritingList> {
   final docsLimit = 10;
   String? questionId = Get.arguments;
   List<String> statusList = [
-    MyStrings.writingStatus0,
-    MyStrings.writingStatus1,
-    MyStrings.writingStatus2,
-    MyStrings.writingStatus3
+    tr('writingStatus0'),
+    tr('writingStatus1'),
+    tr('writingStatus2'),
+    tr('writingStatus3')
   ];
   List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
@@ -198,7 +199,7 @@ class _WritingListState extends State<WritingList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyWidget().getTextWidget(text: writing.userName ?? MyStrings.unNamed, color: MyColors.grey),
+                MyWidget().getTextWidget(text: writing.userName ?? tr('unNamed'), color: MyColors.grey),
               ],
             ),
             const Divider(),
@@ -239,14 +240,14 @@ class _WritingListState extends State<WritingList> {
     });
 
     return Scaffold(
-      appBar: isMyWritings ? null : MyWidget().getAppbar(title: MyStrings.viewOtherUsersWriting),
+      appBar: isMyWritings ? null : MyWidget().getAppbar(title: tr('viewOtherUsersWriting')),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 20, top: 15),
-              child: MyWidget().getTextWidget(text: MyStrings.myWritings, color: MyColors.purple, isBold: true, size: 18),
+              child: MyWidget().getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
             ),
             Expanded(
               child: Stack(
@@ -261,7 +262,7 @@ class _WritingListState extends State<WritingList> {
                               child: isLoaded && writings.isEmpty
                                   ? Center(
                                       child: MyWidget().getTextWidget(
-                                        text: MyStrings.noWritings,
+                                        text: tr('noWritings'),
                                         color: MyColors.purple,
                                         size: 20,
                                         isBold: true,

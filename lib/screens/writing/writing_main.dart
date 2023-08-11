@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -80,7 +81,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        MyWidget().showDialog(content: MyStrings.wantRequestCorrection, yesFn: () {
+        MyWidget().showDialog(content: tr('wantRequestCorrection'), yesFn: () {
           //todo: await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
           Writing writing = Writing(selectedQuestion!);
           writing.userWriting = textEditController.text;
@@ -90,7 +91,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
               collection: 'Writings',
               doc: writing,
               thenFn: (value) {
-                Get.snackbar(MyStrings.requestedCorrection, '');
+                Get.snackbar(tr('requestedCorrection'), '');
                 controller.leftRequestCount.value--;
               });
         });
@@ -115,15 +116,15 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
           } else {
             Get.dialog(
               AlertDialog(
-                title: const Text(MyStrings.requestNotAvailableTitle),
-                content: const Text(MyStrings.requestNotAvailableContent),
+                title: Text(tr('requestNotAvailableTitle')),
+                content: Text(tr('requestNotAvailableContent')),
                 actions: [
                   ElevatedButton(
                     onPressed: () {
                       Get.back();
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
-                    child: const Text(MyStrings.ok),
+                    child: Text(tr('ok')),
                   ),
                 ],
               ),
@@ -163,7 +164,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: MyWidget().getAppbar(
-        title: MyStrings.writing,
+        title: tr('writing'),
         actions: [
           Row(
             children: [
@@ -190,7 +191,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: MyWidget().getTextWidget(
-                        text: MyStrings.selectQuestion, isTextAlignCenter: true, color: MyColors.purple),
+                        text: tr('selectQuestion'), isTextAlignCenter: true, color: MyColors.purple),
                   ),
                   Expanded(
                     child: FutureBuilder(
@@ -258,8 +259,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                                       Get.toNamed(MyStrings.routeOtherWritingList,
                                           arguments: selectedQuestion!.id);
                                     },
-                                    child: const Text(MyStrings.viewOtherUsersWriting,
-                                        style: TextStyle(
+                                    child: Text(tr('viewOtherUsersWriting'),
+                                        style: const TextStyle(
                                           color: MyColors.purple,
                                           decoration: TextDecoration.underline,
                                           fontSize: 15,
@@ -278,14 +279,14 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               controller: textEditController,
                               maxLength: maxLength,
                               maxLines: 1,
-                              hint: MyStrings.writeYourAnswerInKorean,
+                              hint: tr('writeYourAnswerInKorean'),
                               onSubmitted: (value) {
                                 FocusScope.of(context).unfocus();
                               }
                             ),
                             const SizedBox(height: 30),
                             MyWidget().getRoundBtnWidget(
-                              text: MyStrings.correction,
+                              text: tr('correction'),
                               textSize: 15,
                               f: onSendBtn,
                               hasNullFunction: true,
@@ -300,7 +301,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                                 children: [
                                   MyWidget()
                                       .getCheckBox(value: controller.isChecked, onChanged: controller.setCheckbox),
-                                  MyWidget().getTextWidget(text: MyStrings.iveReadTheFollowing),
+                                  MyWidget().getTextWidget(text: tr('iveReadTheFollowing')),
                                 ],
                               ),
                             ),
@@ -308,7 +309,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                             Expanded(
                                 child: SingleChildScrollView(
                                     child: MyWidget()
-                                        .getTextWidget(text: MyStrings.writingComment, color: MyColors.grey))),
+                                        .getTextWidget(text: tr('writingComment'), color: MyColors.grey))),
                             const SizedBox(height: 20),
                           ],
                         ),

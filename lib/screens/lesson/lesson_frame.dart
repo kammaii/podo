@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -78,10 +79,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = Column(
           children: [
             Row(
-              children: const [
-                Icon(Icons.flag_outlined, size: 18),
-                SizedBox(height: 10),
-                Text(MyStrings.newExpression),
+              children: [
+                const Icon(Icons.flag_outlined, size: 18),
+                const SizedBox(height: 10),
+                Text(tr('newExpression')),
               ],
             ),
             Expanded(
@@ -145,7 +146,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               children: [
                 const Icon(Icons.hearing, size: 18),
                 const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.listenAndRepeat),
+                MyWidget().getTextWidget(text: tr('listenAndRepeat')),
               ],
             ),
             const SizedBox(height: 50),
@@ -260,7 +261,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               children: [
                 const Icon(Icons.lightbulb_outline, size: 18),
                 const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.nativesTip),
+                MyWidget().getTextWidget(text: tr('nativesTip')),
               ],
             ),
             Expanded(
@@ -291,7 +292,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               children: [
                 const Icon(Icons.question_mark_rounded, size: 18),
                 const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.takeQuiz),
+                MyWidget().getTextWidget(text: tr('takeQuiz')),
               ],
             ),
             const SizedBox(height: 50),
@@ -506,7 +507,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           Visibility(
                                             visible: card.type == MyStrings.repeat,
                                             child: MyWidget().getTextWidget(
-                                              text: MyStrings.practice3Times,
+                                              text: tr('practice3Times'),
                                               size: 15,
                                               color: MyColors.grey,
                                             ),
@@ -605,7 +606,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Center(
           child: MyWidget().getTextWidget(
-              text: isNormal ? MyStrings.normal : MyStrings.speedDown, color: MyColors.purple, isBold: true),
+              text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
         ),
       ),
     );
