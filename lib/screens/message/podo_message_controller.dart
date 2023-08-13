@@ -5,6 +5,8 @@ import 'package:podo/common/play_audio.dart';
 class PodoMessageController extends GetxController {
   RxBool hasReplied = false.obs;
   RxList<bool> hasFlashcard = <bool>[].obs;
+  RxBool isPlaying = false.obs;
+
 
 
   setHasReplied(bool b) {

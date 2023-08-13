@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -86,8 +87,13 @@ class LessonComplete extends StatelessWidget {
     ), barrierDismissible: false);
   }
 
+  void playYay() async {
+    PlayAudio().playYay();
+  }
+
   @override
   Widget build(BuildContext context) {
+    playYay();
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
     final lesson = Get.arguments;

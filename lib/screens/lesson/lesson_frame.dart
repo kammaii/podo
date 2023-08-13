@@ -308,12 +308,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         selectedAnswer = index;
                         if (examples[index] == answer) {
                           quizBorderColor = MyColors.purple;
+                          PlayAudio().playCorrect();
                           Future.delayed(const Duration(seconds: 1), () {
                             swiperController.move(thisIndex + 1);
                             quizBorderColor = Colors.white;
                           });
                         } else {
                           quizBorderColor = MyColors.red;
+                          PlayAudio().playWrong();
                           Future.delayed(const Duration(seconds: 1), () {
                             setState(() {
                               quizBorderColor = Colors.white;

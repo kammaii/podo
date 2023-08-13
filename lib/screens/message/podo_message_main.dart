@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,9 +7,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
@@ -17,6 +20,7 @@ import 'package:podo/common/history.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class PodoMessageMain extends StatelessWidget {
   PodoMessageMain({Key? key}) : super(key: key);
@@ -71,6 +75,68 @@ class PodoMessageMain extends StatelessWidget {
     return controller.stream;
   }
 
+  Widget getAudioPlayer(String url) {
+    just_audio.AudioPlayer player = just_audio.AudioPlayer();
+    player.setUrl(url);
+    player.playerStateStream.listen((event) {
+      if(event.processingState == just_audio.ProcessingState.completed) {
+        player.seek(Duration.zero);
+        player.pause();
+      }
+    });
+    return Row(
+      children: [
+        StreamBuilder<just_audio.PlayerState>(
+          stream: player.playerStateStream,
+          builder: (context, snapshot) {
+            final playerState = snapshot.data;
+            final isPlaying = playerState?.playing ?? false;
+            return IconButton(
+              icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_arrow_solid),
+              color: MyColors.purple,
+              onPressed: () {
+                isPlaying ? player.pause() : player.play();
+              },
+            );
+          },
+        ),
+        StreamBuilder<Duration?>(
+          stream: player.positionStream,
+          builder: (context, snapshot) {
+            final position = snapshot.data ?? Duration.zero;
+            final duration = player.duration ?? Duration.zero;
+            return Expanded(
+              child: Slider(
+                value: position.inMilliseconds.clamp(0, duration.inMilliseconds).toDouble(),
+                onChanged: (value) {
+                  player.seek(Duration(milliseconds: value.toInt()));
+                },
+                max: duration.inMilliseconds.toDouble(),
+                activeColor: MyColors.purple,
+                inactiveColor: MyColors.purple.withOpacity(0.3),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget getVideoPlayer(String url) {
+    return YoutubePlayer(
+      controller: YoutubePlayerController(
+        initialVideoId: YoutubePlayer.convertUrlToId(url)!,
+        flags: const YoutubePlayerFlags(),
+      ),
+      actionsPadding: const EdgeInsets.all(10),
+      bottomActions: [
+        CurrentPosition(),
+        const SizedBox(width: 10),
+        ProgressBar(isExpanded: true),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     hasReplied = controller.hasReplied.value;
@@ -110,41 +176,69 @@ class PodoMessageMain extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              child: Column(
-                children: [
-                  PodoMessage().content != null
-                      ? Column(
-                        children: [
-                          Html(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    PodoMessage().content != null
+                        ? Column(
+                      children: [
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 3000),
+                          child: Html(
                             data: PodoMessage().content,
                             style: {
-                              'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
                               'p': Style(
                                   fontFamily: 'EnglishFont',
                                   fontSize: const FontSize(18),
                                   lineHeight: LineHeight.number(1.5)),
                             },
+                            customRender: {
+                              'audio': (renderContext, child) {
+                                final String audioSrc = renderContext.tree.element!.attributes['src']!;
+                                return getAudioPlayer(audioSrc);
+                              },
+                              'video': (renderContext, child) {
+                                final String videoSrc = renderContext.tree.element!.attributes['src']!;
+                                return getVideoPlayer(videoSrc);
+                              },
+                              "img": (renderContext, child) {
+                                final String imageSrc = renderContext.tree.element!.attributes['src']!;
+                                final UriData imageData = UriData.fromUri(Uri.parse(imageSrc));
+                                final Uint8List bytes = imageData.contentAsBytes();
+                                return Image.memory(bytes);
+                              },
+                            },
                           ),
-                          const Divider(),
-                        ],
-                      )
-                      : const SizedBox.shrink(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.thumb_up_off_alt, color: MyColors.purple),
-                      const SizedBox(width: 10),
-                      MyWidget().getTextWidget(text: tr('bestReplies'), color: MyColors.purple, size: 20),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: FutureBuilder(
+                        ),
+                        const Divider(),
+                      ],
+                    )
+                        : const SizedBox.shrink(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.thumb_up_off_alt, color: MyColors.purple),
+                        const SizedBox(width: 10),
+                        MyWidget().getTextWidget(text: tr('bestReplies'), color: MyColors.purple, size: 20),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    FutureBuilder(
                       future: Database().getDocs(query: query),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                           List<PodoMessageReply> replies = [];
                           for (dynamic snapshot in snapshot.data) {
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
                             replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
                           }
                           controller.hasFlashcard.value = List.generate(replies.length, (index) => false);
@@ -158,12 +252,14 @@ class PodoMessageMain extends StatelessWidget {
                           } else {
                             return ListView.builder(
                               itemCount: replies.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.only(bottom: 100),
                               itemBuilder: (BuildContext context, int index) {
                                 PodoMessageReply reply = replies[index];
                                 controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: reply.id);
-
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
+                                  padding: const EdgeInsets.only(bottom: 5),
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -194,26 +290,27 @@ class PodoMessageMain extends StatelessWidget {
                                                             size: 16,
                                                             height: 1.5)),
                                                     const SizedBox(width: 10),
-                                                    Obx(() => IconButton(
-                                                        onPressed: () {
-                                                          if (controller.hasFlashcard[index]) {
-                                                            FlashCard().removeFlashcard(itemId: reply.id);
-                                                            controller.hasFlashcard[index] = false;
-                                                          } else {
-                                                            FlashCard().addFlashcard(
-                                                                itemId: reply.id,
-                                                                front: reply.reply,
-                                                                fn: () {
-                                                                  controller.hasFlashcard[index] = true;
-                                                                });
-                                                          }
-                                                        },
-                                                        icon: Icon(
-                                                          controller.hasFlashcard[index]
-                                                              ? CupertinoIcons.heart_fill
-                                                              : CupertinoIcons.heart,
-                                                          color: MyColors.purple,
-                                                        ))),
+                                                    Obx(() =>
+                                                        IconButton(
+                                                            onPressed: () {
+                                                              if (controller.hasFlashcard[index]) {
+                                                                FlashCard().removeFlashcard(itemId: reply.id);
+                                                                controller.hasFlashcard[index] = false;
+                                                              } else {
+                                                                FlashCard().addFlashcard(
+                                                                    itemId: reply.id,
+                                                                    front: reply.reply,
+                                                                    fn: () {
+                                                                      controller.hasFlashcard[index] = true;
+                                                                    });
+                                                              }
+                                                            },
+                                                            icon: Icon(
+                                                              controller.hasFlashcard[index]
+                                                                  ? CupertinoIcons.heart_fill
+                                                                  : CupertinoIcons.heart,
+                                                              color: MyColors.purple,
+                                                            ))),
                                                   ],
                                                 ),
                                                 Row(
@@ -247,8 +344,8 @@ class PodoMessageMain extends StatelessWidget {
                         }
                       },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Align(
@@ -319,11 +416,11 @@ class PodoMessageMain extends StatelessWidget {
             ),
             isBasicUser
                 ? const Positioned.fill(
-                    child: Blur(
-                      blur: 2.3,
-                      child: SizedBox.shrink(),
-                    ),
-                  )
+              child: Blur(
+                blur: 2.3,
+                child: SizedBox.shrink(),
+              ),
+            )
                 : const SizedBox.shrink(),
           ],
         ),
