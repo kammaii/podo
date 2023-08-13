@@ -14,7 +14,6 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
 import 'package:html/parser.dart' as htmlParser;
 
 class WritingList extends StatefulWidget {
@@ -102,7 +101,7 @@ class _WritingListState extends State<WritingList> {
             data: content,
             style: {
               'p': Style(
-                  fontFamily: 'KoreanFont', fontSize: FontSize(15), lineHeight: LineHeight.number(1.5)),
+                  fontFamily: 'KoreanFont', fontSize: const FontSize(15), lineHeight: LineHeight.number(1.5)),
             },
           ),
         ),
@@ -143,9 +142,9 @@ class _WritingListState extends State<WritingList> {
             Row(
               children: [
                 MyWidget().getRoundedContainer(
-                    widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white),
+                    widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
                     radius: 20,
-                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
                     bgColor: statusColors[status]),
                 const SizedBox(width: 10),
                 Expanded(
@@ -239,65 +238,70 @@ class _WritingListState extends State<WritingList> {
       }
     });
 
-    return Scaffold(
-      appBar: isMyWritings ? null : MyWidget().getAppbar(title: tr('viewOtherUsersWriting')),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 15),
-              child: MyWidget().getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  GetBuilder<WritingController>(
-                    builder: (_) {
-                      return Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: isLoaded && writings.isEmpty
-                                  ? Center(
-                                      child: MyWidget().getTextWidget(
-                                        text: tr('noWritings'),
-                                        color: MyColors.purple,
-                                        size: 20,
-                                        isBold: true,
-                                      ),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: writings.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 30),
-                                          child: getWritingList(index),
-                                        );
-                                      },
-                                    ),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  Obx(() => Offstage(
-                        offstage: !controller.isLoading.value,
-                        child: Stack(
-                          children: const [
-                            Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
-                            Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          ],
-                        ),
-                      ))
-                ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: Scaffold(
+        appBar: isMyWritings ? null : MyWidget().getAppbar(title: tr('viewOtherUsersWriting')),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 15),
+                child: MyWidget().getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
               ),
-            ),
-          ],
+              Expanded(
+                child: Stack(
+                  children: [
+                    GetBuilder<WritingController>(
+                      builder: (_) {
+                        return Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: isLoaded && writings.isEmpty
+                                    ? Center(
+                                        child: MyWidget().getTextWidget(
+                                          text: tr('noWritings'),
+                                          color: MyColors.purple,
+                                          size: 20,
+                                          isBold: true,
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        itemCount: writings.length,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(bottom: 30),
+                                            child: getWritingList(index),
+                                          );
+                                        },
+                                      ),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    Obx(() => Offstage(
+                          offstage: !controller.isLoading.value,
+                          child: Stack(
+                            children: const [
+                              Opacity(opacity: 0.3, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                              Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            ],
+                          ),
+                        ))
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

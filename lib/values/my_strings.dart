@@ -20,7 +20,7 @@ class MyStrings {
   static const String routeFlashcardEdit = '/flashcardEdit';
   static const String routeFlashcardReview = '/flashcardReview';
   static const String routePremiumMain = '/premiumMain';
-  static const String routeCloudMessageMain = '/cloudMessageMain';
+  static const String routePodoMessageMain = '/podoMessageMain';
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String repeat = 'repeat';

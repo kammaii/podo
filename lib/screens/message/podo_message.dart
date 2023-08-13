@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:podo/common/database.dart';
 
-class CloudMessage {
-  CloudMessage._init();
-  static final CloudMessage _instance = CloudMessage._init();
+class PodoMessage {
+  PodoMessage._init();
+  static final PodoMessage _instance = PodoMessage._init();
 
-  factory CloudMessage() {
+  factory PodoMessage() {
     return _instance;
   }
 
@@ -23,7 +23,7 @@ class CloudMessage {
   static const String DATE_END = 'dateEnd';
 
   Future<void> getCloudMessage() async {
-    final Query query = FirebaseFirestore.instance.collection('CloudMessages').where('isActive', isEqualTo: true);
+    final Query query = FirebaseFirestore.instance.collection('PodoMessages').where('isActive', isEqualTo: true);
     List<dynamic> snapshots = await Database().getDocs(query: query);
     if(snapshots.isNotEmpty) {
       final json = snapshots[0].data();

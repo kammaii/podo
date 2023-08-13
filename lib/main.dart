@@ -17,8 +17,8 @@ import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/login/logo.dart';
 import 'package:podo/screens/main_frame.dart';
-import 'package:podo/screens/message/cloud_message.dart';
-import 'package:podo/screens/message/cloud_message_main.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_main.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
@@ -111,10 +111,11 @@ class MyApp extends StatelessWidget {
 
   getInitData() async {
     await user.User().getUser();
+    FirebaseMessaging.instance.subscribeToTopic('allUsers');
     await LocalStorage().getPrefs();
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
-    await CloudMessage().getCloudMessage();
+    await PodoMessage().getCloudMessage();
     Get.put(WritingController());
     Get.toNamed(MyStrings.routeMainFrame);
     String thisOs = os.toString().split('.').last;
@@ -170,7 +171,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
         GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),
         GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
-        GetPage(name: MyStrings.routeCloudMessageMain, page: () => CloudMessageMain()),
+        GetPage(name: MyStrings.routePodoMessageMain, page: () => PodoMessageMain()),
       ],
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,

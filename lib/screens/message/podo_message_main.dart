@@ -10,21 +10,21 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
-import 'package:podo/screens/message/cloud_message.dart';
-import 'package:podo/screens/message/cloud_message_controller.dart';
-import 'package:podo/screens/message/cloud_reply.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_controller.dart';
+import 'package:podo/screens/message/podo_message_reply.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class CloudMessageMain extends StatelessWidget {
-  CloudMessageMain({Key? key}) : super(key: key);
+class PodoMessageMain extends StatelessWidget {
+  PodoMessageMain({Key? key}) : super(key: key);
 
   final KO = 'ko';
   final replyController = TextEditingController();
   late bool hasReplied;
-  final controller = Get.find<CloudMessageController>();
+  final controller = Get.find<PodoMessageController>();
   bool isBasicUser = User().status == 1;
 
   Stream<String> getTimeLeftStream(DateTime dateEnd) {
@@ -33,7 +33,7 @@ class CloudMessageMain extends StatelessWidget {
 
     Duration calTimeLeft() {
       DateTime now = DateTime.now();
-      Duration leftTime = CloudMessage().dateEnd!.difference(now);
+      Duration leftTime = PodoMessage().dateEnd!.difference(now);
       return leftTime.isNegative ? Duration.zero : leftTime;
     }
 
@@ -76,11 +76,11 @@ class CloudMessageMain extends StatelessWidget {
     hasReplied = controller.hasReplied.value;
     String? reply;
     if (hasReplied) {
-      History history = LocalStorage().histories.firstWhere((history) => history.itemId == CloudMessage().id);
+      History history = LocalStorage().histories.firstWhere((history) => history.itemId == PodoMessage().id);
       reply = history.content;
     }
     Query query = FirebaseFirestore.instance
-        .collection('CloudMessages/${CloudMessage().id}/Replies')
+        .collection('PodoMessages/${PodoMessage().id}/Replies')
         .where('isSelected', isEqualTo: true)
         .orderBy('date', descending: true);
 
@@ -94,7 +94,7 @@ class CloudMessageMain extends StatelessWidget {
     }) : null;
 
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: CloudMessage().title![KO], isKorean: true, actions: [
+      appBar: MyWidget().getAppbar(title: PodoMessage().title![KO], isKorean: true, actions: [
         IconButton(
           onPressed: () {
             Get.dialog(AlertDialog(
@@ -112,11 +112,11 @@ class CloudMessageMain extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               child: Column(
                 children: [
-                  CloudMessage().content != null
+                  PodoMessage().content != null
                       ? Column(
                         children: [
                           Html(
-                            data: CloudMessage().content,
+                            data: PodoMessage().content,
                             style: {
                               'div': Style(width: 200, height: 200, textAlign: TextAlign.center),
                               'p': Style(
@@ -143,9 +143,9 @@ class CloudMessageMain extends StatelessWidget {
                       future: Database().getDocs(query: query),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                          List<CloudReply> replies = [];
+                          List<PodoMessageReply> replies = [];
                           for (dynamic snapshot in snapshot.data) {
-                            replies.add(CloudReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                            replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
                           }
                           controller.hasFlashcard.value = List.generate(replies.length, (index) => false);
                           if (replies.isEmpty) {
@@ -159,7 +159,7 @@ class CloudMessageMain extends StatelessWidget {
                             return ListView.builder(
                               itemCount: replies.length,
                               itemBuilder: (BuildContext context, int index) {
-                                CloudReply reply = replies[index];
+                                PodoMessageReply reply = replies[index];
                                 controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: reply.id);
 
                                 return Padding(
@@ -260,7 +260,7 @@ class CloudMessageMain extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 5, right: 15),
                     child: StreamBuilder<String>(
-                      stream: getTimeLeftStream(CloudMessage().dateEnd!),
+                      stream: getTimeLeftStream(PodoMessage().dateEnd!),
                       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                         if (snapshot.hasData) {
                           return MyWidget().getTextWidget(text: snapshot.data!, color: MyColors.purple);
@@ -293,18 +293,18 @@ class CloudMessageMain extends StatelessWidget {
                                       content: tr('sendReply'),
                                       yesFn: () async {
                                         //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
-                                        CloudReply reply = CloudReply(replyController.text);
+                                        PodoMessageReply reply = PodoMessageReply(replyController.text);
                                         await Database().setDoc(
-                                            collection: 'CloudMessages/${CloudMessage().id}/Replies',
+                                            collection: 'PodoMessages/${PodoMessage().id}/Replies',
                                             doc: reply,
                                             thenFn: (value) {
-                                              print('Cloud reply completed');
+                                              print('Podo message reply completed');
                                               Get.back();
-                                              Get.find<CloudMessageController>().setHasReplied(true);
+                                              Get.find<PodoMessageController>().setHasReplied(true);
                                             });
                                         History().addHistory(
-                                            item: 'cloudMessage',
-                                            itemId: CloudMessage().id!,
+                                            item: 'podoMessage',
+                                            itemId: PodoMessage().id!,
                                             content: replyController.text);
                                       });
                                 },

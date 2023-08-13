@@ -9,8 +9,8 @@ import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
-import 'package:podo/screens/message/cloud_message.dart';
-import 'package:podo/screens/message/cloud_message_controller.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -264,9 +264,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
     lessonController.isCompleted.value = map;
     lessonIndex = -1;
-    final cloudController = Get.put(CloudMessageController());
-    if (CloudMessage().id != null) {
-      bool hasReplied = LocalStorage().hasHistory(itemId: CloudMessage().id!);
+    final cloudController = Get.put(PodoMessageController());
+    if (PodoMessage().id != null) {
+      bool hasReplied = LocalStorage().hasHistory(itemId: PodoMessage().id!);
       cloudController.setHasReplied(hasReplied);
     }
 
@@ -275,10 +275,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         child: Column(
           children: [
             Visibility(
-              visible: User().status != 0 && CloudMessage().isInDate != null && CloudMessage().isInDate!,
+              visible: User().status != 0 && PodoMessage().isInDate != null && PodoMessage().isInDate!,
               child: InkWell(
                 onTap: () {
-                  Get.toNamed(MyStrings.routeCloudMessageMain);
+                  Get.toNamed(MyStrings.routePodoMessageMain);
                 },
                 child: Container(
                   color: MyColors.navyLight,
@@ -293,14 +293,14 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               MyWidget().getTextWidget(
-                                  text: CloudMessage().title?[KO] ?? '',
+                                  text: PodoMessage().title?[KO] ?? '',
                                   isKorean: true,
                                   size: 18,
                                   color: MyColors.purple,
                                   maxLine: 1),
                               const SizedBox(height: 5),
                               MyWidget().getTextWidget(
-                                  text: CloudMessage().title?[User().language] ?? '',
+                                  text: PodoMessage().title?[User().language] ?? '',
                                   color: MyColors.grey,
                                   size: 13,
                                   maxLine: 1),

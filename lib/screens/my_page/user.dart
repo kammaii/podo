@@ -11,7 +11,6 @@ import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class User {
