@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -12,8 +14,6 @@ import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:blur/blur.dart';
 
 class ReadingListMain extends StatefulWidget {
   ReadingListMain({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class ReadingListMain extends StatefulWidget {
 
 class _ReadingListMainState extends State<ReadingListMain> {
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
-  final categories = ['All', 'About Korea', 'Entertainment', 'Daily life', 'Story book'];
+  late List<String> categories;
   final cardBorderRadius = 8.0;
   int selectedCategory = 0;
   final KO = 'ko';
@@ -37,6 +37,8 @@ class _ReadingListMainState extends State<ReadingListMain> {
   late List<ReadingTitle> readingTitles;
   final controller = Get.put(ReadingController());
   bool isBasicUser = User().status == 1;
+  bool hasCategory = false;
+  late Query query;
 
   Widget getListItem({required ReadingTitle readingTitle}) {
     return Card(
@@ -159,8 +161,28 @@ class _ReadingListMainState extends State<ReadingListMain> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    Query query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
+  void initState() {
+    super.initState();
+    setQuery();
+    Database().getDocs(query: query).then((snapshots) {
+      categories = [];
+      Map<String, int> categoryCountMap = {};
+      for (dynamic snapshot in snapshots) {
+        ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
+        final category = title.category;
+        categoryCountMap[category] = (categoryCountMap[category] ?? 0) + 1;
+      }
+      categories = categoryCountMap.keys.toList();
+      categories.sort((a, b) => categoryCountMap[b]!.compareTo(categoryCountMap[a]!));
+      categories.insert(0, 'All');
+      setState(() {
+        hasCategory = true;
+      });
+    });
+  }
+
+  void setQuery() {
+    query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
     if (selectedCategory == 0) {
       query = query.orderBy(ORDER_ID, descending: true);
     } else {
@@ -170,84 +192,87 @@ class _ReadingListMainState extends State<ReadingListMain> {
     if (User().status == 0) {
       query = query.where(IS_FREE, isEqualTo: true);
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 30,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = index;
-                          });
+          child: hasCategory
+              ? Column(
+                  children: [
+                    SizedBox(
+                      height: 30,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedCategory = index;
+                                  setQuery();
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: selectedCategory == index ? MyColors.purple : Colors.white,
+                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                                child: MyWidget().getTextWidget(
+                                  text: categories[index],
+                                  color: selectedCategory == index ? Colors.white : MyColors.navy,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          );
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: selectedCategory == index ? MyColors.purple : Colors.white,
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                          child: MyWidget().getTextWidget(
-                            text: categories[index],
-                            color: selectedCategory == index ? Colors.white : MyColors.navy,
-                            size: 18,
-                          ),
-                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: FutureBuilder(
-                  future: Database().getDocs(query: query),
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                      readingTitles = [];
-                      Map<String, bool> isCompletedMap = {};
-                      for (dynamic snapshot in snapshot.data) {
-                        ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
-                        readingTitles.add(title);
-                        isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
-                      }
-                      controller.isCompleted.value = isCompletedMap.obs;
-                      if (readingTitles.isEmpty) {
-                        return Center(
-                            child: MyWidget().getTextWidget(
-                                text: tr('noReadingTitle'),
-                                color: MyColors.purple,
-                                size: 20,
-                                isTextAlignCenter: true));
-                      } else {
-                        return ListView.builder(
-                          itemCount: readingTitles.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            ReadingTitle readingTitle = readingTitles[index];
-                            return getListItem(readingTitle: readingTitle);
-                          },
-                        );
-                      }
-                    } else if (snapshot.hasError) {
-                      return Text('에러: ${snapshot.error}');
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
+                    ),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: FutureBuilder(
+                        future: Database().getDocs(query: query),
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                            readingTitles = [];
+                            Map<String, bool> isCompletedMap = {};
+                            for (dynamic snapshot in snapshot.data) {
+                              ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
+                              readingTitles.add(title);
+                              isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
+                            }
+                            controller.isCompleted.value = isCompletedMap.obs;
+
+                            return readingTitles.isEmpty
+                                ? Center(
+                                    child: MyWidget().getTextWidget(
+                                        text: tr('noReadingTitle'),
+                                        color: MyColors.purple,
+                                        size: 20,
+                                        isTextAlignCenter: true))
+                                : ListView.builder(
+                                    itemCount: readingTitles.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      ReadingTitle readingTitle = readingTitles[index];
+                                      return getListItem(readingTitle: readingTitle);
+                                    },
+                                  );
+                          } else {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              : const SizedBox.shrink(),
         ),
       ),
     );

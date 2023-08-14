@@ -31,9 +31,6 @@ import 'firebase_options.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-
-
-
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: $message");
