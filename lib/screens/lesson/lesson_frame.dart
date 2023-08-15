@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:card_swiper/card_swiper.dart';
@@ -23,6 +24,8 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -53,7 +56,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   int selectedAnswer = -1;
   Color quizBorderColor = Colors.white;
   SwiperController swiperController = SwiperController();
-  Map<String, String> audios = {};
+  Map<String, String> audioPaths = {};
   late AnimationController animationController;
   late Animation<Offset> animationOffset;
   late Widget bottomWidget;
@@ -130,7 +133,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   },
                   style: {
                     'p': Style(
-                        fontFamily: 'EnglishFont', fontSize: const FontSize(17), lineHeight: LineHeight.number(1.3)),
+                        fontFamily: 'EnglishFont',
+                        fontSize: const FontSize(17),
+                        lineHeight: LineHeight.number(1.3)),
                   },
                 ),
               ),
@@ -224,29 +229,29 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Offstage(
-                    offstage: card.content[KO] == null,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
-                    )
-                  ),
+                      offstage: card.content[KO] == null,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
+                      )),
                   MyWidget().getTextWidget(text: card.content[fo], size: 20),
-                  card.content[VIDEO] != null ?
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: YoutubePlayer(
-                      controller: YoutubePlayerController(
-                        initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
-                        flags: const YoutubePlayerFlags(),
-                      ),
-                      actionsPadding: const EdgeInsets.all(10),
-                      bottomActions: [
-                        CurrentPosition(),
-                        const SizedBox(width: 10),
-                        ProgressBar(isExpanded: true),
-                      ],
-                    ),
-                  ) : const SizedBox.shrink(),
+                  card.content[VIDEO] != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: YoutubePlayer(
+                            controller: YoutubePlayerController(
+                              initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
+                              flags: const YoutubePlayerFlags(),
+                            ),
+                            actionsPadding: const EdgeInsets.all(10),
+                            bottomActions: [
+                              CurrentPosition(),
+                              const SizedBox(width: 10),
+                              ProgressBar(isExpanded: true),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -399,23 +404,38 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     Future.wait([
       Database().getDocs(query: query),
       CloudStorage().getLessonAudios(lessonId: lesson.id),
-    ]).then((snapshots) {
+    ]).then((snapshots) async {
+      Map<String, bool> flashcardMap = {};
+      for (dynamic snapshot in snapshots[0]) {
+        LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
+        if (card.type == MyStrings.repeat) {
+          flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
+        }
+        cards.add(card);
+      }
+      controller.hasFlashcard.value = flashcardMap.obs;
+      Map<String, String> audios = {};
+      for (dynamic snapshot in snapshots[1]) {
+        audios.addAll(snapshot);
+      }
+      await cacheFiles(audios);
       setState(() {
-        Map<String, bool> flashcardMap = {};
-        for (dynamic snapshot in snapshots[0]) {
-          LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
-          if (card.type == MyStrings.repeat) {
-            flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
-          }
-          cards.add(card);
-        }
-        controller.hasFlashcard.value = flashcardMap.obs;
-        for (dynamic snapshot in snapshots[1]) {
-          audios.addAll(snapshot);
-        }
         isLoading = false;
       });
     });
+  }
+
+  Future<void> cacheFiles(Map<String, String> snapshots) async {
+    final directory = await getTemporaryDirectory();
+    audioPaths = {};
+
+    for (var fileName in snapshots.keys) {
+      final url = snapshots[fileName];
+      final response = await http.get(Uri.parse(url!));
+      final File file = File('${directory.path}/$fileName.m4a');
+      await file.writeAsBytes(response.bodyBytes);
+      audioPaths[fileName] = file.path;
+    }
   }
 
   @override
@@ -478,8 +498,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             PlayAudio().player.stop();
                             if (cards[thisIndex].content.containsKey(AUDIO)) {
                               String fileName = cards[thisIndex].content[AUDIO];
-                              if (audios.containsKey(fileName)) {
-                                controller.setAudioUrlAndPlay(url: audios[fileName]!);
+                              if (audioPaths.containsKey(fileName)) {
+                                String path = audioPaths[fileName]!;
+                                controller.setAudioPathAndPlay(path: path);
                               }
                             }
                           });
