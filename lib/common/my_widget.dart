@@ -296,7 +296,7 @@ class MyWidget {
     );
   }
 
-  showSnackbarWithPodo({String title = '', String content = '', int duration = 500}) {
+  showSnackbarWithPodo({String title = '', String content = '', int duration = 2000}) {
     Get.snackbar(
       title,
       content,

@@ -218,8 +218,8 @@ class _WritingListState extends State<WritingList> {
 
   @override
   void dispose() {
-    super.dispose();
     scrollController.dispose();
+    super.dispose();
   }
 
   @override

@@ -61,8 +61,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
 
   @override
   void dispose() {
-    super.dispose();
     animationController.dispose();
+    super.dispose();
   }
 
   toggleVisibility() {

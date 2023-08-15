@@ -42,8 +42,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   @override
   void dispose() {
-    super.dispose();
     scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -270,77 +270,84 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       cloudController.setHasReplied(hasReplied);
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Visibility(
-              visible: User().status != 0 && PodoMessage().isInDate != null && PodoMessage().isInDate!,
-              child: InkWell(
-                onTap: () {
-                  Get.toNamed(MyStrings.routePodoMessageMain);
-                },
-                child: Container(
-                  color: MyColors.navyLight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    child: Row(
-                      children: [
-                        Image.asset('assets/images/podo.png', height: 40, width: 40),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MyWidget().getTextWidget(
-                                  text: PodoMessage().title?[KO] ?? '',
-                                  isKorean: true,
-                                  size: 18,
-                                  color: MyColors.purple,
-                                  maxLine: 1),
-                              const SizedBox(height: 5),
-                              MyWidget().getTextWidget(
-                                  text: PodoMessage().title?[User().language] ?? '',
-                                  color: MyColors.grey,
-                                  size: 13,
-                                  maxLine: 1),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Center(
-                          child: Obx(
-                            () => MyWidget().getRoundedContainer(
-                              radius: 30,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
-                              widget: MyWidget().getTextWidget(
-                                  text: cloudController.hasReplied.value ? tr('replied') : tr('replyPodo'),
-                                  color: Colors.white,
-                                  size: 13),
+    return RefreshIndicator(
+      onRefresh: () async {
+        await courseController.loadCourses();
+        await PodoMessage().getPodoMessage();
+        setState(() {});
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Visibility(
+                visible: User().status != 0 && PodoMessage().isActive,
+                child: InkWell(
+                  onTap: () {
+                    Get.toNamed(MyStrings.routePodoMessageMain);
+                  },
+                  child: Container(
+                    color: MyColors.navyLight,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Row(
+                        children: [
+                          Image.asset('assets/images/podo.png', height: 40, width: 40),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MyWidget().getTextWidget(
+                                    text: PodoMessage().title?[KO] ?? '',
+                                    isKorean: true,
+                                    size: 18,
+                                    color: MyColors.purple,
+                                    maxLine: 1),
+                                const SizedBox(height: 5),
+                                MyWidget().getTextWidget(
+                                    text: PodoMessage().title?[User().language] ?? '',
+                                    color: MyColors.grey,
+                                    size: 13,
+                                    maxLine: 1),
+                              ],
                             ),
                           ),
-                        )
-                      ],
+                          const SizedBox(width: 10),
+                          Center(
+                            child: Obx(
+                              () => MyWidget().getRoundedContainer(
+                                radius: 30,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
+                                widget: MyWidget().getTextWidget(
+                                    text: cloudController.hasReplied.value ? tr('replied') : tr('replyPodo'),
+                                    color: Colors.white,
+                                    size: 13),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Container(
-                color: MyColors.purpleLight,
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  controller: scrollController,
-                  slivers: [
-                    sliverAppBar(),
-                    sliverList(),
-                  ],
+              Expanded(
+                child: Container(
+                  color: MyColors.purpleLight,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: scrollController,
+                    slivers: [
+                      sliverAppBar(),
+                      sliverList(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

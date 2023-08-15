@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/fcm_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
@@ -112,7 +114,7 @@ class MyApp extends StatelessWidget {
     await LocalStorage().getPrefs();
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
-    await PodoMessage().getCloudMessage();
+    await PodoMessage().getPodoMessage();
     Get.put(WritingController());
     Get.toNamed(MyStrings.routeMainFrame);
     String thisOs = os.toString().split('.').last;
@@ -130,6 +132,28 @@ class MyApp extends StatelessWidget {
     Get.put(FcmController());
 
     FirebaseInAppMessaging.instance;
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      if (message.notification != null) {
+        PlayAudio().playAlarm();
+        switch (message.data['tag']) {
+          case 'podo_message' :
+            MyWidget().showSnackbarWithPodo(
+              title: tr('podosMsg'),
+              content: message.notification!.body!,
+            );
+            break;
+
+          case 'writing' :
+            MyWidget().showSnackbarWithPodo(
+              title: message.notification!.title!,
+              content: message.notification!.body!,
+            );
+            break;
+        }
+      }
+    });
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {

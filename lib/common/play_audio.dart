@@ -15,7 +15,7 @@ class PlayAudio {
 
   PlayAudio.init() {
     player = AudioPlayer();
-    stream = player.playerStateStream.listen((event) { });
+    stream = player.playerStateStream.listen((event) {});
     debugPrint('playAudio 초기화');
   }
 
@@ -30,39 +30,68 @@ class PlayAudio {
   }
 
   void playFlashcard(String? audio, {Function(dynamic event)? addStreamCompleted}) async {
-    if(audio != null) {
-      List<String> audioRegex = audio.split(RegExp(r'_+'));
-      String url = await CloudStorage().getAudio(audio: audioRegex);
-      if(addStreamCompleted != null) {
-        stream = player.playerStateStream.listen(addStreamCompleted);
+    try {
+      if (audio != null) {
+        List<String> audioRegex = audio.split(RegExp(r'_+'));
+        String url = await CloudStorage().getAudio(audio: audioRegex);
+        if (addStreamCompleted != null) {
+          stream = player.playerStateStream.listen(addStreamCompleted);
+        }
+        await player.setUrl(url);
+        await player.play();
       }
-      await player.setUrl(url);
-      await player.play();
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
   void playReading({required String readingTitleId, required String readingId}) async {
-    String url = await CloudStorage().getReadingAudio(fileRef: 'ReadingAudios/$readingTitleId/$readingId.mp3');
-    await player.setUrl(url);
-    await player.play();
+    try {
+      String url = await CloudStorage().getReadingAudio(fileRef: 'ReadingAudios/$readingTitleId/$readingId.mp3');
+      await player.setUrl(url);
+      await player.play();
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
-
   void playCorrect() async {
-    await player.setAsset('assets/audio/correct.mp3');
-    await player.setVolume(0.1);
-    player.play();
+    try {
+      await player.setAsset('assets/audio/correct.mp3');
+      await player.setVolume(0.1);
+      player.play();
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   void playWrong() async {
-    await player.setAsset('assets/audio/wrong.mp3');
-    await player.setVolume(0.1);
-    player.play();
+    try {
+      await player.setAsset('assets/audio/wrong.mp3');
+      await player.setVolume(0.1);
+      player.play();
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   void playYay() async {
-    await player.setAsset('assets/audio/yay.mp3');
-    await player.setVolume(0.1);
-    player.play();
+    try {
+      await player.setAsset('assets/audio/yay.mp3');
+      await player.setVolume(0.1);
+      player.play();
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void playAlarm() async {
+    try {
+      await player.setAsset('assets/audio/alarm.mp3');
+      await player.setVolume(0.5);
+      player.play();
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 }

@@ -196,83 +196,88 @@ class _ReadingListMainState extends State<ReadingListMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: hasCategory
-              ? Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedCategory = index;
-                                  setQuery();
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: selectedCategory == index ? MyColors.purple : Colors.white,
-                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-                                child: MyWidget().getTextWidget(
-                                  text: categories[index],
-                                  color: selectedCategory == index ? Colors.white : MyColors.navy,
-                                  size: 18,
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: hasCategory
+                ? Column(
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedCategory = index;
+                                    setQuery();
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: selectedCategory == index ? MyColors.purple : Colors.white,
+                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+                                  child: MyWidget().getTextWidget(
+                                    text: categories[index],
+                                    color: selectedCategory == index ? Colors.white : MyColors.navy,
+                                    size: 18,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: FutureBuilder(
-                        future: Database().getDocs(query: query),
-                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                            readingTitles = [];
-                            Map<String, bool> isCompletedMap = {};
-                            for (dynamic snapshot in snapshot.data) {
-                              ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
-                              readingTitles.add(title);
-                              isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
-                            }
-                            controller.isCompleted.value = isCompletedMap.obs;
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: FutureBuilder(
+                          future: Database().getDocs(query: query),
+                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                              readingTitles = [];
+                              Map<String, bool> isCompletedMap = {};
+                              for (dynamic snapshot in snapshot.data) {
+                                ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
+                                readingTitles.add(title);
+                                isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
+                              }
+                              controller.isCompleted.value = isCompletedMap.obs;
 
-                            return readingTitles.isEmpty
-                                ? Center(
-                                    child: MyWidget().getTextWidget(
-                                        text: tr('noReadingTitle'),
-                                        color: MyColors.purple,
-                                        size: 20,
-                                        isTextAlignCenter: true))
-                                : ListView.builder(
-                                    itemCount: readingTitles.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      ReadingTitle readingTitle = readingTitles[index];
-                                      return getListItem(readingTitle: readingTitle);
-                                    },
-                                  );
-                          } else {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-                        },
+                              return readingTitles.isEmpty
+                                  ? Center(
+                                      child: MyWidget().getTextWidget(
+                                          text: tr('noReadingTitle'),
+                                          color: MyColors.purple,
+                                          size: 20,
+                                          isTextAlignCenter: true))
+                                  : ListView.builder(
+                                      itemCount: readingTitles.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        ReadingTitle readingTitle = readingTitles[index];
+                                        return getListItem(readingTitle: readingTitle);
+                                      },
+                                    );
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              : const SizedBox.shrink(),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ),
       ),
     );
