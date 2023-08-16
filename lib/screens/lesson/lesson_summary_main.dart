@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -48,7 +49,7 @@ class LessonSummaryMain extends StatelessWidget {
           isNewUser
               ? const SizedBox.shrink()
               : MyWidget().getTextWidget(
-                  text: MyStrings.writing,
+                  text: tr('writing'),
                   size: 15,
                   color: isBasicUser ? MyColors.grey : MyColors.greenDark,
                   isBold: true,
@@ -64,7 +65,7 @@ class LessonSummaryMain extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           MyWidget().getTextWidget(
-            text: MyStrings.learning,
+            text: tr('learning'),
             size: 15,
             color: MyColors.wine,
             isBold: true,
@@ -72,7 +73,7 @@ class LessonSummaryMain extends StatelessWidget {
           const SizedBox(height: 10),
         ],
       ),
-      appBar: MyWidget().getAppbar(title: MyStrings.lessonSummary),
+      appBar: MyWidget().getAppbar(title: tr('lessonSummary')),
       body: SafeArea(
         child: FutureBuilder(
             future: Database().getDocs(query: query),
@@ -121,8 +122,10 @@ class LessonSummaryMain extends StatelessWidget {
 
   Widget getSummary(int index) {
     LessonSummary summary = summaries[index];
+    double bottomPadding;
+    index == summaries.length - 1 ? bottomPadding = 200 : bottomPadding = 40;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 40),
+      padding: EdgeInsets.only(bottom: bottomPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -144,11 +147,11 @@ class LessonSummaryMain extends StatelessWidget {
               children: [
                 MyWidget().getTextWidget(text: summary.content[fo]),
                 const SizedBox(height: 15),
-                summary.examples != null
+                summary.examples.isNotEmpty
                     ? ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: summary.examples!.length,
+                        itemCount: summary.examples.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
@@ -163,7 +166,7 @@ class LessonSummaryMain extends StatelessWidget {
                                   ),
                                 ),
                                 MyWidget().getTextWidget(
-                                  text: summary.examples![index],
+                                  text: summary.examples[index],
                                   isKorean: true,
                                 ),
                               ],

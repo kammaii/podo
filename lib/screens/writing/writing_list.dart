@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -13,7 +14,6 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
 import 'package:html/parser.dart' as htmlParser;
 
 class WritingList extends StatefulWidget {
@@ -32,10 +32,10 @@ class _WritingListState extends State<WritingList> {
   final docsLimit = 10;
   String? questionId = Get.arguments;
   List<String> statusList = [
-    MyStrings.writingStatus0,
-    MyStrings.writingStatus1,
-    MyStrings.writingStatus2,
-    MyStrings.writingStatus3
+    tr('writingStatus0'),
+    tr('writingStatus1'),
+    tr('writingStatus2'),
+    tr('writingStatus3')
   ];
   List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
@@ -101,7 +101,7 @@ class _WritingListState extends State<WritingList> {
             data: content,
             style: {
               'p': Style(
-                  fontFamily: 'KoreanFont', fontSize: FontSize(15), lineHeight: LineHeight.number(1.5)),
+                  fontFamily: 'KoreanFont', fontSize: const FontSize(15), lineHeight: LineHeight.number(1.5)),
             },
           ),
         ),
@@ -142,9 +142,9 @@ class _WritingListState extends State<WritingList> {
             Row(
               children: [
                 MyWidget().getRoundedContainer(
-                    widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white),
+                    widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
                     radius: 20,
-                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
                     bgColor: statusColors[status]),
                 const SizedBox(width: 10),
                 Expanded(
@@ -198,7 +198,7 @@ class _WritingListState extends State<WritingList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyWidget().getTextWidget(text: writing.userName ?? MyStrings.unNamed, color: MyColors.grey),
+                MyWidget().getTextWidget(text: writing.userName ?? tr('unNamed'), color: MyColors.grey),
               ],
             ),
             const Divider(),
@@ -218,8 +218,8 @@ class _WritingListState extends State<WritingList> {
 
   @override
   void dispose() {
-    super.dispose();
     scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -238,65 +238,70 @@ class _WritingListState extends State<WritingList> {
       }
     });
 
-    return Scaffold(
-      appBar: isMyWritings ? null : MyWidget().getAppbar(title: MyStrings.viewOtherUsersWriting),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 15),
-              child: MyWidget().getTextWidget(text: MyStrings.myWritings, color: MyColors.purple, isBold: true, size: 18),
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  GetBuilder<WritingController>(
-                    builder: (_) {
-                      return Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: isLoaded && writings.isEmpty
-                                  ? Center(
-                                      child: MyWidget().getTextWidget(
-                                        text: MyStrings.noWritings,
-                                        color: MyColors.purple,
-                                        size: 20,
-                                        isBold: true,
-                                      ),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: writings.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 30),
-                                          child: getWritingList(index),
-                                        );
-                                      },
-                                    ),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  Obx(() => Offstage(
-                        offstage: !controller.isLoading.value,
-                        child: Stack(
-                          children: const [
-                            Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
-                            Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          ],
-                        ),
-                      ))
-                ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: Scaffold(
+        appBar: isMyWritings ? null : MyWidget().getAppbar(title: tr('viewOtherUsersWriting')),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 15),
+                child: MyWidget().getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
               ),
-            ),
-          ],
+              Expanded(
+                child: Stack(
+                  children: [
+                    GetBuilder<WritingController>(
+                      builder: (_) {
+                        return Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: isLoaded && writings.isEmpty
+                                    ? Center(
+                                        child: MyWidget().getTextWidget(
+                                          text: tr('noWritings'),
+                                          color: MyColors.purple,
+                                          size: 20,
+                                          isBold: true,
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        itemCount: writings.length,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(bottom: 30),
+                                            child: getWritingList(index),
+                                          );
+                                        },
+                                      ),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    Obx(() => Offstage(
+                          offstage: !controller.isLoading.value,
+                          child: Stack(
+                            children: const [
+                              Opacity(opacity: 0.3, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                              Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            ],
+                          ),
+                        ))
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

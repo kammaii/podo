@@ -1,10 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
-import 'package:animated_icon/animated_icon.dart';
+import 'dart:typed_data';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -20,7 +22,10 @@ import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:scratcher/scratcher.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -32,7 +37,6 @@ class LessonFrame extends StatefulWidget {
 class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStateMixin {
   final lesson = Get.arguments;
   int thisIndex = 0;
-  ScrollPhysics scrollPhysics = const AlwaysScrollableScrollPhysics();
   final controller = Get.find<LessonController>();
   final KO = 'ko';
   final PRONUN = 'pronun';
@@ -41,22 +45,32 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   final EX3 = 'ex3';
   final EX4 = 'ex4';
   final AUDIO = 'audio';
+  final VIDEO = 'video';
   final FILE_NAME = 'fileName';
   final SPEAKING = 'speaking';
   String fo = User().language;
   bool isLoading = true;
   List<LessonCard> cards = [];
-  Map<int, GlobalKey<ScratcherState>> scratchKey = {};
-  bool isScratchTextVisible = true;
   List<String> examples = [];
   late String answer;
   int selectedAnswer = -1;
   Color quizBorderColor = Colors.white;
   SwiperController swiperController = SwiperController();
-  Map<String, String> audios = {};
+  Map<String, String> audioPaths = {};
   late AnimationController animationController;
   late Animation<Offset> animationOffset;
   late Widget bottomWidget;
+  final Map<String, Uint8List> _imageCache = {};
+
+  Widget _getCachedImage(String base64Str) {
+    if (_imageCache.containsKey(base64Str)) {
+      return Image.memory(_imageCache[base64Str]!, fit: BoxFit.cover);
+    } else {
+      var bytes = base64.decode(base64Str);
+      _imageCache[base64Str] = bytes;
+      return Image.memory(bytes, fit: BoxFit.cover);
+    }
+  }
 
   Widget getCards(int index) {
     LessonCard card = cards[index];
@@ -68,10 +82,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = Column(
           children: [
             Row(
-              children: const [
-                Icon(Icons.flag_outlined, size: 18),
-                SizedBox(height: 10),
-                Text(MyStrings.newExpression),
+              children: [
+                const Icon(Icons.flag_outlined, size: 18),
+                const SizedBox(height: 10),
+                Text(tr('newExpression')),
               ],
             ),
             Expanded(
@@ -106,11 +120,22 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               child: SingleChildScrollView(
                 child: Html(
                   data: card.content[fo],
+                  customRender: {
+                    "img": (renderContext, child) {
+                      var attributes = renderContext.tree.element!.attributes;
+                      var src = attributes["src"];
+                      if (src != null && src.startsWith("data:image")) {
+                        var base64Str = src.split(",")[1];
+                        return _getCachedImage(base64Str);
+                      }
+                      return child;
+                    },
+                  },
                   style: {
                     'p': Style(
                         fontFamily: 'EnglishFont',
-                        fontSize: FontSize(15),
-                        lineHeight: LineHeight.number(1.5)),
+                        fontSize: const FontSize(17),
+                        lineHeight: LineHeight.number(1.3)),
                   },
                 ),
               ),
@@ -126,7 +151,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               children: [
                 const Icon(Icons.hearing, size: 18),
                 const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.listenAndRepeat),
+                MyWidget().getTextWidget(text: tr('listenAndRepeat')),
               ],
             ),
             const SizedBox(height: 50),
@@ -169,12 +194,17 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         child: MyWidget()
                             .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
-                      const SizedBox(height: 10),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: MyWidget().getTextWidget(
-                            text: card.content[PRONUN], size: 20, color: Colors.black, isKorean: true),
-                      ),
+                      const SizedBox(height: 20),
+                      card.content[PRONUN] != null
+                          ? FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: MyWidget().getTextWidget(
+                                  text: '[${card.content[PRONUN]}]',
+                                  size: 18,
+                                  color: Colors.black,
+                                  isKorean: true),
+                            )
+                          : const SizedBox.shrink(),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -189,78 +219,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         );
         break;
 
-      case MyStrings.speaking:
-        if (!scratchKey.containsKey(index)) {
-          scratchKey[index] = GlobalKey<ScratcherState>();
-        }
-        widget = Column(
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.emoji_emotions_outlined, size: 18),
-                const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.speakInKorean),
-              ],
-            ),
-            const SizedBox(height: 50),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Listener(
-                    onPointerDown: (event) {
-                      setState(() {
-                        scrollPhysics = const NeverScrollableScrollPhysics();
-                        isScratchTextVisible = false;
-                      });
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Scratcher(
-                          key: scratchKey[index],
-                          color: MyColors.grey,
-                          onScratchEnd: () {
-                            setState(() {
-                              scratchKey[index]!.currentState!.reset(duration: const Duration(milliseconds: 500));
-                              scrollPhysics = const AlwaysScrollableScrollPhysics();
-                              isScratchTextVisible = true;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                            child: MyWidget().getTextWidget(
-                              text: card.content[KO],
-                              size: 30,
-                              color: Colors.black,
-                              isKorean: true,
-                            ),
-                          ),
-                        ),
-                        isScratchTextVisible
-                            ? MyWidget().getTextWidget(
-                                text: MyStrings.scratch,
-                                color: MyColors.grey,
-                                size: 12,
-                              )
-                            : const SizedBox.shrink(),
-                      ],
-                    ),
-                  ),
-                  MyWidget().getTextWidget(
-                    text: card.content[fo],
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-            )
-          ],
-        );
-        break;
-
       case MyStrings.mention:
-        bool hasKo;
-        card.content[KO] == null ? hasKo = false : hasKo = true;
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -270,15 +229,29 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Offstage(
-                    offstage: !hasKo,
-                    child: hasKo
-                        ? Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
+                      offstage: card.content[KO] == null,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
+                      )),
                   MyWidget().getTextWidget(text: card.content[fo], size: 20),
+                  card.content[VIDEO] != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: YoutubePlayer(
+                            controller: YoutubePlayerController(
+                              initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
+                              flags: const YoutubePlayerFlags(),
+                            ),
+                            actionsPadding: const EdgeInsets.all(10),
+                            bottomActions: [
+                              CurrentPosition(),
+                              const SizedBox(width: 10),
+                              ProgressBar(isExpanded: true),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -293,7 +266,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               children: [
                 const Icon(Icons.lightbulb_outline, size: 18),
                 const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: MyStrings.nativesTip),
+                MyWidget().getTextWidget(text: tr('nativesTip')),
               ],
             ),
             Expanded(
@@ -306,85 +279,84 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.quiz:
-        if (index == thisIndex) {}
-        if (examples.isEmpty) {
+        if (index == thisIndex && examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
           examples.shuffle(Random());
         }
-        widget = Listener(
-          onPointerDown: (event) {
-            setState(() {
-              scrollPhysics = const NeverScrollableScrollPhysics();
-            });
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.question_mark_rounded, size: 18),
-                  const SizedBox(width: 8),
-                  MyWidget().getTextWidget(text: MyStrings.takeQuiz),
-                ],
-              ),
-              const SizedBox(height: 50),
-              MyWidget().getTextWidget(text: card.content[KO], size: 15, color: Colors.black),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: examples.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedAnswer = index;
-                          if (examples[index] == answer) {
-                            scrollPhysics = const AlwaysScrollableScrollPhysics();
-                            quizBorderColor = MyColors.purple;
-                            Future.delayed(const Duration(seconds: 1), () {
-                              swiperController.move(thisIndex + 1);
+        String question;
+        if (card.content[KO] == null || card.content[KO].toString().isEmpty) {
+          question = card.content[fo];
+        } else {
+          question = card.content[KO];
+        }
+        widget = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.question_mark_rounded, size: 18),
+                const SizedBox(width: 8),
+                MyWidget().getTextWidget(text: tr('takeQuiz')),
+              ],
+            ),
+            const SizedBox(height: 50),
+            MyWidget().getTextWidget(text: question, size: 15, color: Colors.black),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: examples.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedAnswer = index;
+                        if (examples[index] == answer) {
+                          quizBorderColor = MyColors.purple;
+                          PlayAudio().playCorrect();
+                          Future.delayed(const Duration(seconds: 1), () {
+                            swiperController.move(thisIndex + 1);
+                            quizBorderColor = Colors.white;
+                          });
+                        } else {
+                          quizBorderColor = MyColors.red;
+                          PlayAudio().playWrong();
+                          Future.delayed(const Duration(seconds: 1), () {
+                            setState(() {
                               quizBorderColor = Colors.white;
                             });
-                          } else {
-                            quizBorderColor = MyColors.red;
-                            Future.delayed(const Duration(seconds: 1), () {
-                              setState(() {
-                                quizBorderColor = Colors.white;
-                              });
-                            });
-                          }
-                          //todo: 효과음 재생
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: selectedAnswer == index ? quizBorderColor : Colors.white),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 0.5,
-                                  blurRadius: 3,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                            child:
-                                MyWidget().getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
-                          ),
+                          });
+                        }
+                        //todo: 효과음 재생
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: selectedAnswer == index ? quizBorderColor : Colors.white),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 0.5,
+                                blurRadius: 3,
+                                offset: const Offset(0, 2),
+                              )
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          child:
+                              MyWidget().getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         );
         break;
 
@@ -411,84 +383,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
   }
 
-  void animationListener() {
-    bottomWidget = const SizedBox.shrink();
-  }
-
-  setBottomWidget() {
-    animationController.removeListener(animationListener);
-    LessonCard card = cards[thisIndex];
-    if (card.content.containsKey(AUDIO)) {
-      bottomWidget = Column(
-        children: [
-          MyWidget().getTextWidget(
-            text: MyStrings.practice3Times,
-            size: 15,
-            color: MyColors.grey,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              getSpeedBtn(isNormal: true),
-              const SizedBox(width: 20),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircularPercentIndicator(
-                    radius: 30,
-                    lineWidth: 4,
-                    percent: controller.audioProgress,
-                    animateFromLastPercent: true,
-                    progressColor: MyColors.purple,
-                  ),
-                  IconButton(
-                    iconSize: 60,
-                    onPressed: () {
-                      controller.playAudio();
-                    },
-                    icon: const Icon(
-                      Icons.play_arrow_rounded,
-                      color: MyColors.purple,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 20),
-              getSpeedBtn(isNormal: false),
-            ],
-          )
-        ],
-      );
-      toggleBottomAudioWidget(true);
-    } else if (card.type == SPEAKING) {
-      //todo: 클로바 실행
-      bottomWidget = Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          MyWidget().getTextWidget(
-            text: MyStrings.imListening,
-            size: 15,
-            color: MyColors.grey,
-          ),
-          const SizedBox(height: 20),
-          AnimateIcon(
-            onTap: () {},
-            iconType: IconType.continueAnimation,
-            animateIcon: AnimateIcons.activity,
-            color: MyColors.purple,
-            height: 70,
-            width: 70,
-          ),
-        ],
-      );
-      toggleBottomAudioWidget(true);
-    } else {
-      animationController.addListener(animationListener);
-      toggleBottomAudioWidget(false);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -510,23 +404,38 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     Future.wait([
       Database().getDocs(query: query),
       CloudStorage().getLessonAudios(lessonId: lesson.id),
-    ]).then((snapshots) {
+    ]).then((snapshots) async {
+      Map<String, bool> flashcardMap = {};
+      for (dynamic snapshot in snapshots[0]) {
+        LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
+        if (card.type == MyStrings.repeat) {
+          flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
+        }
+        cards.add(card);
+      }
+      controller.hasFlashcard.value = flashcardMap.obs;
+      Map<String, String> audios = {};
+      for (dynamic snapshot in snapshots[1]) {
+        audios.addAll(snapshot);
+      }
+      await cacheFiles(audios);
       setState(() {
-        Map<String, bool> flashcardMap = {};
-        for (dynamic snapshot in snapshots[0]) {
-          LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
-          if (card.type == MyStrings.repeat) {
-            flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
-          }
-          cards.add(card);
-        }
-        controller.hasFlashcard.value = flashcardMap.obs;
-        for (dynamic snapshot in snapshots[1]) {
-          audios.addAll(snapshot);
-        }
         isLoading = false;
       });
     });
+  }
+
+  Future<void> cacheFiles(Map<String, String> snapshots) async {
+    final directory = await getTemporaryDirectory();
+    audioPaths = {};
+
+    for (var fileName in snapshots.keys) {
+      final url = snapshots[fileName];
+      final response = await http.get(Uri.parse(url!));
+      final File file = File('${directory.path}/$fileName.m4a');
+      await file.writeAsBytes(response.bodyBytes);
+      audioPaths[fileName] = file.path;
+    }
   }
 
   @override
@@ -549,12 +458,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    if (!isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setBottomWidget();
-      });
-    }
-
     return Scaffold(
       appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
       body: isLoading
@@ -584,7 +487,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       itemCount: cards.length + 1,
                       viewportFraction: 0.8,
                       scale: 0.8,
-                      physics: scrollPhysics,
                       onIndexChanged: (index) {
                         if (index >= cards.length) {
                           Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
@@ -592,11 +494,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         } else {
                           setState(() {
                             thisIndex = index;
+                            examples.clear();
                             PlayAudio().player.stop();
                             if (cards[thisIndex].content.containsKey(AUDIO)) {
                               String fileName = cards[thisIndex].content[AUDIO];
-                              if (audios.containsKey(fileName)) {
-                                controller.setAudioUrlAndPlay(url: audios[fileName]!);
+                              if (audioPaths.containsKey(fileName)) {
+                                String path = audioPaths[fileName]!;
+                                controller.setAudioPathAndPlay(path: path);
                               }
                             }
                           });
@@ -618,7 +522,57 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                 padding: const EdgeInsets.only(bottom: 30),
                                 child: GetBuilder<LessonController>(
                                   builder: (_) {
-                                    return bottomWidget;
+                                    LessonCard card = cards[thisIndex];
+                                    if (card.content.containsKey(AUDIO)) {
+                                      toggleBottomAudioWidget(true);
+                                      return Column(
+                                        children: [
+                                          Visibility(
+                                            visible: card.type == MyStrings.repeat,
+                                            child: MyWidget().getTextWidget(
+                                              text: tr('practice3Times'),
+                                              size: 15,
+                                              color: MyColors.grey,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              getSpeedBtn(isNormal: true),
+                                              const SizedBox(width: 20),
+                                              Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  CircularPercentIndicator(
+                                                    radius: 30,
+                                                    lineWidth: 4,
+                                                    percent: controller.audioProgress,
+                                                    animateFromLastPercent: true,
+                                                    progressColor: MyColors.purple,
+                                                  ),
+                                                  IconButton(
+                                                    iconSize: 60,
+                                                    onPressed: () {
+                                                      controller.playAudio();
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.play_arrow_rounded,
+                                                      color: MyColors.purple,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(width: 20),
+                                              getSpeedBtn(isNormal: false),
+                                            ],
+                                          )
+                                        ],
+                                      );
+                                    } else {
+                                      toggleBottomAudioWidget(false);
+                                      return const SizedBox.shrink();
+                                    }
                                   },
                                 ),
                               ),
@@ -675,7 +629,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Center(
           child: MyWidget().getTextWidget(
-              text: isNormal ? MyStrings.normal : MyStrings.speedDown, color: MyColors.purple, isBold: true),
+              text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
         ),
       ),
     );

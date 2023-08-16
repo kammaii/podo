@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,7 @@ class Login extends StatelessWidget {
       child: Center(
         child: FlutterLogin(
           logo: 'assets/images/logo.png',
-          title: MyStrings.welcome,
+          title: tr('welcome'),
           theme: LoginTheme(
               primaryColor: MyColors.purple,
               pageColorLight: MyColors.green,
@@ -140,14 +141,14 @@ class Login extends StatelessWidget {
                 print('USER: $user');
                 await _sendEmailVerificationLink(user.email!);
                 Get.dialog(Stack(
-                  children: const [
-                    Offstage(
+                  children: [
+                    const Offstage(
                       offstage: false,
                       child: Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
                     ),
                     AlertDialog(
-                      title: Text(MyStrings.verificationEmailTitle),
-                      content: Text(MyStrings.verificationEmailContent),
+                      title: Text(tr('verificationEmailTitle')),
+                      content: Text(tr('verificationEmailContent')),
                     ),
                   ],
                 ));

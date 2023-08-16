@@ -8,10 +8,11 @@ class LessonCourseController extends GetxController {
 
   bool isVisible = false;
   List<List<LessonCourse>> courses = [[],[]];
+  String hangulCourseId = "5e742744-f494-474f-8729-0ec0468fc069";
 
 
   Future<void> loadCourses() async {
-    final Query query = FirebaseFirestore.instance.collection('LessonCourses');
+    final Query query = FirebaseFirestore.instance.collection('LessonCourses').where('isReleased', isEqualTo: true);
     List<dynamic> snapshots = await Database().getDocs(query: query);
     courses = [[],[]];
     for(dynamic snapshot in snapshots) {
@@ -24,14 +25,30 @@ class LessonCourseController extends GetxController {
     }
     courses[0].sort((a,b) => a.orderId.compareTo(b.orderId));
     courses[1].sort((a,b) => a.orderId.compareTo(b.orderId));
-    if(LocalStorage().getLessonCourse() == null) {
+    LessonCourse? course = LocalStorage().getLessonCourse();
+    bool isCourseExist = false;
+    if(course != null) {
+      isCourseExist = checkExist(course.id);
+    }
+    if(!isCourseExist) {
       isVisible = true;
     }
+  }
+
+  bool checkExist(String id) {
+    for(List<LessonCourse> list in courses) {
+      for(LessonCourse course in list) {
+        if(course.id == id) {
+          LocalStorage().setLessonCourse(course);
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   setVisibility(bool isVisible) {
     this.isVisible = isVisible;
     update();
   }
-
 }

@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:podo/common/database.dart';
 
-class CloudMessage {
-  CloudMessage._init();
-  static final CloudMessage _instance = CloudMessage._init();
+class PodoMessage {
+  PodoMessage._init();
+  static final PodoMessage _instance = PodoMessage._init();
 
-  factory CloudMessage() {
+  factory PodoMessage() {
     return _instance;
   }
 
@@ -14,16 +14,19 @@ class CloudMessage {
   String? content;
   DateTime? dateStart;
   DateTime? dateEnd;
-  bool? isInDate;
+  bool isActive = false;
+  late bool hasBestReply;
 
   static const String ID = 'id';
   static const String TITLE = 'title';
   static const String CONTENT = 'content';
   static const String DATE_START = 'dateStart';
   static const String DATE_END = 'dateEnd';
+  static const String IS_ACTIVE = 'isActive';
+  static const String HAS_BEST_REPLY = 'hasBestReply';
 
-  Future<void> getCloudMessage() async {
-    final Query query = FirebaseFirestore.instance.collection('CloudMessages').where('isActive', isEqualTo: true);
+  Future<void> getPodoMessage() async {
+    final Query query = FirebaseFirestore.instance.collection('PodoMessages').where('isActive', isEqualTo: true);
     List<dynamic> snapshots = await Database().getDocs(query: query);
     if(snapshots.isNotEmpty) {
       final json = snapshots[0].data();
@@ -34,8 +37,8 @@ class CloudMessage {
       dateStart = stamp.toDate();
       stamp = json[DATE_END];
       dateEnd = stamp.toDate();
-      DateTime now = DateTime.now();
-      (now.isAfter(dateStart!) && now.isBefore(dateEnd!)) ? isInDate = true : isInDate = false;
+      isActive = json[IS_ACTIVE];
+      hasBestReply = json[HAS_BEST_REPLY];
     }
   }
 }

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:uuid/uuid.dart';
 
-class CloudReply {
+class PodoMessageReply {
   late String id;
   late String userId;
   late String userName;
@@ -10,7 +10,7 @@ class CloudReply {
   late DateTime date;
   late bool isSelected;
 
-  CloudReply(String text) {
+  PodoMessageReply(String text) {
     id = const Uuid().v4();
     userId = User().id;
     userName = User().name;
@@ -35,7 +35,7 @@ class CloudReply {
     IS_SELECTED: isSelected,
   };
 
-  CloudReply.fromJson(Map<String, dynamic> json) {
+  PodoMessageReply.fromJson(Map<String, dynamic> json) {
     id = json[ID];
     userId = json[USER_ID];
     userName = json[USER_NAME];

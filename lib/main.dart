@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/fcm_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
@@ -17,8 +19,8 @@ import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/login/logo.dart';
 import 'package:podo/screens/main_frame.dart';
-import 'package:podo/screens/message/cloud_message.dart';
-import 'package:podo/screens/message/cloud_message_main.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_main.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
@@ -28,7 +30,8 @@ import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'firebase_options.dart';
-
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -39,6 +42,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  await EasyLocalization.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -46,7 +50,20 @@ void main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  runApp(MyApp());
+  runApp(EasyLocalization(
+    supportedLocales: const [
+      Locale('en'),
+      Locale('es'),
+      Locale('fr'),
+      Locale('de'),
+      Locale('pt'),
+      Locale('in'),
+      Locale('ru'),
+    ],
+    path: 'assets/translations',
+    fallbackLocale: const Locale('en'),
+    child: MyApp())
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -93,10 +110,11 @@ class MyApp extends StatelessWidget {
 
   getInitData() async {
     await user.User().getUser();
+    FirebaseMessaging.instance.subscribeToTopic('allUsers');
     await LocalStorage().getPrefs();
     final courseController = Get.put(LessonCourseController());
     await courseController.loadCourses();
-    await CloudMessage().getCloudMessage();
+    await PodoMessage().getPodoMessage();
     Get.put(WritingController());
     Get.toNamed(MyStrings.routeMainFrame);
     String thisOs = os.toString().split('.').last;
@@ -112,6 +130,30 @@ class MyApp extends StatelessWidget {
 
     initDynamicLinks();
     Get.put(FcmController());
+
+    FirebaseInAppMessaging.instance;
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      if (message.notification != null) {
+        PlayAudio().playAlarm();
+        switch (message.data['tag']) {
+          case 'podo_message' :
+            MyWidget().showSnackbarWithPodo(
+              title: tr('podosMsg'),
+              content: message.notification!.body!,
+            );
+            break;
+
+          case 'writing' :
+            MyWidget().showSnackbarWithPodo(
+              title: message.notification!.title!,
+              content: message.notification!.body!,
+            );
+            break;
+        }
+      }
+    });
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
@@ -150,8 +192,11 @@ class MyApp extends StatelessWidget {
         GetPage(name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
         GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),
         GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
-        GetPage(name: MyStrings.routeCloudMessageMain, page: () => CloudMessageMain()),
+        GetPage(name: MyStrings.routePodoMessageMain, page: () => PodoMessageMain()),
       ],
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
     );
   }
 }

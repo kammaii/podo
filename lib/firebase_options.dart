@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA8UMNwruFZ9e07l_-cEAHhYz_71O9D2bM',
-    appId: '1:1025269170157:android:bf2e3c7bc448333cfcf1e4',
+    appId: '1:1025269170157:android:81e89893bd00fbd3fcf1e4',
     messagingSenderId: '1025269170157',
     projectId: 'podo-49335',
     storageBucket: 'podo-49335.appspot.com',
@@ -59,11 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDl6pIQgKsdsVgeP5QwKDkEh-KTGYiQCRk',
-    appId: '1:1025269170157:ios:f413de2a58a6d1befcf1e4',
+    appId: '1:1025269170157:ios:bf1db4ca54970228fcf1e4',
     messagingSenderId: '1025269170157',
     projectId: 'podo-49335',
     storageBucket: 'podo-49335.appspot.com',
-    iosClientId: '1025269170157-bo8encbak25jgt9cpkdkh9rtm71nv1q8.apps.googleusercontent.com',
-    iosBundleId: 'net.awesomekorean.podo',
+    androidClientId: '1025269170157-d0tq6uta9rp3jrtcns8hth1bps6rnvrn.apps.googleusercontent.com',
+    iosClientId: '1025269170157-vivongh8rhgvsetif1baaehpqigt5a9a.apps.googleusercontent.com',
+    iosBundleId: 'net.awesomekorean.newpodo',
   );
 }

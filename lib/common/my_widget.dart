@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -249,9 +250,9 @@ class MyWidget {
                 onPressed: (){
                   Get.back();
                 },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 13),
-                  child: Text(MyStrings.no, style: TextStyle(color: MyColors.purple)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  child: Text(tr('no'), style: const TextStyle(color: MyColors.purple)),
                 ),
               ),
             ),
@@ -268,9 +269,9 @@ class MyWidget {
                   Get.back();
                   yesFn();
                 },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 13),
-                  child: Text(MyStrings.yes, style: TextStyle(color: Colors.white)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  child: Text(tr('yes'), style: const TextStyle(color: Colors.white)),
                 ),
               ),
             ),
@@ -295,7 +296,7 @@ class MyWidget {
     );
   }
 
-  showSnackbarWithPodo({String title = '', String content = ''}) {
+  showSnackbarWithPodo({String title = '', String content = '', int duration = 2000}) {
     Get.snackbar(
       title,
       content,
@@ -305,7 +306,7 @@ class MyWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Image.asset('assets/images/podo.png'),
       ),
-      duration: const Duration(milliseconds: 2000),
+      duration: Duration(milliseconds: duration),
     );
   }
 }

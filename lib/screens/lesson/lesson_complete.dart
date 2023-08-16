@@ -1,5 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:confetti/confetti.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -49,7 +51,7 @@ class LessonComplete extends StatelessWidget {
     //todo: await FirebaseAnalytics.instance.logEvent(name: 'first_lesson_complete');
     Get.dialog(AlertDialog(
       title: Image.asset('assets/images/podo.png', width: 50, height: 50),
-      content: MyWidget().getTextWidget(text: MyStrings.trialComment, isTextAlignCenter: true, size: 16),
+      content: MyWidget().getTextWidget(text: tr('trialComment'), isTextAlignCenter: true, size: 16),
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.all(20),
       actions:  [
@@ -74,11 +76,11 @@ class LessonComplete extends StatelessWidget {
               await User().setTrialDenied();
             }
           },
-          child: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 13),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 13),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-              child: Text(MyStrings.cool, style: TextStyle(color: Colors.white)),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
+              child: Text(tr('cool'), style: const TextStyle(color: Colors.white)),
             ),
           ),
         ),
@@ -86,8 +88,13 @@ class LessonComplete extends StatelessWidget {
     ), barrierDismissible: false);
   }
 
+  void playYay() async {
+    PlayAudio().playYay();
+  }
+
   @override
   Widget build(BuildContext context) {
+    playYay();
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
     final lesson = Get.arguments;
@@ -136,7 +143,7 @@ class LessonComplete extends StatelessWidget {
               children: [
                 TextLiquidFill(
                   loadDuration: const Duration(seconds: 2),
-                  text: MyStrings.congratulations,
+                  text: tr('congratulations'),
                   textStyle: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
                   waveColor: MyColors.purple,
                   boxBackgroundColor: MyColors.purpleLight,
@@ -151,7 +158,7 @@ class LessonComplete extends StatelessWidget {
                   height: 20,
                 ),
                 MyWidget().getTextWidget(
-                  text: MyStrings.lessonComplete,
+                  text: tr('lessonComplete'),
                   size: 20,
                   color: MyColors.purple,
                 ),
@@ -162,23 +169,28 @@ class LessonComplete extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        getBtn(MyStrings.summary, CupertinoIcons.doc_text, () {
-                          showAd(() {
-                            Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
-                          });
-                        }),
-                        const SizedBox(height: 20),
-                        getBtn(MyStrings.writing, CupertinoIcons.pen, () {
-                          if(User().status == 2 || User().status == 3) {
-                            Get.offNamedUntil(
-                                MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
-                                arguments: lesson.id);
-                          } else {
-                            Get.toNamed(MyStrings.routePremiumMain);
-                          }
-                        }),
-                        const SizedBox(height: 20),
-                        getBtn(MyStrings.nextLesson, CupertinoIcons.arrow_right, () {
+                        !lessonController.isHangulLesson ?
+                        Column(
+                          children: [
+                            getBtn(tr('summary'), CupertinoIcons.doc_text, () {
+                              showAd(() {
+                                Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
+                              });
+                            }),
+                            const SizedBox(height: 20),
+                            getBtn(tr('writing'), CupertinoIcons.pen, () {
+                              if(User().status == 2 || User().status == 3) {
+                                Get.offNamedUntil(
+                                    MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
+                                    arguments: lesson.id);
+                              } else {
+                                Get.toNamed(MyStrings.routePremiumMain);
+                              }
+                            }),
+                            const SizedBox(height: 20),
+                          ],
+                        ) : const SizedBox.shrink(),
+                        getBtn(tr('nextLesson'), CupertinoIcons.arrow_right, () {
                           showAd(() {
                             LessonCourse course = LocalStorage().getLessonCourse()!;
                             List<dynamic> lessons = course.lessons;
@@ -201,12 +213,12 @@ class LessonComplete extends StatelessWidget {
                                   arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
                             } else {
                               Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
-                              MyWidget().showSnackbar(title: MyStrings.lastLesson);
+                              MyWidget().showSnackbar(title: tr('lastLesson'));
                             }
                           });
                         }),
                         const SizedBox(height: 20),
-                        getBtn(MyStrings.goToMain, CupertinoIcons.home, () {
+                        getBtn(tr('goToMain'), CupertinoIcons.home, () {
                           showAd(() {
                             Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
                           });

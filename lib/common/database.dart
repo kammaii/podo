@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -35,12 +36,12 @@ class Database {
   Future<void> setDoc({required String collection, required dynamic doc, Function(dynamic)? thenFn}) async {
     final ref = firestore.collection(collection).doc(doc.id);
     if (thenFn != null) {
-      await ref.set(doc.toJson()).then(thenFn).catchError((e) => Get.snackbar(MyStrings.setError, e));
+      await ref.set(doc.toJson()).then(thenFn).catchError((e) => Get.snackbar(tr('setError'), e));
     } else {
       await ref
           .set(doc.toJson())
           .then((value) => print('setDoc completed'))
-          .catchError((e) => Get.snackbar(MyStrings.setError, e));
+          .catchError((e) => Get.snackbar(tr('setError'), e));
     }
   }
 

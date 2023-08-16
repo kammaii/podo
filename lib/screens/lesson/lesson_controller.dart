@@ -9,7 +9,7 @@ class LessonController extends GetxController {
   late List<bool> audioSpeedToggle;
   RxMap<dynamic, dynamic> hasFlashcard = {}.obs;
   RxMap<dynamic, dynamic> isCompleted = {}.obs;
-
+  bool isHangulLesson = false;
 
 
   @override
@@ -21,9 +21,9 @@ class LessonController extends GetxController {
     audioSpeedToggle = [true, false];
   }
 
-  void setAudioUrlAndPlay({required String url}) async {
+  void setAudioPathAndPlay({required String path}) async {
     print('SETTING URL');
-    duration = await PlayAudio().player.setUrl(url);
+    duration = await PlayAudio().player.setFilePath(path);
     PlayAudio().player.positionStream.listen((position) {
       currentPosition = position;
       if(duration!.inMilliseconds > 0) {

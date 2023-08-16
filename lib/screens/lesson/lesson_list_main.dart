@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
@@ -6,8 +9,8 @@ import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
-import 'package:podo/screens/message/cloud_message.dart';
-import 'package:podo/screens/message/cloud_message_controller.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -23,11 +26,10 @@ class LessonListMain extends StatefulWidget {
 
 class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin {
   ScrollController scrollController = ScrollController();
-  double sliverAppBarHeight = 200.0;
+  double sliverAppBarHeight = 150.0;
   double sliverAppBarStretchOffset = 100.0;
   late LessonCourse course;
   String language = User().language;
-  String sampleImage = 'assets/images/course_hangul.png';
   final KO = 'ko';
   final LESSON = 'Lesson';
   int lessonIndex = -1;
@@ -40,8 +42,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   @override
   void dispose() {
-    super.dispose();
     scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,97 +72,110 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   Widget lessonListWidget(dynamic lessonMap) {
     late Lesson lesson;
+    bool isReleased = true;
+
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
+      if (!lesson.isReleased) {
+        isReleased = false;
+      }
       if (lesson.type == LESSON) {
         lessonIndex++;
       }
     }
 
-    return Column(
-      children: [
-        if (lessonMap is String)
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 5),
-            child: MyWidget().getTextWidget(
-              text: lessonMap,
-              size: 25,
-              color: MyColors.navyLight,
-            ),
-          )
-        else
-          Stack(
+    return isReleased
+        ? Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
+              if (lessonMap is String)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 5),
+                  child: MyWidget().getTextWidget(
+                    text: lessonMap,
+                    size: 25,
+                    color: MyColors.navyLight,
                   ),
-                  color: Colors.white,
-                  child: InkWell(
-                    onTap: () async {
-                      //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
-                      Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              MyWidget().getTextWidget(
-                                text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
-                                color: MyColors.grey,
-                              ),
-                              const SizedBox(width: 10),
-                              Obx(
-                                () => lessonController.isCompleted[lesson.id]
-                                    ? const Icon(
-                                        Icons.check_circle,
-                                        color: MyColors.green,
-                                      )
-                                    : const SizedBox.shrink(),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          MyWidget().getTextWidget(
-                            text: lesson.title[KO],
-                            size: 20,
-                            color: MyColors.navy,
-                          ),
-                          const SizedBox(height: 10),
-                          MyWidget().getTextWidget(
-                            text: lesson.title[language],
-                            color: MyColors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              lesson.tag != null
-                  ? Positioned(
-                      top: 5,
-                      right: 15,
-                      child: Container(
-                          decoration: BoxDecoration(
-                            color: MyColors.pink,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(cardBorderRadius),
-                              bottomLeft: Radius.circular(cardBorderRadius),
+                )
+              else
+                Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(cardBorderRadius),
+                        ),
+                        color: Colors.white,
+                        child: InkWell(
+                          onTap: () async {
+                            //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                            if (course.id == courseController.hangulCourseId) {
+                              lessonController.isHangulLesson = true;
+                              Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                            } else {
+                              lessonController.isHangulLesson = false;
+                              Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    MyWidget().getTextWidget(
+                                      text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
+                                      color: MyColors.grey,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Obx(
+                                      () => lessonController.isCompleted[lesson.id]
+                                          ? const Icon(
+                                              Icons.check_circle,
+                                              color: MyColors.green,
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                  text: lesson.title[KO],
+                                  size: 20,
+                                  color: MyColors.navy,
+                                ),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                  text: lesson.title[language],
+                                  color: MyColors.grey,
+                                ),
+                              ],
                             ),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          child: const Text('New', style: TextStyle(color: MyColors.red))))
-                  : const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                    lesson.tag != null
+                        ? Positioned(
+                            top: 4,
+                            right: 14,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: MyColors.pink,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(cardBorderRadius),
+                                    bottomLeft: Radius.circular(cardBorderRadius),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
+                        : const SizedBox.shrink(),
+                  ],
+                ),
             ],
-          ),
-      ],
-    );
+          )
+        : const SizedBox.shrink();
   }
 
   sliverAppBar() {
@@ -183,7 +198,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       pinned: true,
       stretch: true,
       title: MyWidget().getTextWidget(
-        text: '${course.title[language]} ($lessonCount ${MyStrings.lessons})',
+        text: '${course.title[language]} ($lessonCount ${tr('lessons')})',
         size: 18,
         color: MyColors.purple,
         isBold: true,
@@ -193,19 +208,22 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           Container(
             color: MyColors.purpleLight,
           ),
-          Positioned(
-            top: -50,
-            right: -30,
-            child: FadeTransition(
-              opacity: animation,
-              child: Image.asset(
-                sampleImage,
-                width: 250,
-              ),
-            ),
-          ),
-          Obx(() => LinearProgressIndicator(
-              value: lessonController.isCompleted.values.where((value) => value == true).length / lessonController.isCompleted.length,
+          course.image != null
+              ? Positioned(
+                  top: -30,
+                  right: -30,
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: course.image != null
+                        ? Image.memory(base64Decode(course.image!), gaplessPlayback: true, width: 200)
+                        : const SizedBox.shrink(),
+                  ),
+                )
+              : const SizedBox.shrink(),
+          Obx(
+            () => LinearProgressIndicator(
+              value: lessonController.isCompleted.values.where((value) => value == true).length /
+                  lessonController.isCompleted.length,
               color: MyColors.purple,
               backgroundColor: MyColors.purpleLight,
             ),
@@ -246,83 +264,90 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
     lessonController.isCompleted.value = map;
     lessonIndex = -1;
-    final cloudController = Get.put(CloudMessageController());
-    if (CloudMessage().id != null) {
-      bool hasReplied = LocalStorage().hasHistory(itemId: CloudMessage().id!);
+    final cloudController = Get.put(PodoMessageController());
+    if (PodoMessage().id != null) {
+      bool hasReplied = LocalStorage().hasHistory(itemId: PodoMessage().id!);
       cloudController.setHasReplied(hasReplied);
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Visibility(
-              visible: User().status != 0 && CloudMessage().isInDate != null && CloudMessage().isInDate!,
-              child: InkWell(
-                onTap: () {
-                  Get.toNamed(MyStrings.routeCloudMessageMain);
-                },
-                child: Container(
-                  color: MyColors.navyLight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    child: Row(
-                      children: [
-                        Image.asset('assets/images/podo.png', height: 40, width: 40),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MyWidget().getTextWidget(
-                                  text: CloudMessage().title?[KO] ?? '',
-                                  isKorean: true,
-                                  size: 18,
-                                  color: MyColors.purple,
-                                  maxLine: 1),
-                              const SizedBox(height: 5),
-                              MyWidget().getTextWidget(
-                                  text: CloudMessage().title?[User().language] ?? '',
-                                  color: MyColors.grey,
-                                  size: 13,
-                                  maxLine: 1),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Center(
-                          child: Obx(
-                            () => MyWidget().getRoundedContainer(
-                              radius: 30,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
-                              widget: MyWidget().getTextWidget(
-                                  text: cloudController.hasReplied.value ? MyStrings.replied : MyStrings.replyPodo,
-                                  color: Colors.white,
-                                  size: 13),
+    return RefreshIndicator(
+      onRefresh: () async {
+        await courseController.loadCourses();
+        await PodoMessage().getPodoMessage();
+        setState(() {});
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Visibility(
+                visible: User().status != 0 && PodoMessage().isActive,
+                child: InkWell(
+                  onTap: () {
+                    Get.toNamed(MyStrings.routePodoMessageMain);
+                  },
+                  child: Container(
+                    color: MyColors.navyLight,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Row(
+                        children: [
+                          Image.asset('assets/images/podo.png', height: 40, width: 40),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MyWidget().getTextWidget(
+                                    text: PodoMessage().title?[KO] ?? '',
+                                    isKorean: true,
+                                    size: 18,
+                                    color: MyColors.purple,
+                                    maxLine: 1),
+                                const SizedBox(height: 5),
+                                MyWidget().getTextWidget(
+                                    text: PodoMessage().title?[User().language] ?? '',
+                                    color: MyColors.grey,
+                                    size: 13,
+                                    maxLine: 1),
+                              ],
                             ),
                           ),
-                        )
-                      ],
+                          const SizedBox(width: 10),
+                          Center(
+                            child: Obx(
+                              () => MyWidget().getRoundedContainer(
+                                radius: 30,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
+                                widget: MyWidget().getTextWidget(
+                                    text: cloudController.hasReplied.value ? tr('replied') : tr('replyPodo'),
+                                    color: Colors.white,
+                                    size: 13),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Container(
-                color: MyColors.purpleLight,
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  controller: scrollController,
-                  slivers: [
-                    sliverAppBar(),
-                    sliverList(),
-                  ],
+              Expanded(
+                child: Container(
+                  color: MyColors.purpleLight,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: scrollController,
+                    slivers: [
+                      sliverAppBar(),
+                      sliverList(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
