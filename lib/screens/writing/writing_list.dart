@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -97,12 +97,13 @@ class _WritingListState extends State<WritingList> {
         MyWidget().getTextWidget(text: '$title. ', isBold: true),
         const SizedBox(width: 15),
         Expanded(
-          child: Html(
-            data: content,
-            style: {
-              'p': Style(
-                  fontFamily: 'KoreanFont', fontSize: const FontSize(15), lineHeight: LineHeight.number(1.5)),
-            },
+          child: HtmlWidget(
+            content,
+            textStyle: const TextStyle(
+              fontFamily: 'KoreanFont',
+              fontSize: 15,
+              height: 1.5,
+            ),
           ),
         ),
         Visibility(
