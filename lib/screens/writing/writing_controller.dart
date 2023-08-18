@@ -14,12 +14,12 @@ class WritingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    isChecked = LocalStorage().prefs.getBool(tr('iveReadTheFollowing')) ?? false;
+    isChecked = LocalStorage().prefs!.getBool(tr('iveReadTheFollowing')) ?? false;
   }
 
   setCheckbox(bool? value) {
     isChecked = value!;
-    LocalStorage().prefs.setBool(tr('iveReadTheFollowing'), isChecked);
+    LocalStorage().prefs!.setBool(tr('iveReadTheFollowing'), isChecked);
     update();
   }
 

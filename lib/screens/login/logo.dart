@@ -1,14 +1,116 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
+import 'package:podo/common/database.dart';
+import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
+import 'package:podo/fcm_controller.dart';
+import 'package:podo/screens/lesson/lesson_course_controller.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/writing/writing_controller.dart';
+import 'package:podo/values/my_strings.dart';
+import 'package:podo/screens/my_page/user.dart' as user;
+import 'login.dart';
 
 class Logo extends StatelessWidget {
   Logo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String version = '';
-    PackageInfo.fromPlatform().then((value) {
-      version = value.version;
+    TargetPlatform os = Theme.of(context).platform;
+
+    getInitData() async {
+      await user.User().getUser();
+      FirebaseMessaging.instance.subscribeToTopic('allUsers');
+      await LocalStorage().getPrefs();
+      final courseController = Get.put(LessonCourseController());
+      await courseController.loadCourses();
+      await PodoMessage().getPodoMessage();
+      Get.put(WritingController());
+      Get.toNamed(MyStrings.routeMainFrame);
+      String thisOs = os.toString().split('.').last;
+      if (thisOs != user.User().os) {
+        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: thisOs);
+      }
+    }
+
+    void runDeepLink(Uri deepLink) async {
+      print('RUN DEEPLINK');
+      Uri uri = Uri.parse(deepLink.toString());
+      String mode = uri.queryParameters['mode']!;
+      await FirebaseAuth.instance.currentUser!.reload();
+      User? currentUser = FirebaseAuth.instance.currentUser;
+
+      switch (mode) {
+        case 'verifyEmail':
+          if (currentUser != null && currentUser!.emailVerified) {
+            getInitData();
+          }
+          break;
+
+        case 'cloudMessage':
+          break;
+      }
+    }
+
+    void initDynamicLinks() async {
+      // DynamicLink listener : When the app is already running.
+      FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+        final deepLink = dynamicLinkData.link;
+        runDeepLink(deepLink);
+      }).onError((error) {
+        print('ERROR on DynamicLinkListener: $error');
+      });
+
+      // Get any initial links : When the app is just opened by clicking the deepLink.
+      final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
+      final deepLink = data?.link;
+      if (deepLink != null) {
+        runDeepLink(deepLink);
+      }
+    }
+
+    initDynamicLinks();
+    Get.put(FcmController());
+
+    FirebaseInAppMessaging.instance;
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      if (message.notification != null) {
+        PlayAudio().playAlarm();
+        switch (message.data['tag']) {
+          case 'podo_message' :
+            MyWidget().showSnackbarWithPodo(
+              title: tr('podosMsg'),
+              content: message.notification!.body!,
+            );
+            break;
+
+          case 'writing' :
+            MyWidget().showSnackbarWithPodo(
+              title: message.notification!.title!,
+              content: message.notification!.body!,
+            );
+            break;
+        }
+      }
+    });
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null && user.emailVerified) {
+        print('AUTH STATE CHANGES: Email Verified');
+        getInitData();
+      } else if(user == null) {
+        print('AUTH STATE CHANGES: User is null');
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+      }
     });
 
     return Scaffold(

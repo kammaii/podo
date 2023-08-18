@@ -1,19 +1,16 @@
 import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
+import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/lesson/lesson_list_main.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/my_page/my_page.dart';
