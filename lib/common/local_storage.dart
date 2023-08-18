@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage.init();
-  late final SharedPreferences prefs;
+  SharedPreferences? prefs;
   late String LESSON_COURSE;
   late String FLASHCARDS;
   late String HISTORIES;
@@ -33,21 +33,21 @@ class LocalStorage {
   }
 
   Future<void> getPrefs() async {
+    prefs ??= await SharedPreferences.getInstance();
     if (!isInit) {
       isInit = true;
-      prefs = await SharedPreferences.getInstance();
       await getFlashcards();
       await getHistories();
     }
   }
 
   void setLessonCourse(LessonCourse course) {
-    prefs.setString(LESSON_COURSE, jsonEncode(course.toJson()));
+    prefs!.setString(LESSON_COURSE, jsonEncode(course.toJson()));
   }
 
   LessonCourse? getLessonCourse() {
     LESSON_COURSE = '${User().id}/lessonCourse';
-    String? json = prefs.getString(LESSON_COURSE);
+    String? json = prefs!.getString(LESSON_COURSE);
     if (json != null) {
       return LessonCourse.fromJson(jsonDecode(json));
     } else {
@@ -61,7 +61,7 @@ class LocalStorage {
 
   void setFlashcards() {
     List<String> flashcardsString = flashcards.map((e) => jsonEncode(e.toJson(isLocal: true))).toList();
-    prefs.setStringList(FLASHCARDS, flashcardsString);
+    prefs!.setStringList(FLASHCARDS, flashcardsString);
   }
 
   void convertLocalFlashcards(List<String> localFlashcards) {
@@ -91,7 +91,7 @@ class LocalStorage {
     FLASHCARDS = '${User().id}/flashcards';
     REF_FLASHCARD = 'Users/${User().id}/FlashCards';
     flashcardRef = FirebaseFirestore.instance.collection(REF_FLASHCARD);
-    List<String>? localFlashcards = prefs.getStringList(FLASHCARDS);
+    List<String>? localFlashcards = prefs!.getStringList(FLASHCARDS);
     flashcards = [];
     DateTime? dateOnDB;
     Query query = flashcardRef.orderBy('date', descending: true).limit(1);
@@ -139,7 +139,7 @@ class LocalStorage {
 
   void setHistories() {
     List<String> historiesString = histories.map((e) => jsonEncode(e.toJson(isLocal: true))).toList();
-    prefs.setStringList(HISTORIES, historiesString);
+    prefs!.setStringList(HISTORIES, historiesString);
   }
 
   void downloadHistories() async {
@@ -168,7 +168,7 @@ class LocalStorage {
     HISTORIES = '${User().id}/histories';
     REF_HISTORY = 'Users/${User().id}/Histories';
     historyRef = FirebaseFirestore.instance.collection(REF_HISTORY);
-    List<String>? localHistories = prefs.getStringList(HISTORIES);
+    List<String>? localHistories = prefs!.getStringList(HISTORIES);
     histories = [];
     DateTime? dateOnDB;
     Query query = historyRef.orderBy('date', descending: true).limit(1);

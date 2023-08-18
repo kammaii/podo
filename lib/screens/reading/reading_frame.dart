@@ -48,9 +48,9 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   void dispose() {
     super.dispose();
     if (currentScrollPercent > 0.1 && currentScrollPercent < 0.9) {
-      LocalStorage().prefs.setDouble(readingTitle.id, scrollPosition);
+      LocalStorage().prefs!.setDouble(readingTitle.id, scrollPosition);
     } else {
-      LocalStorage().prefs.remove(readingTitle.id);
+      LocalStorage().prefs!.remove(readingTitle.id);
     }
     scrollController.dispose();
     PlayAudio().reset();
@@ -92,7 +92,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           }
         }));
 
-    double? position = LocalStorage().prefs.getDouble(readingTitle.id);
+    double? position = LocalStorage().prefs!.getDouble(readingTitle.id);
     if (position != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.dialog(AlertDialog(
@@ -255,7 +255,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                             text: tr('complete'),
                             f: () {
                               History().addHistory(item: 'reading', itemId: readingTitle.id);
-                              LocalStorage().prefs.remove(readingTitle.id);
+                              LocalStorage().prefs!.remove(readingTitle.id);
                               controller.isCompleted[readingTitle.id] = true;
                               Get.back();
                             }),

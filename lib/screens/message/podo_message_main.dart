@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:podo/common/database.dart';
@@ -172,7 +172,7 @@ class PodoMessageMain extends StatelessWidget {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left:10, right:10, top: 20, bottom: 100),
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -181,29 +181,27 @@ class PodoMessageMain extends StatelessWidget {
                             children: [
                               ConstrainedBox(
                                 constraints: const BoxConstraints(maxHeight: 3000),
-                                child: Html(
-                                  data: PodoMessage().content,
-                                  style: {
-                                    'p': Style(
-                                        fontFamily: 'EnglishFont',
-                                        fontSize: const FontSize(18),
-                                        lineHeight: LineHeight.number(1.5)),
-                                  },
-                                  customRender: {
-                                    'audio': (renderContext, child) {
-                                      final String audioSrc = renderContext.tree.element!.attributes['src']!;
+                                child: HtmlWidget(
+                                  PodoMessage().content!,
+                                  textStyle: const TextStyle(
+                                    fontFamily: 'EnglishFont',
+                                    fontSize: 18,
+                                    height: 1.5,
+                                  ),
+                                  customWidgetBuilder: (element) {
+                                    if (element.localName == 'audio') {
+                                      final String audioSrc = element.attributes['src']!;
                                       return getAudioPlayer(audioSrc);
-                                    },
-                                    'video': (renderContext, child) {
-                                      final String videoSrc = renderContext.tree.element!.attributes['src']!;
+                                    } else if (element.localName == 'video') {
+                                      final String videoSrc = element.attributes['src']!;
                                       return getVideoPlayer(videoSrc);
-                                    },
-                                    "img": (renderContext, child) {
-                                      final String imageSrc = renderContext.tree.element!.attributes['src']!;
+                                    } else if (element.localName == 'img') {
+                                      final String imageSrc = element.attributes['src']!;
                                       final UriData imageData = UriData.fromUri(Uri.parse(imageSrc));
                                       final Uint8List bytes = imageData.contentAsBytes();
                                       return Image.memory(bytes, width: 200, height: 200);
-                                    },
+                                    }
+                                    return null;
                                   },
                                 ),
                               ),
@@ -338,12 +336,10 @@ class PodoMessageMain extends StatelessWidget {
                             },
                           )
                         : Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 100),
-                          child: MyWidget().getTextWidget(
-                              text: tr('noBestReply'),
-                              color: MyColors.navy,
-                              isTextAlignCenter: true),
-                        ),
+                            padding: const EdgeInsets.symmetric(vertical: 100),
+                            child: MyWidget().getTextWidget(
+                                text: tr('noBestReply'), color: MyColors.navy, isTextAlignCenter: true),
+                          ),
                   ],
                 ),
               ),

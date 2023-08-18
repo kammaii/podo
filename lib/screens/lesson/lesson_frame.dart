@@ -23,9 +23,9 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -118,25 +118,23 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
             const SizedBox(height: 10),
             Expanded(
               child: SingleChildScrollView(
-                child: Html(
-                  data: card.content[fo],
-                  customRender: {
-                    "img": (renderContext, child) {
-                      var attributes = renderContext.tree.element!.attributes;
-                      var src = attributes["src"];
+                child: HtmlWidget(
+                  card.content[fo],
+                  customWidgetBuilder: (element) {
+                    if (element.localName == 'img') {
+                      var src = element.attributes['src'];
                       if (src != null && src.startsWith("data:image")) {
                         var base64Str = src.split(",")[1];
                         return _getCachedImage(base64Str);
                       }
-                      return child;
-                    },
+                    }
+                    return null;
                   },
-                  style: {
-                    'p': Style(
-                        fontFamily: 'EnglishFont',
-                        fontSize: const FontSize(17),
-                        lineHeight: LineHeight.number(1.3)),
-                  },
+                  textStyle: const TextStyle(
+                    fontFamily: 'EnglishFont',
+                    fontSize: 17,
+                    height: 1.3,
+                  ),
                 ),
               ),
             ),
