@@ -156,8 +156,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   sliverAppBar() {
     int wordsLength = 0;
     for (Reading reading in readings) {
-      int length = reading.words[KO].length;
-      wordsLength = wordsLength + length;
+      if(reading.words[KO] != null) {
+        int length = reading.words[KO].length;
+        wordsLength = wordsLength + length;
+      }
     }
 
     return SliverAppBar(
@@ -347,7 +349,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   Widget partWords(int index) {
     Reading reading = readings[index];
-    List<dynamic> wordKoList = reading.words[KO];
+    List<dynamic> wordKoList = reading.words[KO] ?? [];
     List<dynamic> wordFoList = reading.words[fo];
 
     return ListView.builder(

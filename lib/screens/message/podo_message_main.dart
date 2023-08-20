@@ -230,16 +230,6 @@ class PodoMessageMain extends StatelessWidget {
                                 List<PodoMessageReply> replies = [];
                                 for (dynamic snapshot in snapshot.data) {
                                   replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
                                 }
                                 controller.hasFlashcard.value = List.generate(replies.length, (index) => false);
                                 return ListView.builder(
