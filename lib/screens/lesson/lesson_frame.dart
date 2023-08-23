@@ -72,6 +72,44 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
   }
 
+  Widget getHtmlWidget(String html) {
+    return HtmlWidget(
+      html,
+      customWidgetBuilder: (element) {
+        if (element.localName == 'img') {
+          var src = element.attributes['src'];
+          if (src != null && src.startsWith("data:image")) {
+            var base64Str = src.split(",")[1];
+            return _getCachedImage(base64Str);
+          }
+        }
+        return null;
+      },
+      textStyle: const TextStyle(
+        fontFamily: 'EnglishFont',
+        fontSize: 17,
+        height: 1.3,
+      ),
+    );
+  }
+
+  void openDetail(String title, String content) {
+    Get.dialog(AlertDialog(
+      title: Row(
+        children: [
+          GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: const Icon(Icons.arrow_back_ios_rounded, color: MyColors.purple)),
+          const SizedBox(width: 10),
+          Expanded(child: MyWidget().getTextWidget(text: title, color: MyColors.purple, isBold: true, size: 18)),
+        ],
+      ),
+      content: SingleChildScrollView(child: getHtmlWidget(content)),
+    ));
+  }
+
   Widget getCards(int index) {
     LessonCard card = cards[index];
     String type = card.type;
@@ -118,24 +156,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
             const SizedBox(height: 10),
             Expanded(
               child: SingleChildScrollView(
-                child: HtmlWidget(
-                  card.content[fo],
-                  customWidgetBuilder: (element) {
-                    if (element.localName == 'img') {
-                      var src = element.attributes['src'];
-                      if (src != null && src.startsWith("data:image")) {
-                        var base64Str = src.split(",")[1];
-                        return _getCachedImage(base64Str);
-                      }
-                    }
-                    return null;
-                  },
-                  textStyle: const TextStyle(
-                    fontFamily: 'EnglishFont',
-                    fontSize: 17,
-                    height: 1.3,
-                  ),
-                ),
+                child: getHtmlWidget(card.content[fo]),
               ),
             ),
           ],
@@ -223,34 +244,69 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             const Icon(Icons.chat_bubble_outline, size: 18),
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Offstage(
-                      offstage: card.content[KO] == null,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
-                      )),
-                  MyWidget().getTextWidget(text: card.content[fo], size: 20),
-                  card.content[VIDEO] != null
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: YoutubePlayer(
-                            controller: YoutubePlayerController(
-                              initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
-                              flags: const YoutubePlayerFlags(),
-                            ),
-                            actionsPadding: const EdgeInsets.all(10),
-                            bottomActions: [
-                              CurrentPosition(),
-                              const SizedBox(width: 10),
-                              ProgressBar(isExpanded: true),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ],
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Offstage(
+                          offstage: card.content[KO] == null,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
+                          )),
+                      MyWidget().getTextWidget(text: card.content[fo], size: 20),
+                      card.content[VIDEO] != null
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: YoutubePlayer(
+                                controller: YoutubePlayerController(
+                                  initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
+                                  flags: const YoutubePlayerFlags(),
+                                ),
+                                actionsPadding: const EdgeInsets.all(10),
+                                bottomActions: [
+                                  CurrentPosition(),
+                                  const SizedBox(width: 10),
+                                  ProgressBar(isExpanded: true),
+                                ],
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                      card.detailTitle != null
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(User().status == 1 ? CupertinoIcons.lock_circle : Icons.ads_click, color: MyColors.purple),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: TextButton(
+                                        onPressed: () {
+                                          if(User().status != 1) {
+                                            openDetail(card.detailTitle![fo], card.detailContent![fo]);
+                                          } else {
+                                            Get.toNamed('/premiumMain');
+                                          }
+                                        },
+                                        child: MyWidget().getTextWidget(
+                                          text: card.detailTitle![fo],
+                                          color: MyColors.purple,
+                                          size: 17,
+                                          hasUnderline: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -264,7 +320,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               children: [
                 const Icon(Icons.lightbulb_outline, size: 18),
                 const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: tr('nativesTip')),
+                MyWidget().getTextWidget(text: tr('teachersTip')),
               ],
             ),
             Expanded(

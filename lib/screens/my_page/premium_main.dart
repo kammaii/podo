@@ -83,6 +83,10 @@ class _PremiumMainState extends State<PremiumMain> {
                                   const Icon(Icons.check_circle_outline, color: MyColors.green),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
                               getDataRow(
+                                  tr('lessonDetail'),
+                                  const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                  const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                              getDataRow(
                                   tr('writingCorrection'),
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
