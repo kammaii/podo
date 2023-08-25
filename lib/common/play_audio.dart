@@ -45,36 +45,6 @@ class PlayAudio {
     }
   }
 
-  void playReading({required String readingTitleId, required String readingId}) async {
-    try {
-      String url = await CloudStorage().getReadingAudio(fileRef: 'ReadingAudios/$readingTitleId/$readingId.mp3');
-      await player.setUrl(url);
-      await player.play();
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  void playCorrect() async {
-    try {
-      await player.setAsset('assets/audio/correct.mp3');
-      await player.setVolume(0.1);
-      player.play();
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  void playWrong() async {
-    try {
-      await player.setAsset('assets/audio/wrong.mp3');
-      await player.setVolume(0.1);
-      player.play();
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
   void playYay() async {
     try {
       await player.setAsset('assets/audio/yay.mp3');

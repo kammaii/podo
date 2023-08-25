@@ -13,10 +13,10 @@ class CloudStorage {
     print('CloudStorage 초기화');
   }
 
-  Future<List<Map<String, String>>> getLessonAudios({required String lessonId}) async {
+  Future<List<Map<String, String>>> downloadAudios({required String folderName, required String folderId}) async {
     List<Map<String, String>> audios = [];
     try {
-      final result = await storage.ref().child("LessonAudios/${lessonId}").listAll();
+      final result = await storage.ref().child("$folderName/$folderId").listAll();
       print('Downloading audios');
       for (var file in result.items) {
         RegExp regex = RegExp(r'^(.+)\.m4a$');
@@ -34,12 +34,6 @@ class CloudStorage {
 
   Future<String> getAudio({required List<String> audio}) async {
     final ref = storage.ref().child("${audio[0]}/${audio[1]}/${audio[2]}.mp3");
-    String url = await ref.getDownloadURL();
-    return url;
-  }
-
-  Future<String> getReadingAudio({required String fileRef}) async {
-    final ref = storage.ref().child(fileRef);
     String url = await ref.getDownloadURL();
     return url;
   }

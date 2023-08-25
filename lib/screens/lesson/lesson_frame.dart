@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
@@ -62,6 +63,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   late Widget bottomWidget;
   final Map<String, Uint8List> _imageCache = {};
   late double progressValue;
+  AudioPlayer audioPlayerForEffect = AudioPlayer();
 
   Widget _getCachedImage(String base64Str) {
     if (_imageCache.containsKey(base64Str)) {
@@ -335,7 +337,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.quiz:
-        autoPlayAudio();
         if (index == thisIndex && examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
@@ -365,19 +366,19 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                 itemCount: examples.length,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       setState(() {
                         selectedAnswer = index;
                         if (examples[index] == answer) {
                           quizBorderColor = MyColors.purple;
-                          PlayAudio().playCorrect();
+                          effectAudioPlay(isCorrect: true);
                           Future.delayed(const Duration(seconds: 1), () {
                             swiperController.move(thisIndex + 1);
                             quizBorderColor = Colors.white;
                           });
                         } else {
                           quizBorderColor = MyColors.red;
-                          PlayAudio().playWrong();
+                          effectAudioPlay(isCorrect: false);
                           Future.delayed(const Duration(seconds: 1), () {
                             setState(() {
                               quizBorderColor = Colors.white;
@@ -460,10 +461,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
     Future.wait([
       Database().getDocs(query: query),
-      CloudStorage().getLessonAudios(lessonId: lesson.id),
+      CloudStorage().downloadAudios(folderName: 'LessonAudios', folderId: lesson.id),
     ]).then((snapshots) async {
       int totalCards = snapshots[0].length;
-      double incrementPerCard = 0.5 / totalCards;
+      double incrementPerCard = 0.2 / totalCards;
 
       Map<String, bool> flashcardMap = {};
       for (dynamic snapshot in snapshots[0]) {
@@ -490,7 +491,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   Future<void> cacheFiles(Map<String, String> snapshots) async {
     final directory = await getTemporaryDirectory();
     audioPaths = {};
-    double incrementPerFile = 0.5 / snapshots.length;
+    double incrementPerFile = 0.8 / snapshots.length;
 
     for (var fileName in snapshots.keys) {
       final url = snapshots[fileName];
@@ -508,6 +509,20 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     super.didChangeDependencies();
     if (User().status == 1) {
       _loadAd();
+    }
+  }
+
+  void effectAudioPlay({required bool isCorrect}) async {
+    String effect = 'correct';
+    if(!isCorrect) {
+      effect = 'wrong';
+    }
+    try {
+      await audioPlayerForEffect.setAsset('assets/audio/$effect.mp3');
+      await audioPlayerForEffect.setVolume(0.1);
+      audioPlayerForEffect.play();
+    } catch (e) {
+      print('Error: $e');
     }
   }
 

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/ads_controller.dart';
+import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
@@ -18,7 +19,8 @@ import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class ReadingFrame extends StatefulWidget {
   const ReadingFrame({Key? key}) : super(key: key);
@@ -34,6 +36,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   ReadingTitle readingTitle = Get.arguments;
   String fo = User().language;
   final KO = 'ko';
+  final AUDIO = 'audio';
   final cardBorderRadius = 8.0;
   bool isImageVisible = true;
   late AnimationController animationController;
@@ -43,6 +46,9 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   late List<Reading> readings;
   late Future future;
   final controller = Get.find<ReadingController>();
+  late bool isLoading;
+  late double progressValue;
+  Map<String, String> audioPaths = {};
 
   @override
   void dispose() {
@@ -59,10 +65,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    final Query query =
-        FirebaseFirestore.instance.collection('ReadingTitles/${readingTitle.id}/Readings').orderBy('orderId');
-    future = Database().getDocs(query: query);
+    isLoading = true;
     readings = [];
+    progressValue = 0.0;
+
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -91,6 +97,32 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             currentScrollPercent = 1;
           }
         }));
+
+    final Query query =
+        FirebaseFirestore.instance.collection('ReadingTitles/${readingTitle.id}/Readings').orderBy('orderId');
+    Future.wait([
+      Database().getDocs(query: query),
+      CloudStorage().downloadAudios(folderName: 'ReadingAudios', folderId: readingTitle.id),
+    ]).then((snapshots) async {
+      int totalReadings = snapshots[0].length;
+      double incrementPerReading = 0.2 / totalReadings;
+      for (dynamic snapshot in snapshots[0]) {
+        Reading reading = Reading.fromJson(snapshot.data() as Map<String, dynamic>);
+        readings.add(reading);
+        progressValue += incrementPerReading;
+        setState(() {});
+      }
+      controller.hasFlashcard.value = List.generate(readings.length, (index) => false);
+
+      Map<String, String> audios = {};
+      for (dynamic snapshot in snapshots[1]) {
+        audios.addAll(snapshot);
+      }
+      await cacheFiles(audios);
+      setState(() {
+        isLoading = false;
+      });
+    });
 
     double? position = LocalStorage().prefs!.getDouble(readingTitle.id);
     if (position != null) {
@@ -121,6 +153,22 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     super.didChangeDependencies();
     if (User().status == 1) {
       _loadAd();
+    }
+  }
+
+  Future<void> cacheFiles(Map<String, String> snapshots) async {
+    final directory = await getTemporaryDirectory();
+    audioPaths = {};
+    double incrementPerFile = 0.8 / snapshots.length;
+
+    for (var fileName in snapshots.keys) {
+      final url = snapshots[fileName];
+      final response = await http.get(Uri.parse(url!));
+      final File file = File('${directory.path}/$fileName.m4a');
+      await file.writeAsBytes(response.bodyBytes);
+      audioPaths[fileName] = file.path;
+      progressValue += incrementPerFile;
+      setState(() {});
     }
   }
 
@@ -156,7 +204,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   sliverAppBar() {
     int wordsLength = 0;
     for (Reading reading in readings) {
-      if(reading.words[KO] != null) {
+      if (reading.words[KO] != null) {
         int length = reading.words[KO].length;
         wordsLength = wordsLength + length;
       }
@@ -310,8 +358,15 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             Material(
               child: IconButton(
                 icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
-                onPressed: () {
-                  PlayAudio().playReading(readingTitleId: readingTitle.id, readingId: reading.id);
+                onPressed: () async {
+                  PlayAudio().player.stop();
+                  String fileName = reading.id;
+                  if (audioPaths.containsKey(fileName)) {
+                    String path = audioPaths[fileName]!;
+                    PlayAudio().player.setFilePath(path);
+                    await PlayAudio().player.setVolume(1);
+                    PlayAudio().player.play();
+                  }
                 },
               ),
             ),
@@ -381,65 +436,65 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          color: MyColors.purpleLight,
-          child: FutureBuilder(
-            future: future,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                readings = [];
-                for (dynamic snapshot in snapshot.data) {
-                  readings.add(Reading.fromJson(snapshot.data() as Map<String, dynamic>));
-                }
-                controller.hasFlashcard.value = List.generate(readings.length, (index) => false);
-                if (readings.isEmpty) {
-                  return Center(
-                    child: MyWidget().getTextWidget(
-                      text: tr('noReading'),
-                      color: MyColors.purple,
-                      size: 20,
-                      isTextAlignCenter: true,
-                    ),
-                  );
-                } else {
-                  return Stack(
-                    children: [
-                      CustomScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        controller: scrollController,
-                        slivers: [
-                          sliverAppBar(),
-                          sliverList(),
+      body: isLoading
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  MyWidget().getTextWidget(text: 'Loading...', color: MyColors.purple),
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: progressValue,
+                    valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
+                    backgroundColor: MyColors.navyLight,
+                  ),
+                ],
+              ),
+            )
+          : SafeArea(
+              child: Container(
+                color: MyColors.purpleLight,
+                child: readings.isEmpty
+                    ? Center(
+                        child: MyWidget().getTextWidget(
+                          text: tr('noReading'),
+                          color: MyColors.purple,
+                          size: 20,
+                          isTextAlignCenter: true,
+                        ),
+                      )
+                    : Stack(
+                        children: [
+                          CustomScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            controller: scrollController,
+                            slivers: [
+                              sliverAppBar(),
+                              sliverList(),
+                            ],
+                          ),
+                          User().status == 1
+                              ? Positioned(
+                                  bottom: 0,
+                                  child: GetBuilder<AdsController>(
+                                    builder: (_) {
+                                      return AdsController().isBannerAdLoaded
+                                          ? Container(
+                                              color: MyColors.purpleLight,
+                                              width: AdsController().bannerAd!.size.width.toDouble(),
+                                              height: AdsController().bannerAd!.size.height.toDouble(),
+                                              child: AdWidget(ad: AdsController().bannerAd!),
+                                            )
+                                          : const SizedBox.shrink();
+                                    },
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                         ],
                       ),
-                      User().status == 1
-                          ? Positioned(
-                              bottom: 0,
-                              child: GetBuilder<AdsController>(
-                                builder: (_) {
-                                  return AdsController().isBannerAdLoaded
-                                      ? Container(
-                                          color: MyColors.purpleLight,
-                                          width: AdsController().bannerAd!.size.width.toDouble(),
-                                          height: AdsController().bannerAd!.size.height.toDouble(),
-                                          child: AdWidget(ad: AdsController().bannerAd!),
-                                        )
-                                      : const SizedBox.shrink();
-                                },
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                    ],
-                  );
-                }
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }
