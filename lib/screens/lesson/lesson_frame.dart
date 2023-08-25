@@ -61,6 +61,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   late Animation<Offset> animationOffset;
   late Widget bottomWidget;
   final Map<String, Uint8List> _imageCache = {};
+  late double progressValue;
 
   Widget _getCachedImage(String base64Str) {
     if (_imageCache.containsKey(base64Str)) {
@@ -279,13 +280,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Icon(User().status == 1 ? CupertinoIcons.lock_circle : Icons.ads_click, color: MyColors.purple),
+                                  Icon(User().status == 1 ? CupertinoIcons.lock_circle : Icons.ads_click,
+                                      color: MyColors.purple),
                                   Expanded(
                                     child: Align(
                                       alignment: Alignment.centerLeft,
                                       child: TextButton(
                                         onPressed: () {
-                                          if(User().status != 1) {
+                                          if (User().status != 1) {
                                             openDetail(card.detailTitle![fo], card.detailContent![fo]);
                                           } else {
                                             Get.toNamed('/premiumMain');
@@ -333,6 +335,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.quiz:
+        autoPlayAudio();
         if (index == thisIndex && examples.isEmpty) {
           examples = [card.content[EX1], card.content[EX2], card.content[EX3], card.content[EX4]];
           answer = card.content[EX1];
@@ -381,7 +384,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             });
                           });
                         }
-                        //todo: 효과음 재생
                       });
                     },
                     child: Padding(
@@ -442,6 +444,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     super.initState();
     isLoading = true;
     bottomWidget = const SizedBox.shrink();
+    progressValue = 0.0;
 
     animationController = AnimationController(
       vsync: this,
@@ -459,6 +462,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       Database().getDocs(query: query),
       CloudStorage().getLessonAudios(lessonId: lesson.id),
     ]).then((snapshots) async {
+      int totalCards = snapshots[0].length;
+      double incrementPerCard = 0.5 / totalCards;
+
       Map<String, bool> flashcardMap = {};
       for (dynamic snapshot in snapshots[0]) {
         LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
@@ -466,6 +472,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
         }
         cards.add(card);
+        progressValue += incrementPerCard;
+        setState(() {});
       }
       controller.hasFlashcard.value = flashcardMap.obs;
       Map<String, String> audios = {};
@@ -482,6 +490,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   Future<void> cacheFiles(Map<String, String> snapshots) async {
     final directory = await getTemporaryDirectory();
     audioPaths = {};
+    double incrementPerFile = 0.5 / snapshots.length;
 
     for (var fileName in snapshots.keys) {
       final url = snapshots[fileName];
@@ -489,6 +498,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       final File file = File('${directory.path}/$fileName.m4a');
       await file.writeAsBytes(response.bodyBytes);
       audioPaths[fileName] = file.path;
+      progressValue += incrementPerFile;
+      setState(() {});
     }
   }
 
@@ -515,7 +526,21 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     return Scaffold(
       appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  MyWidget().getTextWidget(text: 'Loading...', color: MyColors.purple),
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: progressValue,
+                    valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
+                    backgroundColor: MyColors.navyLight,
+                  ),
+                ],
+              ),
+            )
           : SafeArea(
               child: Column(
                 children: [
@@ -549,14 +574,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           setState(() {
                             thisIndex = index;
                             examples.clear();
-                            PlayAudio().player.stop();
-                            if (cards[thisIndex].content.containsKey(AUDIO)) {
-                              String fileName = cards[thisIndex].content[AUDIO];
-                              if (audioPaths.containsKey(fileName)) {
-                                String path = audioPaths[fileName]!;
-                                controller.setAudioPathAndPlay(path: path);
-                              }
-                            }
+                            autoPlayAudio();
                           });
                         }
                       },
@@ -654,6 +672,17 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               ),
             ),
     );
+  }
+
+  void autoPlayAudio() {
+    PlayAudio().player.stop();
+    if (cards[thisIndex].content.containsKey(AUDIO)) {
+      String fileName = cards[thisIndex].content[AUDIO];
+      if (audioPaths.containsKey(fileName)) {
+        String path = audioPaths[fileName]!;
+        controller.setAudioPathAndPlay(path: path);
+      }
+    }
   }
 
   Widget getSpeedBtn({required isNormal}) {
