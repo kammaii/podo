@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -123,17 +124,12 @@ class User {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
 
-      //todo:
-      //final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-      // await analytics.setUserId(id: id);
-      // await analytics.setUserProperty(name: 'status', value: status.toString());
-
-
-      //todo: revenueCat 등록 후 삭제
+      final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+      await analytics.setUserId(id: id);
+      await analytics.setUserProperty(name: 'status', value: status.toString());
       if(status == 1) {
         Get.put(AdsController());
       }
-
 
     } else {
       print('신규유저입니다. DB를 생성합니다.');
@@ -180,7 +176,7 @@ class User {
         }
       }
       print('SIgn up method : $method');
-      //todo: await FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
+      await FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
     }
   }
 

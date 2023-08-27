@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -50,7 +51,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
         onTap: (isBasicUser && !readingTitle.isFree)
             ? null
             : () async {
-                //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
+                await FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
                 Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
               },
         child: Stack(

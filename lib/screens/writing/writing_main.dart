@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -81,8 +82,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        MyWidget().showDialog(content: tr('wantRequestCorrection'), yesFn: () {
-          //todo: await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
+        MyWidget().showDialog(content: tr('wantRequestCorrection'), yesFn: () async {
+          await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
           Writing writing = Writing(selectedQuestion!);
           writing.userWriting = textEditController.text;
           Get.back();

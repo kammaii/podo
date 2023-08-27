@@ -15,13 +15,11 @@ import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:crypto/crypto.dart';
 
-
 // apple OAuth callback : https://podo-49335.firebaseapp.com/__/auth/handler
 
 class Login extends StatelessWidget {
   final _auth = FirebaseAuth.instance;
   late TargetPlatform os;
-
 
   Future<void> _sendEmailVerificationLink(String email) async {
     await _auth.currentUser?.sendEmailVerification(ActionCodeSettings(
@@ -37,11 +35,9 @@ class Login extends StatelessWidget {
   }
 
   String generateNonce([int length = 32]) {
-    final charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
   }
 
   /// Returns the sha256 hash of [input] in hex notation.
@@ -66,10 +62,7 @@ class Login extends StatelessWidget {
         AppleIDAuthorizationScopes.fullName,
       ],
       webAuthenticationOptions: WebAuthenticationOptions(
-        // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
-        clientId:
-        'net.awesomekorean.newpodo',
-
+        clientId: 'net.awesomekorean.newpodo',
         redirectUri: Uri.parse('https://newpodo.page.link/?mode=verifyEmail'),
       ),
       nonce: nonce,

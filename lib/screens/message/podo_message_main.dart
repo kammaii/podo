@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -375,7 +376,7 @@ class PodoMessageMain extends StatelessWidget {
                                   MyWidget().showDialog(
                                       content: tr('sendReply'),
                                       yesFn: () async {
-                                        //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
+                                        await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
                                         PodoMessageReply reply = PodoMessageReply(replyController.text);
                                         await Database().setDoc(
                                             collection: 'PodoMessages/${PodoMessage().id}/Replies',

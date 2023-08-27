@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -145,9 +146,8 @@ class _PremiumMainState extends State<PremiumMain> {
                                     await Purchases.setEmail(User().email);
                                     await Purchases.setDisplayName(User().name);
                                     await Purchases.setPushToken(User().fcmToken ?? '');
-                                    // todo:
-                                    // String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
-                                    // await Purchases.setFirebaseAppInstanceId(appInstanceId!);
+                                    String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
+                                    await Purchases.setFirebaseAppInstanceId(appInstanceId!);
                                     await Database()
                                         .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
                                     MyWidget().showSnackbarWithPodo(
@@ -165,7 +165,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                     MyWidget().showSnackbar(title: tr('error'), message: errorCode.toString());
                                   }
                                 }
-                                //todo: await FirebaseAnalytics.instance.logPurchase();
+                                await FirebaseAnalytics.instance.logPurchase();
                               },
                               child: Row(
                                 children: [
@@ -233,7 +233,7 @@ class _PremiumMainState extends State<PremiumMain> {
                           FirebaseMessaging messaging = FirebaseMessaging.instance;
                           NotificationSettings settings = await messaging.requestPermission();
                           if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-                            //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved_after_deny');
+                            await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved_after_deny');
                             await User().setTrialAuthorized();
                             Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                           } else {

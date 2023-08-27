@@ -1,6 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:confetti/confetti.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class LessonComplete extends StatelessWidget {
   }
 
   void showMessagePermission() async {
-    //todo: await FirebaseAnalytics.instance.logEvent(name: 'first_lesson_complete');
+    await FirebaseAnalytics.instance.logEvent(name: 'first_lesson_complete');
     Get.dialog(AlertDialog(
       title: Image.asset('assets/images/podo.png', width: 50, height: 50),
       content: MyWidget().getTextWidget(text: tr('trialComment'), isTextAlignCenter: true, size: 16),
@@ -66,12 +67,12 @@ class LessonComplete extends StatelessWidget {
             FirebaseMessaging messaging = FirebaseMessaging.instance;
             NotificationSettings settings = await messaging.requestPermission();
             if(settings.authorizationStatus == AuthorizationStatus.authorized) {
-              //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
+              await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
               await User().setTrialAuthorized();
               Get.offNamedUntil(
                   MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
             } else {
-              //todo: await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
+              await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
               await User().setTrialDenied();
             }
           },

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
@@ -108,7 +109,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                         color: Colors.white,
                         child: InkWell(
                           onTap: () async {
-                            //todo: await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                            await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
                             if (course.id == courseController.hangulCourseId) {
                               lessonController.isHangulLesson = true;
                               Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
