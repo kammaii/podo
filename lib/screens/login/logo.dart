@@ -107,8 +107,8 @@ class Logo extends StatelessWidget {
       if (user != null && user.emailVerified) {
         print('AUTH STATE CHANGES: Email Verified');
         getInitData();
-      } else if(user == null) {
-        print('AUTH STATE CHANGES: User is null');
+      } else {
+        print('AUTH STATE CHANGES: User is null or not verified');
         Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
       }
     });
