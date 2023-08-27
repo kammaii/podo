@@ -34,7 +34,7 @@
   "setError": "Échec de l'enregistrement dans la base de données. Si le problème persiste, veuillez contacter le développeur.",
   "flashcardEdit": "Édition de Cartes Flash",
   "save": "Sauvegarder",
-  "viewAll": "Tout afficher",
+  "makeClear": "Clarifier",
   "viewOtherUsersWriting": "Voir l'écriture d'autres utilisateurs",
   "writeYourAnswerInKorean": "Écrivez votre réponse en coréen",
   "send": "Envoyer",

@@ -148,14 +148,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (User().status == 1) {
-      _loadAd();
-    }
-  }
-
   Future<void> cacheFiles(Map<String, String> snapshots) async {
     final directory = await getTemporaryDirectory();
     audioPaths = {};
@@ -169,6 +161,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       audioPaths[fileName] = file.path;
       progressValue += incrementPerFile;
       setState(() {});
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (User().status == 1) {
+      _loadAd();
     }
   }
 
@@ -437,21 +437,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  MyWidget().getTextWidget(text: 'Loading...', color: MyColors.purple),
-                  const SizedBox(height: 10),
-                  LinearProgressIndicator(
-                    value: progressValue,
-                    valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
-                    backgroundColor: MyColors.navyLight,
-                  ),
-                ],
-              ),
-            )
+          ? MyWidget().getLoading(progressValue)
           : SafeArea(
               child: Container(
                 color: MyColors.purpleLight,

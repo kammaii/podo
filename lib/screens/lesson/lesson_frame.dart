@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:just_audio/just_audio.dart';
@@ -541,21 +542,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     return Scaffold(
       appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
       body: isLoading
-          ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  MyWidget().getTextWidget(text: 'Loading...', color: MyColors.purple),
-                  const SizedBox(height: 10),
-                  LinearProgressIndicator(
-                    value: progressValue,
-                    valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
-                    backgroundColor: MyColors.navyLight,
-                  ),
-                ],
-              ),
-            )
+          ? MyWidget().getLoading(progressValue)
           : SafeArea(
               child: Column(
                 children: [

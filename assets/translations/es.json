@@ -34,7 +34,7 @@
   "setError": "No se pudo guardar en la base de datos. Si el problema persiste, por favor contacta al desarrollador.",
   "flashcardEdit": "Edición de Tarjetas de Estudio",
   "save": "Guardar",
-  "viewAll": "Ver todos",
+  "makeClear": "Aclarar",
   "viewOtherUsersWriting": "Ver escritura de otros usuarios",
   "writeYourAnswerInKorean": "Escribe tu respuesta en coreano",
   "send": "Enviar",

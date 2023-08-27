@@ -101,7 +101,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   Expanded(
                     child: MyWidget().getTextWidget(
                       text: lessonCourse.title[setLanguage],
-                      size: 25,
+                      size: modeToggle[0] ? 25 : 20,
                       color: MyColors.purple,
                       isBold: true,
                     ),

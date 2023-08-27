@@ -1,8 +1,14 @@
+import 'dart:io';
+
+import 'package:blur/blur.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
@@ -10,8 +16,6 @@ import 'package:podo/common/play_stop_icon.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
-import 'package:scratcher/scratcher.dart';
 
 class FlashCardReview extends StatefulWidget {
   const FlashCardReview({Key? key}) : super(key: key);
@@ -27,15 +31,22 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
   late String today;
   late PlayStopIcon playStopIcon;
   bool isPlay = false;
+  late bool isLoading;
+  late double progressValue;
+  late Map<String, String> audioPaths;
 
   @override
   void initState() {
     super.initState();
+    isLoading = true;
+    progressValue = 0.0;
+    audioPaths = {};
     DateTime now = DateTime.now();
     today = '${now.year}-${now.month}-${now.day}';
     allCards = LocalStorage().flashcards;
     cards = allCards.where((card) => (card.dateReview != today)).toList();
     playStopIcon = PlayStopIcon(this, size: 50);
+    _cacheAudioFiles();
   }
 
   @override
@@ -45,18 +56,53 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
     setPlayStopIcon(isForward: false);
   }
 
-  void setPlayStopIcon({required bool isForward}) {
-    if (isForward) {
-      PlayAudio().playFlashcard(cards[0].audio, addStreamCompleted: (event) {
-        if (event.processingState == ProcessingState.completed) {
-          setPlayStopIcon(isForward: false);
-          PlayAudio().stream.cancel();
+  Future<void> _cacheAudioFiles() async {
+    for (FlashCard card in cards) {
+      String? audio = card.audio;
+      if (audio != null && !audioPaths.containsKey(audio)) {
+        try {
+          List<String> audioRegex = audio.split(RegExp(r'_+'));
+          final File? file = await CloudStorage()
+              .downloadAudio(folderName: audioRegex[0], folderId: audioRegex[1], fileId: audioRegex[2]);
+          if (file != null) {
+            audioPaths[audio] = file.path;
+            print(audioPaths);
+          }
+          if (audioPaths.length >= 5) {
+            break;
+          }
+        } catch (e) {
+          print('Error: $e');
         }
+      }
+    }
+    if (isLoading) {
+      setState(() {
+        isLoading = false;
       });
-      playStopIcon.clickIcon(isForward: true);
-      isPlay = true;
+    }
+  }
+
+  void setPlayStopIcon({required bool isForward}) async {
+    AudioPlayer player = PlayAudio().player;
+    player.stop();
+    if (isForward) {
+      String? fileName = cards[0].audio;
+      if (fileName != null && audioPaths.containsKey(fileName)) {
+        playStopIcon.clickIcon(isForward: true);
+        isPlay = true;
+        String path = audioPaths[fileName]!;
+        player.setFilePath(path);
+        await player.setVolume(1);
+        player.playerStateStream.listen((event) {
+          if (event.processingState == ProcessingState.completed) {
+            setPlayStopIcon(isForward: false);
+            PlayAudio().stream.cancel();
+          }
+        });
+        player.play();
+      }
     } else {
-      PlayAudio().stop();
       playStopIcon.clickIcon(isForward: false);
       isPlay = false;
     }
@@ -65,12 +111,42 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
   void checkShuffle(bool? value) {
     setPlayStopIcon(isForward: false);
     controller.isShuffleChecked = value!;
-    if (value) {
-      cards.shuffle();
-    } else {
-      cards = allCards.where((card) => (card.dateReview != today)).toList();
-    }
-    controller.update();
+    audioPaths.clear();
+    isLoading = true;
+    setState(() {
+      if (value) {
+        cards.shuffle();
+      } else {
+        cards = allCards.where((card) => (card.dateReview != today)).toList();
+      }
+      _cacheAudioFiles();
+    });
+  }
+
+  Widget getBtn(String title, IconData icon, Function() fn) {
+    return Row(children: [
+      Expanded(
+          child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: const BorderSide(color: MyColors.purple),
+            ),
+            backgroundColor: Colors.white),
+        onPressed: fn,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+          child: Row(
+            children: [
+              Icon(icon, color: MyColors.purple),
+              const SizedBox(width: 30),
+              Expanded(
+                  child: Center(child: MyWidget().getTextWidget(text: title, size: 18, color: MyColors.purple))),
+            ],
+          ),
+        ),
+      ))
+    ]);
   }
 
   @override
@@ -87,168 +163,174 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
           color: MyColors.purple,
         ),
       ),
-      body: SafeArea(
-        child: GetBuilder<FlashCardController>(
-          builder: (_) {
-            if (cards.isNotEmpty) {
-              FlashCard card = cards[0];
-              setPlayStopIcon(isForward: true);
-              return Column(
-                children: [
-                  LinearPercentIndicator(
-                    animateFromLastPercent: true,
-                    animation: true,
-                    lineHeight: 3.0,
-                    percent: (allCards.length - cards.length) / allCards.length,
-                    backgroundColor: MyColors.navyLight,
-                    progressColor: MyColors.purple,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          MyWidget().getCheckBox(
-                              value: controller.isShuffleChecked,
-                              onChanged: (value) {
-                                checkShuffle(value);
-                              }),
-                          MyWidget().getTextWidget(text: tr('shuffle')),
-                        ],
-                      ),
-                      MyWidget().getTextWidget(text: '${tr('today')} ${allCards.length - cards.length} / ${allCards.length}   '),
-                    ],
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                child: Center(
-                                  child: MyWidget().getTextWidget(
-                                    text: card.front,
-                                    size: 20,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              const Divider(height: 20),
-                              Expanded(
-                                child: Obx(
-                                  () => Center(
-                                    child: controller.isViewAllClicked.value
-                                        ? Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                            child: MyWidget().getTextWidget(
-                                              text: card.back,
-                                              size: 20,
-                                              color: MyColors.grey,
-                                            ))
-                                        : Scratcher(
-                                            color: MyColors.grey,
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                              child: MyWidget().getTextWidget(
-                                                text: card.back,
-                                                size: 20,
-                                                color: MyColors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTapDown: (_) {
-                                  controller.isViewAllClicked.value = true;
-                                },
-                                onTapUp: (_) {
-                                  controller.isViewAllClicked.value = false;
-                                },
-                                child: MyWidget()
-                                    .getTextWidget(text: tr('viewAll'), color: MyColors.grey, size: 13),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: card.audio == null ? 0 : 1,
-                    child: GestureDetector(
-                      onTap: () {
-                        if (isPlay) {
-                          setPlayStopIcon(isForward: false);
-                        } else {
-                          setPlayStopIcon(isForward: true);
-                        }
-                      },
-                      child: playStopIcon.icon,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 30),
-                    child: Row(
+      body: isLoading
+          ? const Center(child: SpinKitThreeBounce(color: MyColors.purple, size: 20))
+          : SafeArea(
+              child: GetBuilder<FlashCardController>(
+                builder: (_) {
+                  if (cards.isNotEmpty) {
+                    FlashCard card = cards[0];
+                    setPlayStopIcon(isForward: true);
+                    return Column(
                       children: [
+                        LinearPercentIndicator(
+                          animateFromLastPercent: true,
+                          animation: true,
+                          lineHeight: 3.0,
+                          percent: (allCards.length - cards.length) / allCards.length,
+                          backgroundColor: MyColors.navyLight,
+                          progressColor: MyColors.purple,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                MyWidget().getCheckBox(
+                                    value: controller.isShuffleChecked,
+                                    onChanged: (value) {
+                                      checkShuffle(value);
+                                    }),
+                                MyWidget().getTextWidget(text: tr('shuffle')),
+                              ],
+                            ),
+                            MyWidget().getTextWidget(
+                                text: '${tr('today')} ${allCards.length - cards.length} / ${allCards.length}   '),
+                          ],
+                        ),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: MyWidget().getRoundBtnWidget(
-                              text: tr('next'),
-                              f: () {
-                                setPlayStopIcon(isForward: false);
-                                FlashCard? reviewedCard = allCards.firstWhere((card) => card.id == cards[0].id);
-                                reviewedCard.dateReview = today;
-                                cards.removeAt(0);
-                                controller.update();
-                              },
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration:
+                                  BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
+                              child: Center(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Expanded(
+                                      child: Center(
+                                        child: MyWidget().getTextWidget(
+                                          text: card.front,
+                                          size: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    const Divider(height: 20),
+                                    Expanded(
+                                      child: Obx(
+                                        () => Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                            child: controller.isViewAllClicked.value
+                                                ? MyWidget().getTextWidget(
+                                                    text: card.back,
+                                                    size: 20,
+                                                    color: MyColors.grey,
+                                                  )
+                                                : Blur(
+                                                    blur: 2.3,
+                                                    child: MyWidget().getTextWidget(
+                                                      text: card.back,
+                                                      size: 20,
+                                                      color: MyColors.grey,
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTapDown: (_) {
+                                        controller.isViewAllClicked.value = true;
+                                      },
+                                      onTapUp: (_) {
+                                        controller.isViewAllClicked.value = false;
+                                      },
+                                      child: MyWidget()
+                                          .getTextWidget(text: tr('makeClear'), color: MyColors.grey, size: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),
+                        Opacity(
+                          opacity: card.audio == null ? 0 : 1,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (isPlay) {
+                                setPlayStopIcon(isForward: false);
+                              } else {
+                                setPlayStopIcon(isForward: true);
+                              }
+                            },
+                            child: playStopIcon.icon,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 30),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: MyWidget().getRoundBtnWidget(
+                                    text: tr('next'),
+                                    f: () {
+                                      setPlayStopIcon(isForward: false);
+                                      FlashCard? reviewedCard =
+                                          allCards.firstWhere((card) => card.id == cards[0].id);
+                                      reviewedCard.dateReview = today;
+                                      cards.removeAt(0);
+                                      audioPaths.remove(reviewedCard.audio);
+                                      controller.update();
+                                      if (audioPaths.length < 4) {
+                                        _cacheAudioFiles();
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
-                    ),
-                  )
-                ],
-              );
-            } else {
-              return Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    MyWidget().getTextWidget(
-                        text: tr('flashCardReviewCompleted'),
-                        isTextAlignCenter: true,
-                        color: MyColors.purple,
-                        size: 20),
-                    const SizedBox(height: 30),
-                    MyWidget().getRoundBtnWidget(
-                        text: tr('reviewAgainTomorrow'),
-                        f: () {
-                          Get.back();
-                        }),
-                    const SizedBox(height: 10),
-                    MyWidget().getRoundBtnWidget(
-                        text: tr('wantReviewMore'),
-                        bgColor: MyColors.pink,
-                        f: () {
-                          cards = [...allCards];
-                          controller.update();
-                        })
-                  ],
-                ),
-              );
-            }
-          },
-        ),
-      ),
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          MyWidget().getTextWidget(
+                              text: tr('flashCardReviewCompleted'),
+                              isTextAlignCenter: true,
+                              color: MyColors.purple,
+                              size: 20),
+                          const SizedBox(height: 30),
+                          getBtn(tr('reviewAgainTomorrow'), CupertinoIcons.paperplane, () => Get.back()),
+                          const SizedBox(height: 20),
+                          getBtn(tr('wantReviewMore'), Icons.refresh_rounded, () {
+                            cards = [...allCards];
+                            if (controller.isShuffleChecked) {
+                              checkShuffle(true);
+                            }
+                            setState(() {
+                              isLoading = true;
+                            });
+                            _cacheAudioFiles();
+                          }),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
     );
   }
 }

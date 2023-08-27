@@ -34,7 +34,7 @@
   "setError": "Speichern in der Datenbank fehlgeschlagen. Wenn das Problem weiterhin besteht, kontaktieren Sie bitte den Entwickler.",
   "flashcardEdit": "Bearbeiten von Lernkarten",
   "save": "Speichern",
-  "viewAll": "Alle anzeigen",
+  "makeClear": "Klären",
   "viewOtherUsersWriting": "Schreibweise anderer Benutzer anzeigen",
   "writeYourAnswerInKorean": "Schreiben Sie Ihre Antwort auf Koreanisch",
   "send": "Senden",

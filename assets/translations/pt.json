@@ -34,7 +34,7 @@
   "setError": "Falha ao salvar no banco de dados. Se o problema persistir, entre em contato com o desenvolvedor.",
   "flashcardEdit": "Edição de Cartões de Estudo",
   "save": "Salvar",
-  "viewAll": "Ver tudo",
+  "makeClear": "Esclarecer",
   "viewOtherUsersWriting": "Ver escrita de outros usuários",
   "writeYourAnswerInKorean": "Escreva sua resposta em coreano",
   "send": "Enviar",

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -307,6 +308,31 @@ class MyWidget {
         child: Image.asset('assets/images/podo.png'),
       ),
       duration: Duration(milliseconds: duration),
+    );
+  }
+
+  Widget getLoading(double progressValue) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              MyWidget().getTextWidget(text: 'Loading', color: MyColors.purple),
+              const SizedBox(width: 5),
+              const SpinKitThreeBounce(color: MyColors.purple, size: 10),
+            ],
+          ),
+          const SizedBox(height: 10),
+          LinearProgressIndicator(
+            value: progressValue,
+            valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
+            backgroundColor: MyColors.navyLight,
+          ),
+        ],
+      ),
     );
   }
 }
