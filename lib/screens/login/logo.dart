@@ -38,6 +38,11 @@ class Logo extends StatelessWidget {
       if (thisOs != user.User().os) {
         Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: thisOs);
       }
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      if (user.User().fcmPermission != permission) {
+        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
+      }
     }
 
     void runDeepLink(Uri deepLink) async {

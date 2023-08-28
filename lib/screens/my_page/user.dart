@@ -32,6 +32,8 @@ class User {
   DateTime? trialEnd;
   late String language;
   String? fcmToken;
+  List<String>? fcmTopic;
+  late bool fcmPermission;
   late int status;
   String? expirationDate; // only for MyPage
 
@@ -45,7 +47,10 @@ class User {
   static const String TRIAL_END = 'trialEnd';
   static const String LANGUAGE = 'language';
   static const String FCM_TOKEN = 'fcmToken';
+  static const String FCM_TOPIC = 'fcmTopic';
+  static const String FCM_PERMISSION = 'fcmPermission';
   static const String STATUS = 'status';
+  static const String ALL_USERS = 'allUsers';
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -56,6 +61,8 @@ class User {
       DATESIGNUP: dateSignUp,
       DATESIGNIN: dateSignIn,
       LANGUAGE: language,
+      FCM_TOPIC: fcmTopic,
+      FCM_PERMISSION: fcmPermission,
       STATUS: status,
     };
     if(fcmToken != null) {
@@ -87,6 +94,11 @@ class User {
       if(json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
       }
+      FirebaseMessaging.instance.subscribeToTopic(ALL_USERS);
+      if(json[FCM_TOPIC] != null) {
+        fcmTopic = json[FCM_TOPIC];
+      }
+      fcmPermission = json[FCM_PERMISSION] ?? false;
       if(json[TRIAL_START] != null) {
         Timestamp stamp = json[TRIAL_START];
         trialStart = stamp.toDate();
@@ -162,6 +174,7 @@ class User {
     if(!Languages().fos.contains(language)) {
       language = 'en';
     }
+    fcmPermission = false;
     status = 0;
     Database().setDoc(collection: 'Users', doc: this);
     

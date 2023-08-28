@@ -31,6 +31,7 @@ class PodoMessageMain extends StatelessWidget {
   late bool hasReplied;
   final controller = Get.find<PodoMessageController>();
   bool isBasicUser = User().status == 1;
+  just_audio.AudioPlayer? player;
 
   Stream<String> getTimeLeftStream(DateTime dateEnd) {
     StreamController<String> controller = StreamController();
@@ -77,18 +78,18 @@ class PodoMessageMain extends StatelessWidget {
   }
 
   Widget getAudioPlayer(String url) {
-    just_audio.AudioPlayer player = just_audio.AudioPlayer();
-    player.setUrl(url);
-    player.playerStateStream.listen((event) {
+    player = just_audio.AudioPlayer();
+    player!.setUrl(url);
+    player!.playerStateStream.listen((event) {
       if (event.processingState == just_audio.ProcessingState.completed) {
-        player.seek(Duration.zero);
-        player.pause();
+        player!.seek(Duration.zero);
+        player!.pause();
       }
     });
     return Row(
       children: [
         StreamBuilder<just_audio.PlayerState>(
-          stream: player.playerStateStream,
+          stream: player!.playerStateStream,
           builder: (context, snapshot) {
             final playerState = snapshot.data;
             final isPlaying = playerState?.playing ?? false;
@@ -96,21 +97,21 @@ class PodoMessageMain extends StatelessWidget {
               icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_arrow_solid),
               color: MyColors.purple,
               onPressed: () {
-                isPlaying ? player.pause() : player.play();
+                isPlaying ? player!.pause() : player!.play();
               },
             );
           },
         ),
         StreamBuilder<Duration?>(
-          stream: player.positionStream,
+          stream: player!.positionStream,
           builder: (context, snapshot) {
             final position = snapshot.data ?? Duration.zero;
-            final duration = player.duration ?? Duration.zero;
+            final duration = player!.duration ?? Duration.zero;
             return Expanded(
               child: Slider(
                 value: position.inMilliseconds.clamp(0, duration.inMilliseconds).toDouble(),
                 onChanged: (value) {
-                  player.seek(Duration(milliseconds: value.toInt()));
+                  player!.seek(Duration(milliseconds: value.toInt()));
                 },
                 max: duration.inMilliseconds.toDouble(),
                 activeColor: MyColors.purple,
@@ -158,17 +159,37 @@ class PodoMessageMain extends StatelessWidget {
         : null;
 
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: PodoMessage().title![KO], isKorean: true, actions: [
-        IconButton(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
           onPressed: () {
-            Get.dialog(AlertDialog(
-              title: MyWidget().getTextWidget(text: tr('howToUse'), size: 18),
-              content: MyWidget().getTextWidget(text: tr('replyDetail'), color: MyColors.grey),
-            ));
+            if(player != null) {
+              player!.dispose();
+            }
+            Get.back();
           },
-          icon: const Icon(Icons.info, color: MyColors.purple),
-        )
-      ]),
+          icon: const Icon(Icons.arrow_back_ios_rounded),
+          color: MyColors.purple,
+        ),
+        title: MyWidget().getTextWidget(
+          text: PodoMessage().title![KO],
+          color: MyColors.purple,
+          isKorean: true,
+          size: 18,
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Get.dialog(AlertDialog(
+                title: MyWidget().getTextWidget(text: tr('howToUse'), size: 18),
+                content: MyWidget().getTextWidget(text: tr('replyDetail'), color: MyColors.grey),
+              ));
+            },
+            icon: const Icon(Icons.info, color: MyColors.purple),
+          )
+        ],
+      ),
       body: SafeArea(
         child: Stack(
           children: [
