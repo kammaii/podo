@@ -24,7 +24,7 @@ import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart' as yt;
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -65,6 +65,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   final Map<String, Uint8List> _imageCache = {};
   late double progressValue;
   AudioPlayer audioPlayerForEffect = AudioPlayer();
+  late Map<String, yt.YoutubePlayerController> youtubeControllers;
 
   Widget _getCachedImage(String base64Str) {
     if (_imageCache.containsKey(base64Str)) {
@@ -131,21 +132,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               ],
             ),
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  MyWidget().getTextWidget(
-                    text: card.content[KO],
-                    size: 30,
-                    color: Colors.black,
-                    isKorean: true,
-                  ),
-                  MyWidget().getTextWidget(
-                    text: card.content[fo],
-                    size: 20,
-                    color: Colors.black,
-                  ),
-                ],
+              child: Center(
+                child: MyWidget().getTextWidget(
+                  text: card.content[KO],
+                  size: 30,
+                  color: Colors.black,
+                  isKorean: true,
+                ),
               ),
             ),
           ],
@@ -218,7 +211,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
                       const SizedBox(height: 20),
-                      card.content[PRONUN] != null
+                      card.content[PRONUN] != null && card.content[PRONUN].toString().isNotEmpty
                           ? FittedBox(
                               fit: BoxFit.scaleDown,
                               child: MyWidget().getTextWidget(
@@ -243,6 +236,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.mention:
+        if(card.content[VIDEO] != null && youtubeControllers.containsKey(card.id)) {
+          if(index == thisIndex) {
+            youtubeControllers[card.id]!.play();
+          } else {
+            youtubeControllers[card.id]!.pause();
+          }
+        }
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -263,16 +263,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       card.content[VIDEO] != null
                           ? Padding(
                               padding: const EdgeInsets.only(top: 20),
-                              child: YoutubePlayer(
-                                controller: YoutubePlayerController(
-                                  initialVideoId: YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
-                                  flags: const YoutubePlayerFlags(),
-                                ),
+                              child: yt.YoutubePlayer(
+                                controller: youtubeControllers[card.id]!,
                                 actionsPadding: const EdgeInsets.all(10),
                                 bottomActions: [
-                                  CurrentPosition(),
+                                  yt.CurrentPosition(),
                                   const SizedBox(width: 10),
-                                  ProgressBar(isExpanded: true),
+                                  yt.ProgressBar(isExpanded: true),
                                 ],
                               ),
                             )
@@ -447,6 +444,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     isLoading = true;
     bottomWidget = const SizedBox.shrink();
     progressValue = 0.0;
+    youtubeControllers = {};
 
     animationController = AnimationController(
       vsync: this,
@@ -468,10 +466,26 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       double incrementPerCard = 0.2 / totalCards;
 
       Map<String, bool> flashcardMap = {};
+      bool videoEnded = false;
       for (dynamic snapshot in snapshots[0]) {
         LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
         if (card.type == MyStrings.repeat) {
           flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
+        }
+        if (card.content[VIDEO] != null) {
+          yt.YoutubePlayerController youtubeController = yt.YoutubePlayerController(
+            initialVideoId: yt.YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
+          );
+          youtubeController.addListener(() {
+            if(!videoEnded && youtubeController.value.isReady && youtubeController.value.playerState == yt.PlayerState.ended) {
+              videoEnded = true;
+              youtubeController.seekTo(const Duration(seconds: 0));
+              youtubeController.pause();
+            } else if (youtubeController.value.playerState == yt.PlayerState.playing) {
+              videoEnded = false;
+            }
+          });
+          youtubeControllers[card.id] = youtubeController;
         }
         cards.add(card);
         progressValue += incrementPerCard;
@@ -515,7 +529,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   void effectAudioPlay({required bool isCorrect}) async {
     String effect = 'correct';
-    if(!isCorrect) {
+    if (!isCorrect) {
       effect = 'wrong';
     }
     try {

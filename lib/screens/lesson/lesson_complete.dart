@@ -15,7 +15,6 @@ import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/screens/my_page/user.dart';
-import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -169,7 +168,7 @@ class LessonComplete extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        !lessonController.isHangulLesson ?
+                        !lesson.hasOptions ?
                         Column(
                           children: [
                             getBtn(tr('summary'), CupertinoIcons.doc_text, () {

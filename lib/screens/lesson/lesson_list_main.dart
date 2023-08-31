@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
@@ -80,9 +79,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       if (!lesson.isReleased) {
         isReleased = false;
       }
-      if (lesson.type == LESSON) {
-        lessonIndex++;
-      }
+      lessonIndex++;
     }
 
     return isReleased
@@ -110,11 +107,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                         child: InkWell(
                           onTap: () async {
                             await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
-                            if (course.id == courseController.hangulCourseId) {
-                              lessonController.isHangulLesson = true;
+                            if (!lesson.hasOptions) {
                               Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                             } else {
-                              lessonController.isHangulLesson = false;
                               Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
                             }
                           },
@@ -126,7 +121,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                 Row(
                                   children: [
                                     MyWidget().getTextWidget(
-                                      text: lesson.type == LESSON ? '$LESSON $lessonIndex' : lesson.type,
+                                      text: '$lessonIndex. ${lesson.type}',
                                       color: MyColors.grey,
                                     ),
                                     const SizedBox(width: 10),
@@ -240,7 +235,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   sliverList() {
     return SliverPadding(
-      padding: const EdgeInsets.only(top: 20.0),
+      padding: const EdgeInsets.only(top: 20, bottom: 50),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -79,6 +80,7 @@ class User {
 
   Future<void> getUser() async {
     id = auth.FirebaseAuth.instance.currentUser!.uid;
+    FirebaseCrashlytics.instance.setUserIdentifier(id);
     DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: id);
     if (snapshot.exists) {
       final json = snapshot.data()!;
