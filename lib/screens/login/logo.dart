@@ -136,10 +136,10 @@ class Logo extends StatelessWidget {
                 },
               ),
               Center(child: Image.asset('assets/images/logo.png')),
-              const Positioned(
+              Positioned(
                 bottom: 100.0,
                 child: Row(
-                  children: [
+                  children: const [
                     SizedBox(
                       height: 20.0,
                       width: 20.0,

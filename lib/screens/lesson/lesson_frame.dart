@@ -48,6 +48,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   final EX4 = 'ex4';
   final AUDIO = 'audio';
   final VIDEO = 'video';
+  final CLIP_START = 'clipStart';
+  final CLIP_END = 'clipEnd';
   final FILE_NAME = 'fileName';
   final SPEAKING = 'speaking';
   String fo = User().language;
@@ -236,8 +238,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.mention:
-        if(card.content[VIDEO] != null && youtubeControllers.containsKey(card.id)) {
-          if(index == thisIndex) {
+        if (card.content[VIDEO] != null && youtubeControllers.containsKey(card.id)) {
+          if (index == thisIndex) {
             youtubeControllers[card.id]!.play();
           } else {
             youtubeControllers[card.id]!.pause();
@@ -467,22 +469,43 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
       Map<String, bool> flashcardMap = {};
       bool videoEnded = false;
+      int clipStart = 0;
+      int? clipEnd;
+
       for (dynamic snapshot in snapshots[0]) {
         LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
         if (card.type == MyStrings.repeat) {
           flashcardMap[card.id] = LocalStorage().hasFlashcard(itemId: card.id);
         }
         if (card.content[VIDEO] != null) {
+          if (card.content[CLIP_START] != null &&
+              card.content[CLIP_END] != null &&
+              card.content[CLIP_START].toString().isNotEmpty &&
+              card.content[CLIP_END].toString().isNotEmpty) {
+            clipStart = int.parse(card.content[CLIP_START]);
+            clipEnd = int.parse(card.content[CLIP_END]);
+          }
           yt.YoutubePlayerController youtubeController = yt.YoutubePlayerController(
-            initialVideoId: yt.YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
-          );
+              initialVideoId: yt.YoutubePlayer.convertUrlToId(card.content[VIDEO])!,
+              flags: yt.YoutubePlayerFlags(
+                startAt: clipStart,
+              ));
           youtubeController.addListener(() {
-            if(!videoEnded && youtubeController.value.isReady && youtubeController.value.playerState == yt.PlayerState.ended) {
+            if (!videoEnded &&
+                youtubeController.value.isReady &&
+                youtubeController.value.playerState == yt.PlayerState.ended) {
+              print('ENDED');
               videoEnded = true;
-              youtubeController.seekTo(const Duration(seconds: 0));
+              youtubeController.seekTo(Duration(seconds: clipStart));
               youtubeController.pause();
             } else if (youtubeController.value.playerState == yt.PlayerState.playing) {
+              print('PLAYING');
               videoEnded = false;
+              if (clipEnd != null && youtubeController.value.position >= Duration(seconds: clipEnd)) {
+                print('CLIP END');
+                youtubeController.seekTo(Duration(seconds: clipStart));
+                youtubeController.pause();
+              }
             }
           });
           youtubeControllers[card.id] = youtubeController;
