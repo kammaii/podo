@@ -52,7 +52,7 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
     _navBarItem(tr('lessons'), const Icon(FontAwesomeIcons.chalkboard)),
     _navBarItem(tr('reading'), const Icon(FontAwesomeIcons.book)),
     _navBarItem(tr('writing'), const Icon(FontAwesomeIcons.pen)),
-    _navBarItem(tr('flashcard'), const Icon(CupertinoIcons.heart_fill)),
+    _navBarItem(tr('flashcard'), const Icon(FontAwesomeIcons.solidStar)),
     _navBarItem(tr('myPage'), const Icon(Icons.settings)),
   ];
 }

@@ -33,41 +33,41 @@ class LessonSummaryMain extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          isNewUser
-              ? const SizedBox.shrink()
-              : FloatingActionButton(
-                  heroTag: 'wiringBtn',
-                  onPressed: () {
-                    isBasicUser
-                        ? Get.toNamed(MyStrings.routePremiumMain)
-                        : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
-                  },
-                  backgroundColor: isBasicUser ? MyColors.grey : MyColors.green,
-                  child: Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: 25),
-                ),
-          const SizedBox(height: 5),
-          isNewUser
-              ? const SizedBox.shrink()
-              : MyWidget().getTextWidget(
-                  text: tr('writing'),
-                  size: 15,
-                  color: isBasicUser ? MyColors.grey : MyColors.greenDark,
-                  isBold: true,
-                ),
-          const SizedBox(height: 15),
           FloatingActionButton(
             heroTag: 'learningBtn',
             onPressed: () {
               Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
             },
-            backgroundColor: MyColors.pink,
+            backgroundColor: MyColors.green,
             child: const Icon(Icons.play_arrow_rounded, size: 40),
           ),
           const SizedBox(height: 5),
           MyWidget().getTextWidget(
             text: tr('learning'),
             size: 15,
-            color: MyColors.wine,
+            color: MyColors.greenDark,
+            isBold: true,
+          ),
+          const SizedBox(height: 15),
+          isNewUser
+              ? const SizedBox.shrink()
+              : FloatingActionButton(
+            heroTag: 'wiringBtn',
+            onPressed: () {
+              isBasicUser
+                  ? Get.toNamed(MyStrings.routePremiumMain)
+                  : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
+            },
+            backgroundColor: isBasicUser ? MyColors.grey : MyColors.pinkDark,
+            child: Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: 25),
+          ),
+          const SizedBox(height: 5),
+          isNewUser
+              ? const SizedBox.shrink()
+              : MyWidget().getTextWidget(
+            text: tr('writing'),
+            size: 15,
+            color: isBasicUser ? MyColors.grey : MyColors.wine,
             isBold: true,
           ),
           const SizedBox(height: 10),

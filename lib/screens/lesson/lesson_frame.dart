@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:just_audio/just_audio.dart';
@@ -15,6 +14,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
@@ -28,6 +28,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart' as yt;
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -179,33 +180,17 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                 children: [
                   Column(
                     children: [
-                      Obx(() => Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                  onPressed: () {
-                                    if (controller.hasFlashcard[card.id]) {
-                                      FlashCard().removeFlashcard(itemId: card.id);
-                                      controller.hasFlashcard[card.id] = false;
-                                    } else {
-                                      FlashCard().addFlashcard(
-                                          itemId: card.id,
-                                          front: card.content[KO],
-                                          back: card.content[fo],
-                                          audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}',
-                                          fn: () {
-                                            controller.hasFlashcard[card.id] = true;
-                                          });
-                                    }
-                                  },
-                                  icon: Icon(
-                                    controller.hasFlashcard[card.id]
-                                        ? CupertinoIcons.heart_fill
-                                        : CupertinoIcons.heart,
-                                    color: MyColors.purple,
-                                  ))
-                            ],
-                          )),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Obx(() => FlashcardIcon().getIcon(
+                              controller: controller,
+                              itemId: card.id,
+                              front: card.content[KO],
+                              back: card.content[fo],
+                              audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}')),
+                        ],
+                      ),
                       const SizedBox(height: 10),
                       FittedBox(
                         fit: BoxFit.scaleDown,

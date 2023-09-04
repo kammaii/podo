@@ -9,6 +9,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
@@ -21,6 +22,7 @@ import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ReadingFrame extends StatefulWidget {
   const ReadingFrame({Key? key}) : super(key: key);
@@ -106,13 +108,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     ]).then((snapshots) async {
       int totalReadings = snapshots[0].length;
       double incrementPerReading = 0.2 / totalReadings;
+      controller.hasFlashcard.value = {};
       for (dynamic snapshot in snapshots[0]) {
         Reading reading = Reading.fromJson(snapshot.data() as Map<String, dynamic>);
         readings.add(reading);
         progressValue += incrementPerReading;
+        controller.hasFlashcard[reading.id] = LocalStorage().hasFlashcard(itemId: reading.id);
         setState(() {});
       }
-      controller.hasFlashcard.value = List.generate(readings.length, (index) => false);
 
       Map<String, String> audios = {};
       for (dynamic snapshot in snapshots[1]) {
@@ -323,7 +326,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   Widget partContentKo(int index) {
     Reading reading = readings[index];
     final contentKo = reading.content[KO];
-    controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: reading.id);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,29 +337,15 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               padding: const EdgeInsets.only(left: 10),
               child: MyWidget().getTextWidget(text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
-            Obx(() => IconButton(
-                onPressed: () {
-                  if (controller.hasFlashcard[index]) {
-                    FlashCard().removeFlashcard(itemId: reading.id);
-                    controller.hasFlashcard[index] = false;
-                  } else {
-                    FlashCard().addFlashcard(
-                        itemId: reading.id,
-                        front: reading.content[KO],
-                        back: reading.content[fo],
-                        audio: 'ReadingAudios_${readingTitle.id}_${reading.id}',
-                        fn: () {
-                          controller.hasFlashcard[index] = true;
-                        });
-                  }
-                },
-                icon: Icon(
-                  controller.hasFlashcard[index] ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                  color: MyColors.purple,
-                ))),
+            Obx(() => FlashcardIcon().getIcon(
+                controller: controller,
+                itemId: reading.id,
+                front: reading.content[KO],
+                back: reading.content[fo],
+                audio: 'ReadingAudios_${readingTitle.id}_${reading.id}')),
             Material(
               child: IconButton(
-                icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple),
+                icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple, size: 28),
                 onPressed: () async {
                   PlayAudio().player.stop();
                   String fileName = reading.id;

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
@@ -62,6 +63,7 @@ class _WritingListState extends State<WritingList> {
     controller.isLoading.value = true;
     List<dynamic> snapshots = await Database().getDocs(query: query);
     controller.isLoading.value = false;
+    controller.hasFlashcard.value = {};
 
     if (snapshots.isNotEmpty) {
       for (dynamic snapshot in snapshots) {
@@ -69,9 +71,8 @@ class _WritingListState extends State<WritingList> {
         writings.add(writing);
       }
       lastSnapshot = snapshots.last;
-      controller.hasFlashcard.value = List.generate(writings.length, (index) => false);
       for (int i = 0; i < writings.length; i++) {
-        controller.hasFlashcard[i] = LocalStorage().hasFlashcard(itemId: writings[i].id);
+        controller.hasFlashcard[writings[i].id] = LocalStorage().hasFlashcard(itemId: writings[i].id);
       }
     }
     isLoaded = true;
@@ -108,24 +109,7 @@ class _WritingListState extends State<WritingList> {
         ),
         Visibility(
           visible: writing.status == 1 && title.contains('C') || writing.status == 2 && title.contains('A'),
-          child: Obx(() => IconButton(
-              onPressed: () {
-                if (controller.hasFlashcard[index]) {
-                  FlashCard().removeFlashcard(itemId: writing.id);
-                  controller.hasFlashcard[index] = false;
-                } else {
-                  FlashCard().addFlashcard(
-                      itemId: writing.id,
-                      front: extractedText,
-                      fn: () {
-                        controller.hasFlashcard[index] = true;
-                      });
-                }
-              },
-              icon: Icon(
-                controller.hasFlashcard[index] ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                color: MyColors.purple,
-              ))),
+          child: Obx(() => FlashcardIcon().getIcon(controller: controller, itemId: writing.id, front: extractedText)),
         )
       ],
     );

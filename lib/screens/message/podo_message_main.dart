@@ -10,10 +10,9 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:podo/common/database.dart';
+import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
-import 'package:podo/common/play_audio.dart';
-import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/message/podo_message_reply.dart';
@@ -28,7 +27,8 @@ class PodoMessageMain extends StatelessWidget {
 
   final KO = 'ko';
   final replyController = TextEditingController();
-  late bool hasReplied;
+  bool isReplyAvailable = true;
+  late String replyHint;
   final controller = Get.find<PodoMessageController>();
   bool isBasicUser = User().status == 1;
   just_audio.AudioPlayer? player;
@@ -128,7 +128,7 @@ class PodoMessageMain extends StatelessWidget {
     return YoutubePlayer(
       controller: YoutubePlayerController(
         initialVideoId: YoutubePlayer.convertUrlToId(url)!,
-        flags: const YoutubePlayerFlags(),
+        flags: YoutubePlayerFlags(autoPlay: isBasicUser ? false : true),
       ),
       actionsPadding: const EdgeInsets.all(10),
       bottomActions: [
@@ -141,11 +141,17 @@ class PodoMessageMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    hasReplied = controller.hasReplied.value;
     String? reply;
-    if (hasReplied) {
+    if (controller.hasReplied) {
       History history = LocalStorage().histories.firstWhere((history) => history.itemId == PodoMessage().id);
       reply = history.content;
+      isReplyAvailable = false;
+      replyHint = reply!;
+    } else if (controller.hasExpired) {
+      replyHint = tr('expired');
+      isReplyAvailable = false;
+    } else {
+      replyHint = tr('replyPodo');
     }
 
     isBasicUser
@@ -164,7 +170,7 @@ class PodoMessageMain extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            if(player != null) {
+            if (player != null) {
               player!.dispose();
             }
             Get.back();
@@ -250,17 +256,19 @@ class PodoMessageMain extends StatelessWidget {
                             builder: (BuildContext context, AsyncSnapshot snapshot) {
                               if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                                 List<PodoMessageReply> replies = [];
+                                controller.hasFlashcard.value = {};
+
                                 for (dynamic snapshot in snapshot.data) {
                                   replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
                                 }
-                                controller.hasFlashcard.value = List.generate(replies.length, (index) => false);
                                 return ListView.builder(
                                   itemCount: replies.length,
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   itemBuilder: (BuildContext context, int index) {
                                     PodoMessageReply reply = replies[index];
-                                    controller.hasFlashcard[index] = LocalStorage().hasFlashcard(itemId: reply.id);
+                                    controller.hasFlashcard[reply.id] =
+                                        LocalStorage().hasFlashcard(itemId: reply.id);
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 5),
                                       child: Row(
@@ -295,26 +303,10 @@ class PodoMessageMain extends StatelessWidget {
                                                                 size: 16,
                                                                 height: 1.5)),
                                                         const SizedBox(width: 10),
-                                                        Obx(() => IconButton(
-                                                            onPressed: () {
-                                                              if (controller.hasFlashcard[index]) {
-                                                                FlashCard().removeFlashcard(itemId: reply.id);
-                                                                controller.hasFlashcard[index] = false;
-                                                              } else {
-                                                                FlashCard().addFlashcard(
-                                                                    itemId: reply.id,
-                                                                    front: reply.reply,
-                                                                    fn: () {
-                                                                      controller.hasFlashcard[index] = true;
-                                                                    });
-                                                              }
-                                                            },
-                                                            icon: Icon(
-                                                              controller.hasFlashcard[index]
-                                                                  ? CupertinoIcons.heart_fill
-                                                                  : CupertinoIcons.heart,
-                                                              color: MyColors.purple,
-                                                            ))),
+                                                        Obx(() => FlashcardIcon().getIcon(
+                                                            controller: controller,
+                                                            itemId: reply.id,
+                                                            front: reply.reply)),
                                                       ],
                                                     ),
                                                     Row(
@@ -384,36 +376,38 @@ class PodoMessageMain extends StatelessWidget {
                         children: [
                           Expanded(
                             child: MyWidget().getTextFieldWidget(
-                              hint: hasReplied ? reply! : tr('replyPodo'),
+                              hint: replyHint,
                               controller: replyController,
-                              enabled: !hasReplied,
+                              enabled: isReplyAvailable,
                             ),
                           ),
                           const SizedBox(width: 20),
                           IgnorePointer(
-                            ignoring: hasReplied,
+                            ignoring: !isReplyAvailable,
                             child: IconButton(
-                                onPressed: () {
-                                  MyWidget().showDialog(
-                                      content: tr('sendReply'),
-                                      yesFn: () async {
-                                        await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
-                                        PodoMessageReply reply = PodoMessageReply(replyController.text);
-                                        await Database().setDoc(
-                                            collection: 'PodoMessages/${PodoMessage().id}/Replies',
-                                            doc: reply,
-                                            thenFn: (value) {
-                                              print('Podo message reply completed');
-                                              Get.back();
-                                              Get.find<PodoMessageController>().setHasReplied(true);
-                                            });
-                                        History().addHistory(
-                                            item: 'podoMessage',
-                                            itemId: PodoMessage().id!,
-                                            content: replyController.text);
-                                      });
-                                },
-                                icon: Icon(Icons.send, color: hasReplied ? MyColors.grey : MyColors.purple)),
+                              onPressed: () {
+                                MyWidget().showDialog(
+                                  content: tr('sendReply'),
+                                  yesFn: () async {
+                                    await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
+                                    PodoMessageReply reply = PodoMessageReply(replyController.text);
+                                    await Database().setDoc(
+                                        collection: 'PodoMessages/${PodoMessage().id}/Replies',
+                                        doc: reply,
+                                        thenFn: (value) {
+                                          print('Podo message reply completed');
+                                          Get.back();
+                                        });
+                                    History().addHistory(
+                                        item: 'podoMessage',
+                                        itemId: PodoMessage().id!,
+                                        content: replyController.text);
+                                    Get.find<PodoMessageController>().setPodoMsgBtn();
+                                  },
+                                );
+                              },
+                              icon: Icon(Icons.send, color: !isReplyAvailable ? MyColors.grey : MyColors.purple),
+                            ),
                           ),
                         ],
                       ),

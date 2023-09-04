@@ -55,7 +55,7 @@ void main() async {
       Locale('fr'),
       Locale('de'),
       Locale('pt'),
-      Locale('in'),
+      Locale('id'),
       Locale('ru'),
     ],
     path: 'assets/translations',

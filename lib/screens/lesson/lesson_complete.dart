@@ -168,7 +168,7 @@ class LessonComplete extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        !lesson.hasOptions ?
+                        lesson.hasOptions ?
                         Column(
                           children: [
                             getBtn(tr('summary'), CupertinoIcons.doc_text, () {

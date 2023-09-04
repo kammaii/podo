@@ -106,7 +106,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                         color: Colors.white,
                         child: InkWell(
                           onTap: () async {
-                            await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                            await FirebaseAnalytics.instance
+                                .logSelectContent(contentType: 'lesson', itemId: lesson.id);
                             if (!lesson.hasOptions) {
                               Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                             } else {
@@ -122,7 +123,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                   children: [
                                     MyWidget().getTextWidget(
                                       text: '$lessonIndex. ${lesson.type}',
-                                      color: MyColors.grey,
+                                      color: MyColors.navy,
                                     ),
                                     const SizedBox(width: 10),
                                     Obx(
@@ -139,7 +140,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                 MyWidget().getTextWidget(
                                   text: lesson.title[KO],
                                   size: 20,
-                                  color: MyColors.navy,
+                                  color: MyColors.purple,
                                 ),
                                 const SizedBox(height: 10),
                                 MyWidget().getTextWidget(
@@ -152,7 +153,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                         ),
                       ),
                     ),
-                    lesson.tag != null
+                    lesson.tag != null && lesson.tag.toString().isNotEmpty
                         ? Positioned(
                             top: 4,
                             right: 14,
@@ -262,8 +263,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     lessonIndex = -1;
     final cloudController = Get.put(PodoMessageController());
     if (PodoMessage().id != null) {
-      bool hasReplied = LocalStorage().hasHistory(itemId: PodoMessage().id!);
-      cloudController.setHasReplied(hasReplied);
+      cloudController.setPodoMsgBtn();
     }
 
     return RefreshIndicator(
@@ -315,11 +315,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                               () => MyWidget().getRoundedContainer(
                                 radius: 30,
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                bgColor: cloudController.hasReplied.value ? MyColors.grey : MyColors.green,
+                                bgColor: cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
                                 widget: MyWidget().getTextWidget(
-                                    text: cloudController.hasReplied.value ? tr('replied') : tr('replyPodo'),
-                                    color: Colors.white,
-                                    size: 13),
+                                    text: cloudController.podoMsgBtnText, color: Colors.white, size: 13),
                               ),
                             ),
                           )

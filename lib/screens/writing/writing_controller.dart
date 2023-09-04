@@ -8,7 +8,7 @@ class WritingController extends GetxController {
   late RxInt leftRequestCount = 0.obs;
   int maxRequestCount = 3;
   RxBool isLoading = false.obs;
-  RxList<bool> hasFlashcard = <bool>[].obs;
+  RxMap<dynamic, dynamic> hasFlashcard = {}.obs;
 
 
   @override

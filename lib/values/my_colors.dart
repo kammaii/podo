@@ -15,5 +15,6 @@ class MyColors {
   static const Color wine = Color(0xffB46468);
   static const Color red = Color(0xffF74A30);
   static const Color pink = Color(0xffFFD8DD);
+  static const Color pinkDark = Color(0xffFF98A5);
   static const Color grey = Colors.grey;
 }
