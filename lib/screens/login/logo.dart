@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -109,12 +110,24 @@ class Logo extends StatelessWidget {
     });
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user != null && user.emailVerified) {
-        print('AUTH STATE CHANGES: Email Verified');
-        getInitData();
-      } else {
-        print('AUTH STATE CHANGES: User is null or not verified');
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+      try {
+        if (user != null && user.emailVerified) {
+          print('AUTH STATE CHANGES: Email Verified');
+          getInitData();
+        } else {
+          print('AUTH STATE CHANGES: User is null or not verified');
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+        }
+      } catch(e, stackTrace) {
+        final fc = FirebaseCrashlytics.instance;
+        fc.log('AuthStateChanges Error');
+        if(user != null) {
+          fc.setCustomKey('user', user);
+          fc.setCustomKey('emailVerified', user.emailVerified);
+        } else {
+          fc.log('User is null');
+        }
+        fc.recordError(e, stackTrace);
       }
     });
 

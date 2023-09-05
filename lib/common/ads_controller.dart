@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -6,7 +9,7 @@ import 'package:podo/screens/my_page/user.dart';
 // ANDROID_앱ID : ca-app-pub-2526130301535877~2249268822
 // IOS_앱ID : ca-app-pub-2526130301535877~5843284501
 
-class AdsController extends GetxController{
+class AdsController extends GetxController {
   final ANDROID_INTERSTITIAL = 'android_interstitial';
   final ANDROID_BANNER = 'android_banner';
   final IOS_INTERSTITIAL = 'ios_interstitial';
@@ -58,6 +61,8 @@ class AdsController extends GetxController{
         }
       }, onAdFailedToLoad: (LoadAdError e) {
         print('Failed to load interstitialAd : $e');
+        FirebaseCrashlytics.instance
+            .recordError(Exception('Failed to load interstitialAd : $e'), null, printDetails: true);
       }),
     );
   }
@@ -75,6 +80,8 @@ class AdsController extends GetxController{
           onAdDismissedFullScreenContent: f,
           onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError e) {
             print('onAdFailedToShowFullScreenContent : $e');
+            FirebaseCrashlytics.instance
+                .recordError(Exception('onAdFailedToShowFullScreenContent : $e'), null, printDetails: true);
             ad.dispose();
             _loadInterstitialAds();
           });
@@ -89,6 +96,7 @@ class AdsController extends GetxController{
       adUnitId: UNIT_ID[User().os == 'iOS' ? IOS_BANNER : ANDROID_BANNER]!,
       listener: BannerAdListener(onAdFailedToLoad: (Ad ad, LoadAdError e) {
         print('Failed to load bannerAd : $e');
+        FirebaseCrashlytics.instance.recordError(Exception('Failed to load bannerAd : $e'), null, printDetails: true,);
         ad.dispose();
       }, onAdLoaded: (Ad ad) {
         print('BannerAd is loaded');
