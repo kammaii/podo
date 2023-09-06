@@ -18,7 +18,6 @@ import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
-import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -28,7 +27,6 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart' as yt;
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);

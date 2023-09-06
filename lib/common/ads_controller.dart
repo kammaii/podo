@@ -28,7 +28,7 @@ class AdsController extends GetxController {
   }
 
   late final Map<String, String> UNIT_ID;
-  InterstitialAd? _interstitialAd;
+  InterstitialAd? interstitialAd;
   BannerAd? bannerAd;
   bool isBannerAdLoaded = false;
 
@@ -55,9 +55,9 @@ class AdsController extends GetxController {
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (InterstitialAd ad) {
         print('InterstitialAd is loaded');
-        _interstitialAd = ad;
+        interstitialAd = ad;
         if (User().os == 'android') {
-          _interstitialAd!.setImmersiveMode(true);
+          interstitialAd!.setImmersiveMode(true);
         }
       }, onAdFailedToLoad: (LoadAdError e) {
         print('Failed to load interstitialAd : $e');
@@ -68,11 +68,11 @@ class AdsController extends GetxController {
   }
 
   void showInterstitialAd(Function(InterstitialAd ad) f) {
-    if (_interstitialAd == null) {
+    if (interstitialAd != null) {
       print('Warning: attempt to show interstitial before loaded.');
       _loadInterstitialAds();
     } else {
-      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
           onAdShowedFullScreenContent: (InterstitialAd ad) {
             print('onAdShowedFullScreenContent');
             _loadInterstitialAds();
@@ -85,8 +85,8 @@ class AdsController extends GetxController {
             ad.dispose();
             _loadInterstitialAds();
           });
-      _interstitialAd!.show();
-      _interstitialAd = null;
+      interstitialAd!.show();
+      interstitialAd = null;
     }
   }
 

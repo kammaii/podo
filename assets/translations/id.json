@@ -96,9 +96,9 @@
   "writingCorrection": "Koreksi Tulisan",
   "reading": "Membaca",
   "flashcard": "Kartu memori",
-  "podosMsg": "Pesan Cloud",
+  "podosMsg": "Pesan dari Podo",
   "adFree": "Tanpa iklan",
-  "limited": "beberapa",
+  "limited": "terbatas",
   "all": "semua",
   "limit20": "batas: 20",
   "unlimited": "tidak terbatas",
@@ -128,7 +128,10 @@
   "trialActivated": "Fitur Premium gratis telah diaktifkan.",
   "getFreePremium": "Dapatkan 10 hari Premium gratis! \n(Izin diperlukan untuk pemberitahuan)",
   "cool": "Keren!",
-  "restartApp": "Please restart the app",
-  "shouldRestart": "You must restart the app after changing the language.",
-  "languageChanged": "The language has been changed."
+  "restartApp": "Harap mulai ulang aplikasi.",
+  "shouldRestart": "Anda harus memulai ulang aplikasi setelah mengganti bahasa.",
+  "languageChanged": "Bahasa telah diubah.",
+  "mode": "Mode",
+  "topic": "Topik",
+  "grammar": "Tata bahasa"
 }

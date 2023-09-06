@@ -98,7 +98,7 @@
   "flashcard": "Tarjeta de memoria",
   "podosMsg": "Mensaje Cloud",
   "adFree": "Sin anuncios",
-  "limited": "limited",
+  "limited": "limitado",
   "all": "todos",
   "limit20": "limite: 20",
   "unlimited": "ilimitado",
@@ -129,6 +129,9 @@
   "getFreePremium": "¡Obtén 10 días de Premium gratis! (Se requiere permiso para notificaciones)",
   "cool": "¡Genial!",
   "restartApp": "Por favor, reinicie la aplicación.",
-  "shouldRestart": "Debe reiniciar la aplicación después de cambiar el idioma.",
-  "languageChanged": "El idioma ha sido cambiado."
+  "shouldRestart": "Debes reiniciar la aplicación después de cambiar el idioma.",
+  "languageChanged": "El idioma ha sido cambiado.",
+  "mode": "Modo",
+  "topic": "Tema",
+  "grammar": "Gramática"
 }

@@ -96,12 +96,12 @@
   "writingCorrection": "Correção de escrita",
   "reading": "Leitura",
   "flashcard": "Cartão de memória",
-  "podosMsg": "Mensagem Cloud",
+  "podosMsg": "Mensagem de Podo",
   "adFree": "Sem anúncios",
   "limited": "alguns",
   "all": "todos",
   "limit20": "limite: 20",
-  "unlimited": "ilimitado",
+  "unlimited": "limitado",
   "summary": "Resumo",
   "nextLesson": "Próxima lição",
   "goToMain": "Ir para a página principal",
@@ -128,7 +128,10 @@
   "trialActivated": "Os recursos Premium gratuitos foram ativados.",
   "getFreePremium": "Receba 10 dias de Premium grátis! (Permissão necessária para notificações)",
   "cool": "Legal!",
-  "restartApp": "Please restart the app",
-  "shouldRestart": "You must restart the app after changing the language.",
-  "languageChanged": "The language has been changed."
+  "restartApp": "Por favor, reinicie o aplicativo.",
+  "shouldRestart": "Você deve reiniciar o aplicativo após alterar o idioma.",
+  "languageChanged": "O idioma foi alterado.",
+  "mode": "Modo",
+  "topic": "Tópico",
+  "grammar": "Gramática"
 }

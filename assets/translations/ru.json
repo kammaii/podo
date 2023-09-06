@@ -96,9 +96,9 @@
   "writingCorrection": "Коррекция письма",
   "reading": "Чтение",
   "flashcard": "Флеш-карта",
-  "podosMsg": "Сообщение Cloud",
+  "podosMsg": "Сообщение от Подо",
   "adFree": "Без рекламы",
-  "limited": "несколько",
+  "limited": "ограниченный",
   "all": "все",
   "limit20": "лимит: 20",
   "unlimited": "неограниченный",
@@ -128,7 +128,10 @@
   "trialActivated": "Бесплатные функции Premium активированы.",
   "getFreePremium": "Получите 10 дней бесплатного Premium! (Требуется разрешение для уведомлений)",
   "cool": "Круто!",
-  "restartApp": "Please restart the app",
-  "shouldRestart": "You must restart the app after changing the language.",
-  "languageChanged": "The language has been changed."
+  "restartApp": "Пожалуйста, перезапустите приложение.",
+  "shouldRestart": "Вы должны перезапустить приложение после смены языка.",
+  "languageChanged": "Язык был изменен.",
+  "mode": "Режим",
+  "topic": "Тема",
+  "grammar": "Грамматика"
 }

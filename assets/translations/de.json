@@ -96,9 +96,9 @@
   "writingCorrection": "Schreiberkorrektur",
   "reading": "Lesen",
   "flashcard": "Lernkarten",
-  "podosMsg": "Cloud-Nachricht",
+  "podosMsg": "Podos Nachricht",
   "adFree": "Werbefrei",
-  "limited": "wenige",
+  "limited": "begrenzt",
   "all": "alle",
   "limit20": "Limit: 20",
   "unlimited": "unbegrenzt",
@@ -128,7 +128,10 @@
   "trialActivated": "Die kostenlosen Premium-Funktionen wurden aktiviert.",
   "getFreePremium": "Erhalte 10 Tage kostenloses Premium! (Berechtigung für Benachrichtigungen erforderlich)",
   "cool": "Cool!",
-  "restartApp": "Please restart the app",
-  "shouldRestart": "You must restart the app after changing the language.",
-  "languageChanged": "The language has been changed."
+  "restartApp": "Bitte starten Sie die App neu.",
+  "shouldRestart": "Sie müssen die App neu starten, nachdem Sie die Sprache geändert haben.",
+  "languageChanged": "Die Sprache wurde geändert.",
+  "mode": "Modus",
+  "topic": "Thema",
+  "grammar": "Grammatik"
 }

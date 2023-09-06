@@ -229,30 +229,45 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                             child: Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    MyWidget().getTextWidget(
-                                      text: tr('selectCourse'),
-                                      size: 20,
-                                      color: MyColors.purple,
-                                      isBold: true,
+                                    Expanded(
+                                      child: MyWidget().getTextWidget(
+                                        text: tr('selectCourse'),
+                                        size: 20,
+                                        color: MyColors.purple,
+                                        isBold: true,
+                                      ),
                                     ),
-                                    ToggleButtons(
-                                      isSelected: modeToggle,
-                                      onPressed: (int index) {
-                                        modeToggle[0] = 0 == index;
-                                        modeToggle[1] = 1 == index;
-                                        controller.update();
-                                      },
-                                      constraints: const BoxConstraints(minHeight: 35, minWidth: 45),
-                                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                      selectedBorderColor: MyColors.purple,
-                                      selectedColor: Colors.white,
-                                      fillColor: MyColors.purple,
-                                      color: MyColors.purple,
-                                      children: const [
-                                        Text(MyStrings.beg),
-                                        Text(MyStrings.int),
+                                    Row(
+                                      children: [
+                                        MyWidget().getTextWidget(
+                                          text: tr('mode'),
+                                          size: 13,
+                                          color: MyColors.purple,
+                                          isBold: true,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        ToggleButtons(
+                                          isSelected: modeToggle,
+                                          onPressed: (int index) {
+                                            modeToggle[0] = 0 == index;
+                                            modeToggle[1] = 1 == index;
+                                            controller.update();
+                                          },
+                                          constraints: const BoxConstraints(minHeight: 35, minWidth: 45),
+                                          borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                          selectedBorderColor: MyColors.purple,
+                                          selectedColor: Colors.white,
+                                          fillColor: MyColors.purple,
+                                          color: MyColors.purple,
+                                          children: [
+                                            Text(tr('topic')),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                                              child: Text(tr('grammar')),
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ],

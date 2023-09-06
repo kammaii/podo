@@ -235,9 +235,13 @@ class LessonComplete extends StatelessWidget {
   }
   void showAd(Function() fn) {
     if(User().status == 1) {
-      AdsController().showInterstitialAd((ad) {
+      if(AdsController().interstitialAd == null) {
+        AdsController().showInterstitialAd((ad) {
+          fn();
+        });
+      } else {
         fn();
-      });
+      }
     } else {
       fn();
     }

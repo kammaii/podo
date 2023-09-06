@@ -130,5 +130,8 @@
   "cool": "Cool!",
   "restartApp": "Please restart the app",
   "shouldRestart": "You must restart the app after changing the language.",
-  "languageChanged": "The language has been changed."
+  "languageChanged": "The language has been changed.",
+  "mode": "Mode",
+  "topic": "Topic",
+  "grammar": "Grammar"
 }

@@ -116,6 +116,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         controller.hasFlashcard[reading.id] = LocalStorage().hasFlashcard(itemId: reading.id);
         setState(() {});
       }
+      controller.initIsExpanded(readings.length);
 
       Map<String, String> audios = {};
       for (dynamic snapshot in snapshots[1]) {
@@ -374,7 +375,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   Widget partContentFo(int index) {
     final contentFo = readings[index].content[fo];
-    controller.initIsExpanded(readings.length);
     return ExpansionTile(
       onExpansionChanged: (value) {
         controller.setIsExpanded(index, value);
@@ -393,7 +393,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   Widget partWords(int index) {
     Reading reading = readings[index];
     List<dynamic> wordKoList = reading.words[KO] ?? [];
-    List<dynamic> wordFoList = reading.words[fo];
+    List<dynamic> wordFoList = reading.words[fo] ?? [];
 
     return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
