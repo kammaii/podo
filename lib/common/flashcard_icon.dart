@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/values/my_colors.dart';
 
 class FlashcardIcon {
-  Widget getIcon(
+  Widget getIconButton(
       {required dynamic controller, required String itemId, required String front, String? back, String? audio}) {
     return Stack(
       children: [
@@ -36,6 +36,18 @@ class FlashcardIcon {
         controller.hasFlashcard[itemId]
             ? const SizedBox.shrink()
             : const Icon(CupertinoIcons.plus_circle_fill, color: MyColors.purple, size: 13),
+      ],
+    );
+  }
+
+  Widget getIconOnly() {
+    return const Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(5),
+          child: Icon(FontAwesomeIcons.star, color: MyColors.purple),
+        ),
+        Icon(CupertinoIcons.plus_circle_fill, color: MyColors.purple, size: 13)
       ],
     );
   }

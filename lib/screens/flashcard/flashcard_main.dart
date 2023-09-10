@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/play_stop_icon.dart';
@@ -19,7 +20,8 @@ class FlashCardMain extends StatefulWidget {
   _FlashCardMainState createState() => _FlashCardMainState();
 }
 
-class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateMixin {
+class _FlashCardMainState extends State<FlashCardMain>
+    with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
   List<FlashCard> cardsSearch = [];
@@ -90,8 +92,12 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                           cardsSearch = [];
                           for (FlashCard card in controller.cards) {
                             if (searchText.isNotEmpty &&
-                                (card.front.toLowerCase().contains(searchText) ||
-                                    card.back.toLowerCase().contains(searchText))) {
+                                (card.front
+                                        .toLowerCase()
+                                        .contains(searchText) ||
+                                    card.back
+                                        .toLowerCase()
+                                        .contains(searchText))) {
                               cardsSearch.add(card);
                             }
                           }
@@ -102,7 +108,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   animationWidget(MyWidget().getCheckBox(
                                       value: controller.isCheckedAll,
@@ -114,15 +121,22 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                       animationWidget(IconButton(
                                           onPressed: () {
                                             MyWidget().showDialog(
-                                                content: tr('wantRemoveFlashcard'),
+                                                content:
+                                                    tr('wantRemoveFlashcard'),
                                                 yesFn: () {
                                                   List<String> ids = [];
-                                                  for (int i = 0; i < controller.isChecked.length; i++) {
+                                                  for (int i = 0;
+                                                      i <
+                                                          controller
+                                                              .isChecked.length;
+                                                      i++) {
                                                     controller.isChecked[i]
-                                                        ? ids.add(controller.cards[i].id)
+                                                        ? ids.add(controller
+                                                            .cards[i].id)
                                                         : null;
                                                   }
-                                                  FlashCard().removeFlashcards(ids: ids);
+                                                  FlashCard().removeFlashcards(
+                                                      ids: ids);
                                                 });
                                           },
                                           icon: const Icon(
@@ -133,13 +147,15 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                       InkWell(
                                         onTap: isBasicUser
                                             ? () {
-                                                Get.toNamed(MyStrings.routePremiumMain);
+                                                Get.toNamed(
+                                                    MyStrings.routePremiumMain);
                                               }
                                             : null,
                                         child: Row(
                                           children: [
                                             MyWidget().getTextWidget(
-                                                text: '$cardsLength ${tr('cards')}',
+                                                text:
+                                                    '$cardsLength ${tr('cards')}',
                                                 size: 15,
                                                 color: Colors.black),
                                             isBasicUser
@@ -159,19 +175,29 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                               ),
                               Expanded(
                                 child: cardsLength <= 0
-                                    ? Center(child: MyWidget().getTextWidget(text: tr('noFlashCards')))
+                                    ? Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        FlashcardIcon().getIconOnly(),
+                                        MyWidget().getTextWidget(
+                                            text: tr('noFlashCards')),
+                                      ],
+                                    )
                                     : GestureDetector(
                                         onTap: () {
                                           _focusNode.unfocus();
                                         },
                                         onLongPress: () {
-                                          controller.isLongClicked = !controller.isLongClicked;
+                                          controller.isLongClicked =
+                                              !controller.isLongClicked;
                                           controller.update();
                                         },
                                         child: ListView.builder(
-                                          padding: const EdgeInsets.only(top: 10, bottom: 80),
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 80),
                                           itemCount: cardsLength,
-                                          itemBuilder: (BuildContext context, int index) {
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
                                             return getFlashCardItem(index);
                                           },
                                         ),
@@ -197,7 +223,9 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                         builder: (_) {
                           return MyWidget().getRoundBtnWidget(
                             text: tr('review'),
-                            bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
+                            bgColor: controller.cards.isNotEmpty
+                                ? MyColors.purple
+                                : MyColors.grey,
                             f: onReviewBtn,
                             hasNullFunction: true,
                           );
@@ -237,7 +265,9 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
 
   Widget getFlashCardItem(int index) {
     FlashCard card;
-    searchText.isEmpty ? card = controller.cards[index] : card = cardsSearch[index];
+    searchText.isEmpty
+        ? card = controller.cards[index]
+        : card = cardsSearch[index];
     String front = card.front;
     String back = card.back;
 
@@ -260,11 +290,18 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
               children: [
                 Expanded(
                     child: Text(front,
-                        overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
-                const SizedBox(width: 20, height: 20, child: VerticalDivider(thickness: 1, color: MyColors.grey)),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 15))),
+                const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: VerticalDivider(thickness: 1, color: MyColors.grey)),
                 Expanded(
                     child: Text(back,
-                        overflow: TextOverflow.ellipsis, maxLines: 1, style: const TextStyle(fontSize: 15))),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 15))),
               ],
             ),
           ),
@@ -277,7 +314,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                   if (card.isPlay) {
                     setPlayStopIcon(index, isForward: false);
                   } else {
-                    PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
+                    PlayAudio().playFlashcard(card.audio!,
+                        addStreamCompleted: (event) {
                       if (event.processingState == ProcessingState.completed) {
                         setPlayStopIcon(index, isForward: false);
                         PlayAudio().stream.cancel();
@@ -293,7 +331,9 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                 },
                 child: SizedBox(
                   width: 30,
-                  child: card.audio == null ? const SizedBox.shrink() : playStopIcons[card.id]!.icon,
+                  child: card.audio == null
+                      ? const SizedBox.shrink()
+                      : playStopIcons[card.id]!.icon,
                 ))),
       ],
     );

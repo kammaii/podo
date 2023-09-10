@@ -13,7 +13,6 @@ import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
-import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading.dart';
@@ -338,7 +337,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               padding: const EdgeInsets.only(left: 10),
               child: MyWidget().getTextWidget(text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
-            Obx(() => FlashcardIcon().getIcon(
+            Obx(() => FlashcardIcon().getIconButton(
                 controller: controller,
                 itemId: reading.id,
                 front: reading.content[KO],
@@ -379,7 +378,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       onExpansionChanged: (value) {
         controller.setIsExpanded(index, value);
       },
-      leading: const Icon(CupertinoIcons.globe),
+      leading: const Icon(FontAwesomeIcons.language),
       iconColor: MyColors.purple,
       title: const Text(''),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 10),

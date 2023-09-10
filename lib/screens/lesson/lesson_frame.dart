@@ -181,7 +181,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Obx(() => FlashcardIcon().getIcon(
+                          Obx(() => FlashcardIcon().getIconButton(
                               controller: controller,
                               itemId: card.id,
                               front: card.content[KO],

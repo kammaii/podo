@@ -303,7 +303,7 @@ class PodoMessageMain extends StatelessWidget {
                                                                 size: 16,
                                                                 height: 1.5)),
                                                         const SizedBox(width: 10),
-                                                        Obx(() => FlashcardIcon().getIcon(
+                                                        Obx(() => FlashcardIcon().getIconButton(
                                                             controller: controller,
                                                             itemId: reply.id,
                                                             front: reply.reply)),

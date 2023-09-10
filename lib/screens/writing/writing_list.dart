@@ -109,7 +109,7 @@ class _WritingListState extends State<WritingList> {
         ),
         Visibility(
           visible: writing.status == 1 && title.contains('C') || writing.status == 2 && title.contains('A'),
-          child: Obx(() => FlashcardIcon().getIcon(controller: controller, itemId: writing.id, front: extractedText)),
+          child: Obx(() => FlashcardIcon().getIconButton(controller: controller, itemId: writing.id, front: extractedText)),
         )
       ],
     );
@@ -183,7 +183,7 @@ class _WritingListState extends State<WritingList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyWidget().getTextWidget(text: writing.userName ?? tr('unNamed'), color: MyColors.grey),
+                MyWidget().getTextWidget(text: writing.userName == null || writing.userName!.isEmpty ? tr('unNamed') : writing.userName, color: MyColors.grey),
               ],
             ),
             const Divider(),
