@@ -41,11 +41,11 @@ class FlashcardIcon {
   }
 
   Widget getIconOnly() {
-    return const Stack(
-      children: [
+    return Stack(
+      children: const [
         Padding(
           padding: EdgeInsets.all(5),
-          child: Icon(FontAwesomeIcons.star, color: MyColors.purple),
+          child: Icon(FontAwesomeIcons.star, color: MyColors.purple, size: 30),
         ),
         Icon(CupertinoIcons.plus_circle_fill, color: MyColors.purple, size: 13)
       ],

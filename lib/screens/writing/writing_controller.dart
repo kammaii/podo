@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
-import 'package:podo/values/my_strings.dart';
 
 class WritingController extends GetxController {
   late bool isChecked;

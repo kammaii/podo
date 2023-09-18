@@ -217,7 +217,7 @@ class _PremiumMainState extends State<PremiumMain> {
                             child: const Positioned(
                               top: 20,
                               right: 20,
-                              child: SizedBox(width: 15, height: 15, child: CircularProgressIndicator(strokeWidth: 2.5)),
+                              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 3)),
                             ),
                           ),
                         ],

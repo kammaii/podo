@@ -16,7 +16,7 @@ class LessonCourseController extends GetxController {
     courses = [[],[]];
     for(dynamic snapshot in snapshots) {
       LessonCourse course = LessonCourse.fromJson(snapshot.data() as Map<String, dynamic>);
-      if(course.isBeginnerMode) {
+      if(course.isTopicMode) {
         courses[0].add(course);
       } else {
         courses[1].add(course);

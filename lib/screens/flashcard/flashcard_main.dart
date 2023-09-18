@@ -179,8 +179,10 @@ class _FlashCardMainState extends State<FlashCardMain>
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         FlashcardIcon().getIconOnly(),
+                                        const SizedBox(height: 10),
                                         MyWidget().getTextWidget(
-                                            text: tr('noFlashCards')),
+                                            text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),
+                                        const SizedBox(height: 50),
                                       ],
                                     )
                                     : GestureDetector(
