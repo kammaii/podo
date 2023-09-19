@@ -18,7 +18,6 @@ import 'package:podo/screens/main_frame.dart';
 import 'package:podo/screens/message/podo_message_main.dart';
 import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
-import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/screens/writing/writing_my_list.dart';
 import 'package:podo/screens/writing/writing_other_list.dart';

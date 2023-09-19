@@ -120,54 +120,81 @@ class _WritingMyListState extends State<WritingMyList> {
       items.add(getItem(writing, tag: 'C'));
     }
 
-    return MyWidget().getRoundedContainer(
-      widget: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: (){
+                MyWidget().showDialog(
+                    content:
+                    tr('wantRemoveWriting'),
+                    yesFn: () {
+                      String id = writing.id;
+                      Database().deleteDoc(collection: 'Writings', docId: id).then((value) {
+                        writings.removeWhere((element) => element.id == id);
+                        controller.update();
+                      });
+                    });
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(5),
+                child: Icon(Icons.remove_circle_outline_rounded, size: 15, color: Colors.red,),
+              ),
+            )
+          ],
+        ),
+        MyWidget().getRoundedContainer(
+          widget: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MyWidget().getRoundedContainer(
-                  widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
-                  radius: 20,
-                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
-                  bgColor: statusColors[status]),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: MyWidget()
-                      .getTextWidget(text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
-              Column(
+              Row(
                 children: [
-                  Row(
+                  MyWidget().getRoundedContainer(
+                      widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
+                      radius: 20,
+                      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+                      bgColor: statusColors[status]),
+                  const SizedBox(width: 10),
+                  Expanded(
+                      child: MyWidget()
+                          .getTextWidget(text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
+                  Column(
                     children: [
-                      const Icon(Icons.keyboard_double_arrow_left_rounded, size: 13, color: MyColors.grey),
-                      const SizedBox(width: 5),
-                      MyWidget().getTextWidget(
-                          text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: MyColors.grey),
+                      Row(
+                        children: [
+                          const Icon(Icons.keyboard_double_arrow_left_rounded, size: 13, color: MyColors.grey),
+                          const SizedBox(width: 5),
+                          MyWidget().getTextWidget(
+                              text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: MyColors.grey),
+                        ],
+                      ),
+                      writing.dateReply != null
+                          ? Row(
+                              children: [
+                                const Icon(Icons.keyboard_double_arrow_right_rounded, size: 13, color: MyColors.grey),
+                                const SizedBox(width: 5),
+                                MyWidget().getTextWidget(
+                                    text: MyDateFormat().getDateFormat(writing.dateReply!),
+                                    size: 12,
+                                    color: MyColors.grey),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
                     ],
                   ),
-                  writing.dateReply != null
-                      ? Row(
-                          children: [
-                            const Icon(Icons.keyboard_double_arrow_right_rounded, size: 13, color: MyColors.grey),
-                            const SizedBox(width: 5),
-                            MyWidget().getTextWidget(
-                                text: MyDateFormat().getDateFormat(writing.dateReply!),
-                                size: 12,
-                                color: MyColors.grey),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
                 ],
+              ),
+              const Divider(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: items,
               ),
             ],
           ),
-          const Divider(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: items,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

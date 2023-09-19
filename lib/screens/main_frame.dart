@@ -16,7 +16,6 @@ import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/my_page/my_page.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
-import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_my_list.dart';
 import 'package:podo/values/my_colors.dart';
 
