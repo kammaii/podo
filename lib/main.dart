@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,8 @@ import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
 import 'package:podo/screens/writing/writing_list.dart';
 import 'package:podo/screens/writing/writing_main.dart';
+import 'package:podo/screens/writing/writing_my_list.dart';
+import 'package:podo/screens/writing/writing_other_list.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'firebase_options.dart';
@@ -85,8 +86,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: MyStrings.routeLessonFrame, page: () => LessonFrame()),
         GetPage(name: MyStrings.routeLessonComplete, page: () => const LessonComplete()),
         GetPage(name: MyStrings.routeWritingMain, page: () => WritingMain()),
-        GetPage(name: MyStrings.routeMyWritingList, page: () => WritingList(true)),
-        GetPage(name: MyStrings.routeOtherWritingList, page: () => WritingList(false)),
+        GetPage(name: MyStrings.routeMyWritingList, page: () => WritingMyList()),
+        GetPage(name: MyStrings.routeOtherWritingList, page: () => WritingOtherList()),
         GetPage(name: MyStrings.routeReadingFrame, page: () => const ReadingFrame()),
         GetPage(name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
         GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),

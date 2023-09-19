@@ -40,6 +40,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
   bool isBasicUser = User().status == 1;
   bool hasCategory = false;
   late Query query;
+  bool shouldLoad = true; // TextField 로 인한 rebuild 방지용
 
   Widget getListItem({required ReadingTitle readingTitle}) {
     return Card(
@@ -182,6 +183,13 @@ class _ReadingListMainState extends State<ReadingListMain> {
     });
   }
 
+  getReading() {
+    if(shouldLoad) {
+      shouldLoad = false;
+      return Database().getDocs(query: query);
+    }
+  }
+
   void setQuery() {
     query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
     if (selectedCategory == 0) {
@@ -219,6 +227,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                               child: GestureDetector(
                                 onTap: () {
                                   setState(() {
+                                    shouldLoad = true;
                                     selectedCategory = index;
                                     setQuery();
                                   });
@@ -243,7 +252,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                       const SizedBox(height: 20),
                       Expanded(
                         child: FutureBuilder(
-                          future: Database().getDocs(query: query),
+                          future: getReading(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                               readingTitles = [];

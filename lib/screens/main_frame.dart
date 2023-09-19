@@ -1,6 +1,6 @@
 import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,8 +17,8 @@ import 'package:podo/screens/my_page/my_page.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/screens/writing/writing_list.dart';
+import 'package:podo/screens/writing/writing_my_list.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
 
 class MainFrame extends StatefulWidget {
   const MainFrame({Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ List<Widget> _buildScreens() {
   return [
     course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
     ReadingListMain(),
-    WritingList(true),
+    WritingMyList(),
     const FlashCardMain(),
     const MyPage(),
   ];

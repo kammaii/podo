@@ -176,8 +176,10 @@ class MyWidget {
     bool enabled = true,
     FocusNode? focusNode,
     Function(String)? onSubmitted,
+    Key? key,
   }) {
     return TextField(
+      key: key,
       focusNode: focusNode,
       controller: controller,
       enabled: enabled,

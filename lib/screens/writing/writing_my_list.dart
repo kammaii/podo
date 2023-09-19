@@ -16,16 +16,14 @@ import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:html/parser.dart' as htmlParser;
 
-class WritingList extends StatefulWidget {
-  WritingList(this.isMyWritings, {Key? key}) : super(key: key);
-
-  bool isMyWritings = true;
+class WritingMyList extends StatefulWidget {
+  WritingMyList({Key? key}) : super(key: key);
 
   @override
-  State<WritingList> createState() => _WritingListState();
+  State<WritingMyList> createState() => _WritingMyListState();
 }
 
-class _WritingListState extends State<WritingList> {
+class _WritingMyListState extends State<WritingMyList> {
   List<Writing> writings = [];
   final controller = Get.find<WritingController>();
   final scrollController = ScrollController();
@@ -40,19 +38,12 @@ class _WritingListState extends State<WritingList> {
   List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
   bool isLoaded = false;
+  bool hasMore = true;
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
-    Query query;
-
-    if (widget.isMyWritings) {
-      query = ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
-    } else {
-      query = ref
-          .where('questionId', isEqualTo: questionId!)
-          .where('userId', isNotEqualTo: User().id)
-          .where('status', whereIn: [1, 2]).limit(docsLimit);
-    }
+    Query query =
+        ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
 
     if (isContinue) {
       query = query.startAfterDocument(lastSnapshot!);
@@ -61,7 +52,6 @@ class _WritingListState extends State<WritingList> {
     controller.isLoading.value = true;
     List<dynamic> snapshots = await Database().getDocs(query: query);
     controller.isLoading.value = false;
-    controller.hasFlashcard.value = {};
     writings = [];
 
     if (snapshots.isNotEmpty) {
@@ -72,48 +62,50 @@ class _WritingListState extends State<WritingList> {
         controller.hasFlashcard[writing.id] = LocalStorage().hasFlashcard(itemId: writing.id);
       }
       lastSnapshot = snapshots.last;
-      // for (int i = 0; i < writings.length; i++) {
-      //   controller.hasFlashcard[writings[i].id] = LocalStorage().hasFlashcard(itemId: writings[i].id);
-      // }
     }
+
+    if (snapshots.length < docsLimit) {
+      hasMore = false;
+    }
+
     isLoaded = true;
     controller.update();
   }
 
-  Widget getItem(int index, {required String title}) {
-    Writing writing = writings[index];
-
+  Widget getItem(Writing writing, {required String tag}) {
     String content = '';
-    if (title == 'Q') {
+    if (tag == 'Q') {
       content = writing.questionTitle;
-    } else if (title == 'A') {
+    } else if (tag == 'A') {
       content = writing.userWriting;
-    } else if (title == 'C') {
+    } else if (tag == 'C') {
       content = writing.correction;
     }
     String extractedText = htmlParser.parse(content).body!.text;
 
-    return Row(
-      children: [
-        widget.isMyWritings ?
-        MyWidget().getTextWidget(text: '$title. ', isBold: true) : const SizedBox.shrink(),
-        const SizedBox(width: 15),
-        Expanded(
-          child: HtmlWidget(
-            content,
-            textStyle: const TextStyle(
-              fontFamily: 'KoreanFont',
-              fontSize: 15,
-              height: 1.5,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: tag == 'A' ? 10 : 0),
+      child: Row(
+        children: [
+          MyWidget().getTextWidget(text: '$tag. ', isBold: true),
+          const SizedBox(width: 15),
+          Expanded(
+            child: HtmlWidget(
+              content,
+              textStyle: const TextStyle(
+                fontFamily: 'KoreanFont',
+                fontSize: 15,
+                height: 1.5,
+              ),
             ),
           ),
-        ),
-        Visibility(
-          visible: writing.status == 1 && title.contains('C') || writing.status == 2 && title.contains('A'),
-          child: Obx(() =>
-              FlashcardIcon().getIconButton(controller: controller, itemId: writing.id, front: extractedText)),
-        )
-      ],
+          Visibility(
+            visible: writing.status == 1 && tag.contains('C') || writing.status == 2 && tag.contains('A'),
+            child: Obx(() =>
+                FlashcardIcon().getIconButton(controller: controller, itemId: writing.id, front: extractedText)),
+          )
+        ],
+      ),
     );
   }
 
@@ -122,93 +114,61 @@ class _WritingListState extends State<WritingList> {
     int status = writing.status;
 
     List<Widget> items = [];
-    if(widget.isMyWritings) {
-      items.add(getItem(index, title: 'Q'));
-      items.add(getItem(index, title: 'A'));
-      if(writing.status != 0) {
-        items.add(getItem(index, title: 'C'));
-      }
-    } else {
-      if(writing.status == 1) {
-        items.add(getItem(index, title: 'C'));
-      } else if (writing.status == 2) {
-        items.add(getItem(index, title: 'A'));
-      }
+    items.add(getItem(writing, tag: 'Q'));
+    items.add(getItem(writing, tag: 'A'));
+    if (writing.status != 0) {
+      items.add(getItem(writing, tag: 'C'));
     }
-    if (widget.isMyWritings) {
-      return MyWidget().getRoundedContainer(
-        widget: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                MyWidget().getRoundedContainer(
-                    widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
-                    radius: 20,
-                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
-                    bgColor: statusColors[status]),
-                const SizedBox(width: 10),
-                Expanded(
-                    child: MyWidget().getTextWidget(
-                        text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.keyboard_double_arrow_left_rounded, size: 13, color: MyColors.grey),
-                        const SizedBox(width: 5),
-                        MyWidget().getTextWidget(
-                            text: MyDateFormat().getDateFormat(writing.dateWriting),
-                            size: 12,
-                            color: MyColors.grey),
-                      ],
-                    ),
-                    writing.dateReply != null
-                        ? Row(
-                      children: [
-                        const Icon(Icons.keyboard_double_arrow_right_rounded,
-                            size: 13, color: MyColors.grey),
-                        const SizedBox(width: 5),
-                        MyWidget().getTextWidget(
-                            text: MyDateFormat().getDateFormat(writing.dateReply!),
-                            size: 12,
-                            color: MyColors.grey),
-                      ],
-                    )
-                        : const SizedBox.shrink(),
-                  ],
-                ),
-              ],
-            ),
-            const Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: items,
-            ),
-          ],
-        ),
-      );
-    } else {
-      return MyWidget().getRoundedContainer(
-        widget: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                MyWidget().getTextWidget(
-                    text: writing.userName == null || writing.userName!.isEmpty ? tr('unNamed') : writing.userName,
-                    color: MyColors.grey),
-              ],
-            ),
-            const Divider(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: items,
-            ),
-          ],
-        ),
-      );
-    }
+
+    return MyWidget().getRoundedContainer(
+      widget: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              MyWidget().getRoundedContainer(
+                  widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
+                  radius: 20,
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+                  bgColor: statusColors[status]),
+              const SizedBox(width: 10),
+              Expanded(
+                  child: MyWidget()
+                      .getTextWidget(text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.keyboard_double_arrow_left_rounded, size: 13, color: MyColors.grey),
+                      const SizedBox(width: 5),
+                      MyWidget().getTextWidget(
+                          text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: MyColors.grey),
+                    ],
+                  ),
+                  writing.dateReply != null
+                      ? Row(
+                          children: [
+                            const Icon(Icons.keyboard_double_arrow_right_rounded, size: 13, color: MyColors.grey),
+                            const SizedBox(width: 5),
+                            MyWidget().getTextWidget(
+                                text: MyDateFormat().getDateFormat(writing.dateReply!),
+                                size: 12,
+                                color: MyColors.grey),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ],
+              ),
+            ],
+          ),
+          const Divider(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: items,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -219,14 +179,15 @@ class _WritingListState extends State<WritingList> {
 
   @override
   Widget build(BuildContext context) {
-    bool isMyWritings = widget.isMyWritings;
     lastSnapshot = null;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadWritings();
-    });
+    if (writings.isEmpty) { // TextField 로 인한 rebuild 방지용
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        loadWritings();
+      });
+    }
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent && hasMore) {
         LoadingController.to.isLoading = true;
         loadWritings(isContinue: true);
         LoadingController.to.isLoading = false;
@@ -235,18 +196,19 @@ class _WritingListState extends State<WritingList> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        setState(() {});
+        setState(() {
+          writings = [];
+        });
       },
       child: Scaffold(
-        appBar: isMyWritings ? null : MyWidget().getAppbar(title: tr('viewOtherUsersWriting')),
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 20, top: 15),
-                child: MyWidget().getTextWidget(
-                    text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
+                child: MyWidget()
+                    .getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
               ),
               Expanded(
                 child: Stack(
@@ -260,31 +222,30 @@ class _WritingListState extends State<WritingList> {
                               Expanded(
                                 child: isLoaded && writings.isEmpty
                                     ? Center(
-                                  child: MyWidget().getTextWidget(
-                                    text: tr('noWritings'),
-                                    isTextAlignCenter: true,
-                                    size: 18,
-                                  ),
-                                )
+                                        child: MyWidget().getTextWidget(
+                                          text: tr('noMyWritings'),
+                                          isTextAlignCenter: true,
+                                          size: 18,
+                                        ),
+                                      )
                                     : ListView.builder(
-                                  itemCount: writings.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    print('LENGTH: ${writings.length}');
+                                        itemCount: writings.length,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          print('MY');
 
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 30),
-                                      child: getWritingList(index),
-                                    );
-                                  },
-                                ),
+                                          return Padding(
+                                            padding: const EdgeInsets.only(bottom: 30),
+                                            child: getWritingList(index),
+                                          );
+                                        },
+                                      ),
                               )
                             ],
                           ),
                         );
                       },
                     ),
-                    Obx(() =>
-                        Offstage(
+                    Obx(() => Offstage(
                           offstage: !controller.isLoading.value,
                           child: Stack(
                             children: const [
