@@ -25,7 +25,7 @@ class LessonListMain extends StatefulWidget {
 }
 
 class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin {
-  ScrollController scrollController = ScrollController();
+  late ScrollController scrollController;
   double sliverAppBarHeight = 150.0;
   double sliverAppBarStretchOffset = 100.0;
   late LessonCourse course;
@@ -39,16 +39,16 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final courseController = Get.find<LessonCourseController>();
   final lessonController = Get.put(LessonController());
   List<Lesson> lessons = [];
+  bool isAdmin = false;
 
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
     super.initState();
+    if(User().email == 'gabmanpark@gmail.com') {
+      isAdmin = true;
+    }
+    scrollController = courseController.scrollController;
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -68,6 +68,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
             }
           }
         }));
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      scrollController.jumpTo(LocalStorage().getLessonScrollPosition());
+    });
   }
 
   Widget lessonListWidget(dynamic lessonMap) {
@@ -76,7 +79,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
     if (lessonMap is Map) {
       lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
-      if (!lesson.isReleased) {
+      if (!isAdmin && !lesson.isReleased) {
         isReleased = false;
       }
       lessonIndex++;
@@ -106,6 +109,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                         color: Colors.white,
                         child: InkWell(
                           onTap: () async {
+                            LocalStorage().setLessonScrollPosition(scrollController.offset);
                             await FirebaseAnalytics.instance
                                 .logSelectContent(contentType: 'lesson', itemId: lesson.id);
                             if (!lesson.hasOptions) {

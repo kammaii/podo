@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -8,6 +9,7 @@ class LessonCourseController extends GetxController {
 
   bool isVisible = false;
   List<List<LessonCourse>> courses = [[],[]];
+  ScrollController scrollController = ScrollController();
 
 
   Future<void> loadCourses() async {

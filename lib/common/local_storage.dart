@@ -5,6 +5,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/common/history.dart';
+import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +17,7 @@ class LocalStorage {
   late String HISTORIES;
   late String REF_FLASHCARD;
   late String REF_HISTORY;
+  late String LESSON_SCROLL_POSITION;
   bool isInit = false;
   List<FlashCard> flashcards = [];
   List<History> histories = [];
@@ -41,8 +43,11 @@ class LocalStorage {
     }
   }
 
-  void setLessonCourse(LessonCourse course) {
+  void setLessonCourse(LessonCourse course, {bool resetPosition = false}) {
     prefs!.setString(LESSON_COURSE, jsonEncode(course.toJson()));
+    if(resetPosition) {
+      setLessonScrollPosition(0);
+    }
   }
 
   LessonCourse? getLessonCourse() {
@@ -53,6 +58,15 @@ class LocalStorage {
     } else {
       return null;
     }
+  }
+
+  void setLessonScrollPosition(double position) {
+    prefs!.setDouble(LESSON_SCROLL_POSITION, position);
+  }
+
+  double getLessonScrollPosition() {
+    LESSON_SCROLL_POSITION = '${User().id}/lessonScrollPosition';
+    return prefs!.getDouble(LESSON_SCROLL_POSITION) ?? 0;
   }
 
   bool hasFlashcard({required String itemId}) {
