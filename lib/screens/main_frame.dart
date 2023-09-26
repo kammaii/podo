@@ -242,11 +242,10 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                       children: [
                                         MyWidget().getTextWidget(
                                           text: tr('mode'),
-                                          size: 13,
                                           color: MyColors.purple,
                                           isBold: true,
                                         ),
-                                        const SizedBox(width: 5),
+                                        const SizedBox(width: 10),
                                         ToggleButtons(
                                           isSelected: modeToggle,
                                           onPressed: (int index) {
@@ -254,7 +253,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                             modeToggle[1] = 1 == index;
                                             controller.update();
                                           },
-                                          constraints: const BoxConstraints(minHeight: 35, minWidth: 45),
+                                          constraints: const BoxConstraints(minHeight: 30, minWidth: 50),
                                           borderRadius: const BorderRadius.all(Radius.circular(10)),
                                           selectedBorderColor: MyColors.purple,
                                           selectedColor: Colors.white,

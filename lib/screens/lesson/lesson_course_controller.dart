@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
+import 'package:podo/screens/my_page/user.dart';
 
 class LessonCourseController extends GetxController {
 
@@ -13,7 +14,13 @@ class LessonCourseController extends GetxController {
 
 
   Future<void> loadCourses() async {
-    final Query query = FirebaseFirestore.instance.collection('LessonCourses').where('isReleased', isEqualTo: true);
+    bool isAdmin = User().email == User().admin;
+    final Query query;
+    if(isAdmin) {
+      query = FirebaseFirestore.instance.collection('LessonCourses');
+    } else {
+      query = FirebaseFirestore.instance.collection('LessonCourses').where('isReleased', isEqualTo: true);
+    }
     List<dynamic> snapshots = await Database().getDocs(query: query);
     courses = [[],[]];
     for(dynamic snapshot in snapshots) {

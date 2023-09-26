@@ -68,7 +68,7 @@ class AdsController extends GetxController {
   }
 
   void showInterstitialAd(Function(InterstitialAd ad) f) {
-    if (interstitialAd != null) {
+    if (interstitialAd == null) {
       print('Warning: attempt to show interstitial before loaded.');
       _loadInterstitialAds();
     } else {

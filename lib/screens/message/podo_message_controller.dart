@@ -24,6 +24,7 @@ class PodoMessageController extends GetxController {
       podoMsgBtnActive.value = false;
     } else {
       podoMsgBtnText = tr('replyPodo');
+      podoMsgBtnActive.value = true;
     }
   }
 }

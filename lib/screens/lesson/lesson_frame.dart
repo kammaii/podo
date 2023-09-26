@@ -67,6 +67,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   late double progressValue;
   AudioPlayer audioPlayerForEffect = AudioPlayer();
   late Map<String, yt.YoutubePlayerController> youtubeControllers;
+  bool isCompleted = false;
 
   Widget _getCachedImage(String base64Str) {
     if (_imageCache.containsKey(base64Str)) {
@@ -424,12 +425,25 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   }
 
   @override
+  void dispose() {
+    animationController.dispose();
+    for (final controller in youtubeControllers.values) {
+      controller.dispose();
+    }
+    if(User().status == 1 && !isCompleted && AdsController().interstitialAd != null) {
+      AdsController().showInterstitialAd((ad) => null);
+    }
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     isLoading = true;
     bottomWidget = const SizedBox.shrink();
     progressValue = 0.0;
     youtubeControllers = {};
+    isCompleted = false;
 
     animationController = AnimationController(
       vsync: this,
@@ -495,7 +509,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         }
         cards.add(card);
         progressValue += incrementPerCard;
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
       controller.hasFlashcard.value = flashcardMap.obs;
       Map<String, String> audios = {};
@@ -503,9 +519,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         audios.addAll(snapshot);
       }
       await cacheFiles(audios);
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
   }
 
@@ -521,7 +539,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       await file.writeAsBytes(response.bodyBytes);
       audioPaths[fileName] = file.path;
       progressValue += incrementPerFile;
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -590,6 +610,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       scale: 0.8,
                       onIndexChanged: (index) {
                         if (index >= cards.length) {
+                          isCompleted = true;
                           Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
                           return;
                         } else {
@@ -624,7 +645,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           Visibility(
                                             visible: card.type == MyStrings.repeat,
                                             child: MyWidget().getTextWidget(
-                                              text: tr('practice3Times'),
+                                              text: tr('practiceSeveralTimes'),
                                               size: 15,
                                               color: MyColors.grey,
                                             ),

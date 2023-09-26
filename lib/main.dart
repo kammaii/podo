@@ -73,6 +73,7 @@ class MyApp extends StatelessWidget {
 
     return GetMaterialApp(
       title: 'Podo Korean app',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: MyColors.purple),
       navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
       home: Logo(),

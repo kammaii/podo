@@ -63,7 +63,7 @@ class _MyPageState extends State<MyPage> {
     print(currentUser);
 
     if (currentUser != null) {
-      DateTime? date = auth.currentUser?.metadata.lastSignInTime;
+      DateTime? date = auth.currentUser?.metadata.creationTime;
       userId = currentUser!.uid ?? '';
       userEmail = currentUser!.email ?? '';
       userName = user.User().name;

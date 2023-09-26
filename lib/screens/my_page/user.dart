@@ -37,6 +37,7 @@ class User {
   late bool fcmPermission;
   late int status;
   String? expirationDate; // only for MyPage
+  final admin = 'gabmanpark@gmail.com';
 
   static const String ID = 'id';
   static const String OS = 'os';

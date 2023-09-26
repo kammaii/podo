@@ -32,7 +32,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   String language = User().language;
   final KO = 'ko';
   final LESSON = 'Lesson';
-  int lessonIndex = -1;
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
@@ -41,11 +40,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   List<Lesson> lessons = [];
   bool isAdmin = false;
 
-
   @override
   void initState() {
     super.initState();
-    if(User().email == 'gabmanpark@gmail.com') {
+    if (User().email == User().admin) {
       isAdmin = true;
     }
     scrollController = courseController.scrollController;
@@ -73,107 +71,96 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     });
   }
 
-  Widget lessonListWidget(dynamic lessonMap) {
+  Widget lessonListWidget(int index) {
     late Lesson lesson;
     bool isReleased = true;
 
-    if (lessonMap is Map) {
-      lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
-      if (!isAdmin && !lesson.isReleased) {
-        isReleased = false;
-      }
-      lessonIndex++;
+    lesson = Lesson.fromJson(course.lessons[index] as Map<String, dynamic>);
+    if (!isAdmin && !lesson.isReleased) {
+      isReleased = false;
     }
 
     return isReleased
         ? Column(
             children: [
-              if (lessonMap is String)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 5),
-                  child: MyWidget().getTextWidget(
-                    text: lessonMap,
-                    size: 25,
-                    color: MyColors.navyLight,
-                  ),
-                )
-              else
-                Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(cardBorderRadius),
-                        ),
-                        color: Colors.white,
-                        child: InkWell(
-                          onTap: () async {
-                            LocalStorage().setLessonScrollPosition(scrollController.offset);
-                            await FirebaseAnalytics.instance
-                                .logSelectContent(contentType: 'lesson', itemId: lesson.id);
-                            if (!lesson.hasOptions) {
-                              Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
-                            } else {
-                              Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    MyWidget().getTextWidget(
-                                      text: '$lessonIndex. ${lesson.type}',
-                                      color: MyColors.navy,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Obx(
-                                      () => lessonController.isCompleted[lesson.id]
-                                          ? const Icon(
-                                              Icons.check_circle,
-                                              color: MyColors.green,
-                                            )
-                                          : const SizedBox.shrink(),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                MyWidget().getTextWidget(
-                                  text: lesson.title[KO],
-                                  size: 20,
-                                  color: MyColors.purple,
-                                ),
-                                const SizedBox(height: 10),
-                                MyWidget().getTextWidget(
-                                  text: lesson.title[language],
-                                  color: MyColors.grey,
-                                ),
-                              ],
-                            ),
+              Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(cardBorderRadius),
+                      ),
+                      color: Colors.white,
+                      child: InkWell(
+                        onTap: () async {
+                          LocalStorage().setLessonScrollPosition(scrollController.offset);
+                          await FirebaseAnalytics.instance
+                              .logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                          if (!lesson.hasOptions) {
+                            Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                          } else {
+                            Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  MyWidget().getTextWidget(
+                                    text: '$index. ${lesson.type}',
+                                    color: lesson.type == LESSON ? MyColors.navy : MyColors.wine,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Obx(
+                                    () => lessonController.isCompleted[lesson.id]
+                                        ? const Icon(
+                                            Icons.check_circle,
+                                            color: MyColors.green,
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              MyWidget().getTextWidget(
+                                text: lesson.title[KO],
+                                size: 20,
+                                color: MyColors.purple,
+                              ),
+                              const SizedBox(height: 10),
+                              course.isTopicMode
+                                  ? MyWidget().getTextWidget(
+                                      text: lesson.title[language],
+                                      color: MyColors.grey,
+                                    )
+                                  : const SizedBox.shrink(),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    lesson.tag != null && lesson.tag.toString().isNotEmpty
-                        ? Positioned(
-                            top: 4,
-                            right: 14,
-                            child: Container(
-                                decoration: BoxDecoration(
-                                  color: MyColors.pink,
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(cardBorderRadius),
-                                    bottomLeft: Radius.circular(cardBorderRadius),
-                                  ),
+                  ),
+                  lesson.tag != null && lesson.tag.toString().isNotEmpty
+                      ? Positioned(
+                          top: 4,
+                          right: 14,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.pink,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(cardBorderRadius),
+                                  bottomLeft: Radius.circular(cardBorderRadius),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                                child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
-                        : const SizedBox.shrink(),
-                  ],
-                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                              child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
+                      : const SizedBox.shrink(),
+                ],
+              ),
             ],
           )
         : const SizedBox.shrink();
@@ -244,7 +231,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            return lessonListWidget(course.lessons[index]);
+            return lessonListWidget(index);
           },
           childCount: course.lessons.length,
         ),
@@ -264,7 +251,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       }
     }
     lessonController.isCompleted.value = map;
-    lessonIndex = -1;
     final cloudController = Get.put(PodoMessageController());
     if (PodoMessage().id != null) {
       cloudController.setPodoMsgBtn();
