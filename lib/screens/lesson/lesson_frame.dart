@@ -68,6 +68,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   AudioPlayer audioPlayerForEffect = AudioPlayer();
   late Map<String, yt.YoutubePlayerController> youtubeControllers;
   bool isCompleted = false;
+  List<String>? firstAudioCards;
 
   Widget _getCachedImage(String base64Str) {
     if (_imageCache.containsKey(base64Str)) {
@@ -444,6 +445,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     progressValue = 0.0;
     youtubeControllers = {};
     isCompleted = false;
+    firstAudioCards = [];
 
     animationController = AnimationController(
       vsync: this,
@@ -507,6 +509,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           });
           youtubeControllers[card.id] = youtubeController;
         }
+        if(card.content[AUDIO] != null && firstAudioCards!.length < 3) {
+          firstAudioCards!.add(card.id);
+        }
         cards.add(card);
         progressValue += incrementPerCard;
         if (mounted) {
@@ -539,8 +544,26 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       await file.writeAsBytes(response.bodyBytes);
       audioPaths[fileName] = file.path;
       progressValue += incrementPerFile;
-      if (mounted) {
-        setState(() {});
+
+      if(firstAudioCards == null) {
+        if (mounted && isLoading) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+
+      } else {
+        if(firstAudioCards!.contains(fileName)) {
+          firstAudioCards!.remove(fileName);
+        }
+
+        if(firstAudioCards!.isEmpty){
+          progressValue = 1;
+          firstAudioCards = null;
+        }
+        if (mounted) {
+          setState(() {});
+        }
       }
     }
   }

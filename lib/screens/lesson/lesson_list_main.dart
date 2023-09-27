@@ -37,7 +37,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   late Animation<double> animation;
   final courseController = Get.find<LessonCourseController>();
   final lessonController = Get.put(LessonController());
-  List<Lesson> lessons = [];
   bool isAdmin = false;
 
   @override
@@ -66,6 +65,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
             }
           }
         }));
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       scrollController.jumpTo(LocalStorage().getLessonScrollPosition());
     });
@@ -116,7 +116,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                   ),
                                   const SizedBox(width: 10),
                                   Obx(
-                                    () => lessonController.isCompleted[lesson.id]
+                                    () => lessonController.getIsCompleted(lesson.id)
                                         ? const Icon(
                                             Icons.check_circle,
                                             color: MyColors.green,
@@ -170,7 +170,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     int lessonCount = 0;
     for (dynamic lesson in course.lessons) {
       if (lesson is Map) {
-        lessonCount++;
+        Lesson l = Lesson.fromJson(lesson as Map<String, dynamic>);
+        if(l.isReleased) {
+          lessonCount++;
+        }
       }
     }
     return SliverAppBar(
@@ -210,8 +213,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               : const SizedBox.shrink(),
           Obx(
             () => LinearProgressIndicator(
-              value: lessonController.isCompleted.values.where((value) => value == true).length /
-                  lessonController.isCompleted.length,
+              value: lessonController.isCompleted.values.isEmpty
+                  ? 0
+                  : lessonController.isCompleted.values.where((value) => value == true).length /
+                      lessonController.isCompleted.length,
               color: MyColors.purple,
               backgroundColor: MyColors.purpleLight,
             ),
@@ -242,15 +247,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     course = widget.course;
-    Map<String, bool> map = {};
-    for (dynamic lessonMap in course.lessons) {
-      if (lessonMap is Map) {
-        Lesson lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
-        lessons.add(lesson);
-        map[lesson.id] = LocalStorage().hasHistory(itemId: lesson.id);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Map<String, bool> map = {};
+      for (dynamic lessonMap in course.lessons) {
+        if (lessonMap is Map) {
+          Lesson lesson = Lesson.fromJson(lessonMap as Map<String, dynamic>);
+          map[lesson.id] = LocalStorage().hasHistory(itemId: lesson.id);
+        }
       }
-    }
-    lessonController.isCompleted.value = map;
+      lessonController.isCompleted.value = map;
+    });
+
     final cloudController = Get.put(PodoMessageController());
     if (PodoMessage().id != null) {
       cloudController.setPodoMsgBtn();

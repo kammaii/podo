@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/screens/lesson/lesson.dart';
+import 'package:podo/screens/lesson/lesson_course.dart';
 
 class LessonController extends GetxController {
   late Duration currentPosition;
@@ -10,7 +13,6 @@ class LessonController extends GetxController {
   RxMap<dynamic, dynamic> hasFlashcard = {}.obs;
   RxMap<dynamic, dynamic> isCompleted = {}.obs;
 
-
   @override
   void onInit() {
     super.onInit();
@@ -18,6 +20,11 @@ class LessonController extends GetxController {
     duration = const Duration(seconds: 0);
     currentPosition = const Duration(seconds: 0);
     audioSpeedToggle = [true, false];
+  }
+
+  bool getIsCompleted(String lessonId) {
+    bool b = isCompleted[lessonId] ?? false;
+    return b;
   }
 
   void setAudioPathAndPlay({required String path}) async {
