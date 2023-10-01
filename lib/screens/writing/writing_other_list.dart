@@ -9,6 +9,7 @@ import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
@@ -25,6 +26,7 @@ class WritingOtherList extends StatelessWidget {
   final docsLimit = 20;
   String? questionId = Get.arguments;
   bool isLoaded = false;
+  late ResponsiveSize rs;
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
@@ -61,8 +63,8 @@ class WritingOtherList extends StatelessWidget {
 
     return Row(
       children: [
-        Expanded(child: MyWidget().getTextWidget(text: extractedText)),
-        Obx(() => FlashcardIcon().getIconButton(controller: controller, itemId: writing.id, front: extractedText)),
+        Expanded(child: MyWidget().getTextWidget(rs, text: extractedText)),
+        Obx(() => FlashcardIcon().getIconButton(rs, controller: controller, itemId: writing.id, front: extractedText)),
       ],
     );
   }
@@ -76,7 +78,7 @@ class WritingOtherList extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              MyWidget().getTextWidget(
+              MyWidget().getTextWidget(rs,
                   text: writing.userName == null || writing.userName!.isEmpty ? tr('unNamed') : writing.userName,
                   color: MyColors.grey),
             ],
@@ -90,14 +92,16 @@ class WritingOtherList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (writings.isEmpty) { // TextField 로 인한 rebuild 방지용
+    rs = ResponsiveSize(context);
+    if (writings.isEmpty) {
+      // TextField 로 인한 rebuild 방지용
       WidgetsBinding.instance.addPostFrameCallback((_) {
         loadWritings();
       });
     }
 
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: tr('viewOtherUsersWriting')),
+      appBar: MyWidget().getAppbar(rs, title: tr('viewOtherUsersWriting')),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +109,7 @@ class WritingOtherList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 20, top: 15),
               child:
-                  MyWidget().getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
+                  MyWidget().getTextWidget(rs, text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
             ),
             Expanded(
               child: Stack(
@@ -120,6 +124,7 @@ class WritingOtherList extends StatelessWidget {
                               child: isLoaded && writings.isEmpty
                                   ? Center(
                                       child: MyWidget().getTextWidget(
+                                        rs,
                                         text: tr('noWritings'),
                                         isTextAlignCenter: true,
                                         size: 18,

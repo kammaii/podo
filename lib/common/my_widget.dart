@@ -3,45 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class MyWidget {
-  AppBar getAppbarWithAction({
-    required String title,
-    required Function actionFunction,
-    required Color actionColor,
-  }) {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      leading: IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.arrow_back_ios_rounded),
-        color: MyColors.purple,
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: MyColors.purple,
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: IconButton(
-            onPressed: () {
-              actionFunction();
-            },
-            icon: const Icon(CupertinoIcons.info_circle_fill),
-            color: actionColor,
-          ),
-        )
-      ],
-    );
-  }
 
-  AppBar getAppbar({required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true}) {
+  AppBar getAppbar(ResponsiveSize rs,
+      {required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true}) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -49,29 +18,35 @@ class MyWidget {
         onPressed: () {
           Get.back();
         },
-        icon: const Icon(Icons.arrow_back_ios_rounded),
+        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
         color: MyColors.purple,
       ),
-      title: MyWidget().getTextWidget(
-        text: title,
-        color: MyColors.purple,
-        isKorean: isKorean,
-        isBold: isBold,
-        size: 18,
+      title: Padding(
+        padding: EdgeInsets.symmetric(vertical: rs.getSize(10, bigger: 1.5)),
+        child: MyWidget().getTextWidget(
+          rs,
+          text: title,
+          color: MyColors.purple,
+          isKorean: isKorean,
+          isBold: isBold,
+          size: 18,
+        ),
       ),
       actions: actions,
     );
   }
 
-  Widget getSearchWidget({required FocusNode focusNode,
-    required TextEditingController controller,
-    required String hint,
-    required Function(String?) onChanged}) {
+  Widget getSearchWidget(ResponsiveSize rs,
+      {required FocusNode focusNode,
+      required TextEditingController controller,
+      required String hint,
+      required Function(String?) onChanged}) {
     return TextField(
+      style: TextStyle(fontSize: rs.getSize(15)),
       focusNode: focusNode,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-        prefixIcon: const Icon(Icons.search),
+        contentPadding: EdgeInsets.symmetric(vertical: rs.getSize(10)),
+        prefixIcon: Icon(Icons.search, size: rs.getSize(20)),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
           borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
@@ -89,7 +64,8 @@ class MyWidget {
     );
   }
 
-  Text getTextWidget({
+  Text getTextWidget(
+    ResponsiveSize rs, {
     required String? text,
     double size = 15,
     Color color = Colors.black,
@@ -104,7 +80,7 @@ class MyWidget {
       text ?? '',
       style: TextStyle(
         fontFamily: isKorean ? 'KoreanFont' : 'EnglishFont',
-        fontSize: size,
+        fontSize: rs.getSize(size),
         color: color,
         fontWeight: isBold ? FontWeight.bold : null,
         decoration: hasUnderline ? TextDecoration.underline : null,
@@ -116,7 +92,8 @@ class MyWidget {
     );
   }
 
-  Widget getRoundBtnWidget({
+  Widget getRoundBtnWidget(
+    ResponsiveSize rs, {
     required String text,
     Color bgColor = MyColors.purple,
     Color fontColor = Colors.white,
@@ -136,11 +113,11 @@ class MyWidget {
       onPressed: hasNullFunction
           ? f()
           : () {
-        f();
-      },
+              f();
+            },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
-        child: MyWidget().getTextWidget(text: text, size: textSize, color: fontColor),
+        padding: EdgeInsets.symmetric(horizontal: rs.getSize(horizontalPadding), vertical: verticalPadding),
+        child: MyWidget().getTextWidget(rs, text: text, size: rs.getSize(textSize), color: fontColor),
       ),
     );
   }
@@ -166,7 +143,8 @@ class MyWidget {
     );
   }
 
-  Widget getTextFieldWidget({
+  Widget getTextFieldWidget(
+    ResponsiveSize rs, {
     String hint = '',
     double fontSize = 15,
     TextEditingController? controller,
@@ -186,7 +164,7 @@ class MyWidget {
       maxLines: maxLines,
       maxLength: maxLength,
       cursorColor: Colors.black,
-      style: TextStyle(fontSize: fontSize),
+      style: TextStyle(fontSize: rs.getSize(fontSize)),
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       decoration: InputDecoration(
@@ -203,17 +181,20 @@ class MyWidget {
           borderSide: BorderSide(color: MyColors.navyLight, width: 1),
         ),
         hintText: hint,
-        hintStyle: TextStyle(fontSize: fontSize),
-        contentPadding: const EdgeInsets.all(10),
+        hintStyle: TextStyle(fontSize: rs.getSize(fontSize)),
+        contentPadding: EdgeInsets.all(rs.getSize(10)),
       ),
     );
   }
 
-  Widget getCheckBox({required bool value, required Function(bool?) onChanged}) {
-    return Checkbox(
-      value: value,
-      onChanged: onChanged,
-      activeColor: MyColors.purple,
+  Widget getCheckBox(ResponsiveSize rs, {required bool value, required Function(bool?) onChanged}) {
+    return Transform.scale(
+      scale: rs.getSize(1),
+      child: Checkbox(
+        value: value,
+        onChanged: onChanged,
+        activeColor: MyColors.purple,
+      ),
     );
   }
 
@@ -233,13 +214,14 @@ class MyWidget {
     );
   }
 
-  showDialog({required String content, required Function yesFn}) {
+  showDialog(ResponsiveSize rs, {required String content, required Function yesFn}) {
     Get.dialog(AlertDialog(
-      title: Image.asset('assets/images/podo.png', width: 50, height: 50),
-      content: MyWidget().getTextWidget(text: content, isTextAlignCenter: true, size: 16),
+      title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
+      content: MyWidget().getTextWidget(rs, text: content, isTextAlignCenter: true, size: 16),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
-      actions:  [
+      actionsPadding:
+          EdgeInsets.only(left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+      actions: [
         Row(
           children: [
             Expanded(
@@ -250,16 +232,16 @@ class MyWidget {
                     ),
                     side: const BorderSide(color: MyColors.purple, width: 1),
                     backgroundColor: Colors.white),
-                onPressed: (){
+                onPressed: () {
                   Get.back();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  child: Text(tr('no'), style: const TextStyle(color: MyColors.purple)),
+                  padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                  child: Text(tr('no'), style: TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
                 ),
               ),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: rs.getSize(15)),
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -268,13 +250,13 @@ class MyWidget {
                     ),
                     side: const BorderSide(color: MyColors.purple, width: 1),
                     backgroundColor: MyColors.purple),
-                onPressed: (){
+                onPressed: () {
                   Get.back();
                   yesFn();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  child: Text(tr('yes'), style: const TextStyle(color: Colors.white)),
+                  padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                  child: Text(tr('yes'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
                 ),
               ),
             ),
@@ -284,22 +266,28 @@ class MyWidget {
     ));
   }
 
-  showSnackbar({
+  showSnackbar(
+    ResponsiveSize rs, {
     String title = '',
     String message = '',
+    double titleSize = 15,
+    double messageSize = 15,
     Color bgColor = Colors.white,
     Color textColor = MyColors.purple,
   }) {
     Get.snackbar(
       title,
       message,
+      titleText: MyWidget().getTextWidget(rs, text: title, size: titleSize),
+      messageText: MyWidget().getTextWidget(rs, text: message, size: messageSize),
       backgroundColor: bgColor,
       colorText: textColor,
       duration: const Duration(seconds: 5),
     );
   }
 
-  showSnackbarWithPodo({String title = '', String content = '', int duration = 2000}) {
+  showSnackbarWithPodo(ResponsiveSize rs,
+      {String title = '', String content = '', double titleSize = 15, double contentSize = 15, int duration = 2000}) {
     Get.snackbar(
       title,
       content,
@@ -307,27 +295,27 @@ class MyWidget {
       backgroundColor: Colors.white,
       icon: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Image.asset('assets/images/podo.png'),
+        child: Image.asset('assets/images/podo.png', height: rs.getSize(40, bigger: 2), width: rs.getSize(40, bigger: 2)),
       ),
       duration: Duration(milliseconds: duration),
     );
   }
 
-  Widget getLoading(double progressValue) {
+  Widget getLoading(ResponsiveSize rs, double progressValue) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50),
+      padding: EdgeInsets.symmetric(horizontal: rs.getSize(50)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MyWidget().getTextWidget(text: 'Loading', color: MyColors.purple),
-              const SizedBox(width: 5),
-              const SpinKitThreeBounce(color: MyColors.purple, size: 10),
+              MyWidget().getTextWidget(rs, text: 'Loading', color: MyColors.purple),
+              SizedBox(width: rs.getSize(5)),
+              SpinKitThreeBounce(color: MyColors.purple, size: rs.getSize(10)),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: rs.getSize(10)),
           LinearProgressIndicator(
             value: progressValue,
             valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),

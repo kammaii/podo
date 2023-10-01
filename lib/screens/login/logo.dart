@@ -11,6 +11,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/fcm_controller.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
@@ -25,6 +26,7 @@ class Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TargetPlatform os = Theme.of(context).platform;
+    ResponsiveSize rs = ResponsiveSize(context);
 
     getInitData() async {
       await user.User().getUser();
@@ -92,18 +94,20 @@ class Logo extends StatelessWidget {
       if (message.notification != null) {
         PlayAudio().playAlarm();
         switch (message.data['tag']) {
-          case 'podo_message' :
-            MyWidget().showSnackbarWithPodo(
-              title: tr('podosMsg'),
-              content: message.notification!.body!,
-            );
+          case 'podo_message':
+            MyWidget().showSnackbarWithPodo(rs,
+                title: tr('podosMsg'),
+                content: message.notification!.body!,
+                titleSize: rs.getSize(20),
+                contentSize: rs.getSize(18));
             break;
 
-          case 'writing' :
-            MyWidget().showSnackbarWithPodo(
-              title: message.notification!.title!,
-              content: message.notification!.body!,
-            );
+          case 'writing':
+            MyWidget().showSnackbarWithPodo(rs,
+                title: message.notification!.title!,
+                content: message.notification!.body!,
+                titleSize: rs.getSize(20),
+                contentSize: rs.getSize(18));
             break;
         }
       }
@@ -118,10 +122,10 @@ class Logo extends StatelessWidget {
           print('AUTH STATE CHANGES: User is null or not verified');
           Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
         }
-      } catch(e, stackTrace) {
+      } catch (e, stackTrace) {
         final fc = FirebaseCrashlytics.instance;
         fc.log('AuthStateChanges Error');
-        if(user != null) {
+        if (user != null) {
           fc.setCustomKey('user', user);
           fc.setCustomKey('emailVerified', user.emailVerified);
         } else {
@@ -141,8 +145,11 @@ class Logo extends StatelessWidget {
               FutureBuilder(
                 future: PackageInfo.fromPlatform(),
                 builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if(snapshot.hasData) {
-                    return Positioned(top: 20.0, right: 20.0, child: Text('version : ${snapshot.data.version}'));
+                  if (snapshot.hasData) {
+                    return Positioned(
+                        top: rs.getSize(20),
+                        right: rs.getSize(20),
+                        child: MyWidget().getTextWidget(rs, text: 'version : ${snapshot.data.version}'));
                   } else {
                     return const SizedBox.shrink();
                   }
@@ -152,16 +159,16 @@ class Logo extends StatelessWidget {
               Positioned(
                 bottom: 100.0,
                 child: Row(
-                  children: const [
+                  children: [
                     SizedBox(
-                      height: 20.0,
-                      width: 20.0,
+                      height: rs.getSize(20),
+                      width: rs.getSize(20),
                       child: CircularProgressIndicator(
-                        strokeWidth: 1.0,
+                        strokeWidth: rs.getSize(1),
                       ),
                     ),
-                    SizedBox(width: 20.0),
-                    Text('Loading...')
+                    const SizedBox(width: 20.0),
+                    MyWidget().getTextWidget(rs, text: 'Loading...'),
                   ],
                 ),
               ),

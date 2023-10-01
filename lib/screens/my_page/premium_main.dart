@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -23,18 +24,19 @@ class _PremiumMainState extends State<PremiumMain> {
   late List<bool> selector;
   late int selectedPlan;
   bool isPurchasing = false;
+  late ResponsiveSize rs;
 
   DataColumn getDataColumn(String label) {
     return DataColumn(
       label: Expanded(
-        child: Center(child: MyWidget().getTextWidget(text: label)),
+        child: Center(child: MyWidget().getTextWidget(rs, text: label)),
       ),
     );
   }
 
   DataRow getDataRow(String title, Widget basic, Widget premium) {
     return DataRow(cells: <DataCell>[
-      DataCell(MyWidget().getTextWidget(text: title)),
+      DataCell(MyWidget().getTextWidget(rs, text: title)),
       DataCell(Center(child: basic)),
       DataCell(Center(child: premium)),
     ]);
@@ -42,8 +44,9 @@ class _PremiumMainState extends State<PremiumMain> {
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: ''),
+      appBar: MyWidget().getAppbar(rs, title: ''),
       body: SafeArea(
         child: Stack(
           children: [
@@ -52,25 +55,26 @@ class _PremiumMainState extends State<PremiumMain> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 50, top: 20),
+                      padding: EdgeInsets.only(
+                          left: rs.getSize(15), right: rs.getSize(15), bottom: rs.getSize(50), top: rs.getSize(20)),
                       child: Column(
                         children: [
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Image.asset('assets/images/quote_upper.png', color: MyColors.purple),
-                              const SizedBox(width: 5),
+                              SizedBox(width: rs.getSize(5)),
                               Expanded(
-                                  child: MyWidget().getTextWidget(
+                                  child: MyWidget().getTextWidget(rs,
                                       text: tr('premiumComment'),
                                       color: MyColors.purple,
                                       isTextAlignCenter: true,
                                       size: 20)),
-                              const SizedBox(width: 5),
+                              SizedBox(width: rs.getSize(5)),
                               Image.asset('assets/images/quote_lower.png', color: MyColors.purple),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: rs.getSize(20)),
                           DataTable(
                             horizontalMargin: 0,
                             columns: <DataColumn>[
@@ -79,9 +83,7 @@ class _PremiumMainState extends State<PremiumMain> {
                               getDataColumn('Premium'),
                             ],
                             rows: <DataRow>[
-                              getDataRow(
-                                  tr('lesson'),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green),
+                              getDataRow(tr('lesson'), const Icon(Icons.check_circle_outline, color: MyColors.green),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
                               getDataRow(
                                   tr('lessonDetail'),
@@ -91,24 +93,20 @@ class _PremiumMainState extends State<PremiumMain> {
                                   tr('writingCorrection'),
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(tr('reading'), MyWidget().getTextWidget(text: tr('limited')),
-                                  MyWidget().getTextWidget(text: tr('all'))),
-                              getDataRow(tr('flashcard'), MyWidget().getTextWidget(text: tr('limit20')),
-                                  MyWidget().getTextWidget(text: tr('unlimited'))),
-                              getDataRow(
-                                  tr('podosMsg'),
-                                  const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                              getDataRow(tr('reading'), MyWidget().getTextWidget(rs, text: tr('limited')),
+                                  MyWidget().getTextWidget(rs, text: tr('all'))),
+                              getDataRow(tr('flashcard'), MyWidget().getTextWidget(rs, text: tr('limit20')),
+                                  MyWidget().getTextWidget(rs, text: tr('unlimited'))),
+                              getDataRow(tr('podosMsg'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(
-                                  tr('adFree'),
-                                  const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                              getDataRow(tr('adFree'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green))
                             ],
                           ),
-                          const Divider(height: 30, thickness: 2, color: MyColors.purple),
+                          Divider(height: rs.getSize(30), thickness: rs.getSize(2), color: MyColors.purple),
                           MyWidget().getTextWidget(
+                            rs,
                             text: tr('premiumDetail'),
-                            size: 15,
                             color: MyColors.grey,
                           ),
                         ],
@@ -128,7 +126,7 @@ class _PremiumMainState extends State<PremiumMain> {
                       return Stack(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                            padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(20)),
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.all(0),
@@ -150,7 +148,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                     await Purchases.setFirebaseAppInstanceId(appInstanceId!);
                                     await Database()
                                         .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-                                    MyWidget().showSnackbarWithPodo(
+                                    MyWidget().showSnackbarWithPodo(rs,
                                         title: tr('purchaseTitle'), content: tr('purchaseContent'));
                                     User().getUser();
                                     Get.offNamedUntil(
@@ -162,7 +160,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                   });
                                   var errorCode = PurchasesErrorHelper.getErrorCode(e);
                                   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-                                    MyWidget().showSnackbar(title: tr('error'), message: errorCode.toString());
+                                    MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
                                   }
                                 }
                                 await FirebaseAnalytics.instance.logPurchase();
@@ -171,33 +169,33 @@ class _PremiumMainState extends State<PremiumMain> {
                                 children: [
                                   Expanded(
                                       child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+                                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(23), vertical: rs.getSize(10)),
                                     decoration: BoxDecoration(
                                         gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
                                         borderRadius: BorderRadius.circular(30)),
                                     child: offering != null
                                         ? Row(
                                             children: [
-                                              const Icon(FontAwesomeIcons.crown, color: Colors.white, size: 30),
-                                              const SizedBox(width: 18),
+                                              Icon(FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(30)),
+                                              SizedBox(width: rs.getSize(18)),
                                               Expanded(
                                                 child: Center(
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      MyWidget().getTextWidget(
+                                                      MyWidget().getTextWidget(rs,
                                                           text: offering.identifier,
                                                           color: Colors.white,
                                                           size: 18,
                                                           isBold: true),
-                                                      MyWidget().getTextWidget(
+                                                      MyWidget().getTextWidget(rs,
                                                           text: offering.serverDescription, color: Colors.white)
                                                     ],
                                                   ),
                                                 ),
                                               ),
-                                              const SizedBox(width: 18),
-                                              MyWidget().getTextWidget(
+                                              SizedBox(width: rs.getSize(18)),
+                                              MyWidget().getTextWidget(rs,
                                                   text: offering.availablePackages[0].storeProduct.priceString,
                                                   color: Colors.white,
                                                   size: 18,
@@ -205,8 +203,8 @@ class _PremiumMainState extends State<PremiumMain> {
                                             ],
                                           )
                                         : Center(
-                                            child: MyWidget().getTextWidget(
-                                                text: tr('failedOffering'), color: Colors.white)),
+                                            child: MyWidget()
+                                                .getTextWidget(rs, text: tr('failedOffering'), color: Colors.white)),
                                   )),
                                 ],
                               ),
@@ -214,10 +212,13 @@ class _PremiumMainState extends State<PremiumMain> {
                           ),
                           Visibility(
                             visible: isPurchasing,
-                            child: const Positioned(
-                              top: 20,
-                              right: 20,
-                              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 3)),
+                            child: Positioned(
+                              top: rs.getSize(20),
+                              right: rs.getSize(20),
+                              child: SizedBox(
+                                  width: rs.getSize(18),
+                                  height: rs.getSize(18),
+                                  child: const CircularProgressIndicator(strokeWidth: 3)),
                             ),
                           ),
                         ],
@@ -234,7 +235,7 @@ class _PremiumMainState extends State<PremiumMain> {
                           NotificationSettings settings = await messaging.requestPermission();
                           if (settings.authorizationStatus == AuthorizationStatus.authorized) {
                             await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved_after_deny');
-                            await User().setTrialAuthorized();
+                            await User().setTrialAuthorized(rs);
                             Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                           } else {
                             await User().setTrialDenied();

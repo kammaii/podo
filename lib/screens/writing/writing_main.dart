@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
@@ -37,6 +38,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   final textEditController = TextEditingController();
   int maxRequestCount = 3;
   int? requestCount;
+  late ResponsiveSize rs;
 
   @override
   void initState() {
@@ -82,7 +84,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        MyWidget().showDialog(content: tr('wantRequestCorrection'), yesFn: () async {
+        MyWidget().showDialog(rs, content: tr('wantRequestCorrection'), yesFn: () async {
           await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
           Writing writing = Writing(selectedQuestion!);
           writing.userWriting = textEditController.text;
@@ -117,15 +119,15 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
           } else {
             Get.dialog(
               AlertDialog(
-                title: Text(tr('requestNotAvailableTitle')),
-                content: Text(tr('requestNotAvailableContent')),
+                title: Text(tr('requestNotAvailableTitle'), style: TextStyle(fontSize: rs.getSize(18))),
+                content: Text(tr('requestNotAvailableContent'), style: TextStyle(fontSize: rs.getSize(15))),
                 actions: [
                   ElevatedButton(
                     onPressed: () {
                       Get.back();
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
-                    child: Text(tr('ok')),
+                    child: MyWidget().getTextWidget(rs, text: tr('ok'), color: Colors.white),
                   ),
                 ],
               ),
@@ -133,7 +135,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
           }
         },
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(rs.getSize(10)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -142,14 +144,16 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                 scale: 0.8,
                 child: Image.asset('assets/images/${rockets[question.level]}.png'),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: rs.getSize(10)),
               MyWidget().getTextWidget(
+                rs,
                 text: question.title[KO] ?? '',
                 size: 20,
                 color: MyColors.navy,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: rs.getSize(10)),
               MyWidget().getTextWidget(
+                rs,
                 text: question.title[fo] ?? '',
                 color: MyColors.grey,
               ),
@@ -162,21 +166,23 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: MyWidget().getAppbar(
+        rs,
         title: tr('writing'),
         actions: [
           Row(
             children: [
               Transform.scale(
-                scale: 0.5,
+                scale: rs.getSize(0.5),
                 child: Image.asset('assets/images/podo.png'),
               ),
               Padding(
-                  padding: const EdgeInsets.only(right: 20, top: 10),
+                  padding: EdgeInsets.only(right: rs.getSize(20), top: rs.getSize(10)),
                   child: Obx(() =>
-                      MyWidget().getTextWidget(text: 'x ${controller.leftRequestCount}', color: MyColors.purple))),
+                      MyWidget().getTextWidget(rs, text: 'x ${controller.leftRequestCount}', color: MyColors.purple))),
             ],
           )
         ],
@@ -185,14 +191,14 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(rs.getSize(10)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: MyWidget().getTextWidget(
-                        text: tr('selectQuestion'), isTextAlignCenter: true, color: MyColors.purple),
+                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
+                    child: MyWidget()
+                        .getTextWidget(rs, text: tr('selectQuestion'), isTextAlignCenter: true, color: MyColors.purple),
                   ),
                   Expanded(
                     child: FutureBuilder(
@@ -249,7 +255,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                   child: GetBuilder<WritingController>(
                     builder: (_) {
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        padding: EdgeInsets.symmetric(horizontal: rs.getSize(15)),
                         child: Column(
                           children: [
                             Row(
@@ -257,42 +263,41 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               children: [
                                 TextButton(
                                     onPressed: () {
-                                      Get.toNamed(MyStrings.routeOtherWritingList,
-                                          arguments: selectedQuestion!.id);
+                                      Get.toNamed(MyStrings.routeOtherWritingList, arguments: selectedQuestion!.id);
                                     },
-                                    child: Text(tr('viewOtherUsersWriting'),
-                                        style: const TextStyle(
-                                          color: MyColors.purple,
-                                          decoration: TextDecoration.underline,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ))),
+                                    child: MyWidget().getTextWidget(
+                                      rs,
+                                      text: tr('viewOtherUsersWriting'),
+                                      color: MyColors.purple,
+                                      hasUnderline: true,
+                                      isBold: true,
+                                    )),
                               ],
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: rs.getSize(20)),
                             MyWidget().getTextWidget(
+                              rs,
                               text: selectedQuestion != null ? selectedQuestion!.title[KO] : '',
                               isKorean: true,
                               size: 20,
                             ),
-                            const SizedBox(height: 30),
-                            MyWidget().getTextFieldWidget(
-                              controller: textEditController,
-                              maxLength: maxLength,
-                              maxLines: 1,
-                              hint: tr('writeYourAnswerInKorean'),
-                              onSubmitted: (value) {
-                                FocusScope.of(context).unfocus();
-                              }
-                            ),
-                            const SizedBox(height: 30),
+                            SizedBox(height: rs.getSize(30)),
+                            MyWidget().getTextFieldWidget(rs,
+                                controller: textEditController,
+                                maxLength: maxLength,
+                                maxLines: 1,
+                                hint: tr('writeYourAnswerInKorean'), onSubmitted: (value) {
+                              FocusScope.of(context).unfocus();
+                            }),
+                            SizedBox(height: rs.getSize(30)),
                             MyWidget().getRoundBtnWidget(
+                              rs,
                               text: tr('correction'),
                               textSize: 15,
                               f: onSendBtn,
                               hasNullFunction: true,
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: rs.getSize(10)),
                             GestureDetector(
                               onTap: () {
                                 controller.setCheckbox(!controller.isChecked);
@@ -301,17 +306,17 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   MyWidget()
-                                      .getCheckBox(value: controller.isChecked, onChanged: controller.setCheckbox),
-                                  MyWidget().getTextWidget(text: tr('iveReadTheFollowing')),
+                                      .getCheckBox(rs, value: controller.isChecked, onChanged: controller.setCheckbox),
+                                  MyWidget().getTextWidget(rs, text: tr('iveReadTheFollowing')),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: rs.getSize(20)),
                             Expanded(
                                 child: SingleChildScrollView(
                                     child: MyWidget()
-                                        .getTextWidget(text: tr('writingComment'), color: MyColors.grey))),
-                            const SizedBox(height: 20),
+                                        .getTextWidget(rs, text: tr('writingComment'), color: MyColors.grey))),
+                            SizedBox(height: rs.getSize(20)),
                           ],
                         ),
                       );

@@ -18,6 +18,7 @@ import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -69,6 +70,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   late Map<String, yt.YoutubePlayerController> youtubeControllers;
   bool isCompleted = false;
   List<String>? firstAudioCards;
+  late ResponsiveSize rs;
 
   Widget _getCachedImage(String base64Str) {
     if (_imageCache.containsKey(base64Str)) {
@@ -93,9 +95,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         }
         return null;
       },
-      textStyle: const TextStyle(
+      textStyle: TextStyle(
         fontFamily: 'EnglishFont',
-        fontSize: 17,
+        fontSize: rs.getSize(17),
         height: 1.3,
       ),
     );
@@ -109,9 +111,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               onTap: () {
                 Get.back();
               },
-              child: const Icon(Icons.arrow_back_ios_rounded, color: MyColors.purple)),
-          const SizedBox(width: 10),
-          Expanded(child: MyWidget().getTextWidget(text: title, color: MyColors.purple, isBold: true, size: 18)),
+              child: Icon(Icons.arrow_back_ios_rounded, color: MyColors.purple, size: rs.getSize(20))),
+          SizedBox(width: rs.getSize(10)),
+          Expanded(child: MyWidget().getTextWidget(rs, text: title, color: MyColors.purple, isBold: true, size: 18)),
         ],
       ),
       content: SingleChildScrollView(child: getHtmlWidget(content)),
@@ -129,14 +131,15 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                const Icon(Icons.flag_outlined, size: 18),
-                const SizedBox(height: 10),
-                Text(tr('newExpression')),
+                Icon(Icons.flag_outlined, size: rs.getSize(18)),
+                SizedBox(height: rs.getSize(10)),
+                MyWidget().getTextWidget(rs, text: tr('newExpression')),
               ],
             ),
             Expanded(
               child: Center(
                 child: MyWidget().getTextWidget(
+                  rs,
                   text: card.content[KO],
                   size: 30,
                   color: Colors.black,
@@ -152,8 +155,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.feed_outlined, size: 18),
-            const SizedBox(height: 10),
+            Icon(Icons.feed_outlined, size: rs.getSize(18)),
+            SizedBox(height: rs.getSize(10)),
             Expanded(
               child: SingleChildScrollView(
                 child: getHtmlWidget(card.content[fo]),
@@ -168,12 +171,12 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                const Icon(Icons.hearing, size: 18),
-                const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: tr('listenAndRepeat')),
+                Icon(Icons.hearing, size: rs.getSize(18)),
+                SizedBox(width: rs.getSize(8)),
+                MyWidget().getTextWidget(rs, text: tr('listenAndRepeat')),
               ],
             ),
-            const SizedBox(height: 50),
+            SizedBox(height: rs.getSize(50)),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,7 +186,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Obx(() => FlashcardIcon().getIconButton(
+                          Obx(() => FlashcardIcon().getIconButton(rs,
                               controller: controller,
                               itemId: card.id,
                               front: card.content[KO],
@@ -191,27 +194,25 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                               audio: 'LessonAudios_${lesson.id}_${card.content[AUDIO]}')),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: rs.getSize(10)),
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: MyWidget()
-                            .getTextWidget(text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
+                            .getTextWidget(rs, text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: rs.getSize(20)),
                       card.content[PRONUN] != null && card.content[PRONUN].toString().isNotEmpty
                           ? FittedBox(
                               fit: BoxFit.scaleDown,
-                              child: MyWidget().getTextWidget(
-                                  text: '[${card.content[PRONUN]}]',
-                                  size: 18,
-                                  color: Colors.black,
-                                  isKorean: true),
+                              child: MyWidget().getTextWidget(rs,
+                                  text: '[${card.content[PRONUN]}]', size: 18, color: Colors.black, isKorean: true),
                             )
                           : const SizedBox.shrink(),
-                      const SizedBox(height: 20),
+                      SizedBox(height: rs.getSize(20)),
                     ],
                   ),
                   MyWidget().getTextWidget(
+                    rs,
                     text: card.content[fo],
                     color: Colors.black,
                   ),
@@ -233,7 +234,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.chat_bubble_outline, size: 18),
+            Icon(Icons.chat_bubble_outline, size: rs.getSize(18)),
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
@@ -243,19 +244,19 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       Offstage(
                           offstage: card.content[KO] == null,
                           child: Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: MyWidget().getTextWidget(text: card.content[KO], isKorean: true, size: 20),
+                            padding: EdgeInsets.only(bottom: rs.getSize(20)),
+                            child: MyWidget().getTextWidget(rs, text: card.content[KO], isKorean: true, size: 20),
                           )),
-                      MyWidget().getTextWidget(text: card.content[fo], size: 20),
+                      MyWidget().getTextWidget(rs, text: card.content[fo], size: 20),
                       card.content[VIDEO] != null
                           ? Padding(
-                              padding: const EdgeInsets.only(top: 20),
+                              padding: EdgeInsets.only(top: rs.getSize(20)),
                               child: yt.YoutubePlayer(
                                 controller: youtubeControllers[card.id]!,
-                                actionsPadding: const EdgeInsets.all(10),
+                                actionsPadding: EdgeInsets.all(rs.getSize(10)),
                                 bottomActions: [
                                   yt.CurrentPosition(),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: rs.getSize(10)),
                                   yt.ProgressBar(isExpanded: true),
                                 ],
                               ),
@@ -263,12 +264,12 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           : const SizedBox.shrink(),
                       card.detailTitle != null
                           ? Padding(
-                              padding: const EdgeInsets.only(top: 20),
+                              padding: EdgeInsets.only(top: rs.getSize(20)),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(User().status == 1 ? CupertinoIcons.lock_circle : Icons.ads_click,
-                                      color: MyColors.purple),
+                                      color: MyColors.purple, size: rs.getSize(20)),
                                   Expanded(
                                     child: Align(
                                       alignment: Alignment.centerLeft,
@@ -281,6 +282,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           }
                                         },
                                         child: MyWidget().getTextWidget(
+                                          rs,
                                           text: card.detailTitle![fo],
                                           color: MyColors.purple,
                                           size: 17,
@@ -307,14 +309,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                const Icon(Icons.lightbulb_outline, size: 18),
-                const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: tr('teachersTip')),
+                Icon(Icons.lightbulb_outline, size: rs.getSize(18)),
+                SizedBox(width: rs.getSize(8)),
+                MyWidget().getTextWidget(rs, text: tr('teachersTip')),
               ],
             ),
             Expanded(
               child: Center(
-                child: MyWidget().getTextWidget(text: card.content[fo], size: 20),
+                child: MyWidget().getTextWidget(rs, text: card.content[fo], size: 20),
               ),
             )
           ],
@@ -338,14 +340,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                const Icon(Icons.question_mark_rounded, size: 18),
-                const SizedBox(width: 8),
-                MyWidget().getTextWidget(text: tr('takeQuiz')),
+                Icon(Icons.question_mark_rounded, size: rs.getSize(18)),
+                SizedBox(width: rs.getSize(8)),
+                MyWidget().getTextWidget(rs, text: tr('takeQuiz')),
               ],
             ),
-            const SizedBox(height: 50),
-            MyWidget().getTextWidget(text: question, size: 15, color: Colors.black),
-            const SizedBox(height: 20),
+            SizedBox(height: rs.getSize(50)),
+            MyWidget().getTextWidget(rs, text: question, color: Colors.black),
+            SizedBox(height: rs.getSize(20)),
             Expanded(
               child: ListView.builder(
                 itemCount: examples.length,
@@ -373,7 +375,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       });
                     },
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
+                      padding: EdgeInsets.only(bottom: rs.getSize(20)),
                       child: Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -388,9 +390,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                               )
                             ]),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                          child:
-                              MyWidget().getTextWidget(text: '${index + 1}. ${examples[index]}', isKorean: true),
+                          padding: EdgeInsets.symmetric(vertical: rs.getSize(15), horizontal: rs.getSize(10)),
+                          child: MyWidget().getTextWidget(rs, text: '${index + 1}. ${examples[index]}', isKorean: true),
                         ),
                       ),
                     ),
@@ -407,10 +408,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 50),
+      padding: EdgeInsets.only(top: rs.getSize(50)),
       child: Card(
           child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(rs.getSize(20)),
         child: widget,
       )),
     );
@@ -431,7 +432,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     for (final controller in youtubeControllers.values) {
       controller.dispose();
     }
-    if(User().status == 1 && !isCompleted && AdsController().interstitialAd != null) {
+    if (User().status == 1 && !isCompleted && AdsController().interstitialAd != null) {
       AdsController().showInterstitialAd((ad) => null);
     }
     super.dispose();
@@ -456,8 +457,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       end: Offset.zero,
     ).animate(animationController);
 
-    final Query query =
-        FirebaseFirestore.instance.collection('Lessons/${lesson.id}/LessonCards').orderBy('orderId');
+    final Query query = FirebaseFirestore.instance.collection('Lessons/${lesson.id}/LessonCards').orderBy('orderId');
 
     Future.wait([
       Database().getDocs(query: query),
@@ -509,7 +509,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           });
           youtubeControllers[card.id] = youtubeController;
         }
-        if(card.content[AUDIO] != null && firstAudioCards!.length < 3) {
+        if (card.content[AUDIO] != null && firstAudioCards!.length < 3) {
           firstAudioCards!.add(card.id);
         }
         cards.add(card);
@@ -545,19 +545,18 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       audioPaths[fileName] = file.path;
       progressValue += incrementPerFile;
 
-      if(firstAudioCards == null) {
+      if (firstAudioCards == null) {
         if (mounted && isLoading) {
           setState(() {
             isLoading = false;
           });
         }
-
       } else {
-        if(firstAudioCards!.contains(fileName)) {
+        if (firstAudioCards!.contains(fileName)) {
           firstAudioCards!.remove(fileName);
         }
 
-        if(firstAudioCards!.isEmpty){
+        if (firstAudioCards!.isEmpty) {
           progressValue = 1;
           firstAudioCards = null;
         }
@@ -591,8 +590,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   }
 
   Future<void> _loadAd() async {
-    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-        MediaQuery.of(context).size.width.truncate());
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(MediaQuery.of(context).size.width.truncate());
     if (size == null) {
       print('Unable to get height of anchored banner.');
       return;
@@ -602,17 +601,18 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     return Scaffold(
-      appBar: MyWidget().getAppbar(title: lesson.title[KO], isKorean: true),
+      appBar: MyWidget().getAppbar(rs, title: lesson.title[KO], isKorean: true),
       body: isLoading
-          ? MyWidget().getLoading(progressValue)
+          ? MyWidget().getLoading(rs, progressValue)
           : SafeArea(
               child: Column(
                 children: [
                   LinearPercentIndicator(
                     animateFromLastPercent: true,
                     animation: true,
-                    lineHeight: 3.0,
+                    lineHeight: rs.getSize(3),
                     percent: thisIndex / cards.length,
                     backgroundColor: MyColors.navyLight,
                     progressColor: MyColors.purple,
@@ -647,7 +647,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                     ),
                   ),
                   SizedBox(
-                    height: 170,
+                    height: rs.getSize(170),
                     child: Stack(
                       children: [
                         Positioned(
@@ -657,7 +657,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             child: SizedBox(
                               width: MediaQuery.of(context).size.width,
                               child: Padding(
-                                padding: const EdgeInsets.only(bottom: 30),
+                                padding: EdgeInsets.only(bottom: rs.getSize(30)),
                                 child: GetBuilder<LessonController>(
                                   builder: (_) {
                                     LessonCard card = cards[thisIndex];
@@ -668,29 +668,29 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           Visibility(
                                             visible: card.type == MyStrings.repeat,
                                             child: MyWidget().getTextWidget(
+                                              rs,
                                               text: tr('practiceSeveralTimes'),
-                                              size: 15,
                                               color: MyColors.grey,
                                             ),
                                           ),
-                                          const SizedBox(height: 20),
+                                          SizedBox(height: rs.getSize(20)),
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               getSpeedBtn(isNormal: true),
-                                              const SizedBox(width: 20),
+                                              SizedBox(width: rs.getSize(20)),
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
                                                   CircularPercentIndicator(
-                                                    radius: 30,
-                                                    lineWidth: 4,
+                                                    radius: rs.getSize(30),
+                                                    lineWidth: rs.getSize(4),
                                                     percent: controller.audioProgress,
                                                     animateFromLastPercent: true,
                                                     progressColor: MyColors.purple,
                                                   ),
                                                   IconButton(
-                                                    iconSize: 60,
+                                                    iconSize: rs.getSize(60),
                                                     onPressed: () {
                                                       controller.playAudio();
                                                     },
@@ -701,7 +701,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(width: 20),
+                                              SizedBox(width: rs.getSize(20)),
                                               getSpeedBtn(isNormal: false),
                                             ],
                                           )
@@ -769,16 +769,16 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
             : controller.changeAudioSpeedToggle(isNormal: false);
       },
       child: Container(
-        width: 90,
+        width: rs.getSize(90),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: borderColor),
           color: containerColor,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 5),
+        padding: EdgeInsets.symmetric(vertical: rs.getSize(5)),
         child: Center(
-          child: MyWidget().getTextWidget(
-              text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
+          child: MyWidget()
+              .getTextWidget(rs, text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
         ),
       ),
     );

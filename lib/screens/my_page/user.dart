@@ -13,6 +13,7 @@ import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class User {
@@ -196,14 +197,14 @@ class User {
     }
   }
 
-  Future<void> setTrialAuthorized() async {
+  Future<void> setTrialAuthorized(ResponsiveSize rs) async {
     status = 3;
     DateTime now = DateTime.now();
     trialStart = now;
     trialEnd = now.add(const Duration(days: 10));
     fcmToken = await FirebaseMessaging.instance.getToken();
     await Database().setDoc(collection: 'Users', doc: this);
-    MyWidget().showSnackbarWithPodo(title: tr('congratulations'), content: tr('trialActivated'));
+    MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
   }
 
   Future<void> setTrialDenied() async {

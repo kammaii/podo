@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_strings.dart';
@@ -31,7 +32,8 @@ class FlashCard {
   FlashCard() {
     id = const Uuid().v4();
     DateTime now = DateTime.now();
-    date = now.subtract(Duration(milliseconds: now.millisecond, microseconds: now.microsecond));
+    date = now.subtract(
+        Duration(milliseconds: now.millisecond, microseconds: now.microsecond));
   }
 
   FlashCard.fromJson(Map<String, dynamic> json, {bool isLocal = false}) {
@@ -67,34 +69,42 @@ class FlashCard {
 
   final controller = Get.put(FlashCardController());
 
-  void addFlashcard(
-      {required String itemId, required String front, String? back, String? audio, required Function fn}) async {
+  void addFlashcard(ResponsiveSize rs,
+      {required String itemId,
+      required String front,
+      String? back,
+      String? audio,
+      required Function fn}) async {
     int status = User().status;
     int length = LocalStorage().flashcards.length;
-    if (status == 2 || status == 3 || (status == 0 && length < limitLength) || (status == 1 && length < limitLength)) {
+    if (status == 2 ||
+        status == 3 ||
+        (status == 0 && length < limitLength) ||
+        (status == 1 && length < limitLength)) {
       FlashCard flashcard = FlashCard();
       flashcard.itemId = itemId;
       flashcard.front = front;
       flashcard.back = back ?? '';
       flashcard.audio = audio;
-      await Database().setDoc(collection: 'Users/${User().id}/FlashCards', doc: flashcard).then((value) {
+      await Database()
+          .setDoc(collection: 'Users/${User().id}/FlashCards', doc: flashcard)
+          .then((value) {
         fn();
       });
       LocalStorage().flashcards.insert(0, flashcard);
       setAndUpdate();
       print('플래시카드 추가');
     } else {
-      MyWidget().showDialog(
-          content: tr('unLimitFlashcard'),
-          yesFn: () {
-            Get.toNamed(MyStrings.routePremiumMain);
-          });
+      MyWidget().showDialog(rs, content: tr('unLimitFlashcard'), yesFn: () {
+        Get.toNamed(MyStrings.routePremiumMain);
+      });
     }
   }
 
   void updateFlashcard({required FlashCard card}) async {
     DateTime now = DateTime.now();
-    now = now.subtract(Duration(milliseconds: now.millisecond, microseconds: now.microsecond));
+    now = now.subtract(
+        Duration(milliseconds: now.millisecond, microseconds: now.microsecond));
     card.date = now;
     await Database().updateFlashcard(card: card);
     for (FlashCard flashcard in LocalStorage().flashcards) {
@@ -110,7 +120,8 @@ class FlashCard {
   void removeFlashcard({required String itemId}) async {
     List<FlashCard> cards = LocalStorage().flashcards;
     FlashCard cardToRemove = cards.firstWhere((card) => card.itemId == itemId);
-    await Database().deleteDoc(collection: 'Users/${User().id}/FlashCards', docId: cardToRemove.id);
+    await Database().deleteDoc(
+        collection: 'Users/${User().id}/FlashCards', docId: cardToRemove.id);
     cards.removeWhere((flashcard) => flashcard.itemId == itemId);
     setAndUpdate();
     print('플레시카드 삭제');

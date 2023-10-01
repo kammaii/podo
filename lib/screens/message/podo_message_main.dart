@@ -13,6 +13,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/message/podo_message_reply.dart';
@@ -32,6 +33,7 @@ class PodoMessageMain extends StatelessWidget {
   final controller = Get.find<PodoMessageController>();
   bool isBasicUser = User().status == 1;
   just_audio.AudioPlayer? player;
+  late ResponsiveSize rs;
 
   Stream<String> getTimeLeftStream(DateTime dateEnd) {
     StreamController<String> controller = StreamController();
@@ -94,7 +96,7 @@ class PodoMessageMain extends StatelessWidget {
             final playerState = snapshot.data;
             final isPlaying = playerState?.playing ?? false;
             return IconButton(
-              icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_arrow_solid),
+              icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_arrow_solid, size: rs.getSize(20)),
               color: MyColors.purple,
               onPressed: () {
                 isPlaying ? player!.pause() : player!.play();
@@ -130,10 +132,10 @@ class PodoMessageMain extends StatelessWidget {
         initialVideoId: YoutubePlayer.convertUrlToId(url)!,
         flags: YoutubePlayerFlags(autoPlay: isBasicUser ? false : true),
       ),
-      actionsPadding: const EdgeInsets.all(10),
+      actionsPadding: EdgeInsets.all(rs.getSize(10)),
       bottomActions: [
         CurrentPosition(),
-        const SizedBox(width: 10),
+        SizedBox(width: rs.getSize(10)),
         ProgressBar(isExpanded: true),
       ],
     );
@@ -141,6 +143,7 @@ class PodoMessageMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     String? reply;
     if (controller.hasReplied) {
       History history = LocalStorage().histories.firstWhere((history) => history.itemId == PodoMessage().id);
@@ -156,51 +159,56 @@ class PodoMessageMain extends StatelessWidget {
 
     isBasicUser
         ? WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            MyWidget().showDialog(
-                content: tr('wantReplyPodo'),
-                yesFn: () {
-                  Get.toNamed(MyStrings.routePremiumMain);
-                });
+            MyWidget().showDialog(rs, content: tr('wantReplyPodo'), yesFn: () {
+              Get.toNamed(MyStrings.routePremiumMain);
+            });
           })
         : null;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            if (player != null) {
-              player!.dispose();
-            }
-            Get.back();
-          },
-          icon: const Icon(Icons.arrow_back_ios_rounded),
-          color: MyColors.purple,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Padding(
+          padding: EdgeInsets.all(rs.getSize(8)),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              onPressed: () {
+                if (player != null) {
+                  player!.dispose();
+                }
+                Get.back();
+              },
+              icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+              color: MyColors.purple,
+            ),
+            title: MyWidget().getTextWidget(
+              rs,
+              text: PodoMessage().title![KO],
+              color: MyColors.purple,
+              isKorean: true,
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Get.dialog(AlertDialog(
+                    title: MyWidget().getTextWidget(rs, text: tr('howToUse'), size: 18),
+                    content: MyWidget().getTextWidget(rs, text: tr('replyDetail'), color: MyColors.grey),
+                  ));
+                },
+                icon: Icon(Icons.info, color: MyColors.purple, size: rs.getSize(20, bigger: 1.2)),
+              )
+            ],
+          ),
         ),
-        title: MyWidget().getTextWidget(
-          text: PodoMessage().title![KO],
-          color: MyColors.purple,
-          isKorean: true,
-          size: 18,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Get.dialog(AlertDialog(
-                title: MyWidget().getTextWidget(text: tr('howToUse'), size: 18),
-                content: MyWidget().getTextWidget(text: tr('replyDetail'), color: MyColors.grey),
-              ));
-            },
-            icon: const Icon(Icons.info, color: MyColors.purple),
-          )
-        ],
       ),
       body: SafeArea(
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
+              padding: EdgeInsets.only(
+                  left: rs.getSize(10), right: rs.getSize(10), top: rs.getSize(20), bottom: rs.getSize(100)),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -211,9 +219,9 @@ class PodoMessageMain extends StatelessWidget {
                                 constraints: const BoxConstraints(maxHeight: 3000),
                                 child: HtmlWidget(
                                   PodoMessage().content!,
-                                  textStyle: const TextStyle(
+                                  textStyle: TextStyle(
                                     fontFamily: 'EnglishFont',
-                                    fontSize: 18,
+                                    fontSize: rs.getSize(18),
                                     height: 1.5,
                                   ),
                                   customWidgetBuilder: (element) {
@@ -227,7 +235,7 @@ class PodoMessageMain extends StatelessWidget {
                                       final String imageSrc = element.attributes['src']!;
                                       final UriData imageData = UriData.fromUri(Uri.parse(imageSrc));
                                       final Uint8List bytes = imageData.contentAsBytes();
-                                      return Image.memory(bytes, width: 200, height: 200);
+                                      return Image.memory(bytes, width: rs.getSize(200), height: rs.getSize(200));
                                     }
                                     return null;
                                   },
@@ -240,12 +248,12 @@ class PodoMessageMain extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.thumb_up_off_alt, color: MyColors.purple),
-                        const SizedBox(width: 10),
-                        MyWidget().getTextWidget(text: tr('bestReplies'), color: MyColors.purple, size: 20),
+                        Icon(Icons.thumb_up_off_alt, color: MyColors.purple, size: rs.getSize(20)),
+                        SizedBox(width: rs.getSize(10)),
+                        MyWidget().getTextWidget(rs, text: tr('bestReplies'), color: MyColors.purple, size: 20),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: rs.getSize(20)),
                     PodoMessage().hasBestReply
                         ? FutureBuilder(
                             future: Database().getDocs(
@@ -267,10 +275,9 @@ class PodoMessageMain extends StatelessWidget {
                                   shrinkWrap: true,
                                   itemBuilder: (BuildContext context, int index) {
                                     PodoMessageReply reply = replies[index];
-                                    controller.hasFlashcard[reply.id] =
-                                        LocalStorage().hasFlashcard(itemId: reply.id);
+                                    controller.hasFlashcard[reply.id] = LocalStorage().hasFlashcard(itemId: reply.id);
                                     return Padding(
-                                      padding: const EdgeInsets.only(bottom: 5),
+                                      padding: EdgeInsets.only(bottom: rs.getSize(5)),
                                       child: Row(
                                         children: [
                                           Expanded(
@@ -280,7 +287,7 @@ class PodoMessageMain extends StatelessWidget {
                                               ),
                                               color: Colors.white,
                                               child: Padding(
-                                                padding: const EdgeInsets.all(10),
+                                                padding: EdgeInsets.all(rs.getSize(10)),
                                                 child: Column(
                                                   children: [
                                                     Row(
@@ -289,21 +296,19 @@ class PodoMessageMain extends StatelessWidget {
                                                           width: 6,
                                                           height: 6,
                                                           decoration: BoxDecoration(
-                                                            color: index % 2 == 0
-                                                                ? MyColors.navyLight
-                                                                : MyColors.pink,
+                                                            color: index % 2 == 0 ? MyColors.navyLight : MyColors.pink,
                                                             shape: BoxShape.circle,
                                                           ),
                                                         ),
-                                                        const SizedBox(width: 10),
+                                                        SizedBox(width: rs.getSize(10)),
                                                         Expanded(
-                                                            child: MyWidget().getTextWidget(
+                                                            child: MyWidget().getTextWidget(rs,
                                                                 text: reply.reply,
                                                                 isKorean: true,
                                                                 size: 16,
                                                                 height: 1.5)),
-                                                        const SizedBox(width: 10),
-                                                        Obx(() => FlashcardIcon().getIconButton(
+                                                        SizedBox(width: rs.getSize(10)),
+                                                        Obx(() => FlashcardIcon().getIconButton(rs,
                                                             controller: controller,
                                                             itemId: reply.id,
                                                             front: reply.reply)),
@@ -313,12 +318,14 @@ class PodoMessageMain extends StatelessWidget {
                                                       mainAxisAlignment: MainAxisAlignment.end,
                                                       children: [
                                                         Padding(
-                                                          padding: const EdgeInsets.only(right: 10, top: 5),
+                                                          padding: EdgeInsets.only(
+                                                              right: rs.getSize(10), top: rs.getSize(5)),
                                                           child: MyWidget().getTextWidget(
-                                                              text: reply.userName.isEmpty
-                                                                  ? tr('unNamed')
-                                                                  : reply.userName,
-                                                              color: MyColors.grey),
+                                                            rs,
+                                                            text:
+                                                                reply.userName.isEmpty ? tr('unNamed') : reply.userName,
+                                                            color: MyColors.grey,
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -340,8 +347,8 @@ class PodoMessageMain extends StatelessWidget {
                             },
                           )
                         : Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 100),
-                            child: MyWidget().getTextWidget(
+                            padding: EdgeInsets.symmetric(vertical: rs.getSize(100)),
+                            child: MyWidget().getTextWidget(rs,
                                 text: tr('noBestReply'), color: MyColors.navy, isTextAlignCenter: true),
                           ),
                   ],
@@ -355,12 +362,12 @@ class PodoMessageMain extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 5, right: 15),
+                    padding: EdgeInsets.only(bottom: rs.getSize(5), right: rs.getSize(15)),
                     child: StreamBuilder<String>(
                       stream: getTimeLeftStream(PodoMessage().dateEnd!),
                       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                         if (snapshot.hasData) {
-                          return MyWidget().getTextWidget(text: snapshot.data!, color: MyColors.purple);
+                          return MyWidget().getTextWidget(rs, text: snapshot.data!, color: MyColors.purple);
                         } else {
                           return Text(tr('expired'));
                         }
@@ -369,24 +376,26 @@ class PodoMessageMain extends StatelessWidget {
                   ),
                   Container(
                     color: MyColors.navyLight,
-                    height: 70,
+                    height: rs.getSize(70),
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
+                      padding: EdgeInsets.only(left: rs.getSize(10)),
                       child: Row(
                         children: [
                           Expanded(
                             child: MyWidget().getTextFieldWidget(
+                              rs,
                               hint: replyHint,
                               controller: replyController,
                               enabled: isReplyAvailable,
                             ),
                           ),
-                          const SizedBox(width: 20),
+                          SizedBox(width: rs.getSize(20)),
                           IgnorePointer(
                             ignoring: !isReplyAvailable,
                             child: IconButton(
                               onPressed: () {
                                 MyWidget().showDialog(
+                                  rs,
                                   content: tr('sendReply'),
                                   yesFn: () async {
                                     await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
@@ -399,14 +408,13 @@ class PodoMessageMain extends StatelessWidget {
                                           Get.back();
                                         });
                                     History().addHistory(
-                                        item: 'podoMessage',
-                                        itemId: PodoMessage().id!,
-                                        content: replyController.text);
+                                        item: 'podoMessage', itemId: PodoMessage().id!, content: replyController.text);
                                     Get.find<PodoMessageController>().setPodoMsgBtn();
                                   },
                                 );
                               },
-                              icon: Icon(Icons.send, color: !isReplyAvailable ? MyColors.grey : MyColors.purple),
+                              icon: Icon(Icons.send,
+                                  color: !isReplyAvailable ? MyColors.grey : MyColors.purple, size: rs.getSize(20)),
                             ),
                           ),
                         ],

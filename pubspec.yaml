@@ -65,6 +65,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   firebase_analytics: ^10.4.3
   firebase_crashlytics: ^3.3.5
+  responsive_framework: ^1.1.1
 
 flutter_launcher_icons:
   android: true

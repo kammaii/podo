@@ -2,7 +2,7 @@
     package="net.awesomekorean.newpodo">
    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
    <application
-        android:label="podo"
+        android:label="Podo Korean"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:icon="@mipmap/ic_launcher">

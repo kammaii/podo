@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -38,6 +39,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final courseController = Get.find<LessonCourseController>();
   final lessonController = Get.put(LessonController());
   bool isAdmin = false;
+  late ResponsiveSize rs;
 
   @override
   void initState() {
@@ -86,7 +88,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(cardBorderRadius),
@@ -95,8 +97,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                       child: InkWell(
                         onTap: () async {
                           LocalStorage().setLessonScrollPosition(scrollController.offset);
-                          await FirebaseAnalytics.instance
-                              .logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                          await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
                           if (!lesson.hasOptions) {
                             Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                           } else {
@@ -104,39 +105,37 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                           }
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: EdgeInsets.all(rs.getSize(10)),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  MyWidget().getTextWidget(
-                                    text: '$index. ${lesson.type}',
-                                    color: lesson.type == LESSON ? MyColors.navy : MyColors.wine,
-                                  ),
+                                  MyWidget().getTextWidget(rs,
+                                      text: '$index. ${lesson.type}',
+                                      color: lesson.type == LESSON ? MyColors.navy : MyColors.wine),
                                   const SizedBox(width: 10),
                                   Obx(
                                     () => lessonController.getIsCompleted(lesson.id)
-                                        ? const Icon(
+                                        ? Icon(
                                             Icons.check_circle,
                                             color: MyColors.green,
+                                            size: rs.getSize(20),
                                           )
                                         : const SizedBox.shrink(),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rs.getSize(10)),
                               MyWidget().getTextWidget(
+                                rs,
                                 text: lesson.title[KO],
                                 size: 20,
                                 color: MyColors.purple,
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rs.getSize(10)),
                               course.isTopicMode
-                                  ? MyWidget().getTextWidget(
-                                      text: lesson.title[language],
-                                      color: MyColors.grey,
-                                    )
+                                  ? MyWidget().getTextWidget(rs, text: lesson.title[language], color: MyColors.grey)
                                   : const SizedBox.shrink(),
                             ],
                           ),
@@ -146,18 +145,19 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   ),
                   lesson.tag != null && lesson.tag.toString().isNotEmpty
                       ? Positioned(
-                          top: 4,
-                          right: 14,
+                          top: rs.getSize(4),
+                          right: rs.getSize(14),
                           child: Container(
-                              decoration: BoxDecoration(
-                                color: MyColors.pink,
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(cardBorderRadius),
-                                  bottomLeft: Radius.circular(cardBorderRadius),
-                                ),
+                            decoration: BoxDecoration(
+                              color: MyColors.pink,
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(cardBorderRadius),
+                                bottomLeft: Radius.circular(cardBorderRadius),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                              child: MyWidget().getTextWidget(text: lesson.tag, color: MyColors.red)))
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(3)),
+                            child: MyWidget().getTextWidget(rs, text: lesson.tag, color: MyColors.red),
+                          ))
                       : const SizedBox.shrink(),
                 ],
               ),
@@ -171,24 +171,25 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     for (dynamic lesson in course.lessons) {
       if (lesson is Map) {
         Lesson l = Lesson.fromJson(lesson as Map<String, dynamic>);
-        if(l.isReleased) {
+        if (l.isReleased) {
           lessonCount++;
         }
       }
     }
     return SliverAppBar(
       leading: IconButton(
-        icon: const Icon(Icons.menu),
+        icon: Icon(Icons.menu, size: rs.getSize(25)),
         color: MyColors.purple,
         onPressed: () {
           courseController.setVisibility(true);
         },
       ),
-      expandedHeight: sliverAppBarHeight,
-      collapsedHeight: 60,
+      expandedHeight: rs.getSize(sliverAppBarHeight),
+      collapsedHeight: rs.getSize(60),
       pinned: true,
       stretch: true,
       title: MyWidget().getTextWidget(
+        rs,
         text: '${course.title[language]} ($lessonCount ${tr('lessons')})',
         size: 18,
         color: MyColors.purple,
@@ -206,7 +207,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   child: FadeTransition(
                     opacity: animation,
                     child: course.image != null
-                        ? Image.memory(base64Decode(course.image!), gaplessPlayback: true, width: 200)
+                        ? Image.memory(base64Decode(course.image!), gaplessPlayback: true, width: rs.getSize(200))
                         : const SizedBox.shrink(),
                   ),
                 )
@@ -232,7 +233,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   sliverList() {
     return SliverPadding(
-      padding: const EdgeInsets.only(top: 20, bottom: 50),
+      padding: EdgeInsets.only(top: rs.getSize(20), bottom: rs.getSize(50)),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
@@ -247,6 +248,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     course = widget.course;
+    rs = ResponsiveSize(context);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       Map<String, bool> map = {};
@@ -283,23 +285,23 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   child: Container(
                     color: MyColors.navyLight,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
                       child: Row(
                         children: [
-                          Image.asset('assets/images/podo.png', height: 40, width: 40),
-                          const SizedBox(width: 15),
+                          Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
+                          SizedBox(width: rs.getSize(15)),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                MyWidget().getTextWidget(
+                                MyWidget().getTextWidget(rs,
                                     text: PodoMessage().title?[KO] ?? '',
                                     isKorean: true,
                                     size: 18,
                                     color: MyColors.purple,
                                     maxLine: 1),
-                                const SizedBox(height: 5),
-                                MyWidget().getTextWidget(
+                                SizedBox(height: rs.getSize(5)),
+                                MyWidget().getTextWidget(rs,
                                     text: PodoMessage().title?[User().language] ?? '',
                                     color: MyColors.grey,
                                     size: 13,
@@ -307,14 +309,14 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                               ],
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: rs.getSize(10)),
                           Center(
                             child: Obx(
                               () => MyWidget().getRoundedContainer(
                                 radius: 30,
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
                                 bgColor: cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
-                                widget: MyWidget().getTextWidget(
+                                widget: MyWidget().getTextWidget(rs,
                                     text: cloudController.podoMsgBtnText, color: Colors.white, size: 13),
                               ),
                             ),

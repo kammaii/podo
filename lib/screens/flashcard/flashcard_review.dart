@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:blur/blur.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +12,7 @@ import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/play_stop_icon.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/values/my_colors.dart';
@@ -34,6 +34,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
   late bool isLoading;
   late double progressValue;
   late Map<String, String> audioPaths;
+  late ResponsiveSize rs;
 
   @override
   void initState() {
@@ -45,7 +46,6 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
     today = '${now.year}-${now.month}-${now.day}';
     allCards = LocalStorage().flashcards;
     cards = allCards.where((card) => (card.dateReview != today)).toList();
-    playStopIcon = PlayStopIcon(this, size: 50);
     _cacheAudioFiles();
   }
 
@@ -135,13 +135,13 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
             backgroundColor: Colors.white),
         onPressed: fn,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+          padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(13)),
           child: Row(
             children: [
-              Icon(icon, color: MyColors.purple),
-              const SizedBox(width: 30),
+              Icon(icon, color: MyColors.purple, size: rs.getSize(20)),
+              SizedBox(width: rs.getSize(30)),
               Expanded(
-                  child: Center(child: MyWidget().getTextWidget(text: title, size: 18, color: MyColors.purple))),
+                  child: Center(child: MyWidget().getTextWidget(rs, text: title, size: 18, color: MyColors.purple))),
             ],
           ),
         ),
@@ -151,6 +151,9 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
+    playStopIcon = PlayStopIcon(rs, this, size: 50);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -159,12 +162,12 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(Icons.arrow_back_ios_rounded),
+          icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
           color: MyColors.purple,
         ),
       ),
       body: isLoading
-          ? const Center(child: SpinKitThreeBounce(color: MyColors.purple, size: 20))
+          ? Center(child: SpinKitThreeBounce(color: MyColors.purple, size: rs.getSize(20)))
           : SafeArea(
               child: GetBuilder<FlashCardController>(
                 builder: (_) {
@@ -176,7 +179,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                         LinearPercentIndicator(
                           animateFromLastPercent: true,
                           animation: true,
-                          lineHeight: 3.0,
+                          lineHeight: rs.getSize(3),
                           percent: (allCards.length - cards.length) / allCards.length,
                           backgroundColor: MyColors.navyLight,
                           progressColor: MyColors.purple,
@@ -186,15 +189,13 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                           children: [
                             Row(
                               children: [
-                                MyWidget().getCheckBox(
-                                    value: controller.isShuffleChecked,
-                                    onChanged: (value) {
-                                      checkShuffle(value);
-                                    }),
-                                MyWidget().getTextWidget(text: tr('shuffle')),
+                                MyWidget().getCheckBox(rs, value: controller.isShuffleChecked, onChanged: (value) {
+                                  checkShuffle(value);
+                                }),
+                                MyWidget().getTextWidget(rs, text: tr('shuffle')),
                               ],
                             ),
-                            MyWidget().getTextWidget(
+                            MyWidget().getTextWidget(rs,
                                 text: '${tr('today')} ${allCards.length - cards.length} / ${allCards.length}   '),
                           ],
                         ),
@@ -203,8 +204,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             child: Container(
                               padding: const EdgeInsets.all(20),
-                              decoration:
-                                  BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
                               child: Center(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -212,6 +212,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                     Expanded(
                                       child: Center(
                                         child: MyWidget().getTextWidget(
+                                          rs,
                                           text: card.front,
                                           size: 20,
                                           color: Colors.black,
@@ -226,6 +227,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                             child: controller.isViewAllClicked.value
                                                 ? MyWidget().getTextWidget(
+                                                    rs,
                                                     text: card.back,
                                                     size: 20,
                                                     color: MyColors.grey,
@@ -233,6 +235,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                                 : Blur(
                                                     blur: 2.3,
                                                     child: MyWidget().getTextWidget(
+                                                      rs,
                                                       text: card.back,
                                                       size: 20,
                                                       color: MyColors.grey,
@@ -250,7 +253,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                         controller.isViewAllClicked.value = false;
                                       },
                                       child: MyWidget()
-                                          .getTextWidget(text: tr('makeClear'), color: MyColors.grey, size: 13),
+                                          .getTextWidget(rs, text: tr('makeClear'), color: MyColors.grey, size: 13),
                                     ),
                                   ],
                                 ),
@@ -277,13 +280,13 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(20)),
                                   child: MyWidget().getRoundBtnWidget(
+                                    rs,
                                     text: tr('next'),
                                     f: () {
                                       setPlayStopIcon(isForward: false);
-                                      FlashCard? reviewedCard =
-                                          allCards.firstWhere((card) => card.id == cards[0].id);
+                                      FlashCard? reviewedCard = allCards.firstWhere((card) => card.id == cards[0].id);
                                       reviewedCard.dateReview = today;
                                       cards.removeAt(0);
                                       audioPaths.remove(reviewedCard.audio);
@@ -306,7 +309,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          MyWidget().getTextWidget(
+                          MyWidget().getTextWidget(rs,
                               text: tr('flashCardReviewCompleted'),
                               isTextAlignCenter: true,
                               color: MyColors.purple,

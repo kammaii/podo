@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
@@ -26,36 +27,6 @@ class MainFrame extends StatefulWidget {
   _MainFrameState createState() => _MainFrameState();
 }
 
-List<Widget> _buildScreens() {
-  LessonCourse? course = LocalStorage().getLessonCourse();
-  return [
-    course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
-    ReadingListMain(),
-    WritingMyList(),
-    const FlashCardMain(),
-    const MyPage(),
-  ];
-}
-
-PersistentBottomNavBarItem _navBarItem(String title, Icon icon) {
-  return PersistentBottomNavBarItem(
-    icon: icon,
-    title: title,
-    activeColorPrimary: MyColors.purple,
-    inactiveColorPrimary: MyColors.grey,
-  );
-}
-
-List<PersistentBottomNavBarItem> _navBarsItems() {
-  return [
-    _navBarItem(tr('lessons'), const Icon(FontAwesomeIcons.chalkboard)),
-    _navBarItem(tr('reading'), const Icon(FontAwesomeIcons.book)),
-    _navBarItem(tr('writing'), const Icon(FontAwesomeIcons.pen)),
-    _navBarItem(tr('flashcard'), const Icon(FontAwesomeIcons.solidStar)),
-    _navBarItem(tr('myPage'), const Icon(Icons.settings)),
-  ];
-}
-
 class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMixin {
   List<bool> modeToggle = [true, false];
   final LESSON_COURSES = 'LessonCourses';
@@ -67,6 +38,39 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   final controller = Get.find<LessonCourseController>();
   List<LessonCourse> courses = [];
   late PersistentTabController _controller;
+  late ResponsiveSize rs;
+
+  List<Widget> _buildScreens() {
+    LessonCourse? course = LocalStorage().getLessonCourse();
+    return [
+      course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
+      ReadingListMain(),
+      WritingMyList(),
+      const FlashCardMain(),
+      const MyPage(),
+    ];
+  }
+
+  PersistentBottomNavBarItem _navBarItem(String title, Icon icon) {
+    return PersistentBottomNavBarItem(
+      icon: icon,
+      title: title,
+      activeColorPrimary: MyColors.purple,
+      inactiveColorPrimary: MyColors.grey,
+      iconSize: rs.getSize(23),
+      textStyle: TextStyle(fontSize: rs.getSize(13)),
+    );
+  }
+
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+    return [
+      _navBarItem(tr('lessons'), const Icon(FontAwesomeIcons.chalkboard)),
+      _navBarItem(tr('reading'), const Icon(FontAwesomeIcons.book)),
+      _navBarItem(tr('writing'), const Icon(FontAwesomeIcons.pen)),
+      _navBarItem(tr('flashcard'), const Icon(FontAwesomeIcons.solidStar)),
+      _navBarItem(tr('myPage'), const Icon(Icons.settings)),
+    ];
+  }
 
   setCourseVisibility() {
     if (controller.isVisible) {
@@ -85,7 +89,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           controller.setVisibility(false);
         },
         child: Padding(
-          padding: const EdgeInsets.all(15),
+          padding: EdgeInsets.all(rs.getSize(15)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,12 +98,14 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                 children: [
                   lessonCourse.image != null
                       ? Padding(
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Image.memory(base64Decode(lessonCourse.image!), height: 80, width: 80),
+                          padding: EdgeInsets.only(right: rs.getSize(20)),
+                          child: Image.memory(base64Decode(lessonCourse.image!),
+                              height: rs.getSize(80), width: rs.getSize(80)),
                         )
                       : const SizedBox.shrink(),
                   Expanded(
                     child: MyWidget().getTextWidget(
+                      rs,
                       text: lessonCourse.title[setLanguage],
                       size: modeToggle[0] ? 25 : 20,
                       color: MyColors.purple,
@@ -108,11 +114,11 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   ),
                 ],
               ),
-              SizedBox(height: modeToggle[0] ? 20 : 0),
+              SizedBox(height: modeToggle[0] ? rs.getSize(20) : 0),
               modeToggle[0]
                   ? MyWidget().getTextWidget(
+                      rs,
                       text: lessonCourse.description[setLanguage],
-                      size: 15,
                       color: MyColors.grey,
                     )
                   : const SizedBox.shrink(),
@@ -139,13 +145,14 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     if (!LocalStorage().hasWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LocalStorage().hasWelcome = true;
-        MyWidget().showSnackbarWithPodo(title: tr('welcome'), content: tr('welcomeMessage'));
+        MyWidget().showSnackbarWithPodo(rs, title: tr('welcome'), content: tr('welcomeMessage'));
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     return GetBuilder<LessonCourseController>(
       builder: (_) {
         modeToggle[0] ? courses = controller.courses[0] : courses = controller.courses[1];
@@ -155,19 +162,19 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           onWillPop: () async {
             bool isExit = false;
             await Get.dialog(AlertDialog(
-              title: Text(tr('exitApp')),
+              title: MyWidget().getTextWidget(rs, text: tr('exitApp')),
               actions: [
                 TextButton(
                     onPressed: () {
                       SystemNavigator.pop();
                       isExit = true;
                     },
-                    child: Text(tr('yes'), style: const TextStyle(color: MyColors.navy))),
+                    child: MyWidget().getTextWidget(rs, text: tr('yes'), color: MyColors.navy)),
                 TextButton(
                     onPressed: () {
                       Get.back();
                     },
-                    child: Text(tr('no'), style: const TextStyle(color: MyColors.purple))),
+                    child: MyWidget().getTextWidget(rs, text: tr('no'), color: MyColors.purple)),
               ],
             ));
             return isExit;
@@ -208,7 +215,9 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                     curve: Curves.ease,
                     duration: Duration(milliseconds: 200),
                   ),
-                  navBarStyle: NavBarStyle.style3, // Choose the nav bar style with this property.
+                  navBarStyle: NavBarStyle.style6,
+                  // Choose the nav bar style with this property.
+                  navBarHeight: rs.getSize(55),
                 ),
                 Offstage(
                   offstage: !controller.isVisible,
@@ -225,13 +234,14 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                         child: Container(
                           color: MyColors.purpleLight,
                           child: Padding(
-                            padding: const EdgeInsets.all(10),
+                            padding: EdgeInsets.all(rs.getSize(10)),
                             child: Column(
                               children: [
                                 Row(
                                   children: [
                                     Expanded(
                                       child: MyWidget().getTextWidget(
+                                        rs,
                                         text: tr('selectCourse'),
                                         size: 20,
                                         color: MyColors.purple,
@@ -241,11 +251,12 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                     Row(
                                       children: [
                                         MyWidget().getTextWidget(
+                                          rs,
                                           text: tr('mode'),
                                           color: MyColors.purple,
                                           isBold: true,
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: rs.getSize(10)),
                                         ToggleButtons(
                                           isSelected: modeToggle,
                                           onPressed: (int index) {
@@ -253,17 +264,18 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                             modeToggle[1] = 1 == index;
                                             controller.update();
                                           },
-                                          constraints: const BoxConstraints(minHeight: 30, minWidth: 50),
+                                          constraints:
+                                              BoxConstraints(minHeight: rs.getSize(30), minWidth: rs.getSize(50)),
                                           borderRadius: const BorderRadius.all(Radius.circular(10)),
                                           selectedBorderColor: MyColors.purple,
                                           selectedColor: Colors.white,
                                           fillColor: MyColors.purple,
                                           color: MyColors.purple,
                                           children: [
-                                            Text(tr('topic')),
+                                            Text(tr('topic'), style: TextStyle(fontSize: rs.getSize(15))),
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 5),
-                                              child: Text(tr('grammar')),
+                                              padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
+                                              child: Text(tr('grammar'), style: TextStyle(fontSize: rs.getSize(15))),
                                             ),
                                           ],
                                         ),
@@ -271,6 +283,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                     ),
                                   ],
                                 ),
+                                SizedBox(height: rs.getSize(10)),
                                 Expanded(
                                   child: ListView.builder(
                                     itemCount: courses.length,

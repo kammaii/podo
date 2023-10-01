@@ -7,6 +7,7 @@ import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/play_stop_icon.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -20,8 +21,7 @@ class FlashCardMain extends StatefulWidget {
   _FlashCardMainState createState() => _FlashCardMainState();
 }
 
-class _FlashCardMainState extends State<FlashCardMain>
-    with TickerProviderStateMixin {
+class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
   List<FlashCard> cardsSearch = [];
@@ -32,6 +32,7 @@ class _FlashCardMainState extends State<FlashCardMain>
   late int cardsLength;
   DocumentSnapshot? lastSnapshot;
   bool isBasicUser = User().status == 1;
+  late ResponsiveSize rs;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _FlashCardMainState extends State<FlashCardMain>
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -69,21 +71,18 @@ class _FlashCardMainState extends State<FlashCardMain>
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  MyWidget().getSearchWidget(
-                      focusNode: _focusNode,
-                      controller: searchController,
-                      hint: tr('search'),
-                      onChanged: (text) {
-                        searchText = searchController.text;
-                        controller.update();
-                      }),
-                  const SizedBox(height: 20),
+                  MyWidget().getSearchWidget(rs,
+                      focusNode: _focusNode, controller: searchController, hint: tr('search'), onChanged: (text) {
+                    searchText = searchController.text;
+                    controller.update();
+                  }),
+                  SizedBox(height: rs.getSize(20)),
                   Expanded(
                     child: GetBuilder<FlashCardController>(
                       builder: (_) {
                         for (FlashCard card in controller.cards) {
                           if (card.audio != null) {
-                            playStopIcons[card.id] = PlayStopIcon(this);
+                            playStopIcons[card.id] = PlayStopIcon(rs, this);
                           }
                         }
                         cardsLength = controller.cards.length;
@@ -92,12 +91,8 @@ class _FlashCardMainState extends State<FlashCardMain>
                           cardsSearch = [];
                           for (FlashCard card in controller.cards) {
                             if (searchText.isNotEmpty &&
-                                (card.front
-                                        .toLowerCase()
-                                        .contains(searchText) ||
-                                    card.back
-                                        .toLowerCase()
-                                        .contains(searchText))) {
+                                (card.front.toLowerCase().contains(searchText) ||
+                                    card.back.toLowerCase().contains(searchText))) {
                               cardsSearch.add(card);
                             }
                           }
@@ -108,60 +103,44 @@ class _FlashCardMainState extends State<FlashCardMain>
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  animationWidget(MyWidget().getCheckBox(
-                                      value: controller.isCheckedAll,
-                                      onChanged: (value) {
-                                        controller.isCheckedAllClicked(value!);
-                                      })),
+                                  animationWidget(
+                                      MyWidget().getCheckBox(rs, value: controller.isCheckedAll, onChanged: (value) {
+                                    controller.isCheckedAllClicked(value!);
+                                  })),
                                   Row(
                                     children: [
                                       animationWidget(IconButton(
                                           onPressed: () {
-                                            MyWidget().showDialog(
-                                                content:
-                                                    tr('wantRemoveFlashcard'),
-                                                yesFn: () {
-                                                  List<String> ids = [];
-                                                  for (int i = 0;
-                                                      i <
-                                                          controller
-                                                              .isChecked.length;
-                                                      i++) {
-                                                    controller.isChecked[i]
-                                                        ? ids.add(controller
-                                                            .cards[i].id)
-                                                        : null;
-                                                  }
-                                                  FlashCard().removeFlashcards(
-                                                      ids: ids);
-                                                });
+                                            MyWidget().showDialog(rs, content: tr('wantRemoveFlashcard'), yesFn: () {
+                                              List<String> ids = [];
+                                              for (int i = 0; i < controller.isChecked.length; i++) {
+                                                controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
+                                              }
+                                              FlashCard().removeFlashcards(ids: ids);
+                                            });
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.delete,
                                             color: MyColors.red,
+                                            size: rs.getSize(20),
                                           ))),
-                                      const SizedBox(width: 20),
+                                      SizedBox(width: rs.getSize(20)),
                                       InkWell(
                                         onTap: isBasicUser
                                             ? () {
-                                                Get.toNamed(
-                                                    MyStrings.routePremiumMain);
+                                                Get.toNamed(MyStrings.routePremiumMain);
                                               }
                                             : null,
                                         child: Row(
                                           children: [
-                                            MyWidget().getTextWidget(
-                                                text:
-                                                    '$cardsLength ${tr('cards')}',
-                                                size: 15,
-                                                color: Colors.black),
+                                            MyWidget().getTextWidget(rs,
+                                                text: '$cardsLength ${tr('cards')}', color: Colors.black),
                                             isBasicUser
                                                 ? MyWidget().getTextWidget(
+                                                    rs,
                                                     text: ' (${tr('limit20')})',
-                                                    size: 15,
                                                     color: MyColors.red,
                                                     isBold: true,
                                                   )
@@ -176,31 +155,31 @@ class _FlashCardMainState extends State<FlashCardMain>
                               Expanded(
                                 child: cardsLength <= 0
                                     ? Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        FlashcardIcon().getIconOnly(),
-                                        const SizedBox(height: 10),
-                                        MyWidget().getTextWidget(
-                                            text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),
-                                        const SizedBox(height: 50),
-                                      ],
-                                    )
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          FlashcardIcon().getIconOnly(rs),
+                                          SizedBox(height: rs.getSize(10)),
+                                          MyWidget().getTextWidget(rs,
+                                              text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),
+                                          SizedBox(height: rs.getSize(50)),
+                                        ],
+                                      )
                                     : GestureDetector(
                                         onTap: () {
                                           _focusNode.unfocus();
                                         },
                                         onLongPress: () {
-                                          controller.isLongClicked =
-                                              !controller.isLongClicked;
+                                          controller.isLongClicked = !controller.isLongClicked;
                                           controller.update();
                                         },
                                         child: ListView.builder(
-                                          padding: const EdgeInsets.only(
-                                              top: 10, bottom: 80),
+                                          padding: EdgeInsets.only(top: rs.getSize(10), bottom: rs.getSize(80)),
                                           itemCount: cardsLength,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            return getFlashCardItem(index);
+                                          itemBuilder: (BuildContext context, int index) {
+                                            return Padding(
+                                              padding: EdgeInsets.only(bottom: rs.getSize(8)),
+                                              child: getFlashCardItem(index),
+                                            );
                                           },
                                         ),
                                       ),
@@ -215,7 +194,7 @@ class _FlashCardMainState extends State<FlashCardMain>
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              padding: EdgeInsets.symmetric(horizontal: rs.getSize(20), vertical: rs.getSize(30)),
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Row(
@@ -224,10 +203,9 @@ class _FlashCardMainState extends State<FlashCardMain>
                       child: GetBuilder<FlashCardController>(
                         builder: (_) {
                           return MyWidget().getRoundBtnWidget(
+                            rs,
                             text: tr('review'),
-                            bgColor: controller.cards.isNotEmpty
-                                ? MyColors.purple
-                                : MyColors.grey,
+                            bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
                             f: onReviewBtn,
                             hasNullFunction: true,
                           );
@@ -267,21 +245,17 @@ class _FlashCardMainState extends State<FlashCardMain>
 
   Widget getFlashCardItem(int index) {
     FlashCard card;
-    searchText.isEmpty
-        ? card = controller.cards[index]
-        : card = cardsSearch[index];
+    searchText.isEmpty ? card = controller.cards[index] : card = cardsSearch[index];
     String front = card.front;
     String back = card.back;
 
     return Row(
       children: [
-        animationWidget(MyWidget().getCheckBox(
-            value: controller.isChecked[index],
-            onChanged: (value) {
-              controller.isChecked[index] = value!;
-              controller.update();
-            })),
-        const SizedBox(width: 10),
+        animationWidget(MyWidget().getCheckBox(rs, value: controller.isChecked[index], onChanged: (value) {
+          controller.isChecked[index] = value!;
+          controller.update();
+        })),
+        SizedBox(width: rs.getSize(10)),
         Expanded(
           child: GestureDetector(
             onTap: () {
@@ -294,16 +268,16 @@ class _FlashCardMainState extends State<FlashCardMain>
                     child: Text(front,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: const TextStyle(fontSize: 15))),
-                const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: VerticalDivider(thickness: 1, color: MyColors.grey)),
+                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2)))),
+                SizedBox(
+                    width: rs.getSize(20),
+                    height: rs.getSize(20),
+                    child: VerticalDivider(thickness: rs.getSize(1), color: MyColors.grey)),
                 Expanded(
                     child: Text(back,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: const TextStyle(fontSize: 15))),
+                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2)))),
               ],
             ),
           ),
@@ -316,8 +290,7 @@ class _FlashCardMainState extends State<FlashCardMain>
                   if (card.isPlay) {
                     setPlayStopIcon(index, isForward: false);
                   } else {
-                    PlayAudio().playFlashcard(card.audio!,
-                        addStreamCompleted: (event) {
+                    PlayAudio().playFlashcard(card.audio!, addStreamCompleted: (event) {
                       if (event.processingState == ProcessingState.completed) {
                         setPlayStopIcon(index, isForward: false);
                         PlayAudio().stream.cancel();
@@ -332,10 +305,8 @@ class _FlashCardMainState extends State<FlashCardMain>
                   }
                 },
                 child: SizedBox(
-                  width: 30,
-                  child: card.audio == null
-                      ? const SizedBox.shrink()
-                      : playStopIcons[card.id]!.icon,
+                  width: rs.getSize(30),
+                  child: card.audio == null ? const SizedBox.shrink() : playStopIcons[card.id]!.icon,
                 ))),
       ],
     );

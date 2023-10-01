@@ -10,6 +10,7 @@ import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -19,7 +20,9 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class LessonComplete extends StatelessWidget {
-  const LessonComplete({Key? key}) : super(key: key);
+  LessonComplete({Key? key}) : super(key: key);
+
+  late ResponsiveSize rs;
 
   Widget getBtn(String title, IconData icon, Function() fn) {
     return Row(children: [
@@ -33,13 +36,13 @@ class LessonComplete extends StatelessWidget {
             backgroundColor: Colors.white),
         onPressed: fn,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 13),
+          padding: EdgeInsets.symmetric(horizontal: rs.getSize(50), vertical: rs.getSize(13)),
           child: Row(
             children: [
-              Icon(icon, color: MyColors.purple),
-              const SizedBox(width: 30),
+              Icon(icon, color: MyColors.purple, size: rs.getSize(20)),
+              SizedBox(width: rs.getSize(30)),
               Expanded(
-                  child: Center(child: MyWidget().getTextWidget(text: title, size: 20, color: MyColors.purple))),
+                  child: Center(child: MyWidget().getTextWidget(rs, text: title, size: 20, color: MyColors.purple))),
             ],
           ),
         ),
@@ -49,42 +52,43 @@ class LessonComplete extends StatelessWidget {
 
   void showMessagePermission() async {
     await FirebaseAnalytics.instance.logEvent(name: 'first_lesson_complete');
-    Get.dialog(AlertDialog(
-      title: Image.asset('assets/images/podo.png', width: 50, height: 50),
-      content: MyWidget().getTextWidget(text: tr('trialComment'), isTextAlignCenter: true, size: 16),
-      actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.all(20),
-      actions:  [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+    Get.dialog(
+        AlertDialog(
+          title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
+          content: MyWidget().getTextWidget(rs, text: tr('trialComment'), isTextAlignCenter: true, size: 16),
+          actionsAlignment: MainAxisAlignment.center,
+          actionsPadding: EdgeInsets.all(rs.getSize(20)),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  backgroundColor: MyColors.purple),
+              onPressed: () async {
+                Get.back();
+                FirebaseMessaging messaging = FirebaseMessaging.instance;
+                NotificationSettings settings = await messaging.requestPermission();
+                if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+                  await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
+                  await User().setTrialAuthorized(rs);
+                  Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                } else {
+                  await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
+                  await User().setTrialDenied();
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(3)),
+                  child: MyWidget().getTextWidget(rs, text: tr('cool'), color: Colors.white),
+                ),
               ),
-              backgroundColor: MyColors.purple),
-          onPressed: () async {
-            Get.back();
-            FirebaseMessaging messaging = FirebaseMessaging.instance;
-            NotificationSettings settings = await messaging.requestPermission();
-            if(settings.authorizationStatus == AuthorizationStatus.authorized) {
-              await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
-              await User().setTrialAuthorized();
-              Get.offNamedUntil(
-                  MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-            } else {
-              await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
-              await User().setTrialDenied();
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 13),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 3),
-              child: Text(tr('cool'), style: const TextStyle(color: Colors.white)),
             ),
-          ),
+          ],
         ),
-      ],
-    ), barrierDismissible: false);
+        barrierDismissible: false);
   }
 
   void playYay() async {
@@ -93,6 +97,7 @@ class LessonComplete extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     playYay();
     final ConfettiController controller = ConfettiController(duration: const Duration(seconds: 10));
     controller.play();
@@ -101,7 +106,7 @@ class LessonComplete extends StatelessWidget {
     History().addHistory(item: 'lesson', itemId: lesson.id);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       lessonController.isCompleted[lesson.id] = true;
-      if(User().status == 0 && User().trialStart == null) {
+      if (User().status == 0 && User().trialStart == null) {
         showMessagePermission();
       }
     });
@@ -143,52 +148,52 @@ class LessonComplete extends StatelessWidget {
                 TextLiquidFill(
                   loadDuration: const Duration(seconds: 2),
                   text: tr('congratulations'),
-                  textStyle: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),
+                  textStyle: TextStyle(fontSize: rs.getSize(30), fontWeight: FontWeight.bold, color: Colors.white),
                   waveColor: MyColors.purple,
                   boxBackgroundColor: MyColors.purpleLight,
-                  boxHeight: 100,
+                  boxHeight: rs.getSize(100),
                 ),
-                const Divider(
-                  thickness: 1,
-                  indent: 30,
-                  endIndent: 30,
+                Divider(
+                  thickness: rs.getSize(1),
+                  indent: rs.getSize(30),
+                  endIndent: rs.getSize(30),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                SizedBox(height: rs.getSize(20)),
                 MyWidget().getTextWidget(
+                  rs,
                   text: tr('lessonComplete'),
                   size: 20,
                   color: MyColors.purple,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: rs.getSize(20)),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(20)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        lesson.hasOptions ?
-                        Column(
-                          children: [
-                            getBtn(tr('summary'), CupertinoIcons.doc_text, () {
-                              showAd(() {
-                                Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
-                              });
-                            }),
-                            const SizedBox(height: 20),
-                            getBtn(tr('writing'), CupertinoIcons.pen, () {
-                              if(User().status == 2 || User().status == 3) {
-                                Get.offNamedUntil(
-                                    MyStrings.routeWritingMain, ModalRoute.withName(MyStrings.routeLessonSummaryMain),
-                                    arguments: lesson.id);
-                              } else {
-                                Get.toNamed(MyStrings.routePremiumMain);
-                              }
-                            }),
-                            const SizedBox(height: 20),
-                          ],
-                        ) : const SizedBox.shrink(),
+                        lesson.hasOptions
+                            ? Column(
+                                children: [
+                                  getBtn(tr('summary'), CupertinoIcons.doc_text, () {
+                                    showAd(() {
+                                      Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
+                                    });
+                                  }),
+                                  SizedBox(height: rs.getSize(20)),
+                                  getBtn(tr('writing'), CupertinoIcons.pen, () {
+                                    if (User().status == 2 || User().status == 3) {
+                                      Get.offNamedUntil(MyStrings.routeWritingMain,
+                                          ModalRoute.withName(MyStrings.routeLessonSummaryMain),
+                                          arguments: lesson.id);
+                                    } else {
+                                      Get.toNamed(MyStrings.routePremiumMain);
+                                    }
+                                  }),
+                                  SizedBox(height: rs.getSize(20)),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
                         getBtn(tr('nextLesson'), CupertinoIcons.arrow_right, () {
                           showAd(() {
                             LessonCourse course = LocalStorage().getLessonCourse()!;
@@ -208,15 +213,16 @@ class LessonComplete extends StatelessWidget {
                               if (lessons[nextIndex] is String) {
                                 nextIndex++;
                               }
-                              Get.offNamedUntil(MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
+                              Get.offNamedUntil(
+                                  MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
                                   arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
                             } else {
                               Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
-                              MyWidget().showSnackbar(title: tr('lastLesson'));
+                              MyWidget().showSnackbar(rs, title: tr('lastLesson'));
                             }
                           });
                         }),
-                        const SizedBox(height: 20),
+                        SizedBox(height: rs.getSize(20)),
                         getBtn(tr('goToMain'), CupertinoIcons.home, () {
                           showAd(() {
                             Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
@@ -233,9 +239,10 @@ class LessonComplete extends StatelessWidget {
       ),
     );
   }
+
   void showAd(Function() fn) {
-    if(User().status == 1) {
-      if(AdsController().interstitialAd != null) {
+    if (User().status == 1) {
+      if (AdsController().interstitialAd != null) {
         AdsController().showInterstitialAd((ad) {
           fn();
         });
@@ -251,7 +258,7 @@ class LessonComplete extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(5),
+          padding: EdgeInsets.all(rs.getSize(5)),
           decoration: BoxDecoration(
             border: Border.all(
               color: MyColors.purple,
@@ -263,15 +270,14 @@ class LessonComplete extends StatelessWidget {
           ),
           child: IconButton(
             icon: icon,
-            iconSize: 40,
+            iconSize: rs.getSize(40),
             color: MyColors.purple,
             onPressed: () {},
           ),
         ),
-        const SizedBox(
-          height: 5,
-        ),
+        SizedBox(height: rs.getSize(5)),
         MyWidget().getTextWidget(
+          rs,
           text: text,
           size: 17,
           color: MyColors.purple,
@@ -280,4 +286,3 @@ class LessonComplete extends StatelessWidget {
     );
   }
 }
-

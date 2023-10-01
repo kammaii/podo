@@ -24,6 +24,7 @@ import 'package:podo/screens/writing/writing_other_list.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'firebase_options.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -43,25 +44,25 @@ void main() async {
   };
   // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
   PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true, printDetails: true);
+    FirebaseCrashlytics.instance
+        .recordError(error, stack, fatal: true, printDetails: true);
     return true;
   };
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(EasyLocalization(
-    supportedLocales: const [
-      Locale('en'),
-      Locale('es'),
-      Locale('fr'),
-      Locale('de'),
-      Locale('pt'),
-      Locale('id'),
-      Locale('ru'),
-    ],
-    path: 'assets/translations',
-    fallbackLocale: const Locale('en'),
-    child: MyApp())
-  );
+      supportedLocales: const [
+        Locale('en'),
+        Locale('es'),
+        Locale('fr'),
+        Locale('de'),
+        Locale('pt'),
+        Locale('id'),
+        Locale('ru'),
+      ],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -72,6 +73,13 @@ class MyApp extends StatelessWidget {
     final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
     return GetMaterialApp(
+      builder: (context, child) => ResponsiveBreakpoints.builder(
+        child: child!,
+        breakpoints: [
+          const Breakpoint(start: 0, end: 450, name: MOBILE),
+          const Breakpoint(start: 451, end: 800, name: TABLET),
+        ],
+      ),
       title: 'Podo Korean app',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: MyColors.purple),
@@ -82,17 +90,31 @@ class MyApp extends StatelessWidget {
         GetPage(name: MyStrings.routeMainFrame, page: () => const MainFrame()),
         GetPage(name: MyStrings.routeLogo, page: () => Logo()),
         GetPage(name: MyStrings.routeLogin, page: () => Login()),
-        GetPage(name: MyStrings.routeLessonSummaryMain, page: () => LessonSummaryMain()),
+        GetPage(
+            name: MyStrings.routeLessonSummaryMain,
+            page: () => LessonSummaryMain()),
         GetPage(name: MyStrings.routeLessonFrame, page: () => LessonFrame()),
-        GetPage(name: MyStrings.routeLessonComplete, page: () => const LessonComplete()),
+        GetPage(
+            name: MyStrings.routeLessonComplete,
+            page: () => LessonComplete()),
         GetPage(name: MyStrings.routeWritingMain, page: () => WritingMain()),
-        GetPage(name: MyStrings.routeMyWritingList, page: () => WritingMyList()),
-        GetPage(name: MyStrings.routeOtherWritingList, page: () => WritingOtherList()),
-        GetPage(name: MyStrings.routeReadingFrame, page: () => const ReadingFrame()),
-        GetPage(name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
-        GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),
+        GetPage(
+            name: MyStrings.routeMyWritingList, page: () => WritingMyList()),
+        GetPage(
+            name: MyStrings.routeOtherWritingList,
+            page: () => WritingOtherList()),
+        GetPage(
+            name: MyStrings.routeReadingFrame,
+            page: () => const ReadingFrame()),
+        GetPage(
+            name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
+        GetPage(
+            name: MyStrings.routeFlashcardReview,
+            page: () => const FlashCardReview()),
         GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
-        GetPage(name: MyStrings.routePodoMessageMain, page: () => PodoMessageMain()),
+        GetPage(
+            name: MyStrings.routePodoMessageMain,
+            page: () => PodoMessageMain()),
       ],
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,

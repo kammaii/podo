@@ -1,16 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/values/my_colors.dart';
 
 class FlashcardIcon {
-  Widget getIconButton(
-      {required dynamic controller, required String itemId, required String front, String? back, String? audio}) {
+  Widget getIconButton(ResponsiveSize rs,
+      {required dynamic controller,
+      required String itemId,
+      required String front,
+      String? back,
+      String? audio}) {
     return Stack(
       children: [
         IconButton(
-          padding: const EdgeInsets.all(5),
+          padding: EdgeInsets.all(rs.getSize(5, bigger: 1.2)),
           constraints: const BoxConstraints(),
           onPressed: () {
             if (controller.hasFlashcard[itemId]) {
@@ -18,6 +23,7 @@ class FlashcardIcon {
               controller.hasFlashcard[itemId] = false;
             } else {
               FlashCard().addFlashcard(
+                rs,
                 itemId: itemId,
                 front: front,
                 back: back,
@@ -29,25 +35,31 @@ class FlashcardIcon {
             }
           },
           icon: Icon(
-            controller.hasFlashcard[itemId] ? FontAwesomeIcons.solidStar : FontAwesomeIcons.star,
+            controller.hasFlashcard[itemId]
+                ? FontAwesomeIcons.solidStar
+                : FontAwesomeIcons.star,
             color: MyColors.purple,
+            size: rs.getSize(20),
           ),
         ),
         controller.hasFlashcard[itemId]
             ? const SizedBox.shrink()
-            : const Icon(CupertinoIcons.plus_circle_fill, color: MyColors.purple, size: 13),
+            : Icon(CupertinoIcons.plus_circle_fill,
+                color: MyColors.purple, size: rs.getSize(13)),
       ],
     );
   }
 
-  Widget getIconOnly() {
+  Widget getIconOnly(ResponsiveSize rs) {
     return Stack(
-      children: const [
+      children: [
         Padding(
-          padding: EdgeInsets.all(5),
-          child: Icon(FontAwesomeIcons.star, color: MyColors.purple, size: 30),
+          padding: const EdgeInsets.all(5),
+          child: Icon(FontAwesomeIcons.star,
+              color: MyColors.purple, size: rs.getSize(30)),
         ),
-        Icon(CupertinoIcons.plus_circle_fill, color: MyColors.purple, size: 13)
+        Icon(CupertinoIcons.plus_circle_fill,
+            color: MyColors.purple, size: rs.getSize(13))
       ],
     );
   }

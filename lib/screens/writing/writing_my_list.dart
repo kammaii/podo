@@ -9,6 +9,7 @@ import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/loading_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
@@ -29,21 +30,16 @@ class _WritingMyListState extends State<WritingMyList> {
   final scrollController = ScrollController();
   final docsLimit = 10;
   String? questionId = Get.arguments;
-  List<String> statusList = [
-    tr('writingStatus0'),
-    tr('writingStatus1'),
-    tr('writingStatus2'),
-    tr('writingStatus3')
-  ];
+  List<String> statusList = [tr('writingStatus0'), tr('writingStatus1'), tr('writingStatus2'), tr('writingStatus3')];
   List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
   bool isLoaded = false;
   bool hasMore = true;
+  late ResponsiveSize rs;
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
-    Query query =
-        ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
+    Query query = ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
 
     if (isContinue) {
       query = query.startAfterDocument(lastSnapshot!);
@@ -84,17 +80,17 @@ class _WritingMyListState extends State<WritingMyList> {
     String extractedText = htmlParser.parse(content).body!.text;
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: tag == 'A' ? 10 : 0),
+      padding: EdgeInsets.symmetric(vertical: tag == 'A' ? rs.getSize(10) : 0),
       child: Row(
         children: [
-          MyWidget().getTextWidget(text: '$tag. ', isBold: true),
-          const SizedBox(width: 15),
+          MyWidget().getTextWidget(rs, text: '$tag. ', isBold: true),
+          SizedBox(width: rs.getSize(15)),
           Expanded(
             child: HtmlWidget(
               content,
-              textStyle: const TextStyle(
+              textStyle: TextStyle(
                 fontFamily: 'KoreanFont',
-                fontSize: 15,
+                fontSize: rs.getSize(15),
                 height: 1.5,
               ),
             ),
@@ -102,7 +98,7 @@ class _WritingMyListState extends State<WritingMyList> {
           Visibility(
             visible: writing.status == 1 && tag.contains('C') || writing.status == 2 && tag.contains('A'),
             child: Obx(() =>
-                FlashcardIcon().getIconButton(controller: controller, itemId: writing.id, front: extractedText)),
+                FlashcardIcon().getIconButton(rs, controller: controller, itemId: writing.id, front: extractedText)),
           )
         ],
       ),
@@ -126,21 +122,22 @@ class _WritingMyListState extends State<WritingMyList> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             GestureDetector(
-              onTap: (){
-                MyWidget().showDialog(
-                    content:
-                    tr('wantRemoveWriting'),
-                    yesFn: () {
-                      String id = writing.id;
-                      Database().deleteDoc(collection: 'Writings', docId: id).then((value) {
-                        writings.removeWhere((element) => element.id == id);
-                        controller.update();
-                      });
-                    });
+              onTap: () {
+                MyWidget().showDialog(rs, content: tr('wantRemoveWriting'), yesFn: () {
+                  String id = writing.id;
+                  Database().deleteDoc(collection: 'Writings', docId: id).then((value) {
+                    writings.removeWhere((element) => element.id == id);
+                    controller.update();
+                  });
+                });
               },
-              child: const Padding(
-                padding: EdgeInsets.all(5),
-                child: Icon(Icons.remove_circle_outline_rounded, size: 15, color: Colors.red,),
+              child: Padding(
+                padding: EdgeInsets.all(rs.getSize(5)),
+                child: Icon(
+                  Icons.remove_circle_outline_rounded,
+                  size: rs.getSize(15),
+                  color: Colors.red,
+                ),
               ),
             )
           ],
@@ -152,30 +149,31 @@ class _WritingMyListState extends State<WritingMyList> {
               Row(
                 children: [
                   MyWidget().getRoundedContainer(
-                      widget: MyWidget().getTextWidget(text: statusList[status], color: Colors.white, size: 13),
+                      widget: MyWidget().getTextWidget(rs, text: statusList[status], color: Colors.white, size: 13),
                       radius: 20,
-                      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+                      padding: EdgeInsets.symmetric(vertical: rs.getSize(2), horizontal: rs.getSize(10)),
                       bgColor: statusColors[status]),
-                  const SizedBox(width: 10),
+                  SizedBox(width: rs.getSize(10)),
                   Expanded(
-                      child: MyWidget()
-                          .getTextWidget(text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
+                      child: MyWidget().getTextWidget(rs,
+                          text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
                   Column(
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.keyboard_double_arrow_left_rounded, size: 13, color: MyColors.grey),
+                          Icon(Icons.keyboard_double_arrow_left_rounded, size: rs.getSize(13), color: MyColors.grey),
                           const SizedBox(width: 5),
-                          MyWidget().getTextWidget(
+                          MyWidget().getTextWidget(rs,
                               text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: MyColors.grey),
                         ],
                       ),
                       writing.dateReply != null
                           ? Row(
                               children: [
-                                const Icon(Icons.keyboard_double_arrow_right_rounded, size: 13, color: MyColors.grey),
+                                Icon(Icons.keyboard_double_arrow_right_rounded,
+                                    size: rs.getSize(13), color: MyColors.grey),
                                 const SizedBox(width: 5),
-                                MyWidget().getTextWidget(
+                                MyWidget().getTextWidget(rs,
                                     text: MyDateFormat().getDateFormat(writing.dateReply!),
                                     size: 12,
                                     color: MyColors.grey),
@@ -206,8 +204,10 @@ class _WritingMyListState extends State<WritingMyList> {
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     lastSnapshot = null;
-    if (writings.isEmpty) { // TextField 로 인한 rebuild 방지용
+    if (writings.isEmpty) {
+      // TextField 로 인한 rebuild 방지용
       WidgetsBinding.instance.addPostFrameCallback((_) {
         loadWritings();
       });
@@ -233,9 +233,9 @@ class _WritingMyListState extends State<WritingMyList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 20, top: 15),
+                padding: EdgeInsets.only(left: rs.getSize(20), top: rs.getSize(15)),
                 child: MyWidget()
-                    .getTextWidget(text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
+                    .getTextWidget(rs, text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
               ),
               Expanded(
                 child: Stack(
@@ -243,13 +243,14 @@ class _WritingMyListState extends State<WritingMyList> {
                     GetBuilder<WritingController>(
                       builder: (_) {
                         return Padding(
-                          padding: const EdgeInsets.all(15),
+                          padding: EdgeInsets.all(rs.getSize(15)),
                           child: Column(
                             children: [
                               Expanded(
                                 child: isLoaded && writings.isEmpty
                                     ? Center(
                                         child: MyWidget().getTextWidget(
+                                          rs,
                                           text: tr('noMyWritings'),
                                           isTextAlignCenter: true,
                                           size: 18,
@@ -258,10 +259,8 @@ class _WritingMyListState extends State<WritingMyList> {
                                     : ListView.builder(
                                         itemCount: writings.length,
                                         itemBuilder: (BuildContext context, int index) {
-                                          print('MY');
-
                                           return Padding(
-                                            padding: const EdgeInsets.only(bottom: 30),
+                                            padding: EdgeInsets.only(bottom: rs.getSize(30)),
                                             child: getWritingList(index),
                                           );
                                         },
@@ -274,8 +273,8 @@ class _WritingMyListState extends State<WritingMyList> {
                     ),
                     Obx(() => Offstage(
                           offstage: !controller.isLoading.value,
-                          child: Stack(
-                            children: const [
+                          child: const Stack(
+                            children: [
                               Opacity(opacity: 0.3, child: ModalBarrier(dismissible: false, color: Colors.black)),
                               Center(
                                 child: CircularProgressIndicator(),

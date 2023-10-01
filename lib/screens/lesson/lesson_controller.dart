@@ -1,9 +1,6 @@
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/play_audio.dart';
-import 'package:podo/screens/lesson/lesson.dart';
-import 'package:podo/screens/lesson/lesson_course.dart';
 
 class LessonController extends GetxController {
   late Duration currentPosition;

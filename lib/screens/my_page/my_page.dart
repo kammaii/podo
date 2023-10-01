@@ -10,6 +10,7 @@ import 'package:podo/common/languages.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
@@ -55,9 +56,11 @@ class _MyPageState extends State<MyPage> {
     tr('russian')
   ];
   late bool hasUserName;
+  late ResponsiveSize rs;
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     feedback = '';
     currentUser = auth.currentUser;
     print(currentUser);
@@ -84,7 +87,7 @@ class _MyPageState extends State<MyPage> {
     return SafeArea(
       child: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(rs.getSize(20)),
           child: Column(
             children: [
               user.User().status == 1
@@ -99,16 +102,17 @@ class _MyPageState extends State<MyPage> {
                         Get.toNamed('/premiumMain');
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 30),
+                        padding: EdgeInsets.symmetric(vertical: rs.getSize(13), horizontal: rs.getSize(30)),
                         decoration: BoxDecoration(
                             gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
                             borderRadius: BorderRadius.circular(30)),
                         child: Row(
                           children: [
-                            const Icon(FontAwesomeIcons.crown, color: Colors.white),
+                            Icon(FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(20)),
                             Expanded(
                               child: Center(
                                 child: MyWidget().getTextWidget(
+                                  rs,
                                   text: tr('getPremium'),
                                   size: 20,
                                   color: Colors.white,
@@ -121,8 +125,8 @@ class _MyPageState extends State<MyPage> {
                       ),
                     )
                   : const SizedBox.shrink(),
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: rs.getSize(20),
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -131,9 +135,10 @@ class _MyPageState extends State<MyPage> {
                     children: [
                       Row(
                         children: [
-                          Image.asset('assets/images/podo.png', width: 30, height: 30),
+                          Image.asset('assets/images/podo.png', width: rs.getSize(30), height: rs.getSize(30)),
                           const SizedBox(width: 10),
                           MyWidget().getTextWidget(
+                            rs,
                             text: hasUserName ? userName : tr('unNamed'),
                             size: hasUserName ? 20 : 15,
                             color: hasUserName ? MyColors.purple : MyColors.grey,
@@ -141,6 +146,7 @@ class _MyPageState extends State<MyPage> {
                             isKorean: true,
                           ),
                           MyWidget().getTextWidget(
+                            rs,
                             text: ', 안녕하세요?',
                             size: 20,
                             color: MyColors.purple,
@@ -149,7 +155,7 @@ class _MyPageState extends State<MyPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: rs.getSize(20)),
                       ExpansionPanelList(
                         expansionCallback: (index, isExpanded) {
                           setState(() {
@@ -163,35 +169,38 @@ class _MyPageState extends State<MyPage> {
                           getExpansionPanel(
                               items[0],
                               Padding(
-                                padding: const EdgeInsets.all(10),
+                                padding: EdgeInsets.all(rs.getSize(10)),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.only(left: 5),
                                       child: MyWidget().getTextWidget(
+                                        rs,
                                         text: tr('name'),
-                                        size: 15,
                                         color: Colors.black,
                                         isBold: true,
                                       ),
                                     ),
-                                    const SizedBox(height: 5),
+                                    SizedBox(height: rs.getSize(5)),
                                     Row(
                                       children: [
                                         Expanded(
                                           child: MyWidget().getTextFieldWidget(
+                                            rs,
                                             controller: TextEditingController(text: userName),
                                             onChanged: (text) {
                                               userName = text;
                                             },
                                           ),
                                         ),
-                                        const SizedBox(width: 10),
+                                        SizedBox(width: rs.getSize(10)),
                                         MyWidget().getRoundBtnWidget(
+                                          rs,
                                           text: tr('edit'),
                                           verticalPadding: 8,
                                           horizontalPadding: 3,
+                                          textSize: 15,
                                           f: () async {
                                             try {
                                               if (currentUser != null) {
@@ -204,11 +213,11 @@ class _MyPageState extends State<MyPage> {
                                                     value: userName);
                                                 setState(() {
                                                   user.User().name = userName ?? '';
-                                                  MyWidget().showSnackbar(title: tr('nameChanged'));
+                                                  MyWidget().showSnackbar(rs, title: tr('nameChanged'));
                                                 });
                                               }
                                             } catch (e) {
-                                              MyWidget().showSnackbar(title: tr('error'), message: e.toString());
+                                              MyWidget().showSnackbar(rs, title: tr('error'), message: e.toString());
                                             }
                                           },
                                         )
@@ -224,44 +233,48 @@ class _MyPageState extends State<MyPage> {
                             items[1],
                             ListTile(
                               title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   MyWidget().getTextWidget(
+                                    rs,
                                     text: tr('shouldRestart'),
-                                    size: 15,
                                     color: MyColors.purple,
                                   ),
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: rs.getSize(10)),
                                   ListView.builder(
                                     shrinkWrap: true,
                                     itemBuilder: (BuildContext context, int index) {
-                                      return ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(30),
-                                            ),
-                                            side: const BorderSide(color: MyColors.purple, width: 1),
-                                            backgroundColor: Colors.white),
-                                        onPressed: () async {
-                                          String lang = Languages().fos[index];
-                                          user.User().language = lang;
-                                          EasyLocalization.of(context)!.setLocale(Locale(lang));
-                                          await Database().updateDoc(
-                                              collection: 'Users',
-                                              docId: user.User().id,
-                                              key: 'language',
-                                              value: lang);
-                                          MyWidget().showSnackbarWithPodo(
-                                              title: tr('languageChanged'),
-                                              content: tr('shouldRestart'),
-                                              duration: 5000);
-                                          setState(() {
-                                            closePanels();
-                                          });
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 13),
-                                          child: Text(language[index],
-                                              style: const TextStyle(color: MyColors.purple)),
+                                      return Padding(
+                                        padding: EdgeInsets.only(bottom: rs.getSize(8)),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                              ),
+                                              side: const BorderSide(color: MyColors.purple, width: 1),
+                                              backgroundColor: Colors.white),
+                                          onPressed: () async {
+                                            String lang = Languages().fos[index];
+                                            user.User().language = lang;
+                                            EasyLocalization.of(context)!.setLocale(Locale(lang));
+                                            await Database().updateDoc(
+                                                collection: 'Users',
+                                                docId: user.User().id,
+                                                key: 'language',
+                                                value: lang);
+                                            MyWidget().showSnackbarWithPodo(rs,
+                                                title: tr('languageChanged'),
+                                                content: tr('shouldRestart'),
+                                                duration: 5000);
+                                            setState(() {
+                                              closePanels();
+                                            });
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                                            child: Text(language[index],
+                                                style: TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
+                                          ),
                                         ),
                                       );
                                     },
@@ -280,8 +293,8 @@ class _MyPageState extends State<MyPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   MyWidget().getTextWidget(
+                                    rs,
                                     text: tr('feedbackDetail'),
-                                    size: 15,
                                     color: MyColors.purple,
                                   ),
                                   const SizedBox(
@@ -293,17 +306,17 @@ class _MyPageState extends State<MyPage> {
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Expanded(
-                                          child: MyWidget().getTextFieldWidget(
+                                          child: MyWidget().getTextFieldWidget(rs,
                                               hint: tr('feedbackHint'),
-                                              controller: TextEditingController(text: feedback),
-                                              onChanged: (text) {
-                                                feedback = text;
-                                              }),
+                                              controller: TextEditingController(text: feedback), onChanged: (text) {
+                                            feedback = text;
+                                          }),
                                         ),
                                         const SizedBox(
                                           width: 10,
                                         ),
                                         MyWidget().getRoundBtnWidget(
+                                          rs,
                                           text: tr('send'),
                                           verticalPadding: 8,
                                           horizontalPadding: 3,
@@ -315,13 +328,12 @@ class _MyPageState extends State<MyPage> {
                                                 userFeedback.userId = userId;
                                                 userFeedback.email = userEmail;
                                                 userFeedback.message = feedback;
-                                                await Database()
-                                                    .setDoc(collection: 'Feedbacks', doc: userFeedback);
-                                                MyWidget().showSnackbar(title: tr('thanksFeedback'));
+                                                await Database().setDoc(collection: 'Feedbacks', doc: userFeedback);
+                                                MyWidget().showSnackbar(rs, title: tr('thanksFeedback'));
                                               }
                                             } catch (e) {
                                               if (e is PlatformException && e.code == "not_available") {
-                                                MyWidget().showSnackbar(title: tr('error'), message: e.toString());
+                                                MyWidget().showSnackbar(rs, title: tr('error'), message: e.toString());
                                               }
                                             }
                                             setState(() {
@@ -343,8 +355,8 @@ class _MyPageState extends State<MyPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     MyWidget().getTextWidget(
+                                      rs,
                                       text: tr('logOutDetail'),
-                                      size: 15,
                                       color: MyColors.purple,
                                     ),
                                     Padding(
@@ -353,6 +365,7 @@ class _MyPageState extends State<MyPage> {
                                         children: [
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
+                                            rs,
                                             text: tr('yes'),
                                             textSize: 15,
                                             f: () async {
@@ -367,6 +380,7 @@ class _MyPageState extends State<MyPage> {
                                           ),
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
+                                            rs,
                                             text: tr('cancel'),
                                             textSize: 15,
                                             bgColor: MyColors.red,
@@ -392,30 +406,37 @@ class _MyPageState extends State<MyPage> {
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    MyWidget().getTextWidget(text: tr('removeDetail'), color: MyColors.red),
+                                    MyWidget().getTextWidget(
+                                      rs,
+                                      text: tr('removeDetail'),
+                                      color: MyColors.red,
+                                    ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       child: Row(
                                         children: [
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
+                                            rs,
                                             text: tr('yes'),
                                             textSize: 15,
                                             f: () {
                                               Get.dialog(
                                                 AlertDialog(
                                                   title: MyWidget().getTextWidget(
+                                                    rs,
                                                     text: tr('areYouSure'),
                                                     size: 20,
                                                     color: Colors.black,
                                                   ),
                                                   content: MyWidget().getTextWidget(
+                                                    rs,
                                                     text: tr('removeDetail2'),
                                                     color: MyColors.red,
                                                   ),
                                                   actions: [
                                                     TextButton(
-                                                      child: MyWidget().getTextWidget(text: tr('yes')),
+                                                      child: MyWidget().getTextWidget(rs, text: tr('yes')),
                                                       onPressed: () {
                                                         User? user = auth.currentUser;
                                                         if (user != null) {
@@ -429,21 +450,20 @@ class _MyPageState extends State<MyPage> {
                                                               String password = '';
                                                               Get.back();
                                                               Get.dialog(AlertDialog(
-                                                                title: MyWidget().getTextFieldWidget(
-                                                                    hint: tr('passwordAgain'),
-                                                                    onChanged: (value) {
-                                                                      password = value;
-                                                                    }),
+                                                                title: MyWidget().getTextFieldWidget(rs,
+                                                                    hint: tr('passwordAgain'), onChanged: (value) {
+                                                                  password = value;
+                                                                }),
                                                                 actions: [
                                                                   TextButton(
-                                                                    child: Text(tr('send')),
+                                                                    child: Text(tr('send'),
+                                                                        style: TextStyle(fontSize: rs.getSize(15))),
                                                                     onPressed: () async {
                                                                       Get.back();
                                                                       try {
                                                                         await user.reauthenticateWithCredential(
                                                                           EmailAuthProvider.credential(
-                                                                              email: user.email!,
-                                                                              password: password),
+                                                                              email: user.email!, password: password),
                                                                         );
                                                                         await Database().deleteDoc(
                                                                             collection: 'Users',
@@ -469,7 +489,7 @@ class _MyPageState extends State<MyPage> {
                                                       },
                                                     ),
                                                     TextButton(
-                                                      child: MyWidget().getTextWidget(text: tr('cancel')),
+                                                      child: MyWidget().getTextWidget(rs, text: tr('cancel')),
                                                       onPressed: () {
                                                         Get.back();
                                                         setState(() {
@@ -488,6 +508,7 @@ class _MyPageState extends State<MyPage> {
                                           ),
                                           Expanded(
                                               child: MyWidget().getRoundBtnWidget(
+                                            rs,
                                             text: tr('cancel'),
                                             textSize: 15,
                                             bgColor: MyColors.red,
@@ -515,21 +536,24 @@ class _MyPageState extends State<MyPage> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               MyWidget().getTextWidget(
+                                rs,
                                 text: user.User().email,
                                 color: MyColors.grey,
                               ),
                               MyWidget().getTextWidget(
+                                rs,
                                 text: 'Sign up: $signupDate',
                                 color: MyColors.grey,
                               ),
                               Row(
                                 children: [
                                   MyWidget().getTextWidget(
+                                    rs,
                                     text: userTier[user.User().status],
                                     color: MyColors.grey,
                                   ),
                                   expiredDate != null
-                                      ? MyWidget().getTextWidget(text: ': ~ $expiredDate', color: MyColors.grey)
+                                      ? MyWidget().getTextWidget(rs, text: ': ~ $expiredDate', color: MyColors.grey)
                                       : const SizedBox.shrink(),
                                 ],
                               ),
@@ -537,7 +561,7 @@ class _MyPageState extends State<MyPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 50),
+                      SizedBox(height: rs.getSize(50)),
                     ],
                   ),
                 ),
@@ -566,78 +590,50 @@ class _MyPageState extends State<MyPage> {
     );
     print('ERROR: $e');
   }
-}
 
-Widget getTextField(
-    {required String title,
-    required String inputText,
-    required Function(String) onChanged,
-    required Function onClicked}) {
-  return Padding(
-    padding: const EdgeInsets.all(10),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: MyWidget().getTextWidget(
-            text: title,
-            size: 15,
-            color: Colors.black,
-            isBold: true,
-          ),
-        ),
-        const SizedBox(height: 5),
-        Row(
-          children: [
-            Expanded(
-              child: MyWidget().getTextFieldWidget(
-                controller: TextEditingController(text: inputText),
-                onChanged: onChanged,
-              ),
-            ),
-            const SizedBox(width: 10),
-            MyWidget().getRoundBtnWidget(text: tr('edit'), f: onClicked, verticalPadding: 8, horizontalPadding: 3)
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-ExpansionPanel getExpansionPanel(MyPageItem item, Widget body, {String? subTitle}) {
-  return ExpansionPanel(
-      canTapOnHeader: true,
-      isExpanded: item.isExpanded,
-      headerBuilder: (context, isExpanded) {
-        return subTitle == null
-            ? ListTile(
-                leading: Icon(
-                  item.icon,
-                  color: MyColors.purple,
-                  size: 30,
-                ),
-                title: MyWidget().getTextWidget(
-                  text: item.title,
-                  size: 18,
-                  color: Colors.black,
-                ),
-              )
-            : ListTile(
-                leading: Icon(
-                  item.icon,
-                  color: MyColors.purple,
-                  size: 30,
-                ),
-                title: MyWidget().getTextWidget(
-                  text: item.title,
-                  size: 18,
-                  color: Colors.black,
-                ),
-                subtitle: MyWidget().getTextWidget(
-                  text: subTitle,
-                  color: MyColors.red,
-                ));
-      },
-      body: body);
+  ExpansionPanel getExpansionPanel(MyPageItem item, Widget body, {String? subTitle}) {
+    return ExpansionPanel(
+        canTapOnHeader: true,
+        isExpanded: item.isExpanded,
+        headerBuilder: (context, isExpanded) {
+          return subTitle == null
+              ? Padding(
+                  padding: EdgeInsets.all(rs.getSize(8)),
+                  child: ListTile(
+                    leading: Icon(
+                      item.icon,
+                      color: MyColors.purple,
+                      size: rs.getSize(30),
+                    ),
+                    title: MyWidget().getTextWidget(
+                      rs,
+                      text: item.title,
+                      size: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding: EdgeInsets.all(rs.getSize(8)),
+                  child: ListTile(
+                      leading: Icon(
+                        item.icon,
+                        color: MyColors.purple,
+                        size: rs.getSize(30),
+                      ),
+                      title: MyWidget().getTextWidget(
+                        rs,
+                        text: item.title,
+                        size: 18,
+                        color: Colors.black,
+                      ),
+                      subtitle: MyWidget().getTextWidget(
+                        rs,
+                        text: subTitle,
+                        color: MyColors.red,
+                      )),
+                );
+        },
+        body: body);
+  }
 }

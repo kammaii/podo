@@ -14,6 +14,7 @@ import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/history.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
@@ -21,7 +22,6 @@ import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ReadingFrame extends StatefulWidget {
   const ReadingFrame({Key? key}) : super(key: key);
@@ -50,6 +50,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   late bool isLoading;
   late double progressValue;
   Map<String, String> audioPaths = {};
+  late ResponsiveSize rs;
 
   @override
   void dispose() {
@@ -131,20 +132,19 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     if (position != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.dialog(AlertDialog(
-          title: Text(tr('continueReading')),
+          title: MyWidget().getTextWidget(rs, text: tr('continueReading')),
           actions: [
             TextButton(
                 onPressed: () {
                   Get.back();
                 },
-                child: Text(tr('no'), style: const TextStyle(color: MyColors.navy))),
+                child: MyWidget().getTextWidget(rs, text: tr('no'), color: MyColors.navy)),
             TextButton(
                 onPressed: () {
                   Get.back();
-                  scrollController.animateTo(position,
-                      duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                  scrollController.animateTo(position, duration: const Duration(milliseconds: 500), curve: Curves.ease);
                 },
-                child: Text(tr('yes'), style: const TextStyle(color: MyColors.purple))),
+                child: MyWidget().getTextWidget(rs, text: tr('yes'), color: MyColors.purple)),
           ],
         ));
       });
@@ -176,8 +176,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   Future<void> _loadAd() async {
-    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-        MediaQuery.of(context).size.width.truncate());
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(MediaQuery.of(context).size.width.truncate());
     if (size == null) {
       print('Unable to get height of anchored banner.');
       return;
@@ -187,8 +187,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   Widget letterContainer(String text) {
     return Container(
-      width: 28,
-      height: 28,
+      width: rs.getSize(28),
+      height: rs.getSize(28),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
@@ -198,7 +198,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(1),
-          child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: MyWidget().getTextWidget(rs, text: text, color: Colors.white, isBold: true),
         ),
       ),
     );
@@ -215,17 +215,18 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
     return SliverAppBar(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_rounded),
+        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
         color: Colors.white,
         onPressed: () {
           Navigator.pop(context);
         },
       ),
-      expandedHeight: sliverAppBarHeight,
-      collapsedHeight: 60,
+      expandedHeight: rs.getSize(sliverAppBarHeight),
+      collapsedHeight: rs.getSize(60),
       pinned: true,
       stretch: true,
       title: MyWidget().getTextWidget(
+        rs,
         text: '${readingTitle.title[KO]}',
         size: 18,
         color: Colors.white,
@@ -243,7 +244,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               tag: 'readingImage:${readingTitle.id}',
               child: FadeTransition(
                 opacity: animation,
-                child: Image.memory(base64Decode(readingTitle.image!), width: 250, gaplessPlayback: true),
+                child: Image.memory(base64Decode(readingTitle.image!), width: rs.getSize(250), gaplessPlayback: true),
               ),
             ),
           ),
@@ -265,14 +266,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   letterContainer('S'),
-                  const SizedBox(width: 10),
-                  Text('${readings.length}'),
-                  const SizedBox(width: 20),
-                  const Text('|'),
-                  const SizedBox(width: 20),
+                  SizedBox(width: rs.getSize(10)),
+                  MyWidget().getTextWidget(rs, text: '${readings.length}', color: Colors.white),
+                  SizedBox(width: rs.getSize(20)),
+                  MyWidget().getTextWidget(rs, text: '|', color: Colors.white),
+                  SizedBox(width: rs.getSize(20)),
                   letterContainer('V'),
-                  const SizedBox(width: 10),
-                  Text('$wordsLength'),
+                  SizedBox(width: rs.getSize(10)),
+                  MyWidget().getTextWidget(rs, text: '$wordsLength', color: Colors.white),
                 ],
               ),
               expandedTitleScale: 1.0,
@@ -286,32 +287,30 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   sliverList() {
     int length = readings.length;
     return SliverPadding(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(rs.getSize(10)),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             return Column(
               children: [
                 partContentKo(index),
-                const SizedBox(height: 30),
+                SizedBox(height: rs.getSize(30)),
                 partWords(index),
-                const SizedBox(height: 30),
+                SizedBox(height: rs.getSize(30)),
                 partContentFo(index),
                 Obx(() {
                   return controller.getIsExpanded(index) ? const SizedBox.shrink() : const Divider();
                 }),
-                const SizedBox(height: 30),
+                SizedBox(height: rs.getSize(30)),
                 index == length - 1
                     ? Padding(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: MyWidget().getRoundBtnWidget(
-                            text: tr('complete'),
-                            f: () {
-                              History().addHistory(item: 'reading', itemId: readingTitle.id);
-                              LocalStorage().prefs!.remove(readingTitle.id);
-                              controller.isCompleted[readingTitle.id] = true;
-                              Get.back();
-                            }),
+                        padding: EdgeInsets.only(bottom: rs.getSize(100)),
+                        child: MyWidget().getRoundBtnWidget(rs, text: tr('complete'), f: () {
+                          History().addHistory(item: 'reading', itemId: readingTitle.id);
+                          LocalStorage().prefs!.remove(readingTitle.id);
+                          controller.isCompleted[readingTitle.id] = true;
+                          Get.back();
+                        }),
                       )
                     : const SizedBox.shrink(),
               ],
@@ -334,10 +333,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           children: [
             Expanded(
                 child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: MyWidget().getTextWidget(text: (index + 1).toString(), color: MyColors.purple, isBold: true),
+              padding: EdgeInsets.only(left: rs.getSize(10)),
+              child: MyWidget().getTextWidget(rs, text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
-            Obx(() => FlashcardIcon().getIconButton(
+            Obx(() => FlashcardIcon().getIconButton(rs,
                 controller: controller,
                 itemId: reading.id,
                 front: reading.content[KO],
@@ -345,7 +344,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 audio: 'ReadingAudios_${readingTitle.id}_${reading.id}')),
             Material(
               child: IconButton(
-                icon: const Icon(Icons.volume_up_outlined, color: MyColors.purple, size: 28),
+                icon: Icon(Icons.volume_up_outlined, color: MyColors.purple, size: rs.getSize(28)),
                 onPressed: () async {
                   PlayAudio().player.stop();
                   String fileName = reading.id;
@@ -366,7 +365,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             color: Colors.white,
             borderRadius: BorderRadius.circular(15),
           ),
-          child: MyWidget().getTextWidget(text: contentKo, size: 18, height: 1.8, isKorean: true),
+          child: MyWidget().getTextWidget(rs, text: contentKo, size: 18, height: 1.8, isKorean: true),
         ),
       ],
     );
@@ -378,13 +377,13 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       onExpansionChanged: (value) {
         controller.setIsExpanded(index, value);
       },
-      leading: const Icon(FontAwesomeIcons.language),
+      leading: Icon(CupertinoIcons.globe, size: rs.getSize(20)),
       iconColor: MyColors.purple,
       title: const Text(''),
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 10),
+      childrenPadding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
       children: [
-        MyWidget().getTextWidget(text: contentFo, color: MyColors.grey),
-        const SizedBox(height: 20),
+        MyWidget().getTextWidget(rs, text: contentFo, color: MyColors.grey),
+        SizedBox(height: rs.getSize(20)),
       ],
     );
   }
@@ -411,9 +410,9 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                     width: 18,
                   ),
                 ),
-                MyWidget().getTextWidget(text: wordKoList[index], isKorean: true, size: 18),
+                MyWidget().getTextWidget(rs, text: wordKoList[index], isKorean: true, size: 18),
                 const Text(' : '),
-                MyWidget().getTextWidget(text: wordFoList[index])
+                MyWidget().getTextWidget(rs, text: wordFoList[index])
               ],
             ),
           );
@@ -422,15 +421,17 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     return Scaffold(
       body: isLoading
-          ? MyWidget().getLoading(progressValue)
+          ? MyWidget().getLoading(rs, progressValue)
           : SafeArea(
               child: Container(
                 color: MyColors.purpleLight,
                 child: readings.isEmpty
                     ? Center(
                         child: MyWidget().getTextWidget(
+                          rs,
                           text: tr('noReading'),
                           color: MyColors.purple,
                           size: 20,

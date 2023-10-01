@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/values/my_colors.dart';
@@ -20,9 +21,11 @@ class LessonSummaryMain extends StatelessWidget {
   String fo = User().language;
   bool isBasicUser = User().status == 1;
   bool isNewUser = User().status == 0;
+  late ResponsiveSize rs;
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     Lesson lesson = Get.arguments;
     summaries = [];
     final Query query = FirebaseFirestore.instance
@@ -33,47 +36,56 @@ class LessonSummaryMain extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
-            heroTag: 'learningBtn',
-            onPressed: () {
-              Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
-            },
-            backgroundColor: MyColors.green,
-            child: const Icon(Icons.play_arrow_rounded, size: 40),
+          SizedBox(
+            width: rs.getSize(56),
+            height: rs.getSize(56),
+            child: FloatingActionButton(
+              heroTag: 'learningBtn',
+              onPressed: () {
+                Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+              },
+              backgroundColor: MyColors.green,
+              child: Icon(Icons.play_arrow_rounded, size: rs.getSize(40)),
+            ),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: rs.getSize(5)),
           MyWidget().getTextWidget(
+            rs,
             text: tr('learning'),
-            size: 15,
             color: MyColors.greenDark,
             isBold: true,
           ),
-          const SizedBox(height: 15),
+          SizedBox(height: rs.getSize(15)),
           isNewUser
               ? const SizedBox.shrink()
-              : FloatingActionButton(
-            heroTag: 'wiringBtn',
-            onPressed: () {
-              isBasicUser
-                  ? Get.toNamed(MyStrings.routePremiumMain)
-                  : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
-            },
-            backgroundColor: isBasicUser ? MyColors.grey : MyColors.pinkDark,
-            child: Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: 25),
-          ),
-          const SizedBox(height: 5),
+              : SizedBox(
+                  width: rs.getSize(56),
+                  height: rs.getSize(56),
+                  child: FloatingActionButton(
+                    heroTag: 'wiringBtn',
+                    onPressed: () {
+                      isBasicUser
+                          ? Get.toNamed(MyStrings.routePremiumMain)
+                          : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
+                    },
+                    backgroundColor: isBasicUser ? MyColors.grey : MyColors.pinkDark,
+                    child:
+                        Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: rs.getSize(25)),
+                  ),
+                ),
+          SizedBox(height: rs.getSize(5)),
           isNewUser
               ? const SizedBox.shrink()
               : MyWidget().getTextWidget(
-            text: tr('writing'),
-            size: 15,
-            color: isBasicUser ? MyColors.grey : MyColors.wine,
-            isBold: true,
-          ),
-          const SizedBox(height: 10),
+                  rs,
+                  text: tr('writing'),
+                  color: isBasicUser ? MyColors.grey : MyColors.wine,
+                  isBold: true,
+                ),
+          SizedBox(height: rs.getSize(10)),
         ],
       ),
-      appBar: MyWidget().getAppbar(title: tr('lessonSummary')),
+      appBar: MyWidget().getAppbar(rs, title: tr('lessonSummary')),
       body: SafeArea(
         child: FutureBuilder(
             future: Database().getDocs(query: query),
@@ -83,15 +95,16 @@ class LessonSummaryMain extends StatelessWidget {
                   summaries.add(LessonSummary.fromJson(snapshot.data() as Map<String, dynamic>));
                 }
                 return Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(rs.getSize(20)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Container(height: 10, width: 10, color: MyColors.purple),
-                          const SizedBox(width: 10),
+                          Container(height: rs.getSize(10), width: rs.getSize(10), color: MyColors.purple),
+                          SizedBox(width: rs.getSize(10)),
                           MyWidget().getTextWidget(
+                            rs,
                             text: lesson.title[KO],
                             size: 18,
                             color: MyColors.purple,
@@ -100,7 +113,7 @@ class LessonSummaryMain extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: rs.getSize(30)),
                       Expanded(
                         child: ListView.builder(
                           itemCount: summaries.length,
@@ -123,21 +136,20 @@ class LessonSummaryMain extends StatelessWidget {
   Widget getSummary(int index) {
     LessonSummary summary = summaries[index];
     double bottomPadding;
-    index == summaries.length - 1 ? bottomPadding = 200 : bottomPadding = 40;
+    index == summaries.length - 1 ? bottomPadding = rs.getSize(200) : bottomPadding = rs.getSize(40);
     return Padding(
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MyWidget().getTextWidget(
-            text: '${(index + 1).toString()}. ${summary.content[KO]} ',
-            color: MyColors.purple,
-            isBold: true,
-            isKorean: true,
-          ),
-          const SizedBox(height: 15),
+          MyWidget().getTextWidget(rs,
+              text: '${(index + 1).toString()}. ${summary.content[KO]} ',
+              color: MyColors.purple,
+              isBold: true,
+              isKorean: true),
+          SizedBox(height: rs.getSize(15)),
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(rs.getSize(10)),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
@@ -145,8 +157,8 @@ class LessonSummaryMain extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MyWidget().getTextWidget(text: summary.content[fo]),
-                const SizedBox(height: 15),
+                MyWidget().getTextWidget(rs, text: summary.content[fo]),
+                SizedBox(height: rs.getSize(15)),
                 summary.examples.isNotEmpty
                     ? ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
@@ -154,7 +166,7 @@ class LessonSummaryMain extends StatelessWidget {
                         itemCount: summary.examples.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.only(bottom: rs.getSize(10)),
                             child: Row(
                               children: [
                                 const SizedBox(
@@ -165,10 +177,7 @@ class LessonSummaryMain extends StatelessWidget {
                                     width: 18,
                                   ),
                                 ),
-                                MyWidget().getTextWidget(
-                                  text: summary.examples[index],
-                                  isKorean: true,
-                                ),
+                                MyWidget().getTextWidget(rs, text: summary.examples[index], isKorean: true),
                               ],
                             ),
                           );

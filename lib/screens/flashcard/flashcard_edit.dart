@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/values/my_colors.dart';
@@ -16,6 +17,7 @@ class FlashCardEdit extends StatelessWidget {
   late String back;
   final FocusNode _focusNodeFront = FocusNode();
   final FocusNode _focusNodeBack = FocusNode();
+  late ResponsiveSize rs;
 
   Function? onSaveBtn() {
     if (isCorrected) {
@@ -34,6 +36,7 @@ class FlashCardEdit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    rs = ResponsiveSize(context);
     card = Get.arguments;
     front = card.front;
     back = card.back;
@@ -50,7 +53,8 @@ class FlashCardEdit extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios_rounded),
             color: MyColors.purple,
           ),
-          title: Text(tr('flashcardEdit'), style: const TextStyle(color: MyColors.purple)),
+          title: Text(tr('flashcardEdit'),
+              style: const TextStyle(color: MyColors.purple)),
         ),
         body: Column(
           children: [
@@ -59,37 +63,37 @@ class FlashCardEdit extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white),
                   child: Center(
                     child: Column(
                       children: [
                         Expanded(
                           child: Center(
-                            child: MyWidget().getTextFieldWidget(
+                            child: MyWidget().getTextFieldWidget(rs,
                                 focusNode: _focusNodeFront,
                                 controller: TextEditingController(text: front),
                                 hint: 'front',
                                 fontSize: 20,
-                                maxLines: 5,
-                                onChanged: (text) {
-                                  front = text;
-                                  Get.find<FlashCardController>().update();
-                                }),
+                                maxLines: 5, onChanged: (text) {
+                              front = text;
+                              Get.find<FlashCardController>().update();
+                            }),
                           ),
                         ),
                         const Divider(height: 10),
                         Expanded(
                           child: Center(
-                            child: MyWidget().getTextFieldWidget(
+                            child: MyWidget().getTextFieldWidget(rs,
                                 focusNode: _focusNodeBack,
                                 controller: TextEditingController(text: back),
                                 hint: 'back',
                                 fontSize: 20,
-                                maxLines: 5,
-                                onChanged: (text) {
-                                  back = text;
-                                  Get.find<FlashCardController>().update();
-                                }),
+                                maxLines: 5, onChanged: (text) {
+                              back = text;
+                              Get.find<FlashCardController>().update();
+                            }),
                           ),
                         ),
                       ],
@@ -112,6 +116,7 @@ class FlashCardEdit extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: MyWidget().getRoundBtnWidget(
+                            rs,
                             text: tr('save'),
                             verticalPadding: 10,
                             hasNullFunction: true,
