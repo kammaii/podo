@@ -126,7 +126,7 @@ class _MyPageState extends State<MyPage> {
                     )
                   : const SizedBox.shrink(),
               SizedBox(
-                height: rs.getSize(20),
+                height: rs.getSize(20)
               ),
               Expanded(
                 child: SingleChildScrollView(

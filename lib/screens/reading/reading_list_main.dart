@@ -25,7 +25,7 @@ class ReadingListMain extends StatefulWidget {
 
 class _ReadingListMainState extends State<ReadingListMain> {
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
-  late List<String> categories;
+  final categories = ['All', 'About Korea'];
   final cardBorderRadius = 8.0;
   int selectedCategory = 0;
   final KO = 'ko';
@@ -38,7 +38,6 @@ class _ReadingListMainState extends State<ReadingListMain> {
   late List<ReadingTitle> readingTitles;
   final controller = Get.put(ReadingController());
   bool isBasicUser = User().status == 1;
-  bool hasCategory = false;
   late Query query;
   bool shouldLoad = true; // TextField 로 인한 rebuild 방지용
   late ResponsiveSize rs;
@@ -130,7 +129,8 @@ class _ReadingListMainState extends State<ReadingListMain> {
                           ),
                         ),
                         padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(3)),
-                        child: Text(readingTitle.tag, style: TextStyle(color: MyColors.red, fontSize: rs.getSize(15)))),
+                        child: Text(readingTitle.tag,
+                            style: TextStyle(color: MyColors.red, fontSize: rs.getSize(15)))),
                   )
                 : const SizedBox.shrink(),
             (isBasicUser && !readingTitle.isFree)
@@ -168,32 +168,11 @@ class _ReadingListMainState extends State<ReadingListMain> {
   @override
   void initState() {
     super.initState();
-    setQuery();
-    Database().getDocs(query: query).then((snapshots) {
-      categories = [];
-      Map<String, int> categoryCountMap = {};
-      for (dynamic snapshot in snapshots) {
-        ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
-        final category = title.category;
-        categoryCountMap[category] = (categoryCountMap[category] ?? 0) + 1;
-      }
-      categories = categoryCountMap.keys.toList();
-      categories.sort((a, b) => categoryCountMap[b]!.compareTo(categoryCountMap[a]!));
-      categories.insert(0, 'All');
-      setState(() {
-        hasCategory = true;
-      });
-    });
+    selectedCategory = 0;
+    getReading();
   }
 
-  getReading() {
-    if (shouldLoad) {
-      shouldLoad = false;
-      return Database().getDocs(query: query);
-    }
-  }
-
-  void setQuery() {
+  getReading() async {
     query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
     if (selectedCategory == 0) {
       query = query.orderBy(ORDER_ID, descending: true);
@@ -203,6 +182,22 @@ class _ReadingListMainState extends State<ReadingListMain> {
 
     if (User().status == 0) {
       query = query.where(IS_FREE, isEqualTo: true);
+    }
+
+    if (shouldLoad) {
+      readingTitles = [];
+      Map<String, bool> isCompletedMap = {};
+      await Database().getDocs(query: query).then((snapshots) {
+        for (dynamic snapshot in snapshots) {
+          ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
+          readingTitles.add(title);
+          isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
+          controller.isCompleted.value = isCompletedMap.obs;
+        }
+        setState(() {
+          shouldLoad = false;
+        });
+      });
     }
   }
 
@@ -217,81 +212,63 @@ class _ReadingListMainState extends State<ReadingListMain> {
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(rs.getSize(10)),
-            child: hasCategory
-                ? Column(
-                    children: [
-                      SizedBox(
-                        height: rs.getSize(30),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categories.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    shouldLoad = true;
-                                    selectedCategory = index;
-                                    setQuery();
-                                  });
+            child: Column(
+              children: [
+                SizedBox(
+                  height: rs.getSize(30),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 5),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              shouldLoad = true;
+                              selectedCategory = index;
+                              getReading();
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: selectedCategory == index ? MyColors.purple : Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(3)),
+                            child: MyWidget().getTextWidget(
+                              rs,
+                              text: categories[index],
+                              color: selectedCategory == index ? Colors.white : MyColors.navy,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: rs.getSize(10)),
+                shouldLoad
+                    ? const Expanded(child: Center(child: CircularProgressIndicator()))
+                    : Expanded(
+                        child: readingTitles.isEmpty
+                            ? Center(
+                                child: MyWidget().getTextWidget(rs,
+                                    text: tr('noReadingTitle'),
+                                    color: MyColors.purple,
+                                    size: rs.getSize(20),
+                                    isTextAlignCenter: true))
+                            : ListView.builder(
+                                itemCount: readingTitles.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  ReadingTitle readingTitle = readingTitles[index];
+                                  return getListItem(readingTitle: readingTitle);
                                 },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: selectedCategory == index ? MyColors.purple : Colors.white,
-                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(3)),
-                                  child: MyWidget().getTextWidget(
-                                    rs,
-                                    text: categories[index],
-                                    color: selectedCategory == index ? Colors.white : MyColors.navy,
-                                    size: 18,
-                                  ),
-                                ),
                               ),
-                            );
-                          },
-                        ),
                       ),
-                      SizedBox(height: rs.getSize(10)),
-                      Expanded(
-                        child: FutureBuilder(
-                          future: getReading(),
-                          builder: (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                              readingTitles = [];
-                              Map<String, bool> isCompletedMap = {};
-                              for (dynamic snapshot in snapshot.data) {
-                                ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
-                                readingTitles.add(title);
-                                isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
-                              }
-                              controller.isCompleted.value = isCompletedMap.obs;
-
-                              return readingTitles.isEmpty
-                                  ? Center(
-                                      child: MyWidget().getTextWidget(rs,
-                                          text: tr('noReadingTitle'),
-                                          color: MyColors.purple,
-                                          size: 20,
-                                          isTextAlignCenter: true))
-                                  : ListView.builder(
-                                      itemCount: readingTitles.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        ReadingTitle readingTitle = readingTitles[index];
-                                        return getListItem(readingTitle: readingTitle);
-                                      },
-                                    );
-                            } else {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
+              ],
+            ),
           ),
         ),
       ),

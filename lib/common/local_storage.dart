@@ -44,6 +44,7 @@ class LocalStorage {
   }
 
   void setLessonCourse(LessonCourse course, {bool resetPosition = false}) {
+    LESSON_COURSE = '${User().id}/lessonCourse';
     prefs!.setString(LESSON_COURSE, jsonEncode(course.toJson()));
     if(resetPosition) {
       setLessonScrollPosition(0);
@@ -61,6 +62,7 @@ class LocalStorage {
   }
 
   void setLessonScrollPosition(double position) {
+    LESSON_SCROLL_POSITION = '${User().id}/lessonScrollPosition';
     prefs!.setDouble(LESSON_SCROLL_POSITION, position);
   }
 

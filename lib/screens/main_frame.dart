@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,7 +84,9 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       child: InkWell(
         onTap: () {
           LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
-          controller.scrollController.jumpTo(0);
+          if(controller.scrollController.hasClients) {
+            controller.scrollController.jumpTo(0);
+          }
           controller.setVisibility(false);
         },
         child: Padding(
