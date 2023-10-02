@@ -84,9 +84,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       child: InkWell(
         onTap: () {
           LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
-          if(controller.scrollController.hasClients) {
-            controller.scrollController.jumpTo(0);
-          }
           controller.setVisibility(false);
         },
         child: Padding(

@@ -26,7 +26,7 @@ class LessonListMain extends StatefulWidget {
 }
 
 class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin {
-  late ScrollController scrollController;
+  ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 150.0;
   double sliverAppBarStretchOffset = 100.0;
   late LessonCourse course;
@@ -47,7 +47,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     if (User().email == User().admin) {
       isAdmin = true;
     }
-    scrollController = courseController.scrollController;
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -71,6 +70,13 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       scrollController.jumpTo(LocalStorage().getLessonScrollPosition());
     });
+  }
+
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   Widget lessonListWidget(int index) {
@@ -114,7 +120,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                   MyWidget().getTextWidget(rs,
                                       text: '$index. ${lesson.type}',
                                       color: lesson.type == LESSON ? MyColors.navy : MyColors.wine),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: rs.getSize(10)),
                                   Obx(
                                     () => lessonController.getIsCompleted(lesson.id)
                                         ? Icon(
@@ -182,6 +188,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         color: MyColors.purple,
         onPressed: () {
           courseController.setVisibility(true);
+          Future.delayed(const Duration(milliseconds: 500), () {
+            scrollController.jumpTo(0);
+          });
         },
       ),
       expandedHeight: rs.getSize(sliverAppBarHeight),

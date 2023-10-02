@@ -225,6 +225,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
       case MyStrings.mention:
         if (card.content[VIDEO] != null && youtubeControllers.containsKey(card.id)) {
+          print('index: $index');
+          print('thisIndex: $thisIndex');
           if (index == thisIndex) {
             youtubeControllers[card.id]!.play();
           } else {
@@ -248,7 +250,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             child: MyWidget().getTextWidget(rs, text: card.content[KO], isKorean: true, size: 20),
                           )),
                       MyWidget().getTextWidget(rs, text: card.content[fo], size: 20),
-                      card.content[VIDEO] != null
+                      card.content[VIDEO] != null && index == thisIndex
                           ? Padding(
                               padding: EdgeInsets.only(top: rs.getSize(20)),
                               child: yt.YoutubePlayer(

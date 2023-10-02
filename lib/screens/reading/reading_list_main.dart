@@ -172,6 +172,8 @@ class _ReadingListMainState extends State<ReadingListMain> {
     getReading();
   }
 
+
+
   getReading() async {
     query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
     if (selectedCategory == 0) {

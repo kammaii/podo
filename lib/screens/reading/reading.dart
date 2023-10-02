@@ -4,6 +4,8 @@ class Reading {
   late int orderId;
   late Map<String, dynamic> content;
   late Map<String, dynamic> words;
+  bool isPlay = false;
+
 
   static const String ID = 'id';
   static const String ORDERID = 'orderId';

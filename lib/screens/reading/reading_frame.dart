@@ -6,12 +6,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/flashcard_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -51,17 +53,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   late double progressValue;
   Map<String, String> audioPaths = {};
   late ResponsiveSize rs;
+  Map<String, PlayStopIcon> playStopIcons = {};
 
   @override
   void dispose() {
-    super.dispose();
-    if (currentScrollPercent > 0.1 && currentScrollPercent < 0.9) {
-      LocalStorage().prefs!.setDouble(readingTitle.id, scrollPosition);
-    } else {
-      LocalStorage().prefs!.remove(readingTitle.id);
-    }
     scrollController.dispose();
+    animationController.dispose();
     PlayAudio().reset();
+    super.dispose();
   }
 
   @override
@@ -114,6 +113,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         readings.add(reading);
         progressValue += incrementPerReading;
         controller.hasFlashcard[reading.id] = LocalStorage().hasFlashcard(itemId: reading.id);
+        playStopIcons[reading.id] = PlayStopIcon(rs, this);
         setState(() {});
       }
       controller.initIsExpanded(readings.length);
@@ -127,27 +127,16 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         isLoading = false;
       });
     });
+  }
 
-    double? position = LocalStorage().prefs!.getDouble(readingTitle.id);
-    if (position != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.dialog(AlertDialog(
-          title: MyWidget().getTextWidget(rs, text: tr('continueReading')),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: MyWidget().getTextWidget(rs, text: tr('no'), color: MyColors.navy)),
-            TextButton(
-                onPressed: () {
-                  Get.back();
-                  scrollController.animateTo(position, duration: const Duration(milliseconds: 500), curve: Curves.ease);
-                },
-                child: MyWidget().getTextWidget(rs, text: tr('yes'), color: MyColors.purple)),
-          ],
-        ));
-      });
+  void setPlayStopIcon(int index, {required bool isForward}) {
+    Reading reading = readings[index];
+    if (isForward) {
+      playStopIcons[reading.id]!.clickIcon(isForward: true);
+      reading.isPlay = true;
+    } else {
+      playStopIcons[reading.id]!.clickIcon(isForward: false);
+      reading.isPlay = false;
     }
   }
 
@@ -176,8 +165,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   }
 
   Future<void> _loadAd() async {
-    final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(MediaQuery.of(context).size.width.truncate());
+    final AnchoredAdaptiveBannerAdSize? size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+        MediaQuery.of(context).size.width.truncate());
     if (size == null) {
       print('Unable to get height of anchored banner.');
       return;
@@ -244,7 +233,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               tag: 'readingImage:${readingTitle.id}',
               child: FadeTransition(
                 opacity: animation,
-                child: Image.memory(base64Decode(readingTitle.image!), width: rs.getSize(250), gaplessPlayback: true),
+                child:
+                    Image.memory(base64Decode(readingTitle.image!), width: rs.getSize(250), gaplessPlayback: true),
               ),
             ),
           ),
@@ -334,7 +324,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             Expanded(
                 child: Padding(
               padding: EdgeInsets.only(left: rs.getSize(10)),
-              child: MyWidget().getTextWidget(rs, text: (index + 1).toString(), color: MyColors.purple, isBold: true),
+              child:
+                  MyWidget().getTextWidget(rs, text: (index + 1).toString(), color: MyColors.purple, isBold: true),
             )),
             Obx(() => FlashcardIcon().getIconButton(rs,
                 controller: controller,
@@ -342,21 +333,33 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                 front: reading.content[KO],
                 back: reading.content[fo],
                 audio: 'ReadingAudios_${readingTitle.id}_${reading.id}')),
-            Material(
-              child: IconButton(
-                icon: Icon(Icons.volume_up_outlined, color: MyColors.purple, size: rs.getSize(28)),
-                onPressed: () async {
-                  PlayAudio().player.stop();
+            GestureDetector(
+              onTap: () async {
+                PlayAudio().stop();
+                if (reading.isPlay) {
+                  setPlayStopIcon(index, isForward: false);
+                } else {
                   String fileName = reading.id;
-                  if (audioPaths.containsKey(fileName)) {
+                  if(audioPaths.containsKey(fileName)) {
                     String path = audioPaths[fileName]!;
                     PlayAudio().player.setFilePath(path);
-                    await PlayAudio().player.setVolume(1);
+                    PlayAudio().player.setVolume(1);
+                    PlayAudio().player.playerStateStream.listen((event) {
+                      if (event.processingState == ProcessingState.completed) {
+                        setPlayStopIcon(index, isForward: false);
+                        PlayAudio().stream.cancel();
+                      }
+                    });
                     PlayAudio().player.play();
                   }
-                },
-              ),
-            ),
+                  for (int i = 0; i < readings.length; i++) {
+                    setPlayStopIcon(i, isForward: false);
+                  }
+                  setPlayStopIcon(index, isForward: true);
+                }
+              },
+              child: playStopIcons[reading.id]!.icon,
+            )
           ],
         ),
         Container(

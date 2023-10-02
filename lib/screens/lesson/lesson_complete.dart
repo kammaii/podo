@@ -213,9 +213,18 @@ class LessonComplete extends StatelessWidget {
                               if (lessons[nextIndex] is String) {
                                 nextIndex++;
                               }
-                              Get.offNamedUntil(
-                                  MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
-                                  arguments: Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>));
+                              Lesson nextLesson = Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>);
+                              if(nextLesson.hasOptions) {
+                                Get.offNamedUntil(
+                                    MyStrings.routeLessonSummaryMain,
+                                    ModalRoute.withName(MyStrings.routeMainFrame),
+                                    arguments: nextLesson);
+                              } else {
+                                Get.offNamedUntil(
+                                    MyStrings.routeLessonFrame,
+                                    ModalRoute.withName(MyStrings.routeMainFrame),
+                                    arguments: nextLesson);
+                              }
                             } else {
                               Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
                               MyWidget().showSnackbar(rs, title: tr('lastLesson'));

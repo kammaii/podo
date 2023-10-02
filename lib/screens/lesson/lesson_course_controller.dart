@@ -10,8 +10,6 @@ class LessonCourseController extends GetxController {
 
   bool isVisible = false;
   List<List<LessonCourse>> courses = [[],[]];
-  ScrollController scrollController = ScrollController();
-
 
   Future<void> loadCourses() async {
     bool isAdmin = User().email == User().admin;
