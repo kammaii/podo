@@ -8,8 +8,8 @@ class PodoMessageController extends GetxController {
   RxBool isPlaying = false.obs;
   String? podoMsgBtnText;
   RxBool podoMsgBtnActive = true.obs;
-  late bool hasExpired;
-  late bool hasReplied;
+  bool hasExpired = false;
+  bool hasReplied = false;
 
   setPodoMsgBtn() {
     DateTime now = DateTime.now();

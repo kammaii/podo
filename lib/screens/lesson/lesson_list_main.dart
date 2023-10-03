@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
+import 'package:podo/fcm_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -285,56 +286,60 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         body: SafeArea(
           child: Column(
             children: [
-              Visibility(
-                visible: User().status != 0 && PodoMessage().isActive,
-                child: InkWell(
-                  onTap: () {
-                    Get.toNamed(MyStrings.routePodoMessageMain);
-                  },
-                  child: Container(
-                    color: MyColors.navyLight,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
-                      child: Row(
-                        children: [
-                          Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
-                          SizedBox(width: rs.getSize(15)),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                MyWidget().getTextWidget(rs,
-                                    text: PodoMessage().title?[KO] ?? '',
-                                    isKorean: true,
-                                    size: 18,
-                                    color: MyColors.purple,
-                                    maxLine: 1),
-                                SizedBox(height: rs.getSize(5)),
-                                MyWidget().getTextWidget(rs,
-                                    text: PodoMessage().title?[User().language] ?? '',
-                                    color: MyColors.grey,
-                                    size: 13,
-                                    maxLine: 1),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: rs.getSize(10)),
-                          Center(
-                            child: Obx(
-                              () => MyWidget().getRoundedContainer(
-                                radius: 30,
-                                padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
-                                bgColor: cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
-                                widget: MyWidget().getTextWidget(rs,
-                                    text: cloudController.podoMsgBtnText, color: Colors.white, size: 13),
+              GetBuilder<LessonController>(
+                builder: (_) {
+                  return Visibility(
+                    visible: User().status != 0 && PodoMessage().isActive,
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed(MyStrings.routePodoMessageMain);
+                      },
+                      child: Container(
+                        color: MyColors.navyLight,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
+                          child: Row(
+                            children: [
+                              Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
+                              SizedBox(width: rs.getSize(15)),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    MyWidget().getTextWidget(rs,
+                                        text: PodoMessage().title?[KO] ?? '',
+                                        isKorean: true,
+                                        size: 18,
+                                        color: MyColors.purple,
+                                        maxLine: 1),
+                                    SizedBox(height: rs.getSize(5)),
+                                    MyWidget().getTextWidget(rs,
+                                        text: PodoMessage().title?[User().language] ?? '',
+                                        color: MyColors.grey,
+                                        size: 13,
+                                        maxLine: 1),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                        ],
+                              SizedBox(width: rs.getSize(10)),
+                              Center(
+                                child: Obx(
+                                      () => MyWidget().getRoundedContainer(
+                                    radius: 30,
+                                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
+                                    bgColor: cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
+                                    widget: MyWidget().getTextWidget(rs,
+                                        text: cloudController.podoMsgBtnText, color: Colors.white, size: 13),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
               Expanded(
                 child: Container(

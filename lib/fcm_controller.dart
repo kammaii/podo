@@ -1,10 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:podo/screens/lesson/lesson_controller.dart';
+import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/values/my_strings.dart';
 
 class FcmController extends GetxController {
 
+  bool hasPodoMsg = false;
 
   @override
   void onInit() {
@@ -19,7 +23,6 @@ class FcmController extends GetxController {
   Future<void> setupInteractedMessage() async {
     // Get any messages which caused the application to open from a terminated state.
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-
     // If the message also contains a data property with a "type" of "chat", navigate to a chat screen
     if (initialMessage != null) {
       _handleMessage(initialMessage);
@@ -29,13 +32,25 @@ class FcmController extends GetxController {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
-  void _handleMessage(RemoteMessage message) {
+  void _handleMessage(RemoteMessage message) async {
+    print('Handle background message : $message');
     User? user = FirebaseAuth.instance.currentUser;
-    print('REMOTE MESSAGE: ${message.notification}');
     if(user != null && user.emailVerified) {
-      String type = message.data['type'];
-      if (type == 'writing') {
-        Get.toNamed(MyStrings.routeWritingMain, arguments: message.data['lessonId']);
+      String type = message.data['tag'];
+      switch(type) {
+        case 'writing' :
+          Get.toNamed(MyStrings.routeMyWritingList);
+          break;
+
+        case 'podo_message' :
+          hasPodoMsg = true;
+          await PodoMessage().getPodoMessage();
+          final msgController = Get.put(PodoMessageController());
+          msgController.setPodoMsgBtn();
+          final lessonController = Get.put(LessonController());
+          lessonController.update();
+          Get.toNamed(MyStrings.routePodoMessageMain);
+          break;
       }
     }
   }

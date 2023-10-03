@@ -39,6 +39,9 @@ class PodoMessage {
       dateEnd = stamp.toDate();
       isActive = json[IS_ACTIVE];
       hasBestReply = json[HAS_BEST_REPLY];
+    } else {
+      id = null;
+      isActive = false;
     }
   }
 }

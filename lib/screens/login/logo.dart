@@ -13,8 +13,10 @@ import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/fcm_controller.dart';
+import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
+import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
@@ -89,7 +91,7 @@ class Logo extends StatelessWidget {
 
     FirebaseInAppMessaging.instance;
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print('Got a message whilst in the foreground!');
       if (message.notification != null) {
         PlayAudio().playAlarm();
@@ -100,6 +102,11 @@ class Logo extends StatelessWidget {
                 content: message.notification!.body!,
                 titleSize: rs.getSize(20),
                 contentSize: rs.getSize(18));
+            await PodoMessage().getPodoMessage();
+            final messageController = Get.put(PodoMessageController());
+            messageController.setPodoMsgBtn();
+            final lessonController = Get.find<LessonController>();
+            lessonController.update();
             break;
 
           case 'writing':
@@ -120,7 +127,7 @@ class Logo extends StatelessWidget {
           getInitData();
         } else {
           print('AUTH STATE CHANGES: User is null or not verified');
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+          Get.offNamed(MyStrings.routeLogin);
         }
       } catch (e, stackTrace) {
         final fc = FirebaseCrashlytics.instance;

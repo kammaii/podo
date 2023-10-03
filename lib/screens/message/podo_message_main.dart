@@ -23,9 +23,14 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class PodoMessageMain extends StatelessWidget {
+class PodoMessageMain extends StatefulWidget {
   PodoMessageMain({Key? key}) : super(key: key);
 
+  @override
+  State<PodoMessageMain> createState() => _PodoMessageMainState();
+}
+
+class _PodoMessageMainState extends State<PodoMessageMain> {
   final KO = 'ko';
   final replyController = TextEditingController();
   bool isReplyAvailable = true;
@@ -34,6 +39,17 @@ class PodoMessageMain extends StatelessWidget {
   bool isBasicUser = User().status == 1;
   just_audio.AudioPlayer? player;
   late ResponsiveSize rs;
+  bool isLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        isLoaded = true;
+      });
+    });
+  }
 
   Stream<String> getTimeLeftStream(DateTime dateEnd) {
     StreamController<String> controller = StreamController();
@@ -96,7 +112,8 @@ class PodoMessageMain extends StatelessWidget {
             final playerState = snapshot.data;
             final isPlaying = playerState?.playing ?? false;
             return IconButton(
-              icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_arrow_solid, size: rs.getSize(20)),
+              icon: Icon(isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_arrow_solid,
+                  size: rs.getSize(20)),
               color: MyColors.purple,
               onPressed: () {
                 isPlaying ? player!.pause() : player!.play();
@@ -275,7 +292,8 @@ class PodoMessageMain extends StatelessWidget {
                                   shrinkWrap: true,
                                   itemBuilder: (BuildContext context, int index) {
                                     PodoMessageReply reply = replies[index];
-                                    controller.hasFlashcard[reply.id] = LocalStorage().hasFlashcard(itemId: reply.id);
+                                    controller.hasFlashcard[reply.id] =
+                                        LocalStorage().hasFlashcard(itemId: reply.id);
                                     return Padding(
                                       padding: EdgeInsets.only(bottom: rs.getSize(5)),
                                       child: Row(
@@ -296,7 +314,9 @@ class PodoMessageMain extends StatelessWidget {
                                                           width: 6,
                                                           height: 6,
                                                           decoration: BoxDecoration(
-                                                            color: index % 2 == 0 ? MyColors.navyLight : MyColors.pink,
+                                                            color: index % 2 == 0
+                                                                ? MyColors.navyLight
+                                                                : MyColors.pink,
                                                             shape: BoxShape.circle,
                                                           ),
                                                         ),
@@ -308,10 +328,12 @@ class PodoMessageMain extends StatelessWidget {
                                                                 size: 16,
                                                                 height: 1.5)),
                                                         SizedBox(width: rs.getSize(10)),
-                                                        Obx(() => FlashcardIcon().getIconButton(rs,
-                                                            controller: controller,
-                                                            itemId: reply.id,
-                                                            front: reply.reply)),
+                                                        isLoaded
+                                                            ? Obx(() => FlashcardIcon().getIconButton(rs,
+                                                                controller: controller,
+                                                                itemId: reply.id,
+                                                                front: reply.reply))
+                                                            : const SizedBox.shrink()
                                                       ],
                                                     ),
                                                     Row(
@@ -322,8 +344,9 @@ class PodoMessageMain extends StatelessWidget {
                                                               right: rs.getSize(10), top: rs.getSize(5)),
                                                           child: MyWidget().getTextWidget(
                                                             rs,
-                                                            text:
-                                                                reply.userName.isEmpty ? tr('unNamed') : reply.userName,
+                                                            text: reply.userName.isEmpty
+                                                                ? tr('unNamed')
+                                                                : reply.userName,
                                                             color: MyColors.grey,
                                                           ),
                                                         ),
@@ -405,16 +428,19 @@ class PodoMessageMain extends StatelessWidget {
                                         doc: reply,
                                         thenFn: (value) {
                                           print('Podo message reply completed');
-                                          Get.back();
                                         });
                                     History().addHistory(
-                                        item: 'podoMessage', itemId: PodoMessage().id!, content: replyController.text);
+                                        item: 'podoMessage',
+                                        itemId: PodoMessage().id!,
+                                        content: replyController.text);
                                     Get.find<PodoMessageController>().setPodoMsgBtn();
+                                    setState(() {});
                                   },
                                 );
                               },
                               icon: Icon(Icons.send,
-                                  color: !isReplyAvailable ? MyColors.grey : MyColors.purple, size: rs.getSize(20)),
+                                  color: !isReplyAvailable ? MyColors.grey : MyColors.purple,
+                                  size: rs.getSize(20)),
                             ),
                           ),
                         ],
