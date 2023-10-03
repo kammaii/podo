@@ -33,13 +33,12 @@ class FcmController extends GetxController {
   }
 
   void _handleMessage(RemoteMessage message) async {
-    print('Handle background message : $message');
     User? user = FirebaseAuth.instance.currentUser;
     if(user != null && user.emailVerified) {
       String type = message.data['tag'];
       switch(type) {
         case 'writing' :
-          Get.toNamed(MyStrings.routeMyWritingList);
+          Get.toNamed(MyStrings.routeMyWritingList, arguments: true);
           break;
 
         case 'podo_message' :
@@ -56,7 +55,7 @@ class FcmController extends GetxController {
   }
 
   void setForegroundNotificationForIos() async {
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions();
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
   }
 
   // void setForegroundNotificationForAndroid() async {

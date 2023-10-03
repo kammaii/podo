@@ -225,8 +225,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
       case MyStrings.mention:
         if (card.content[VIDEO] != null && youtubeControllers.containsKey(card.id)) {
-          print('index: $index');
-          print('thisIndex: $thisIndex');
           if (index == thisIndex) {
             youtubeControllers[card.id]!.play();
           } else {
@@ -421,8 +419,10 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   toggleBottomAudioWidget(bool isForward) {
     if (isForward) {
-      controller.update();
-      animationController.forward();
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        controller.update();
+        animationController.forward();
+      });
     } else {
       animationController.reverse();
     }

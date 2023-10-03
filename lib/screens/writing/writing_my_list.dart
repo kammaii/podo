@@ -17,6 +17,8 @@ import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:html/parser.dart' as htmlParser;
 
+import '../../values/my_strings.dart';
+
 class WritingMyList extends StatefulWidget {
   WritingMyList({Key? key}) : super(key: key);
 
@@ -29,13 +31,13 @@ class _WritingMyListState extends State<WritingMyList> {
   final controller = Get.find<WritingController>();
   final scrollController = ScrollController();
   final docsLimit = 10;
-  String? questionId = Get.arguments;
   List<String> statusList = [tr('writingStatus0'), tr('writingStatus1'), tr('writingStatus2'), tr('writingStatus3')];
   List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
   bool isLoaded = false;
   bool hasMore = true;
   late ResponsiveSize rs;
+  bool? hasBackBtn = Get.arguments;
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
@@ -228,6 +230,7 @@ class _WritingMyListState extends State<WritingMyList> {
         });
       },
       child: Scaffold(
+        appBar: hasBackBtn != null && hasBackBtn! ? MyWidget().getAppbar(rs, title: '') : null,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

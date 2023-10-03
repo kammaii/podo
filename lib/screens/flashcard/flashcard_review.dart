@@ -92,7 +92,11 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
         playStopIcon.clickIcon(isForward: true);
         isPlay = true;
         String path = audioPaths[fileName]!;
-        player.setFilePath(path);
+        if(Platform.isIOS) {
+          player.setFilePath('$path.m4a');
+        } else {
+          player.setFilePath(path);
+        }
         await player.setVolume(1);
         player.playerStateStream.listen((event) {
           if (event.processingState == ProcessingState.completed) {
@@ -253,7 +257,7 @@ class _FlashCardReviewState extends State<FlashCardReview> with TickerProviderSt
                                         controller.isViewAllClicked.value = false;
                                       },
                                       child: MyWidget()
-                                          .getTextWidget(rs, text: tr('makeClear'), color: MyColors.grey, size: 13),
+                                          .getTextWidget(rs, text: tr('makeClear'), color: MyColors.grey, size: rs.getSize(13)),
                                     ),
                                   ],
                                 ),

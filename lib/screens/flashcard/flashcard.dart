@@ -19,7 +19,7 @@ class FlashCard {
   late DateTime date;
   bool isPlay = false;
   String? dateReview;
-  int limitLength = 5;
+  int limitLength = 20;
 
   static const String ID = 'id';
   static const String ITEM_ID = 'itemId';
