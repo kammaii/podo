@@ -125,9 +125,7 @@ class _MyPageState extends State<MyPage> {
                       ),
                     )
                   : const SizedBox.shrink(),
-              SizedBox(
-                height: rs.getSize(20)
-              ),
+              SizedBox(height: rs.getSize(20)),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -217,7 +215,8 @@ class _MyPageState extends State<MyPage> {
                                                 });
                                               }
                                             } catch (e) {
-                                              MyWidget().showSnackbar(rs, title: tr('error'), message: e.toString());
+                                              MyWidget()
+                                                  .showSnackbar(rs, title: tr('error'), message: e.toString());
                                             }
                                           },
                                         )
@@ -273,7 +272,8 @@ class _MyPageState extends State<MyPage> {
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
                                             child: Text(language[index],
-                                                style: TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
+                                                style:
+                                                    TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
                                           ),
                                         ),
                                       );
@@ -308,7 +308,8 @@ class _MyPageState extends State<MyPage> {
                                         Expanded(
                                           child: MyWidget().getTextFieldWidget(rs,
                                               hint: tr('feedbackHint'),
-                                              controller: TextEditingController(text: feedback), onChanged: (text) {
+                                              controller: TextEditingController(text: feedback),
+                                              onChanged: (text) {
                                             feedback = text;
                                           }),
                                         ),
@@ -328,12 +329,14 @@ class _MyPageState extends State<MyPage> {
                                                 userFeedback.userId = userId;
                                                 userFeedback.email = userEmail;
                                                 userFeedback.message = feedback;
-                                                await Database().setDoc(collection: 'Feedbacks', doc: userFeedback);
+                                                await Database()
+                                                    .setDoc(collection: 'Feedbacks', doc: userFeedback);
                                                 MyWidget().showSnackbar(rs, title: tr('thanksFeedback'));
                                               }
                                             } catch (e) {
                                               if (e is PlatformException && e.code == "not_available") {
-                                                MyWidget().showSnackbar(rs, title: tr('error'), message: e.toString());
+                                                MyWidget()
+                                                    .showSnackbar(rs, title: tr('error'), message: e.toString());
                                               }
                                             }
                                             setState(() {
@@ -457,13 +460,15 @@ class _MyPageState extends State<MyPage> {
                                                                 actions: [
                                                                   TextButton(
                                                                     child: Text(tr('send'),
-                                                                        style: TextStyle(fontSize: rs.getSize(15))),
+                                                                        style:
+                                                                            TextStyle(fontSize: rs.getSize(15))),
                                                                     onPressed: () async {
                                                                       Get.back();
                                                                       try {
                                                                         await user.reauthenticateWithCredential(
                                                                           EmailAuthProvider.credential(
-                                                                              email: user.email!, password: password),
+                                                                              email: user.email!,
+                                                                              password: password),
                                                                         );
                                                                         await Database().deleteDoc(
                                                                             collection: 'Users',
@@ -479,10 +484,16 @@ class _MyPageState extends State<MyPage> {
                                                               ));
                                                               break;
 
-                                                            case 'google.com':
-                                                              break;
-
-                                                            case 'apple.com':
+                                                            default:
+                                                              Database().deleteDoc(
+                                                                  collection: 'Users',
+                                                                  docId: auth.currentUser!.uid);
+                                                              user
+                                                                  .delete()
+                                                                  .then((value) => print('User deleted'))
+                                                                  .catchError((e) {
+                                                                print('User delete failed : $e');
+                                                              });
                                                               break;
                                                           }
                                                         }
@@ -553,7 +564,8 @@ class _MyPageState extends State<MyPage> {
                                     color: MyColors.grey,
                                   ),
                                   expiredDate != null
-                                      ? MyWidget().getTextWidget(rs, text: ': ~ $expiredDate', color: MyColors.grey)
+                                      ? MyWidget()
+                                          .getTextWidget(rs, text: ': ~ $expiredDate', color: MyColors.grey)
                                       : const SizedBox.shrink(),
                                 ],
                               ),

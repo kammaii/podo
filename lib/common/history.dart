@@ -55,7 +55,7 @@ class History {
     return map;
   }
 
-  void addHistory({required String item, required String itemId, String? content}) async {
+  Future<void> addHistory({required String item, required String itemId, String? content}) async {
     if(!LocalStorage().hasHistory(itemId: itemId)) {
       History history = History();
       history.item = item;

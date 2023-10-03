@@ -429,7 +429,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                                         thenFn: (value) {
                                           print('Podo message reply completed');
                                         });
-                                    History().addHistory(
+                                    await History().addHistory(
                                         item: 'podoMessage',
                                         itemId: PodoMessage().id!,
                                         content: replyController.text);
