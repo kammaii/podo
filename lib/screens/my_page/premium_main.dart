@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_performance/firebase_performance.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,7 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PremiumMain extends StatefulWidget {
   PremiumMain({Key? key}) : super(key: key);
@@ -25,6 +29,11 @@ class _PremiumMainState extends State<PremiumMain> {
   late int selectedPlan;
   bool isPurchasing = false;
   late ResponsiveSize rs;
+  final PURCHASE_TRACE = 'purchase_trace';
+  final PURCHASE_STATUS = 'purchase_status';
+  final SUCCESS = 'success';
+  final FAILED = 'failed';
+  final ERROR_CODE = 'errorCode';
 
   DataColumn getDataColumn(String label) {
     return DataColumn(
@@ -104,11 +113,35 @@ class _PremiumMainState extends State<PremiumMain> {
                             ],
                           ),
                           Divider(height: rs.getSize(30), thickness: rs.getSize(2), color: MyColors.purple),
-                          MyWidget().getTextWidget(
-                            rs,
-                            text: tr('premiumDetail'),
-                            color: MyColors.grey,
-                          ),
+                          RichText(
+                            text: TextSpan(children: [
+                              TextSpan(
+                                  text: tr('premiumDetail'),
+                                  style:
+                                      TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                              TextSpan(
+                                text: tr('termOfUse'),
+                                style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    launchUrl(
+                                        Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
+                                  },
+                              ),
+                              TextSpan(
+                                  text: tr('and'),
+                                  style:
+                                      TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                              TextSpan(
+                                text: tr('privacyPolicy'),
+                                style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    launchUrl(Uri.parse('https://awesomekorean.net/privacyPolicy.html'));
+                                  },
+                              )
+                            ]),
+                          )
                         ],
                       ),
                     ),
@@ -135,18 +168,22 @@ class _PremiumMainState extends State<PremiumMain> {
                                 backgroundColor: Colors.transparent,
                               ),
                               onPressed: () async {
+                                final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
+                                purchaseTrace.start();
+
                                 setState(() {
                                   isPurchasing = true;
                                 });
                                 try {
                                   CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
+                                  purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
                                   if (purchaserInfo.entitlements.active.isNotEmpty) {
-                                    await Purchases.setEmail(User().email);
-                                    await Purchases.setDisplayName(User().name);
-                                    await Purchases.setPushToken(User().fcmToken ?? '');
+                                    Purchases.setEmail(User().email);
+                                    Purchases.setDisplayName(User().name);
+                                    Purchases.setPushToken(User().fcmToken ?? '');
                                     String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
-                                    await Purchases.setFirebaseAppInstanceId(appInstanceId!);
-                                    await Database()
+                                    Purchases.setFirebaseAppInstanceId(appInstanceId!);
+                                    Database()
                                         .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
                                     MyWidget().showSnackbarWithPodo(rs,
                                         title: tr('purchaseTitle'), content: tr('purchaseContent'));
@@ -159,11 +196,15 @@ class _PremiumMainState extends State<PremiumMain> {
                                     isPurchasing = false;
                                   });
                                   var errorCode = PurchasesErrorHelper.getErrorCode(e);
+                                  purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
+                                  purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
                                   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+                                    FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
                                     MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
                                   }
                                 }
                                 await FirebaseAnalytics.instance.logPurchase();
+                                purchaseTrace.stop();
                               },
                               child: Row(
                                 children: [
@@ -184,12 +225,20 @@ class _PremiumMainState extends State<PremiumMain> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       MyWidget().getTextWidget(rs,
-                                                          text: offering.identifier,
+                                                          text: 'Get Podo Premium',
                                                           color: Colors.white,
-                                                          size: 18,
+                                                          size: rs.getSize(18),
                                                           isBold: true),
                                                       MyWidget().getTextWidget(rs,
-                                                          text: offering.serverDescription, color: Colors.white)
+                                                          text: offering.identifier,
+                                                          color: Colors.white,
+                                                          size: rs.getSize(18),
+                                                          isBold: true),
+                                                      MyWidget().getTextWidget(rs,
+                                                          text: offering.serverDescription,
+                                                          color: Colors.white,
+                                                          size: rs.getSize(15),
+                                                          isBold: true)
                                                     ],
                                                   ),
                                                 ),

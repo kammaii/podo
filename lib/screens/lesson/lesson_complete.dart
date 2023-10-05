@@ -72,11 +72,11 @@ class LessonComplete extends StatelessWidget {
                 if (settings.authorizationStatus == AuthorizationStatus.authorized) {
                   await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
                   await User().setTrialAuthorized(rs);
-                  Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                 } else {
                   await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
                   await User().setTrialDenied();
                 }
+                Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
