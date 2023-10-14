@@ -28,7 +28,7 @@ class WritingMyList extends StatefulWidget {
 
 class _WritingMyListState extends State<WritingMyList> {
   List<Writing> writings = [];
-  final controller = Get.find<WritingController>();
+  late final WritingController controller;
   final scrollController = ScrollController();
   final docsLimit = 10;
   List<String> statusList = [tr('writingStatus0'), tr('writingStatus1'), tr('writingStatus2'), tr('writingStatus3')];
@@ -202,6 +202,17 @@ class _WritingMyListState extends State<WritingMyList> {
   void dispose() {
     scrollController.dispose();
     super.dispose();
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    if(Get.isRegistered<WritingController>()) {
+      controller = Get.find<WritingController>();
+    } else {
+      controller = Get.put(WritingController());
+    }
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -27,7 +29,6 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TargetPlatform os = Theme.of(context).platform;
     ResponsiveSize rs = ResponsiveSize(context);
 
     getInitData() async {
@@ -39,9 +40,22 @@ class Logo extends StatelessWidget {
       await PodoMessage().getPodoMessage();
       Get.put(WritingController());
       Get.toNamed(MyStrings.routeMainFrame);
-      String thisOs = os.toString().split('.').last;
-      if (thisOs != user.User().os) {
-        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: thisOs);
+      if (user.User().os.isEmpty) {
+        String os = '';
+        if(Platform.isIOS) {
+          os = 'iOS';
+        } else if (Platform.isAndroid) {
+          os = 'android';
+        } else if (Platform.isWindows) {
+          os = 'windows';
+        } else if (Platform.isMacOS) {
+          os = 'macOS';
+        } else if (Platform.isLinux) {
+          os = 'linux';
+        } else {
+          os = 'others';
+        }
+        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
       }
       final settings = await FirebaseMessaging.instance.getNotificationSettings();
       bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;

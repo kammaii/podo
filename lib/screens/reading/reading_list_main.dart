@@ -51,8 +51,8 @@ class _ReadingListMainState extends State<ReadingListMain> {
       child: InkWell(
         onTap: (isBasicUser && !readingTitle.isFree)
             ? null
-            : () async {
-                await FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
+            : () {
+                FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
                 Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
               },
         child: Stack(
@@ -61,7 +61,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
               padding: EdgeInsets.all(rs.getSize(10)),
               child: Row(
                 children: [
-                  readingTitle.image != null
+                  readingTitle.image != null && readingTitle.image!.isNotEmpty
                       ? Hero(
                           tag: 'readingImage:${readingTitle.id}',
                           child: Image.memory(base64Decode(readingTitle.image!),

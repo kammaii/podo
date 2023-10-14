@@ -137,7 +137,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                 style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    launchUrl(Uri.parse('https://awesomekorean.net/privacyPolicy.html'));
+                                    launchUrl(Uri.parse('https://podo-49335.web.app/privacyPolicy.html'));
                                   },
                               )
                             ]),

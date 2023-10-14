@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -434,8 +435,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     for (final controller in youtubeControllers.values) {
       controller.dispose();
     }
-    if (User().status == 1 && !isCompleted && AdsController().interstitialAd != null) {
-      AdsController().showInterstitialAd((ad) => null);
+    if (User().status == 1) {
+      AdsController().bannerAd?.dispose();
+      if(!isCompleted && AdsController().interstitialAd != null) {
+        AdsController().showInterstitialAd((ad) => ad.dispose());
+      }
     }
     super.dispose();
   }
@@ -472,6 +476,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       bool videoEnded = false;
       int clipStart = 0;
       int? clipEnd;
+
+      if(User().status == 1) {
+        _loadAd();
+        AdsController().loadInterstitialAds();
+      }
 
       for (dynamic snapshot in snapshots[0]) {
         LessonCard card = LessonCard.fromJson(snapshot.data() as Map<String, dynamic>);
@@ -541,6 +550,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
     for (var fileName in snapshots.keys) {
       final url = snapshots[fileName];
+      FirebaseCrashlytics.instance.log('Error occurred in cacheFiles()');
+      FirebaseCrashlytics.instance.setCustomKey('fileName', fileName);
+      FirebaseCrashlytics.instance.setCustomKey('snapshots', snapshots.toString());
       final response = await http.get(Uri.parse(url!));
       final File file = File('${directory.path}/$fileName.m4a');
       await file.writeAsBytes(response.bodyBytes);
@@ -566,14 +578,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           setState(() {});
         }
       }
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (User().status == 1) {
-      _loadAd();
     }
   }
 
@@ -724,15 +728,18 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   ),
                   User().status == 1
                       ? GetBuilder<AdsController>(
-                          builder: (_) {
-                            return AdsController().isBannerAdLoaded
-                                ? Container(
-                                    color: MyColors.purpleLight,
-                                    width: AdsController().bannerAd!.size.width.toDouble(),
-                                    height: AdsController().bannerAd!.size.height.toDouble(),
-                                    child: AdWidget(ad: AdsController().bannerAd!),
-                                  )
-                                : const SizedBox.shrink();
+                          builder: (controller) {
+                            FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
+                            if(controller.bannerAd != null && controller.isBannerAdLoaded) {
+                              return Container(
+                                color: MyColors.purpleLight,
+                                width: controller.bannerAd!.size.width.toDouble(),
+                                height: controller.bannerAd!.size.height.toDouble(),
+                                child: AdWidget(ad: controller.bannerAd!),
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
                           },
                         )
                       : const SizedBox.shrink(),

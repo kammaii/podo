@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -23,7 +24,6 @@ class AdsController extends GetxController {
 
   AdsController.init() {
     _initAds();
-    _loadInterstitialAds();
     print('Ads 초기화');
   }
 
@@ -49,14 +49,14 @@ class AdsController extends GetxController {
           };
   }
 
-  void _loadInterstitialAds() {
+  void loadInterstitialAds() {
     InterstitialAd.load(
-      adUnitId: UNIT_ID[User().os == 'iOS' ? IOS_INTERSTITIAL : ANDROID_INTERSTITIAL]!,
+      adUnitId: UNIT_ID[Platform.isIOS ? IOS_INTERSTITIAL : ANDROID_INTERSTITIAL]!,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (InterstitialAd ad) {
         print('InterstitialAd is loaded');
         interstitialAd = ad;
-        if (User().os == 'android') {
+        if (Platform.isAndroid) {
           interstitialAd!.setImmersiveMode(true);
         }
       }, onAdFailedToLoad: (LoadAdError e) {
@@ -68,14 +68,10 @@ class AdsController extends GetxController {
   }
 
   void showInterstitialAd(Function(InterstitialAd ad) f) {
-    if (interstitialAd == null) {
-      print('Warning: attempt to show interstitial before loaded.');
-      _loadInterstitialAds();
-    } else {
+    if (interstitialAd != null) {
       interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
           onAdShowedFullScreenContent: (InterstitialAd ad) {
             print('onAdShowedFullScreenContent');
-            _loadInterstitialAds();
           },
           onAdDismissedFullScreenContent: f,
           onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError e) {
@@ -83,20 +79,28 @@ class AdsController extends GetxController {
             FirebaseCrashlytics.instance
                 .recordError(Exception('onAdFailedToShowFullScreenContent : $e'), null, printDetails: true);
             ad.dispose();
-            _loadInterstitialAds();
           });
       interstitialAd!.show();
       interstitialAd = null;
+    } else {
+      print('Warning: attempt to show interstitial before loaded.');
+      FirebaseCrashlytics.instance.recordError(
+          Exception('Warning: attempt to show interstitial before loaded.'), null,
+          printDetails: true);
     }
   }
 
   void loadBannerAd(AdSize size) {
     bannerAd = BannerAd(
       size: size,
-      adUnitId: UNIT_ID[User().os == 'iOS' ? IOS_BANNER : ANDROID_BANNER]!,
+      adUnitId: UNIT_ID[Platform.isIOS ? IOS_BANNER : ANDROID_BANNER]!,
       listener: BannerAdListener(onAdFailedToLoad: (Ad ad, LoadAdError e) {
         print('Failed to load bannerAd : $e');
-        FirebaseCrashlytics.instance.recordError(Exception('Failed to load bannerAd : $e'), null, printDetails: true,);
+        FirebaseCrashlytics.instance.recordError(
+          Exception('Failed to load bannerAd : $e'),
+          null,
+          printDetails: true,
+        );
         ad.dispose();
       }, onAdLoaded: (Ad ad) {
         print('BannerAd is loaded');

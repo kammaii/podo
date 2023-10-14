@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -59,6 +60,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   void dispose() {
     scrollController.dispose();
     animationController.dispose();
+    AdsController().bannerAd?.dispose();
     PlayAudio().reset();
     super.dispose();
   }
@@ -147,6 +149,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
     for (var fileName in snapshots.keys) {
       final url = snapshots[fileName];
+      FirebaseCrashlytics.instance.log('Error occurred in cacheFiles()');
+      FirebaseCrashlytics.instance.setCustomKey('fileName', fileName);
+      FirebaseCrashlytics.instance.setCustomKey('snapshots', snapshots.toString());
+
       final response = await http.get(Uri.parse(url!));
       final File file = File('${directory.path}/$fileName.m4a');
       await file.writeAsBytes(response.bodyBytes);
@@ -226,6 +232,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           Container(
             color: MyColors.navyLight,
           ),
+          readingTitle.image != null && readingTitle.image!.isNotEmpty ?
           Positioned(
             top: 0,
             right: -30,
@@ -237,7 +244,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                     Image.memory(base64Decode(readingTitle.image!), width: rs.getSize(250), gaplessPlayback: true),
               ),
             ),
-          ),
+          ) : const SizedBox.shrink(),
           Opacity(
             opacity: 0.2,
             child: Container(
@@ -455,15 +462,18 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                               ? Positioned(
                                   bottom: 0,
                                   child: GetBuilder<AdsController>(
-                                    builder: (_) {
-                                      return AdsController().isBannerAdLoaded
-                                          ? Container(
-                                              color: MyColors.purpleLight,
-                                              width: AdsController().bannerAd!.size.width.toDouble(),
-                                              height: AdsController().bannerAd!.size.height.toDouble(),
-                                              child: AdWidget(ad: AdsController().bannerAd!),
-                                            )
-                                          : const SizedBox.shrink();
+                                    builder: (controller) {
+                                      FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
+                                      if(controller.bannerAd != null && controller.isBannerAdLoaded) {
+                                        return Container(
+                                          color: MyColors.purpleLight,
+                                          width: controller.bannerAd!.size.width.toDouble(),
+                                          height: controller.bannerAd!.size.height.toDouble(),
+                                          child: AdWidget(ad: controller.bannerAd!),
+                                        );
+                                      } else {
+                                        return const SizedBox.shrink();
+                                      }
                                     },
                                   ),
                                 )

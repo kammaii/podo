@@ -143,9 +143,6 @@ class User {
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       await analytics.setUserId(id: id);
       await analytics.setUserProperty(name: 'status', value: status.toString());
-      if(status == 1) {
-        Get.put(AdsController());
-      }
 
     } else {
       print('신규유저입니다. DB를 생성합니다.');
@@ -199,6 +196,7 @@ class User {
 
   Future<void> setTrialAuthorized(ResponsiveSize rs) async {
     status = 3;
+    fcmPermission = true;
     DateTime now = DateTime.now();
     trialStart = now;
     trialEnd = now.add(const Duration(days: 10));
@@ -209,6 +207,7 @@ class User {
 
   Future<void> setTrialDenied() async {
     status = 1;
+    fcmPermission = false;
     await Database().setDoc(collection: 'Users', doc: this);
   }
 }

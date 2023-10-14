@@ -35,7 +35,7 @@ class FlashcardIcon {
             }
           },
           icon: Icon(
-            controller.hasFlashcard[itemId]
+            controller.hasFlashcard[itemId] != null && controller.hasFlashcard[itemId]
                 ? FontAwesomeIcons.solidStar
                 : FontAwesomeIcons.star,
             color: MyColors.purple,
