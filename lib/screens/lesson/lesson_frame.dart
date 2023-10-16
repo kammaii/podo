@@ -114,7 +114,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
               },
               child: Icon(Icons.arrow_back_ios_rounded, color: MyColors.purple, size: rs.getSize(20))),
           SizedBox(width: rs.getSize(10)),
-          Expanded(child: MyWidget().getTextWidget(rs, text: title, color: MyColors.purple, isBold: true, size: 18)),
+          Expanded(
+              child: MyWidget().getTextWidget(rs, text: title, color: MyColors.purple, isBold: true, size: 18)),
         ],
       ),
       content: SingleChildScrollView(child: getHtmlWidget(content)),
@@ -198,15 +199,18 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       SizedBox(height: rs.getSize(10)),
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: MyWidget()
-                            .getTextWidget(rs, text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
+                        child: MyWidget().getTextWidget(rs,
+                            text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
                       ),
                       SizedBox(height: rs.getSize(20)),
                       card.content[PRONUN] != null && card.content[PRONUN].toString().isNotEmpty
                           ? FittedBox(
                               fit: BoxFit.scaleDown,
                               child: MyWidget().getTextWidget(rs,
-                                  text: '[${card.content[PRONUN]}]', size: 18, color: Colors.black, isKorean: true),
+                                  text: '[${card.content[PRONUN]}]',
+                                  size: 18,
+                                  color: Colors.black,
+                                  isKorean: true),
                             )
                           : const SizedBox.shrink(),
                       SizedBox(height: rs.getSize(20)),
@@ -392,7 +396,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                             ]),
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: rs.getSize(15), horizontal: rs.getSize(10)),
-                          child: MyWidget().getTextWidget(rs, text: '${index + 1}. ${examples[index]}', isKorean: true),
+                          child: MyWidget()
+                              .getTextWidget(rs, text: '${index + 1}. ${examples[index]}', isKorean: true),
                         ),
                       ),
                     ),
@@ -420,10 +425,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
   toggleBottomAudioWidget(bool isForward) {
     if (isForward) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        controller.update();
-        animationController.forward();
-      });
+      animationController.forward();
     } else {
       animationController.reverse();
     }
@@ -437,7 +439,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
     if (User().status == 1) {
       AdsController().bannerAd?.dispose();
-      if(!isCompleted && AdsController().interstitialAd != null) {
+      if (!isCompleted && AdsController().interstitialAd != null) {
         AdsController().showInterstitialAd((ad) => ad.dispose());
       }
     }
@@ -530,6 +532,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         }
       }
       controller.hasFlashcard.value = flashcardMap.obs;
+      FirebaseCrashlytics.instance.setCustomKey('hasFlashcard', controller.hasFlashcard.value.toString());
+      FirebaseCrashlytics.instance.setCustomKey('flashcardMap', flashcardMap.toString());
       Map<String, String> audios = {};
       for (dynamic snapshot in snapshots[1]) {
         audios.addAll(snapshot);
@@ -550,9 +554,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
     for (var fileName in snapshots.keys) {
       final url = snapshots[fileName];
-      FirebaseCrashlytics.instance.log('Error occurred in cacheFiles()');
-      FirebaseCrashlytics.instance.setCustomKey('fileName', fileName);
-      FirebaseCrashlytics.instance.setCustomKey('snapshots', snapshots.toString());
       final response = await http.get(Uri.parse(url!));
       final File file = File('${directory.path}/$fileName.m4a');
       await file.writeAsBytes(response.bodyBytes);
@@ -730,7 +731,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       ? GetBuilder<AdsController>(
                           builder: (controller) {
                             FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
-                            if(controller.bannerAd != null && controller.isBannerAdLoaded) {
+                            if (controller.bannerAd != null && controller.isBannerAdLoaded) {
                               return Container(
                                 color: MyColors.purpleLight,
                                 width: controller.bannerAd!.size.width.toDouble(),
@@ -786,8 +787,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         ),
         padding: EdgeInsets.symmetric(vertical: rs.getSize(5)),
         child: Center(
-          child: MyWidget()
-              .getTextWidget(rs, text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
+          child: MyWidget().getTextWidget(rs,
+              text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
         ),
       ),
     );
