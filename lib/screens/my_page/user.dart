@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/ads_controller.dart';
@@ -117,8 +118,11 @@ class User {
         status = 1;
       }
 
-      if(status == 1 || status == 2) {
+      if(status != 0) {
         await initRevenueCat();
+      }
+
+      if(status == 1 || status == 2) {
         try {
           CustomerInfo customerInfo = await Purchases.getCustomerInfo();
           final entitlement = customerInfo.entitlements.active;
@@ -194,20 +198,15 @@ class User {
     }
   }
 
-  Future<void> setTrialAuthorized(ResponsiveSize rs) async {
+  Future<void> setTrialAuthorized(ResponsiveSize rs, bool permission) async {
     status = 3;
-    fcmPermission = true;
+    fcmPermission = permission;
     DateTime now = DateTime.now();
     trialStart = now;
     trialEnd = now.add(const Duration(days: 10));
-    fcmToken = await FirebaseMessaging.instance.getToken();
-    await Database().setDoc(collection: 'Users', doc: this);
-    MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
-  }
-
-  Future<void> setTrialDenied() async {
-    status = 1;
-    fcmPermission = false;
+    if(permission) {
+      fcmToken = await FirebaseMessaging.instance.getToken();
+    }
     await Database().setDoc(collection: 'Users', doc: this);
   }
 }

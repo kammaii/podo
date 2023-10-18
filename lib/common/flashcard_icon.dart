@@ -14,7 +14,6 @@ class FlashcardIcon {
       required String front,
       String? back,
       String? audio}) {
-    FirebaseCrashlytics.instance.setCustomKey('controller.hasFlashcard', controller.hasFlashcard.value.toString());
     if(controller.hasFlashcard[itemId] == null) {
       controller.hasFlashcard[itemId] = LocalStorage().hasFlashcard(itemId: itemId);
     }

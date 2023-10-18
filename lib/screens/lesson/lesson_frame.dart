@@ -532,8 +532,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         }
       }
       controller.hasFlashcard.value = flashcardMap.obs;
-      FirebaseCrashlytics.instance.setCustomKey('hasFlashcard', controller.hasFlashcard.value.toString());
-      FirebaseCrashlytics.instance.setCustomKey('flashcardMap', flashcardMap.toString());
       Map<String, String> audios = {};
       for (dynamic snapshot in snapshots[1]) {
         audios.addAll(snapshot);

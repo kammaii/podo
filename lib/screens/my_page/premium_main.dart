@@ -277,21 +277,6 @@ class _PremiumMainState extends State<PremiumMain> {
                     }
                   },
                 ),
-                User().trialStart == null
-                    ? TextButton(
-                        onPressed: () async {
-                          FirebaseMessaging messaging = FirebaseMessaging.instance;
-                          NotificationSettings settings = await messaging.requestPermission();
-                          if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-                            await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved_after_deny');
-                            await User().setTrialAuthorized(rs);
-                            Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-                          } else {
-                            await User().setTrialDenied();
-                          }
-                        },
-                        child: Text(tr('getFreePremium')))
-                    : const SizedBox.shrink(),
               ],
             ),
             Offstage(

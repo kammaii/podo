@@ -42,7 +42,8 @@ class LessonComplete extends StatelessWidget {
               Icon(icon, color: MyColors.purple, size: rs.getSize(20)),
               SizedBox(width: rs.getSize(30)),
               Expanded(
-                  child: Center(child: MyWidget().getTextWidget(rs, text: title, size: 20, color: MyColors.purple))),
+                  child:
+                      Center(child: MyWidget().getTextWidget(rs, text: title, size: 20, color: MyColors.purple))),
             ],
           ),
         ),
@@ -71,12 +72,24 @@ class LessonComplete extends StatelessWidget {
                 NotificationSettings settings = await messaging.requestPermission();
                 if (settings.authorizationStatus == AuthorizationStatus.authorized) {
                   await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
-                  await User().setTrialAuthorized(rs);
+                  await User().setTrialAuthorized(rs, true);
+                  MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
+                  Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                 } else {
                   await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
-                  await User().setTrialDenied();
+                  await User().setTrialAuthorized(rs, false);
+                  Get.defaultDialog(
+                      title: tr('trialDenyTitle'),
+                      content: Center(child: Text(tr('trialDenyContent'), textAlign: TextAlign.center)),
+                      titlePadding: const EdgeInsets.all(10),
+                      contentPadding: const EdgeInsets.all(10),
+                      buttonColor: MyColors.purple,
+                      confirmTextColor: Colors.white,
+                      barrierDismissible: false,
+                      onConfirm: () {
+                        Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+                      });
                 }
-                Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
@@ -214,15 +227,13 @@ class LessonComplete extends StatelessWidget {
                                 nextIndex++;
                               }
                               Lesson nextLesson = Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>);
-                              if(nextLesson.hasOptions) {
-                                Get.offNamedUntil(
-                                    MyStrings.routeLessonSummaryMain,
+                              if (nextLesson.hasOptions) {
+                                Get.offNamedUntil(MyStrings.routeLessonSummaryMain,
                                     ModalRoute.withName(MyStrings.routeMainFrame),
                                     arguments: nextLesson);
                               } else {
                                 Get.offNamedUntil(
-                                    MyStrings.routeLessonFrame,
-                                    ModalRoute.withName(MyStrings.routeMainFrame),
+                                    MyStrings.routeLessonFrame, ModalRoute.withName(MyStrings.routeMainFrame),
                                     arguments: nextLesson);
                               }
                             } else {
