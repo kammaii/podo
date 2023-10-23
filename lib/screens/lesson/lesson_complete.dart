@@ -116,7 +116,7 @@ class LessonComplete extends StatelessWidget {
     controller.play();
     final lesson = Get.arguments;
     final lessonController = Get.find<LessonController>();
-    History().addHistory(item: 'lesson', itemId: lesson.id);
+    History().addHistory(itemIndex: 0, itemId: lesson.id);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       lessonController.isCompleted[lesson.id] = true;
       if (User().status == 0 && User().trialStart == null) {

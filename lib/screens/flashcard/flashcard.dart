@@ -113,7 +113,7 @@ class FlashCard {
         break;
       }
     }
-    setAndUpdate();
+    setAndUpdate(shouldCount: false);
     print('플래시카드 수정');
   }
 
@@ -143,7 +143,11 @@ class FlashCard {
     }
   }
 
-  void setAndUpdate() {
+  void setAndUpdate({bool shouldCount = true}) {
+    if(shouldCount) {
+      Database().updateDoc(
+          collection: 'Users', docId: User().id, key: 'flashcardCount', value: LocalStorage().flashcards.length);
+    }
     LocalStorage().setFlashcards();
     controller.init();
     controller.update();

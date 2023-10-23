@@ -55,10 +55,23 @@ class History {
     return map;
   }
 
-  Future<void> addHistory({required String item, required String itemId, String? content}) async {
+  final List<String> historyItem = ['lesson', 'reading', 'podoMsg'];
+
+  void setHistoryCount(int itemIndex) {
+    int count = 0;
+    String item = historyItem[itemIndex];
+    for(History history in LocalStorage().histories) {
+      if(history.item == item) {
+        count++;
+      }
+    }
+    Database().updateDoc(collection: 'Users', docId: User().id, key: '${item}Count', value: count);
+  }
+
+  Future<void> addHistory({required int itemIndex, required String itemId, String? content}) async {
     if(!LocalStorage().hasHistory(itemId: itemId)) {
       History history = History();
-      history.item = item;
+      history.item = historyItem[itemIndex];
       history.itemId = itemId;
       history.content = content;
       print('HISTORY: ${history.toJson()}');
@@ -66,6 +79,14 @@ class History {
       LocalStorage().histories.insert(0, history);
       LocalStorage().setHistories();
       print('히스토리 추가');
+
+      if(itemIndex == 0) {
+        setHistoryCount(0);
+      } else if (itemIndex == 1) {
+        setHistoryCount(1);
+      } else if (itemIndex == 2) {
+        setHistoryCount(2);
+      }
     } else {
       print('히스토리 있음');
     }

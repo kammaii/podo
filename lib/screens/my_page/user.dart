@@ -194,7 +194,7 @@ class User {
         }
       }
       print('SIgn up method : $method');
-      await FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
+      FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
     }
   }
 

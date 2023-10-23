@@ -363,7 +363,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                     ? Padding(
                         padding: EdgeInsets.only(bottom: rs.getSize(100)),
                         child: MyWidget().getRoundBtnWidget(rs, text: tr('complete'), f: () {
-                          History().addHistory(item: 'reading', itemId: readingTitle.id);
+                          History().addHistory(itemIndex: 1, itemId: readingTitle.id);
                           LocalStorage().prefs!.remove(readingTitle.id);
                           controller.isCompleted[readingTitle.id] = true;
                           if (User().status == 0 && User().trialStart == null) {

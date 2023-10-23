@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/my_page/user.dart';
-import 'package:podo/values/my_strings.dart';
+import 'package:flutter/material.dart';
 
 class Database {
   static final Database _instance = Database.init();
@@ -48,10 +48,14 @@ class Database {
   Future<dynamic> getDoc({required String collection, required String docId}) async {
     dynamic document;
     final ref = firestore.collection(collection).doc(docId);
-    await ref.get().then((DocumentSnapshot snapshot) {
-      print('$collection/$docId is loaded');
-      document = snapshot;
-    });
+    try {
+      await ref.get().then((DocumentSnapshot snapshot) {
+        print('$collection/$docId is loaded');
+        document = snapshot;
+      });
+    } catch(e) {
+      Get.defaultDialog(content: Text(e.toString()));
+    }
     return document;
   }
 

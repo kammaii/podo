@@ -172,18 +172,12 @@ class _ReadingListMainState extends State<ReadingListMain> {
     getReading();
   }
 
-
-
   getReading() async {
     query = FirebaseFirestore.instance.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
     if (selectedCategory == 0) {
       query = query.orderBy(ORDER_ID, descending: true);
     } else {
       query = query.where(CATEGORY, isEqualTo: categories[selectedCategory]).orderBy(ORDER_ID, descending: true);
-    }
-
-    if (User().status == 0) {
-      query = query.where(IS_FREE, isEqualTo: true);
     }
 
     if (shouldLoad) {

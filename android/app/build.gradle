@@ -60,6 +60,16 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
+            manifestPlaceholders = [
+                    crashlytics_collection_enabled: "true",
+                    analytics_collection_enabled: "true"
+            ]
+        }
+        debug {
+            manifestPlaceholders = [
+                    crashlytics_collection_enabled: "false",
+                    analytics_collection_enabled: "false"
+            ]
         }
     }
 }

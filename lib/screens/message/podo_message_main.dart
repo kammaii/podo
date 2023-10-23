@@ -40,6 +40,8 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
   just_audio.AudioPlayer? player;
   late ResponsiveSize rs;
   bool isLoaded = false;
+  late Timer timer;
+  StreamController<String> streamController = StreamController();
 
   @override
   void initState() {
@@ -47,14 +49,24 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
         isLoaded = true;
+        if(isBasicUser) {
+          MyWidget().showDialog(rs, content: tr('wantReplyPodo'), yesFn: () {
+            Get.toNamed(MyStrings.routePremiumMain);
+          });
+        }
       });
     });
   }
 
-  Stream<String> getTimeLeftStream(DateTime dateEnd) {
-    StreamController<String> controller = StreamController();
-    late Timer timer;
 
+  @override
+  void dispose() {
+    timer.cancel();
+    streamController.close();
+    super.dispose();
+  }
+
+  Stream<String> getTimeLeftStream(DateTime dateEnd) {
     Duration calTimeLeft() {
       DateTime now = DateTime.now();
       Duration leftTime = PodoMessage().dateEnd!.difference(now);
@@ -62,16 +74,19 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
     }
 
     void updateText() {
+      if(!mounted) {
+        return;
+      }
       Duration leftTime = calTimeLeft();
       String day = leftTime.inDays != 0 ? '${leftTime.inDays.toString().padLeft(2, '0')} 일' : '';
       String hour = '${(leftTime.inHours % 24).toString().padLeft(2, '0')} 시간';
       String min = '${(leftTime.inMinutes % 60).toString().padLeft(2, '0')} 분';
       String sec = '${(leftTime.inSeconds % 60).toString().padLeft(2, '0')} 초';
-      controller.add('$day $hour $min $sec');
+      streamController.add('$day $hour $min $sec');
 
       if (leftTime == Duration.zero) {
         timer.cancel();
-        controller.close();
+        streamController.close();
       }
     }
 
@@ -85,14 +100,14 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
       });
     }
 
-    controller = StreamController<String>(onListen: () {
+    streamController = StreamController<String>(onListen: () {
       updateText();
       startTimer();
     }, onCancel: () {
       timer.cancel();
     });
 
-    return controller.stream;
+    return streamController.stream;
   }
 
   Widget getAudioPlayer(String url) {
@@ -174,14 +189,6 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
       replyHint = tr('replyPodo');
     }
 
-    isBasicUser
-        ? WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            MyWidget().showDialog(rs, content: tr('wantReplyPodo'), yesFn: () {
-              Get.toNamed(MyStrings.routePremiumMain);
-            });
-          })
-        : null;
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -214,7 +221,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                     content: MyWidget().getTextWidget(rs, text: tr('replyDetail'), color: MyColors.grey),
                   ));
                 },
-                icon: Icon(Icons.info, color: MyColors.purple, size: rs.getSize(20, bigger: 1.2)),
+                icon: Icon(CupertinoIcons.info_circle, color: MyColors.purple, size: rs.getSize(23, bigger: 1.2)),
               )
             ],
           ),
@@ -430,9 +437,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                                           print('Podo message reply completed');
                                         });
                                     await History().addHistory(
-                                        item: 'podoMessage',
-                                        itemId: PodoMessage().id!,
-                                        content: replyController.text);
+                                        itemIndex: 2, itemId: PodoMessage().id!, content: replyController.text);
                                     Get.find<PodoMessageController>().setPodoMsgBtn();
                                     setState(() {});
                                   },
