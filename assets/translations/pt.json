@@ -31,7 +31,7 @@
   "continueReading": "Gostaria de continuar lendo?",
   "yes": "Sim",
   "no": "Não",
-  "setError": "Falha ao salvar no banco de dados. Se o problema persistir, entre em contato com o desenvolvedor.",
+  "setError": "Falha ao acessar o banco de dados. Se o problema persistir, entre em contato com o desenvolvedor.",
   "flashcardEdit": "Edição de Cartões de Estudo",
   "save": "Salvar",
   "makeClear": "Esclarecer",
@@ -140,5 +140,8 @@
   "languageChanged": "O idioma foi alterado.",
   "mode": "Modo",
   "topic": "Tópico",
-  "grammar": "Gramática"
+  "grammar": "Gramática",
+  "premiumEnd": "Seu Premium gratuito de 10 dias acabou.",
+  "getDiscount": "Assine o Premium agora e ganhe 50% de desconto.",
+  "checkoutPremium": "Confira o Premium"
 }

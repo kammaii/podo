@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -13,12 +12,13 @@ import 'package:get/get.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
-import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
+import 'package:podo/values/my_colors.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class User {
   User._init();
+
   static final User _instance = User._init();
 
   factory User() {
@@ -35,11 +35,11 @@ class User {
   DateTime? trialEnd;
   late String language;
   String? fcmToken;
-  List<String>? fcmTopic;
   late bool fcmPermission;
   late int status;
   String? expirationDate; // only for MyPage
   final admin = 'gabmanpark@gmail.com';
+  bool isConvertedBasic = false;
 
   static const String ID = 'id';
   static const String OS = 'os';
@@ -51,7 +51,6 @@ class User {
   static const String TRIAL_END = 'trialEnd';
   static const String LANGUAGE = 'language';
   static const String FCM_TOKEN = 'fcmToken';
-  static const String FCM_TOPIC = 'fcmTopic';
   static const String FCM_PERMISSION = 'fcmPermission';
   static const String STATUS = 'status';
   static const String ALL_USERS = 'allUsers';
@@ -65,17 +64,16 @@ class User {
       DATESIGNUP: dateSignUp,
       DATESIGNIN: dateSignIn,
       LANGUAGE: language,
-      FCM_TOPIC: fcmTopic,
       FCM_PERMISSION: fcmPermission,
       STATUS: status,
     };
-    if(fcmToken != null) {
+    if (fcmToken != null) {
       map[FCM_TOKEN] = fcmToken;
     }
-    if(trialStart != null) {
+    if (trialStart != null) {
       map[TRIAL_START] = trialStart;
     }
-    if(trialEnd != null) {
+    if (trialEnd != null) {
       map[TRIAL_END] = trialEnd;
     }
     return map;
@@ -96,43 +94,48 @@ class User {
       dateSignIn = DateTime.now();
       Database().updateDoc(collection: 'Users', docId: id, key: 'dateSignIn', value: DateTime.now());
       language = json[LANGUAGE];
-      if(json[FCM_TOKEN] != null) {
+      if (json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
       }
       FirebaseMessaging.instance.subscribeToTopic(ALL_USERS);
-      if(json[FCM_TOPIC] != null) {
-        fcmTopic = json[FCM_TOPIC];
-      }
       fcmPermission = json[FCM_PERMISSION] ?? false;
-      if(json[TRIAL_START] != null) {
+      if (json[TRIAL_START] != null) {
         Timestamp stamp = json[TRIAL_START];
         trialStart = stamp.toDate();
       }
-      if(json[TRIAL_END] != null) {
+      if (json[TRIAL_END] != null) {
         Timestamp stamp = json[TRIAL_END];
         trialEnd = stamp.toDate();
       }
       status = json[STATUS];
 
-      if(status == 3 && DateTime.now().isAfter(trialEnd!)) {
+      if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
         status = 1;
+        isConvertedBasic = true;
       }
 
-      if(status != 0) {
+      if (status != 0) {
         await initRevenueCat();
       }
 
-      if(status == 1 || status == 2) {
+      if (status == 1 || status == 2) {
         try {
           CustomerInfo customerInfo = await Purchases.getCustomerInfo();
           final entitlement = customerInfo.entitlements.active;
-          if(entitlement['premium'] != null) {
-            expirationDate = entitlement['premium']!.expirationDate.toString().substring(0, 10).replaceAll('-', '.');
+          if (entitlement['premium'] != null) {
+            expirationDate =
+                entitlement['premium']!.expirationDate.toString().substring(0, 10).replaceAll('-', '.');
           }
           if (entitlement.isNotEmpty) {
+            FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
             status = 2;
           } else {
+            if(status == 2) {
+              FirebaseMessaging.instance.unsubscribeFromTopic('premiumUsers');
+              FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
+            }
             status = 1;
+            FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
             Get.put(AdsController());
           }
         } on PlatformException catch (e) {
@@ -147,7 +150,6 @@ class User {
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       await analytics.setUserId(id: id);
       await analytics.setUserProperty(name: 'status', value: status.toString());
-
     } else {
       print('신규유저입니다. DB를 생성합니다.');
       makeNewUserOnDB();
@@ -176,21 +178,23 @@ class User {
     dateSignIn = DateTime.now();
     Locale locale = window.locale;
     language = locale.languageCode;
-    if(!Languages().fos.contains(language)) {
+    if (!Languages().fos.contains(language)) {
       language = 'en';
     }
     fcmPermission = false;
     status = 0;
     Database().setDoc(collection: 'Users', doc: this);
-    
+
     List<String> signInMethods = await auth.FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-    if(signInMethods.isNotEmpty) {
+    if (signInMethods.isNotEmpty) {
       String method = 'email';
-      for(String signInMethod in signInMethods) {
-        if(signInMethod == 'google.com') {
+      for (String signInMethod in signInMethods) {
+        if (signInMethod == 'google.com') {
           method = 'google';
-        } else if(signInMethod == 'apple.com') {
+          break;
+        } else if (signInMethod == 'apple.com') {
           method = 'apple';
+          break;
         }
       }
       print('SIgn up method : $method');
@@ -199,14 +203,23 @@ class User {
   }
 
   Future<void> setTrialAuthorized(ResponsiveSize rs, bool permission) async {
+    fcmToken = await FirebaseMessaging.instance.getToken();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').where('fcmToken', isEqualTo: fcmToken).get();
     status = 3;
     fcmPermission = permission;
     DateTime now = DateTime.now();
     trialStart = now;
     trialEnd = now.add(const Duration(days: 10));
-    if(permission) {
-      fcmToken = await FirebaseMessaging.instance.getToken();
+    Map<String, dynamic> map = {
+      STATUS: status,
+      FCM_PERMISSION: fcmPermission,
+      TRIAL_START: trialStart,
+      TRIAL_END: trialEnd,
+      FCM_TOKEN: fcmToken
+    };
+    if(querySnapshot.docs.isNotEmpty) {
+      map['fakeUser'] = true;
     }
-    await Database().setDoc(collection: 'Users', doc: this);
+    await Database().updateFields(collection: 'Users', docId: id, fields: map);
   }
 }

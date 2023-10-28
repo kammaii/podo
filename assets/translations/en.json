@@ -31,7 +31,7 @@
   "continueReading": "Would you like to continue reading?",
   "yes": "Yes",
   "no": "No",
-  "setError": "Failed to save to database. If the problem persists, please contact the developer.",
+  "setError": "Failed to access the database. If the problem persists, please contact the developer.",
   "flashcardEdit": "Flashcard Edit",
   "save": "save",
   "makeClear": "Make clear",
@@ -140,5 +140,8 @@
   "languageChanged": "The language has been changed.",
   "mode": "Mode",
   "topic": "Topic",
-  "grammar": "Grammar"
+  "grammar": "Grammar",
+  "premiumEnd": "Your 10-Day Free Premium has ended.",
+  "getDiscount": "Subscribe to Premium now and get 50% off.",
+  "checkoutPremium": "Check out Premium"
 }

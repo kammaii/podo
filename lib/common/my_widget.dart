@@ -8,7 +8,6 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class MyWidget {
-
   AppBar getAppbar(ResponsiveSize rs,
       {required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true}) {
     return AppBar(
@@ -72,6 +71,7 @@ class MyWidget {
     bool isBold = false,
     bool isTextAlignCenter = false,
     bool hasUnderline = false,
+    bool hasCancelLine = false,
     bool isKorean = false,
     double? height,
     int? maxLine,
@@ -83,7 +83,7 @@ class MyWidget {
         fontSize: rs.getSize(size),
         color: color,
         fontWeight: isBold ? FontWeight.bold : null,
-        decoration: hasUnderline ? TextDecoration.underline : null,
+        decoration: hasUnderline ? TextDecoration.underline : hasCancelLine ? TextDecoration.lineThrough : null,
         height: height,
       ),
       textAlign: isTextAlignCenter ? TextAlign.center : null,
@@ -219,8 +219,8 @@ class MyWidget {
       title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
       content: MyWidget().getTextWidget(rs, text: content, isTextAlignCenter: true, size: 16),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding:
-          EdgeInsets.only(left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+      actionsPadding: EdgeInsets.only(
+          left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
       actions: [
         Row(
           children: [
@@ -266,6 +266,14 @@ class MyWidget {
     ));
   }
 
+  showSimpleDialog(String title, String content) {
+    Get.dialog(AlertDialog(
+      title: Text(title,
+          textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      content: Text(content, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15)),
+    ));
+  }
+
   showSnackbar(
     ResponsiveSize rs, {
     String title = '',
@@ -287,7 +295,11 @@ class MyWidget {
   }
 
   showSnackbarWithPodo(ResponsiveSize rs,
-      {String title = '', String content = '', double titleSize = 15, double contentSize = 15, int duration = 2000}) {
+      {String title = '',
+      String content = '',
+      double titleSize = 15,
+      double contentSize = 15,
+      int duration = 2000}) {
     Get.snackbar(
       title,
       content,
@@ -295,7 +307,8 @@ class MyWidget {
       backgroundColor: Colors.white,
       icon: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Image.asset('assets/images/podo.png', height: rs.getSize(40, bigger: 2), width: rs.getSize(40, bigger: 2)),
+        child: Image.asset('assets/images/podo.png',
+            height: rs.getSize(40, bigger: 2), width: rs.getSize(40, bigger: 2)),
       ),
       duration: Duration(milliseconds: duration),
     );

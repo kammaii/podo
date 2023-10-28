@@ -31,7 +31,7 @@
   "continueReading": "¿Te gustaría continuar leyendo?",
   "yes": "Sí",
   "no": "No",
-  "setError": "No se pudo guardar en la base de datos. Si el problema persiste, por favor contacta al desarrollador.",
+  "setError": "Fallo al acceder a la base de datos. Si el problema persiste, por favor contacta al desarrollador.",
   "flashcardEdit": "Edición de Tarjetas de Estudio",
   "save": "Guardar",
   "makeClear": "Aclarar",
@@ -140,5 +140,8 @@
   "languageChanged": "El idioma ha sido cambiado.",
   "mode": "Modo",
   "topic": "Tema",
-  "grammar": "Gramática"
+  "grammar": "Gramática",
+  "premiumEnd": "Tu Premium gratuito de 10 días ha terminado.",
+  "getDiscount": "Suscríbete a Premium ahora y obtén un 50% de descuento.",
+  "checkoutPremium": "Echa un vistazo a Premium"
 }

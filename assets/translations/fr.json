@@ -31,7 +31,7 @@
   "continueReading": "Souhaitez-vous continuer à lire ?",
   "yes": "Oui",
   "no": "Non",
-  "setError": "Échec de l'enregistrement dans la base de données. Si le problème persiste, veuillez contacter le développeur.",
+  "setError": "Échec d'accès à la base de données. Si le problème persiste, veuillez contacter le développeur.",
   "flashcardEdit": "Édition de Cartes Flash",
   "save": "Sauvegarder",
   "makeClear": "Clarifier",
@@ -140,5 +140,8 @@
   "languageChanged": "La langue a été changée.",
   "mode": "Mode",
   "topic": "Sujet",
-  "grammar": "Grammaire"
+  "grammar": "Grammaire",
+  "premiumEnd": "Votre Premium gratuit de 10 jours est terminé.",
+  "getDiscount": "Abonnez-vous à Premium dès maintenant et obtenez 50% de réduction.",
+  "checkoutPremium": "Découvrez Premium"
 }

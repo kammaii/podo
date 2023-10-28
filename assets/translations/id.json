@@ -31,7 +31,7 @@
   "continueReading": "Apakah Anda ingin melanjutkan membaca?",
   "yes": "Ya",
   "no": "Tidak",
-  "setError": "Gagal menyimpan ke database. Jika masalah ini berlanjut, silakan hubungi pengembang.",
+  "setError": "Gagal mengakses basis data. Jika masalah ini berlanjut, silakan hubungi pengembang.",
   "flashcardEdit": "Edit Kartu Ajar",
   "save": "Menyimpan",
   "makeClear": "Menjelaskan",
@@ -140,5 +140,8 @@
   "languageChanged": "Bahasa telah diubah.",
   "mode": "Mode",
   "topic": "Topik",
-  "grammar": "Tata bahasa"
+  "grammar": "Tata bahasa",
+  "premiumEnd": "Masa percobaan Premium 10 hari Anda telah berakhir.",
+  "getDiscount": "Berlangganan Premium sekarang dan dapatkan diskon 50%.",
+  "checkoutPremium": "Cek Premium"
 }

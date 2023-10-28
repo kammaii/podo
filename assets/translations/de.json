@@ -31,7 +31,7 @@
   "continueReading": "Möchtest du weiterlesen?",
   "yes": "Ja",
   "no": "Nein",
-  "setError": "Speichern in der Datenbank fehlgeschlagen. Wenn das Problem weiterhin besteht, kontaktieren Sie bitte den Entwickler.",
+  "setError": "Fehler beim Zugriff auf die Datenbank. Wenn das Problem weiterhin besteht, kontaktieren Sie bitte den Entwickler.",
   "flashcardEdit": "Bearbeiten von Lernkarten",
   "save": "Speichern",
   "makeClear": "Klären",
@@ -140,5 +140,8 @@
   "languageChanged": "Die Sprache wurde geändert.",
   "mode": "Modus",
   "topic": "Thema",
-  "grammar": "Grammatik"
+  "grammar": "Grammatik",
+  "premiumEnd": "Ihre 10-tägige kostenlose Premium-Mitgliedschaft ist abgelaufen.",
+  "getDiscount": "Abonnieren Sie jetzt Premium und erhalten Sie 50% Rabatt.",
+  "checkoutPremium": "Schauen Sie sich Premium an"
 }

@@ -168,6 +168,8 @@ class _PremiumMainState extends State<PremiumMain> {
                                 backgroundColor: Colors.transparent,
                               ),
                               onPressed: () async {
+                                FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
+                                FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
                                 final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
                                 purchaseTrace.start();
 
@@ -220,35 +222,47 @@ class _PremiumMainState extends State<PremiumMain> {
                                               Icon(FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(30)),
                                               SizedBox(width: rs.getSize(18)),
                                               Expanded(
-                                                child: Center(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      MyWidget().getTextWidget(rs,
-                                                          text: 'Get Podo Premium!',
-                                                          color: Colors.white,
-                                                          size: rs.getSize(18),
-                                                          isBold: true),
-                                                      MyWidget().getTextWidget(rs,
-                                                          text: offering.identifier,
-                                                          color: Colors.white,
-                                                          size: rs.getSize(18),
-                                                          isBold: true),
-                                                      MyWidget().getTextWidget(rs,
-                                                          text: offering.serverDescription,
-                                                          color: Colors.white,
-                                                          size: rs.getSize(15),
-                                                          isBold: true)
-                                                    ],
-                                                  ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        MyWidget().getTextWidget(rs,
+                                                            text: 'Get Podo Premium!',
+                                                            color: Colors.white,
+                                                            size: rs.getSize(18),
+                                                            isBold: true),
+                                                        Row(
+                                                          children: [
+                                                            MyWidget().getTextWidget(rs,
+                                                                text: snapshot.data?.getOffering('default')?.twoMonth?.storeProduct.priceString,
+                                                                color: Colors.white,
+                                                                hasCancelLine: true,
+                                                                size: 15),
+                                                            const SizedBox(width: 10),
+                                                            const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                                                            const SizedBox(width: 10),
+                                                            MyWidget().getTextWidget(rs,
+                                                                text: offering.availablePackages[0].storeProduct.priceString,
+                                                                color: Colors.white,
+                                                                size: 18,
+                                                                isBold: true),
+                                                            MyWidget().getTextWidget(rs,
+                                                                text: ' / ${offering.identifier}',
+                                                                color: Colors.white,
+                                                                size: 18),
+                                                          ],
+                                                        ),
+                                                        MyWidget().getTextWidget(rs,
+                                                            text: offering.serverDescription,
+                                                            color: Colors.white,
+                                                            size: rs.getSize(15))
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                              SizedBox(width: rs.getSize(18)),
-                                              MyWidget().getTextWidget(rs,
-                                                  text: offering.availablePackages[0].storeProduct.priceString,
-                                                  color: Colors.white,
-                                                  size: 18,
-                                                  isBold: true),
                                             ],
                                           )
                                         : Center(
@@ -258,6 +272,11 @@ class _PremiumMainState extends State<PremiumMain> {
                                 ],
                               ),
                             ),
+                          ),
+                          Positioned(
+                            top: rs.getSize(5),
+                            right: rs.getSize(30),
+                            child: MyWidget().getRoundedContainer(widget: const Text('50% off', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),), bgColor: MyColors.red, radius: 30, padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10))
                           ),
                           Visibility(
                             visible: isPurchasing,

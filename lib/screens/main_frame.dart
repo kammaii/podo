@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -144,6 +145,55 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LocalStorage().hasWelcome = true;
         MyWidget().showSnackbarWithPodo(rs, title: tr('welcome'), content: tr('welcomeMessage'));
+        if (User().isConvertedBasic) {
+          Get.dialog(AlertDialog(
+            title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MyWidget().getTextWidget(rs,
+                    text: tr('premiumEnd'),
+                    isTextAlignCenter: true,
+                    size: 16),
+                const SizedBox(height: 10),
+                MyWidget().getTextWidget(rs,
+                    text: tr('getDiscount'),
+                    isTextAlignCenter: true,
+                    color: MyColors.purple,
+                    isBold: true,
+                    size: 18),
+              ],
+            ),
+            actionsAlignment: MainAxisAlignment.center,
+            actionsPadding: EdgeInsets.only(
+                left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          side: const BorderSide(color: MyColors.purple, width: 1),
+                          backgroundColor: MyColors.purple),
+                      onPressed: () {
+                        FirebaseAnalytics.instance.logEvent(name: 'trial_end_click');
+                        Get.back();
+                        Get.toNamed('/premiumMain');
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                        child: Text(tr('checkoutPremium'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ), barrierDismissible: false);
+        }
       });
     }
   }
@@ -273,7 +323,8 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                             Text(tr('topic'), style: TextStyle(fontSize: rs.getSize(15))),
                                             Padding(
                                               padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
-                                              child: Text(tr('grammar'), style: TextStyle(fontSize: rs.getSize(15))),
+                                              child:
+                                                  Text(tr('grammar'), style: TextStyle(fontSize: rs.getSize(15))),
                                             ),
                                           ],
                                         ),
