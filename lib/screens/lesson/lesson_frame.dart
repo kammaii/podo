@@ -275,10 +275,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   TextButton(onPressed: () async {
-                                    final url = Uri.parse(card.content[VIDEO]!.toString().replaceFirst('https://', 'vnd.youtube://'));
+                                    String replace = Platform.isIOS ? 'youtube://' : 'vnd.youtube://';
+                                    final url = Uri.parse(card.content[VIDEO]!.toString().replaceFirst('https://', replace));
                                     try {
+                                      print('try');
                                       await launchUrl(url);
                                     } catch(e) {
+                                      print('error: $e');
                                       MyWidget().showSimpleDialog(tr('error'), e.toString());
                                     }
 
