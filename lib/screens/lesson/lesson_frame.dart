@@ -29,6 +29,8 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart' as yt;
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonFrame extends StatefulWidget {
   LessonFrame({Key? key}) : super(key: key);
@@ -254,18 +256,44 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           )),
                       MyWidget().getTextWidget(rs, text: card.content[fo], size: 20),
                       card.content[VIDEO] != null && index == thisIndex
-                          ? Padding(
-                              padding: EdgeInsets.only(top: rs.getSize(20)),
-                              child: yt.YoutubePlayer(
-                                controller: youtubeControllers[card.id]!,
-                                actionsPadding: EdgeInsets.all(rs.getSize(10)),
-                                bottomActions: [
-                                  yt.CurrentPosition(),
-                                  SizedBox(width: rs.getSize(10)),
-                                  yt.ProgressBar(isExpanded: true),
+                          ? Column(
+                            children: [
+                              Padding(
+                                  padding: EdgeInsets.only(top: rs.getSize(20)),
+                                  child: yt.YoutubePlayer(
+                                    controller: youtubeControllers[card.id]!,
+                                    actionsPadding: EdgeInsets.all(rs.getSize(10)),
+                                    bottomActions: [
+                                      yt.CurrentPosition(),
+                                      SizedBox(width: rs.getSize(10)),
+                                      yt.ProgressBar(isExpanded: true),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(onPressed: () async {
+                                    final url = Uri.parse(card.content[VIDEO]!.toString().replaceFirst('https://', 'vnd.youtube://'));
+                                    try {
+                                      await launchUrl(url);
+                                    } catch(e) {
+                                      MyWidget().showSimpleDialog(tr('error'), e.toString());
+                                    }
+
+                                  }, child: Row(
+                                    children: [
+                                      const Icon(FontAwesomeIcons.youtube, color: MyColors.red,),
+                                      const SizedBox(width: 8),
+                                      Text(tr('watchOnYoutube'), style: const TextStyle(color: MyColors.red)),
+                                    ],
+                                  )
+                                  ),
                                 ],
-                              ),
-                            )
+                              )
+                            ],
+                          )
                           : const SizedBox.shrink(),
                       card.detailTitle != null
                           ? Padding(
