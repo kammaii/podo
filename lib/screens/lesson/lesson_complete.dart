@@ -18,6 +18,7 @@ import 'package:podo/common/history.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 class LessonComplete extends StatelessWidget {
   LessonComplete({Key? key}) : super(key: key);
@@ -108,6 +109,14 @@ class LessonComplete extends StatelessWidget {
     PlayAudio().playYay();
   }
 
+  void showReviewRequest() async {
+    FirebaseAnalytics.instance.logEvent(name: 'review_requested');
+    final InAppReview inAppReview = InAppReview.instance;
+    if(await inAppReview.isAvailable()) {
+      inAppReview.requestReview();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
@@ -121,6 +130,9 @@ class LessonComplete extends StatelessWidget {
       lessonController.isCompleted[lesson.id] = true;
       if (User().status == 0 && User().trialStart == null) {
         showMessagePermission();
+      }
+      if(LocalStorage().histories.length % 7 == 0){
+        showReviewRequest();
       }
     });
 

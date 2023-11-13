@@ -39,6 +39,9 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   List<LessonCourse> courses = [];
   late PersistentTabController _controller;
   late ResponsiveSize rs;
+  int? trialLeftDate;
+  bool showTrialLeftDate = false;
+  int controllerIndex = 0;
 
   List<Widget> _buildScreens() {
     LessonCourse? course = LocalStorage().getLessonCourse();
@@ -133,6 +136,10 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     super.initState();
     Get.put(LoadingController());
     _controller = PersistentTabController(initialIndex: 0);
+    _controller.addListener(() {
+      controllerIndex = _controller.index;
+      controller.update();
+    });
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -141,6 +148,10 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(animationController);
+    if(User().status == 3) {
+      trialLeftDate = User().trialEnd!.difference(DateTime.now()).inDays;
+      showTrialLeftDate = true;
+    }
     if (!LocalStorage().hasWelcome) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LocalStorage().hasWelcome = true;
@@ -185,7 +196,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                        child: Text(tr('checkoutPremium'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
+                        child: Text(tr('explorePremium'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
                       ),
                     ),
                   ),
@@ -350,6 +361,48 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                     ),
                   ),
                 ),
+                showTrialLeftDate && _controller.index != 3 ?
+                Positioned(
+                  right: rs.getSize(20),
+                  bottom: rs.getSize(80),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(0),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    onPressed: () {
+                      Get.toNamed('/premiumMain', arguments: trialLeftDate);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: rs.getSize(5), horizontal: rs.getSize(25)),
+                      decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Column(
+                              children: [
+                                MyWidget().getTextWidget(rs, text: '$trialLeftDate ${trialLeftDate! > 1 ? 'days' : 'day'} Left of Trial', color: Colors.white),
+                                const SizedBox(height: 5),
+                                MyWidget().getTextWidget(rs, text: tr('explorePremium'), color: Colors.white, isBold: true, hasUnderline: true),
+                              ],
+                            ),
+                    ),
+                  ),
+                ) : const SizedBox.shrink(),
+                showTrialLeftDate && _controller.index != 3 ?
+                Positioned(
+                  right: rs.getSize(5),
+                  bottom: rs.getSize(115),
+                  child: IconButton(
+                    onPressed: (){
+                      setState(() {
+                        showTrialLeftDate = false;
+                      });
+                    },
+                    icon: Icon(Icons.remove_circle, color: MyColors.red, size: rs.getSize(20)),
+                  ),
+                ) : const SizedBox.shrink(),
               ],
             ),
           ),

@@ -143,6 +143,8 @@
   "grammar": "Tata bahasa",
   "premiumEnd": "Masa percobaan Premium 10 hari Anda telah berakhir.",
   "getDiscount": "Berlangganan Premium sekarang dan dapatkan diskon 50%.",
-  "checkoutPremium": "Cek Premium",
-  "watchOnYoutube": "Tonton di YouTube"
+  "explorePremium": "Jelajahi Premium",
+  "watchOnYoutube": "Tonton di YouTube",
+  "msgForTrial1": "Masa percobaan gratis sedang aktif. \nCoba dan lihat bagaimana Anda menyukainya!",
+  "msgForTrial2": "Masa percobaan gratis hampir berakhir. \nBerlangganan sekarang dan dapatkan diskon 50% untuk pembelian Anda!"
 }

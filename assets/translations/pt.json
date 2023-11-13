@@ -143,6 +143,8 @@
   "grammar": "Gramática",
   "premiumEnd": "Seu Premium gratuito de 10 dias acabou.",
   "getDiscount": "Assine o Premium agora e ganhe 50% de desconto.",
-  "checkoutPremium": "Confira o Premium",
-  "watchOnYoutube": "Assista no YouTube"
+  "explorePremium": "Explorar Premium",
+  "watchOnYoutube": "Assista no YouTube",
+  "msgForTrial1": "O período de avaliação gratuita está atualmente ativado. \nExperimente e veja se gosta!",
+  "msgForTrial2": "O período de avaliação gratuita está quase no fim. \nAssine agora e ganhe 50% de desconto na sua compra!"
 }

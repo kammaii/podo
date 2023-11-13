@@ -73,7 +73,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     });
   }
 
-
   @override
   void dispose() {
     scrollController.dispose();
@@ -104,7 +103,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                       child: InkWell(
                         onTap: () async {
                           LocalStorage().setLessonScrollPosition(scrollController.offset);
-                          await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+                          await FirebaseAnalytics.instance
+                              .logSelectContent(contentType: 'lesson', itemId: lesson.id);
                           if (!lesson.hasOptions) {
                             Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                           } else {
@@ -142,7 +142,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                               ),
                               SizedBox(height: rs.getSize(10)),
                               course.isTopicMode
-                                  ? MyWidget().getTextWidget(rs, text: lesson.title[language], color: MyColors.grey)
+                                  ? MyWidget()
+                                      .getTextWidget(rs, text: lesson.title[language], color: MyColors.grey)
                                   : const SizedBox.shrink(),
                             ],
                           ),
@@ -324,10 +325,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                               SizedBox(width: rs.getSize(10)),
                               Center(
                                 child: Obx(
-                                      () => MyWidget().getRoundedContainer(
+                                  () => MyWidget().getRoundedContainer(
                                     radius: 30,
-                                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
-                                    bgColor: cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
+                                    bgColor:
+                                        cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
                                     widget: MyWidget().getTextWidget(rs,
                                         text: cloudController.podoMsgBtnText, color: Colors.white, size: 13),
                                   ),
