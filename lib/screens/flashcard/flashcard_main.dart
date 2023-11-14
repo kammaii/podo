@@ -33,6 +33,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   DocumentSnapshot? lastSnapshot;
   bool isBasicUser = User().status == 1;
   late ResponsiveSize rs;
+  int limit = 20;
 
   @override
   void initState() {
@@ -136,15 +137,17 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                         child: Row(
                                           children: [
                                             MyWidget().getTextWidget(rs,
-                                                text: '$cardsLength ${tr('cards')}', color: Colors.black),
+                                                text: '$cardsLength ', color: Colors.black),
                                             isBasicUser
                                                 ? MyWidget().getTextWidget(
                                                     rs,
-                                                    text: ' (${tr('limit20')})',
+                                                    text: '/ ${limit.toString()} ',
                                                     color: MyColors.red,
                                                     isBold: true,
                                                   )
                                                 : const SizedBox.shrink(),
+                                            MyWidget().getTextWidget(rs,
+                                                text: tr('cards'), color: Colors.black),
                                           ],
                                         ),
                                       ),

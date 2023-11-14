@@ -383,7 +383,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                       child: Column(
                               children: [
                                 MyWidget().getTextWidget(rs, text: '$trialLeftDate ${trialLeftDate! > 1 ? 'days' : 'day'} Left of Trial', color: Colors.white),
-                                const SizedBox(height: 5),
                                 MyWidget().getTextWidget(rs, text: tr('explorePremium'), color: Colors.white, isBold: true, hasUnderline: true),
                               ],
                             ),

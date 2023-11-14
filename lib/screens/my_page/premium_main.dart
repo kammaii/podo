@@ -63,7 +63,7 @@ class _PremiumMainState extends State<PremiumMain> {
     }
 
     void updateText() {
-      if (!mounted) {
+      if (!mounted || streamController.isClosed) {
         return;
       }
       Duration leftTime = calTimeLeft();
@@ -117,7 +117,7 @@ class _PremiumMainState extends State<PremiumMain> {
     );
   }
 
-  DataRow getDataRow(String title, Widget basic, Widget premium, {bool isLimited = false, bool isFlashcard = false}) {
+  DataRow getDataRow(String title, Widget basic, Widget premium, {bool isLimited = false}) {
     return DataRow(cells: <DataCell>[
       DataCell(MyWidget().getTextWidget(rs, text: title)),
       isLimited ?
@@ -125,7 +125,7 @@ class _PremiumMainState extends State<PremiumMain> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           basic,
-          MyWidget().getTextWidget(rs, text: isFlashcard ? tr('limit20') : tr('limited'), size: 10, color: MyColors.mustard),
+          MyWidget().getTextWidget(rs, text: tr('limited'), size: 10, color: MyColors.mustard),
         ],
       ))) :
       DataCell(Center(child: basic)),
@@ -191,18 +191,18 @@ class _PremiumMainState extends State<PremiumMain> {
                             ],
                             rows: <DataRow>[
                               getDataRow(
-                                  tr('lesson'), const Icon(Icons.remove_circle_outline, color: MyColors.mustard),
+                                  tr('lesson'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
+                              getDataRow(
+                                  tr('reading'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
+                              getDataRow(
+                                  tr('flashcard'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
                               getDataRow(
                                   tr('writingCorrection'),
                                   const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(
-                                  tr('reading'), const Icon(Icons.remove_circle_outline, color: MyColors.mustard),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                              getDataRow(
-                                  tr('flashcard'), const Icon(Icons.remove_circle_outline, color: MyColors.mustard),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true, isFlashcard: true),
                               getDataRow(
                                   tr('podosMsg'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                   const Icon(Icons.check_circle_outline, color: MyColors.green)),
