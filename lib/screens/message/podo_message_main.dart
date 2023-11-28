@@ -49,15 +49,14 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
         isLoaded = true;
-        if(isBasicUser) {
+        if (isBasicUser) {
           MyWidget().showDialog(rs, content: tr('wantReplyPodo'), yesFn: () {
             Get.toNamed(MyStrings.routePremiumMain);
-          });
+          }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
         }
       });
     });
   }
-
 
   @override
   void dispose() {
@@ -74,7 +73,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
     }
 
     void updateText() {
-      if(!mounted) {
+      if (!mounted) {
         return;
       }
       Duration leftTime = calTimeLeft();
@@ -343,21 +342,38 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                                                             : const SizedBox.shrink()
                                                       ],
                                                     ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.end,
-                                                      children: [
-                                                        Padding(
-                                                          padding: EdgeInsets.only(
-                                                              right: rs.getSize(10), top: rs.getSize(5)),
-                                                          child: MyWidget().getTextWidget(
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(top: 10),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          reply.isCorrected
+                                                              ? MyWidget().getRoundedContainer(
+                                                                  widget: Row(
+                                                                    children: [
+                                                                      const Icon(Icons.rate_review_outlined,
+                                                                          color: MyColors.green, size: 15),
+                                                                      const SizedBox(width: 5),
+                                                                      MyWidget().getTextWidget(rs,
+                                                                          text: tr('writingStatus1'),
+                                                                          color: MyColors.green,
+                                                                          size: 13)
+                                                                    ],
+                                                                  ),
+                                                                  bgColor: MyColors.greenLight,
+                                                                  radius: 30,
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                      vertical: 3, horizontal: 10))
+                                                              : const SizedBox.shrink(),
+                                                          MyWidget().getTextWidget(
                                                             rs,
                                                             text: reply.userName.isEmpty
                                                                 ? tr('unNamed')
                                                                 : reply.userName,
                                                             color: MyColors.grey,
                                                           ),
-                                                        ),
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
                                                   ],
                                                 ),

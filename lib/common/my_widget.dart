@@ -83,7 +83,11 @@ class MyWidget {
         fontSize: rs.getSize(size),
         color: color,
         fontWeight: isBold ? FontWeight.bold : null,
-        decoration: hasUnderline ? TextDecoration.underline : hasCancelLine ? TextDecoration.lineThrough : null,
+        decoration: hasUnderline
+            ? TextDecoration.underline
+            : hasCancelLine
+                ? TextDecoration.lineThrough
+                : null,
         height: height,
       ),
       textAlign: isTextAlignCenter ? TextAlign.center : null,
@@ -214,9 +218,36 @@ class MyWidget {
     );
   }
 
-  showDialog(ResponsiveSize rs, {required String content, required Function yesFn}) {
+  showDialog(ResponsiveSize rs,
+      {required String content,
+      required Function yesFn,
+      bool hasTextBtn = false,
+      bool hasNoBtn = true,
+      bool hasPremiumTag = false, String? yesText}) {
     Get.dialog(AlertDialog(
-      title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
+      iconPadding: const EdgeInsets.only(bottom: 20),
+      icon: hasPremiumTag ? Row(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              color: MyColors.purpleLight,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomRight: Radius.circular(5),
+              ),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: rs.getSize(8), vertical: rs.getSize(3)),
+            child: Row(
+              children: [
+                const Icon(Icons.workspace_premium, color: MyColors.purple, size: 15),
+                const SizedBox(width: 5),
+                MyWidget().getTextWidget(rs, text: tr('premiumOnly'), color: MyColors.purple, size: 13, isBold: true),
+              ],
+            ),
+          ),
+        ],
+      ) : const SizedBox.shrink(),
+      title: Center(child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
       content: MyWidget().getTextWidget(rs, text: content, isTextAlignCenter: true, size: 16),
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: EdgeInsets.only(
@@ -224,24 +255,26 @@ class MyWidget {
       actions: [
         Row(
           children: [
-            Expanded(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+            hasNoBtn
+                ? Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          side: const BorderSide(color: MyColors.purple, width: 1),
+                          backgroundColor: Colors.white),
+                      onPressed: () {
+                        Get.back();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                        child: Text(tr('no'), style: TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
+                      ),
                     ),
-                    side: const BorderSide(color: MyColors.purple, width: 1),
-                    backgroundColor: Colors.white),
-                onPressed: () {
-                  Get.back();
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                  child: Text(tr('no'), style: TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
-                ),
-              ),
-            ),
-            SizedBox(width: rs.getSize(15)),
+                  )
+                : const SizedBox.shrink(),
+            SizedBox(width: rs.getSize(hasNoBtn ? 15 : 0)),
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -256,12 +289,24 @@ class MyWidget {
                 },
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                  child: Text(tr('yes'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
+                  child: Text(yesText ?? tr('yes'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
                 ),
               ),
             ),
           ],
-        )
+        ),
+        hasTextBtn
+            ? Center(
+                child: Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: TextButton(
+                  onPressed: () {
+                    Get.toNamed(MyStrings.routePremiumMain);
+                  },
+                  child: MyWidget().getTextWidget(rs, text: tr('explorePremium'), color: MyColors.purple),
+                ),
+              ))
+            : const SizedBox.shrink(),
       ],
     ));
   }
@@ -315,27 +360,40 @@ class MyWidget {
   }
 
   Widget getLoading(ResponsiveSize rs, double progressValue) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: rs.getSize(50)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
+    return Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: rs.getSize(50)),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MyWidget().getTextWidget(rs, text: 'Loading', color: MyColors.purple),
-              SizedBox(width: rs.getSize(5)),
-              SpinKitThreeBounce(color: MyColors.purple, size: rs.getSize(10)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  MyWidget().getTextWidget(rs, text: 'Loading', color: MyColors.purple),
+                  SizedBox(width: rs.getSize(5)),
+                  SpinKitThreeBounce(color: MyColors.purple, size: rs.getSize(10)),
+                ],
+              ),
+              SizedBox(height: rs.getSize(10)),
+              LinearProgressIndicator(
+                value: progressValue,
+                valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
+                backgroundColor: MyColors.navyLight,
+              ),
             ],
           ),
-          SizedBox(height: rs.getSize(10)),
-          LinearProgressIndicator(
-            value: progressValue,
-            valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
-            backgroundColor: MyColors.navyLight,
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Image.asset(
+            'assets/images/background.png', // 이미지 파일 경로
+            fit: BoxFit.cover, // 화면에 맞게 이미지 크기 조절
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

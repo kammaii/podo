@@ -3,9 +3,11 @@ import 'package:blur/blur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
@@ -49,28 +51,40 @@ class _ReadingListMainState extends State<ReadingListMain> {
       ),
       color: Colors.white,
       child: InkWell(
-        onTap: (isBasicUser && !readingTitle.isFree)
-            ? null
-            : () {
+        onTap: (){
+          if (isBasicUser) {
+            if(!readingTitle.isFree) {
+              MyWidget().showDialog(rs, content: tr('wantUnlockReading'), yesFn: () {
+                Get.toNamed(MyStrings.routePremiumMain);
+              }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+            } else {
+              MyWidget().showDialog(rs, content: tr('watchRewardAdReading'), yesFn: () {
+                AdsController().showRewardAd();
                 FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
                 Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
-              },
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(rs.getSize(10)),
-              child: Row(
-                children: [
-                  readingTitle.image != null && readingTitle.image!.isNotEmpty
-                      ? Hero(
-                          tag: 'readingImage:${readingTitle.id}',
-                          child: Image.memory(base64Decode(readingTitle.image!),
-                              gaplessPlayback: true, height: rs.getSize(80), width: rs.getSize(80)))
-                      : const SizedBox.shrink(),
-                  SizedBox(width: rs.getSize(20)),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              }, hasNoBtn: false, hasTextBtn: true);
+            }
+          } else {
+            Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.all(rs.getSize(10)),
+          child: Row(
+            children: [
+              readingTitle.image != null && readingTitle.image!.isNotEmpty
+                  ? Hero(
+                      tag: 'readingImage:${readingTitle.id}',
+                      child: Image.memory(base64Decode(readingTitle.image!),
+                          gaplessPlayback: true, height: rs.getSize(80), width: rs.getSize(80)))
+                  : const SizedBox.shrink(),
+              SizedBox(width: rs.getSize(20)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
@@ -79,87 +93,60 @@ class _ReadingListMainState extends State<ReadingListMain> {
                               scale: 0.8,
                               child: Image.asset('assets/images/${rockets[readingTitle.level]}.png'),
                             ),
-                            SizedBox(width: rs.getSize(10)),
-                            Obx(
-                              () => controller.isCompleted[readingTitle.id]
-                                  ? Icon(
-                                      Icons.check_circle,
-                                      color: MyColors.green,
-                                      size: rs.getSize(20),
-                                    )
-                                  : const SizedBox.shrink(),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Obx(
+                                () => controller.isCompleted[readingTitle.id]
+                                    ? Icon(
+                                        Icons.check_circle,
+                                        color: MyColors.green,
+                                        size: rs.getSize(20),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
                             ),
+                            readingTitle.tag != null && readingTitle.tag.toString().isNotEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: MyWidget().getRoundedContainer(
+                                        widget: MyWidget().getTextWidget(rs,
+                                            text: readingTitle.tag, color: MyColors.red, size: 13),
+                                        bgColor: MyColors.pink,
+                                        radius: 30,
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
+                                  )
+                                : const SizedBox.shrink(),
                           ],
                         ),
-                        SizedBox(height: rs.getSize(10)),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: MyWidget().getTextWidget(
-                            rs,
-                            text: readingTitle.title[KO] ?? '',
-                            size: 20,
-                            color: MyColors.navy,
-                          ),
-                        ),
-                        SizedBox(height: rs.getSize(10)),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: MyWidget().getTextWidget(
-                            rs,
-                            text: readingTitle.title[fo] ?? '',
-                            color: MyColors.grey,
-                          ),
-                        ),
+                        (isBasicUser && !readingTitle.isFree)
+                            ? const Icon(CupertinoIcons.lock_fill, color: MyColors.grey, size: 15)
+                            : const SizedBox.shrink(),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            readingTitle.tag.isNotEmpty
-                ? Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                        decoration: BoxDecoration(
-                          color: MyColors.pink,
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(cardBorderRadius),
-                            bottomLeft: Radius.circular(cardBorderRadius),
-                          ),
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(3)),
-                        child: Text(readingTitle.tag,
-                            style: TextStyle(color: MyColors.red, fontSize: rs.getSize(15)))),
-                  )
-                : const SizedBox.shrink(),
-            (isBasicUser && !readingTitle.isFree)
-                ? Positioned.fill(
-                    child: InkWell(
-                      onTap: () {
-                        Get.toNamed(MyStrings.routePremiumMain);
-                      },
-                      child: Stack(
-                        children: [
-                          const Positioned.fill(
-                            child: Blur(
-                              blur: 1.0,
-                              child: SizedBox.shrink(),
-                            ),
-                          ),
-                          Center(
-                            child: Icon(
-                              FontAwesomeIcons.lock,
-                              color: MyColors.grey,
-                              size: rs.getSize(30),
-                            ),
-                          )
-                        ],
+                    SizedBox(height: rs.getSize(10)),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: MyWidget().getTextWidget(
+                        rs,
+                        text: readingTitle.title[KO] ?? '',
+                        size: 20,
+                        color: MyColors.navy,
                       ),
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ],
+                    SizedBox(height: rs.getSize(10)),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: MyWidget().getTextWidget(
+                        rs,
+                        text: readingTitle.title[fo] ?? '',
+                        color: MyColors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

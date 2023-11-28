@@ -9,6 +9,7 @@ class PodoMessageReply {
   late String reply;
   late DateTime date;
   late bool isSelected;
+  bool isCorrected = false;
 
   PodoMessageReply(String text) {
     id = const Uuid().v4();
@@ -25,6 +26,7 @@ class PodoMessageReply {
   static const String REPLY = 'reply';
   static const String DATE = 'date';
   static const String IS_SELECTED = 'isSelected';
+  static const String ORIGINAL_REPLY = 'originalReply';
 
   Map<String, dynamic> toJson() => {
     ID: id,
@@ -43,5 +45,8 @@ class PodoMessageReply {
     Timestamp stamp = json[DATE];
     date = stamp.toDate();
     isSelected = json[IS_SELECTED];
+    if(json[ORIGINAL_REPLY] != null && json[ORIGINAL_REPLY].toString().isNotEmpty) {
+      isCorrected = true;
+    }
   }
 }

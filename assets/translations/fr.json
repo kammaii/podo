@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Souhaitez-vous demander une correction ?",
   "cancel": "Annuler",
   "writingStatus0": "Soumis",
-  "writingStatus1": "Corrigé",
+  "writingStatus1": "Révisé",
   "writingStatus2": "Parfait",
   "writingStatus3": "Irréparable",
   "requestedCorrection": "Vous avez demandé une correction",
@@ -146,5 +146,12 @@
   "explorePremium": "Explorer Premium",
   "watchOnYoutube": "Regardez sur YouTube",
   "msgForTrial1": "L'essai gratuit est actuellement activé. \nEssayez-le et voyez si vous l'aimez !",
-  "msgForTrial2": "La période d'essai gratuit touche à sa fin. \nAbonnez-vous maintenant et bénéficiez de 50 % de réduction sur votre achat !"
+  "msgForTrial2": "La période d'essai gratuit touche à sa fin. \nAbonnez-vous maintenant et bénéficiez de 50 % de réduction sur votre achat !",
+  "watchRewardAdLesson": "Voulez-vous regarder une publicité pour débloquer cette leçon ?",
+  "watchRewardAdReading": "Voulez-vous regarder une publicité pour débloquer cette lecture ?",
+  "wantUnlockLesson": "Voulez-vous vous abonner pour débloquer cette leçon ?",
+  "wantUnlockDetail": "Voulez-vous vous abonner pour débloquer des explications détaillées ?",
+  "wantUnlockReading": "Voulez-vous vous abonner pour débloquer le contenu de lecture ?",
+  "wantUnlockWriting": "Voulez-vous vous abonner pour débloquer la pratique de l'écriture ?",
+  "premiumOnly": "Uniquement Premium"
 }

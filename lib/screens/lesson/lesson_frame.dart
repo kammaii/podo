@@ -71,7 +71,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   late double progressValue;
   AudioPlayer audioPlayerForEffect = AudioPlayer();
   late Map<String, yt.YoutubePlayerController> youtubeControllers;
-  bool isCompleted = false;
   List<String>? firstAudioCards;
   late ResponsiveSize rs;
 
@@ -314,7 +313,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           if (User().status != 1) {
                                             openDetail(card.detailTitle![fo], card.detailContent![fo]);
                                           } else {
-                                            Get.toNamed('/premiumMain');
+                                            MyWidget().showDialog(rs, content: tr('wantUnlockDetail'), yesFn: () {
+                                              Get.toNamed(MyStrings.routePremiumMain);
+                                            }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
                                           }
                                         },
                                         child: MyWidget().getTextWidget(
@@ -470,9 +471,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
     if (User().status == 1) {
       AdsController().bannerAd?.dispose();
-      if (!isCompleted && AdsController().interstitialAd != null) {
-        AdsController().showInterstitialAd((ad) => ad.dispose());
-      }
     }
     super.dispose();
   }
@@ -484,7 +482,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     bottomWidget = const SizedBox.shrink();
     progressValue = 0.0;
     youtubeControllers = {};
-    isCompleted = false;
     firstAudioCards = [];
 
     animationController = AnimationController(
@@ -512,7 +509,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
       if(User().status == 1) {
         _loadAd();
-        AdsController().loadInterstitialAds();
       }
 
       for (dynamic snapshot in snapshots[0]) {
@@ -669,7 +665,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       scale: 0.8,
                       onIndexChanged: (index) {
                         if (index >= cards.length) {
-                          isCompleted = true;
                           Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
                           return;
                         } else {

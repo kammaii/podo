@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Apakah Anda ingin meminta koreksi?",
   "cancel": "Batal",
   "writingStatus0": "Dikirim",
-  "writingStatus1": "Diperbaiki",
+  "writingStatus1": "Direvisi",
   "writingStatus2": "Sempurna",
   "writingStatus3": "Tidak dapat diperbaiki",
   "requestedCorrection": "Anda telah mengajukan permintaan koreksi",
@@ -146,5 +146,12 @@
   "explorePremium": "Jelajahi Premium",
   "watchOnYoutube": "Tonton di YouTube",
   "msgForTrial1": "Masa percobaan gratis sedang aktif. \nCoba dan lihat bagaimana Anda menyukainya!",
-  "msgForTrial2": "Masa percobaan gratis hampir berakhir. \nBerlangganan sekarang dan dapatkan diskon 50% untuk pembelian Anda!"
+  "msgForTrial2": "Masa percobaan gratis hampir berakhir. \nBerlangganan sekarang dan dapatkan diskon 50% untuk pembelian Anda!",
+  "watchRewardAdLesson": "Apakah Anda ingin menonton iklan untuk membuka pelajaran ini?",
+  "watchRewardAdReading": "Apakah Anda ingin menonton iklan untuk membuka bacaan ini?",
+  "wantUnlockLesson": "Apakah Anda ingin berlangganan untuk membuka pelajaran ini?",
+  "wantUnlockDetail": "Apakah Anda ingin berlangganan untuk membuka penjelasan detail?",
+  "wantUnlockReading": "Apakah Anda ingin berlangganan untuk membuka konten bacaan?",
+  "wantUnlockWriting": "Apakah Anda ingin berlangganan untuk membuka latihan menulis?",
+  "premiumOnly": "Hanya Premium"
 }

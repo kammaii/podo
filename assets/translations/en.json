@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Do you want to request a correction?",
   "cancel": "Cancel",
   "writingStatus0": "Submitted",
-  "writingStatus1": "Corrected",
+  "writingStatus1": "Revised",
   "writingStatus2": "Perfect",
   "writingStatus3": "Uncorrectable",
   "requestedCorrection": "Requested a correction",
@@ -146,5 +146,12 @@
   "explorePremium": "Explore Premium",
   "watchOnYoutube": "Watch on YouTube",
   "msgForTrial1": "Free Trial is currently activated. \nTry it out and see how you like it!",
-  "msgForTrial2": "Free Trial period is almost over. \nSubscribe now and get 50% off your purchase!"
+  "msgForTrial2": "Free Trial period is almost over. \nSubscribe now and get 50% off your purchase!",
+  "watchRewardAdLesson": "Would you like to watch an ad \nto unlock this lesson?",
+  "watchRewardAdReading": "Would you like to watch an ad \nto unlock this reading?",
+  "wantUnlockLesson": "Would you like to subscribe \nto unlock this lesson?",
+  "wantUnlockDetail": "Would you like to subscribe \nto unlock detail explanations?",
+  "wantUnlockReading": "Would you like to subscribe \nto unlock reading contents?",
+  "wantUnlockWriting": "Would you like to subscribe \nto unlock writing practice?",
+  "premiumOnly": "Premium Only"
 }

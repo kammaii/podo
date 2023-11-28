@@ -110,6 +110,7 @@ class User {
       status = json[STATUS];
 
       if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
+        FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');
         status = 1;
         isConvertedBasic = true;
       }
@@ -135,7 +136,7 @@ class User {
               FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
             }
             status = 1;
-            FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
+            FirebaseMessaging.instance.subscribeToTopic('basicUsers');
             Get.put(AdsController());
           }
         } on PlatformException catch (e) {
@@ -146,6 +147,8 @@ class User {
       if (json[STATUS] != status) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
+      fcmToken = await FirebaseMessaging.instance.getToken();
+      Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
 
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       await analytics.setUserId(id: id);
@@ -203,7 +206,7 @@ class User {
   }
 
   Future<void> setTrialAuthorized(ResponsiveSize rs, bool permission) async {
-    fcmToken = await FirebaseMessaging.instance.getToken();
+    FirebaseMessaging.instance.subscribeToTopic('trialUsers');
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').where('fcmToken', isEqualTo: fcmToken).get();
     status = 3;
     fcmPermission = permission;
@@ -215,7 +218,6 @@ class User {
       FCM_PERMISSION: fcmPermission,
       TRIAL_START: trialStart,
       TRIAL_END: trialEnd,
-      FCM_TOKEN: fcmToken
     };
     if(querySnapshot.docs.isNotEmpty) {
       map['fakeUser'] = true;

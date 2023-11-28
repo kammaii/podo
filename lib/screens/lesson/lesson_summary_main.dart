@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -42,7 +43,14 @@ class LessonSummaryMain extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: 'learningBtn',
               onPressed: () {
-                Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                if (User().status == 1) {
+                  MyWidget().showDialog(rs, content: tr('watchRewardAdLesson'), yesFn: () {
+                    Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                    AdsController().showRewardAd();
+                  }, hasNoBtn: false, hasTextBtn: true);
+                } else {
+                  Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+                }
               },
               backgroundColor: MyColors.green,
               child: Icon(Icons.play_arrow_rounded, size: rs.getSize(40)),
@@ -65,12 +73,14 @@ class LessonSummaryMain extends StatelessWidget {
                     heroTag: 'wiringBtn',
                     onPressed: () {
                       isBasicUser
-                          ? Get.toNamed(MyStrings.routePremiumMain)
+                          ? MyWidget().showDialog(rs, content: tr('wantUnlockLesson'), yesFn: () {
+                              Get.toNamed(MyStrings.routePremiumMain);
+                            }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'))
                           : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
                     },
                     backgroundColor: isBasicUser ? MyColors.grey : MyColors.pinkDark,
-                    child:
-                        Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare, size: rs.getSize(25)),
+                    child: Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare,
+                        size: rs.getSize(25)),
                   ),
                 ),
           SizedBox(height: rs.getSize(5)),

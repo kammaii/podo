@@ -33,7 +33,6 @@ class Logo extends StatelessWidget {
 
     getInitData() async {
       await user.User().getUser();
-      FirebaseMessaging.instance.subscribeToTopic('allUsers');
       await LocalStorage().getPrefs();
       final courseController = Get.put(LessonCourseController());
       await courseController.loadCourses();

@@ -112,7 +112,7 @@ class LessonComplete extends StatelessWidget {
   void showReviewRequest() async {
     FirebaseAnalytics.instance.logEvent(name: 'review_requested');
     final InAppReview inAppReview = InAppReview.instance;
-    if(await inAppReview.isAvailable()) {
+    if (await inAppReview.isAvailable()) {
       inAppReview.requestReview();
     }
   }
@@ -131,7 +131,7 @@ class LessonComplete extends StatelessWidget {
       if (User().status == 0 && User().trialStart == null) {
         showMessagePermission();
       }
-      if(LocalStorage().histories.length % 7 == 0){
+      if (LocalStorage().histories.length % 5 == 0) {
         showReviewRequest();
       }
     });
@@ -201,9 +201,7 @@ class LessonComplete extends StatelessWidget {
                             ? Column(
                                 children: [
                                   getBtn(tr('summary'), CupertinoIcons.doc_text, () {
-                                    showAd(() {
-                                      Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
-                                    });
+                                    Get.until((route) => Get.currentRoute == MyStrings.routeLessonSummaryMain);
                                   }),
                                   SizedBox(height: rs.getSize(20)),
                                   getBtn(tr('writing'), CupertinoIcons.pen, () {
@@ -219,8 +217,10 @@ class LessonComplete extends StatelessWidget {
                                 ],
                               )
                             : const SizedBox.shrink(),
-                        getBtn(tr('nextLesson'), CupertinoIcons.arrow_right, () {
-                          showAd(() {
+                        User().status != 1 ?
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: getBtn(tr('nextLesson'), CupertinoIcons.arrow_right, () {
                             LessonCourse course = LocalStorage().getLessonCourse()!;
                             List<dynamic> lessons = course.lessons;
                             int thisIndex = -1;
@@ -240,8 +240,8 @@ class LessonComplete extends StatelessWidget {
                               }
                               Lesson nextLesson = Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>);
                               if (nextLesson.hasOptions) {
-                                Get.offNamedUntil(MyStrings.routeLessonSummaryMain,
-                                    ModalRoute.withName(MyStrings.routeMainFrame),
+                                Get.offNamedUntil(
+                                    MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
                                     arguments: nextLesson);
                               } else {
                                 Get.offNamedUntil(
@@ -252,13 +252,10 @@ class LessonComplete extends StatelessWidget {
                               Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
                               MyWidget().showSnackbar(rs, title: tr('lastLesson'));
                             }
-                          });
-                        }),
-                        SizedBox(height: rs.getSize(20)),
+                          }),
+                        ) : const SizedBox.shrink(),
                         getBtn(tr('goToMain'), CupertinoIcons.home, () {
-                          showAd(() {
-                            Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
-                          });
+                          Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
                         }),
                       ],
                     ),
@@ -272,20 +269,20 @@ class LessonComplete extends StatelessWidget {
     );
   }
 
-  void showAd(Function() fn) {
-    if (User().status == 1) {
-      if (AdsController().interstitialAd != null) {
-        AdsController().showInterstitialAd((ad) {
-          fn();
-          ad.dispose();
-        });
-      } else {
-        fn();
-      }
-    } else {
-      fn();
-    }
-  }
+  // void showAd(Function() fn) {
+  //   if (User().status == 1) {
+  //     if (AdsController().interstitialAd != null) {
+  //       AdsController().showInterstitialAd((ad) {
+  //         fn();
+  //         ad.dispose();
+  //       });
+  //     } else {
+  //       fn();
+  //     }
+  //   } else {
+  //     fn();
+  //   }
+  // }
 
   Widget getCircleBtn(Icon icon, String text) {
     return Column(

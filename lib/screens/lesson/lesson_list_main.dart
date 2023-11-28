@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -79,6 +81,16 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     super.dispose();
   }
 
+  runLesson(Lesson lesson) async {
+    LocalStorage().setLessonScrollPosition(scrollController.offset);
+    await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+    if (!lesson.hasOptions) {
+      Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
+    } else {
+      Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
+    }
+  }
+
   Widget lessonListWidget(int index) {
     late Lesson lesson;
     bool isReleased = true;
@@ -87,87 +99,97 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     if (!isAdmin && !lesson.isReleased) {
       isReleased = false;
     }
+    bool isLocked = false;
+    if (User().status == 1 && !lesson.isFree) {
+      isLocked = true;
+    }
 
     return isReleased
         ? Column(
             children: [
-              Stack(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(cardBorderRadius),
-                      ),
-                      color: Colors.white,
-                      child: InkWell(
-                        onTap: () async {
-                          LocalStorage().setLessonScrollPosition(scrollController.offset);
-                          await FirebaseAnalytics.instance
-                              .logSelectContent(contentType: 'lesson', itemId: lesson.id);
-                          if (!lesson.hasOptions) {
-                            Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
-                          } else {
-                            Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: lesson);
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(rs.getSize(10)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                  ),
+                  color: Colors.white,
+                  child: InkWell(
+                    onTap: () {
+                      if (isLocked) {
+                        MyWidget().showDialog(rs, content: tr('wantUnlockLesson'), yesFn: () {
+                          Get.toNamed(MyStrings.routePremiumMain);
+                        }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+                      } else {
+                        if (User().status == 1 && !lesson.hasOptions) {
+                          MyWidget().showDialog(rs, content: tr('watchRewardAdLesson'), yesFn: () {
+                            AdsController().showRewardAd();
+                            runLesson(lesson);
+                          }, hasNoBtn: false, hasTextBtn: true);
+                        } else {
+                          runLesson(lesson);
+                        }
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(rs.getSize(10)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
                                   MyWidget().getTextWidget(rs,
                                       text: '$index. ${lesson.type}',
                                       color: lesson.type == LESSON ? MyColors.navy : MyColors.wine),
-                                  SizedBox(width: rs.getSize(10)),
                                   Obx(
                                     () => lessonController.getIsCompleted(lesson.id)
-                                        ? Icon(
-                                            Icons.check_circle,
-                                            color: MyColors.green,
-                                            size: rs.getSize(20),
-                                          )
+                                        ? Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: Icon(
+                                              Icons.check_circle,
+                                              color: MyColors.green,
+                                              size: rs.getSize(20),
+                                            ),
+                                        )
                                         : const SizedBox.shrink(),
                                   ),
+                                  lesson.tag != null && lesson.tag.toString().isNotEmpty
+                                      ? Padding(
+                                        padding: const EdgeInsets.only(left: 10),
+                                        child: MyWidget().getRoundedContainer(
+                                            widget:
+                                                MyWidget().getTextWidget(rs, text: lesson.tag, color: MyColors.red, size: 13),
+                                            bgColor: MyColors.pink,
+                                            radius: 30,
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
+                                      )
+                                      : const SizedBox.shrink(),
                                 ],
                               ),
-                              SizedBox(height: rs.getSize(10)),
-                              MyWidget().getTextWidget(
-                                rs,
-                                text: lesson.title[KO],
-                                size: 20,
-                                color: MyColors.purple,
-                              ),
-                              SizedBox(height: rs.getSize(10)),
-                              course.isTopicMode
-                                  ? MyWidget()
-                                      .getTextWidget(rs, text: lesson.title[language], color: MyColors.grey)
-                                  : const SizedBox.shrink(),
+                              isLocked
+                                  ? const Icon(CupertinoIcons.lock_fill, color: MyColors.grey, size: 15)
+                                  : const SizedBox.shrink()
                             ],
                           ),
-                        ),
+                          SizedBox(height: rs.getSize(10)),
+                          MyWidget().getTextWidget(
+                            rs,
+                            text: lesson.title[KO],
+                            size: 20,
+                            color: MyColors.purple,
+                          ),
+                          SizedBox(height: rs.getSize(10)),
+                          course.isTopicMode
+                              ? MyWidget().getTextWidget(rs, text: lesson.title[language], color: MyColors.grey)
+                              : const SizedBox.shrink(),
+                        ],
                       ),
                     ),
                   ),
-                  lesson.tag != null && lesson.tag.toString().isNotEmpty
-                      ? Positioned(
-                          top: rs.getSize(4),
-                          right: rs.getSize(14),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: MyColors.pink,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(cardBorderRadius),
-                                bottomLeft: Radius.circular(cardBorderRadius),
-                              ),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(3)),
-                            child: MyWidget().getTextWidget(rs, text: lesson.tag, color: MyColors.red),
-                          ))
-                      : const SizedBox.shrink(),
-                ],
+                ),
               ),
             ],
           )

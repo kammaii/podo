@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Você deseja solicitar uma correção?",
   "cancel": "Cancelar",
   "writingStatus0": "Enviado",
-  "writingStatus1": "Corrigido",
+  "writingStatus1": "Revisado",
   "writingStatus2": "Perfeito",
   "writingStatus3": "Irreparável",
   "requestedCorrection": "Você solicitou uma correção",
@@ -146,5 +146,12 @@
   "explorePremium": "Explorar Premium",
   "watchOnYoutube": "Assista no YouTube",
   "msgForTrial1": "O período de avaliação gratuita está atualmente ativado. \nExperimente e veja se gosta!",
-  "msgForTrial2": "O período de avaliação gratuita está quase no fim. \nAssine agora e ganhe 50% de desconto na sua compra!"
+  "msgForTrial2": "O período de avaliação gratuita está quase no fim. \nAssine agora e ganhe 50% de desconto na sua compra!",
+  "watchRewardAdLesson": "Gostaria de assistir a um anúncio para desbloquear esta lição?",
+  "watchRewardAdReading": "Gostaria de assistir a um anúncio para desbloquear esta leitura?",
+  "wantUnlockLesson": "Gostaria de se inscrever para desbloquear esta lição?",
+  "wantUnlockDetail": "Gostaria de se inscrever para desbloquear explicações detalhadas?",
+  "wantUnlockReading": "Gostaria de se inscrever para desbloquear os conteúdos de leitura?",
+  "wantUnlockWriting": "Gostaria de se inscrever para desbloquear a prática de escrita?",
+  "premiumOnly": "Apenas Premium"
 }
