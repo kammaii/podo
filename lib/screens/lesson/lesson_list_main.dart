@@ -43,7 +43,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final lessonController = Get.put(LessonController());
   bool isAdmin = false;
   late ResponsiveSize rs;
-  bool isDarkMode = Get.find<MyPageController>().isDarkMode;
 
   @override
   void initState() {
@@ -214,15 +213,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       }
     }
     return SliverAppBar(
-      leading: IconButton(
-        icon: Icon(Icons.menu, size: rs.getSize(25)),
-        color: Theme.of(context).primaryColor,
-        onPressed: () {
-          courseController.setVisibility(true);
-          Future.delayed(const Duration(milliseconds: 500), () {
-            scrollController.jumpTo(0);
-          });
-        },
+      leading: Theme(
+        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
+        child: IconButton(
+          icon: Icon(Icons.menu, size: rs.getSize(25)),
+          color: Theme.of(context).primaryColor,
+          onPressed: () {
+            courseController.setVisibility(true);
+            Future.delayed(const Duration(milliseconds: 500), () {
+              scrollController.jumpTo(0);
+            });
+          },
+        ),
       ),
       expandedHeight: rs.getSize(sliverAppBarHeight),
       collapsedHeight: rs.getSize(60),

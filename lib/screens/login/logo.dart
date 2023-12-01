@@ -19,6 +19,7 @@ import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
+import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
@@ -32,17 +33,37 @@ class Logo extends StatelessWidget {
     ResponsiveSize rs = ResponsiveSize(context);
 
     getInitData() async {
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
-      if (user.User().fcmPermission != permission) {
-        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
-      }
-
+      await user.User().getUser();
+      await LocalStorage().getPrefs();
+      final myPageController = Get.find<MyPageController>();
+      myPageController.loadThemeMode();
       final courseController = Get.put(LessonCourseController());
       await courseController.loadCourses();
       await PodoMessage().getPodoMessage();
       Get.put(WritingController());
       Get.toNamed(MyStrings.routeMainFrame);
+      if (user.User().os.isEmpty) {
+        String os = '';
+        if (Platform.isIOS) {
+          os = 'iOS';
+        } else if (Platform.isAndroid) {
+          os = 'android';
+        } else if (Platform.isWindows) {
+          os = 'windows';
+        } else if (Platform.isMacOS) {
+          os = 'macOS';
+        } else if (Platform.isLinux) {
+          os = 'linux';
+        } else {
+          os = 'others';
+        }
+        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
+      }
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      if (user.User().fcmPermission != permission) {
+        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
+      }
     }
 
     void runDeepLink(Uri deepLink) async {
@@ -82,6 +103,7 @@ class Logo extends StatelessWidget {
     }
 
     initDynamicLinks();
+
     Get.put(FcmController());
 
     FirebaseInAppMessaging.instance;

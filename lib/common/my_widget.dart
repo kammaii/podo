@@ -14,9 +14,7 @@ class MyWidget {
       backgroundColor: Theme.of(context).cardColor,
       elevation: 0,
       leading: Theme(
-        data: Theme.of(context).copyWith(
-          highlightColor: MyColors.navyLight
-        ),
+        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
         child: IconButton(
           onPressed: () {
             Get.back();

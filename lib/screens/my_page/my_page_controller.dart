@@ -7,22 +7,12 @@ import 'package:podo/screens/message/podo_message.dart';
 class MyPageController extends GetxController {
   List<bool> modeToggle = [true, false];
   var themeMode = ThemeMode.system.obs;
-  late bool isDarkMode;
-
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadThemeMode();
-  }
 
   void loadThemeMode() {
     if(LocalStorage().prefs != null && LocalStorage().getThemeMode()) {
-      isDarkMode = true;
       modeToggle = [true, false];
       themeMode.value = ThemeMode.dark;
     } else {
-      isDarkMode = false;
       modeToggle = [false, true];
       themeMode.value = ThemeMode.system;
     }

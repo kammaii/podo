@@ -580,7 +580,6 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     for (var card in cards) {
       String? audioId = card.content[AUDIO];
       if (audioId != null && audioPaths[audioId] == null) {
-        print('ID: $audioId');
         final url = snapshots[audioId];
         final response = await http.get(Uri.parse(url!));
         final File file = File('${directory.path}/$audioId.m4a');
@@ -589,13 +588,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         progressValue += incrementPerFile;
 
         if(firstAudioCards != null) {
-          print('NOT NULL: $firstAudioCards');
           if (firstAudioCards!.contains(audioId)) {
             firstAudioCards!.remove(audioId);
           }
 
           if (firstAudioCards!.isEmpty && mounted) {
-            print('EMPTY');
             setState(() {
               progressValue = 1;
               firstAudioCards = null;

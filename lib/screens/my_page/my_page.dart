@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:package_info/package_info.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/local_storage.dart';
@@ -194,7 +195,7 @@ class _MyPageState extends State<MyPage> {
                           setState(() {
                             feedback = '';
                             closePanels();
-                            if(Platform.isIOS) {
+                            if (Platform.isIOS) {
                               items[index].isExpanded = !isExpanded;
                             } else {
                               items[index].isExpanded = isExpanded;
@@ -599,6 +600,20 @@ class _MyPageState extends State<MyPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            FutureBuilder(
+                              future: PackageInfo.fromPlatform(),
+                              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                if (snapshot.hasData) {
+                                  return MyWidget().getTextWidget(
+                                    rs,
+                                    text: 'v${snapshot.data.version}',
+                                    color: Theme.of(context).disabledColor,
+                                  );
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+                              },
+                            ),
                             MyWidget().getTextWidget(
                               rs,
                               text: user.User().email,
@@ -606,14 +621,14 @@ class _MyPageState extends State<MyPage> {
                             ),
                             MyWidget().getTextWidget(
                               rs,
-                              text: 'Sign up: $signupDate',
+                              text: 'Sign up $signupDate',
                               color: Theme.of(context).disabledColor,
                             ),
                             Row(
                               children: [
                                 MyWidget().getTextWidget(
                                   rs,
-                                  text: userTier[user.User().status],
+                                  text: '${userTier[user.User().status]} Mode',
                                   color: Theme.of(context).disabledColor,
                                 ),
                                 expiredDate != null
