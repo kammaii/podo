@@ -31,6 +31,7 @@ import 'package:podo/screens/writing/writing_my_list.dart';
 import 'package:podo/screens/writing/writing_other_list.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:status_bar_control/status_bar_control.dart';
 import 'firebase_options.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
@@ -90,6 +91,7 @@ void main() async {
     Locale('id'),
     Locale('ru'),
   ], path: 'assets/translations', fallbackLocale: const Locale('en'), child: MyApp()));
+  await StatusBarControl.setStyle(StatusBarStyle.LIGHT_CONTENT);
 }
 
 class MyApp extends StatelessWidget {

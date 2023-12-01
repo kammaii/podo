@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -192,7 +194,11 @@ class _MyPageState extends State<MyPage> {
                           setState(() {
                             feedback = '';
                             closePanels();
-                            items[index].isExpanded = isExpanded;
+                            if(Platform.isIOS) {
+                              items[index].isExpanded = !isExpanded;
+                            } else {
+                              items[index].isExpanded = isExpanded;
+                            }
                           });
                         },
                         children: [
