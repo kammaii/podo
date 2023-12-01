@@ -8,7 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/values/my_colors.dart';
 
 class FlashcardIcon {
-  Widget getIconButton(ResponsiveSize rs,
+  Widget getIconButton(BuildContext context, ResponsiveSize rs,
       {required dynamic controller,
       required String itemId,
       required String front,
@@ -20,38 +20,41 @@ class FlashcardIcon {
 
     return Stack(
       children: [
-        IconButton(
-          padding: EdgeInsets.all(rs.getSize(5, bigger: 1.2)),
-          constraints: const BoxConstraints(),
-          onPressed: () {
-            if (controller.hasFlashcard[itemId]) {
-              FlashCard().removeFlashcard(itemId: itemId);
-              controller.hasFlashcard[itemId] = false;
-            } else {
-              FlashCard().addFlashcard(
-                rs,
-                itemId: itemId,
-                front: front,
-                back: back,
-                audio: audio,
-                fn: () {
-                  controller.hasFlashcard[itemId] = true;
-                },
-              );
-            }
-          },
-          icon: Icon(
-            controller.hasFlashcard[itemId]
-                ? FontAwesomeIcons.solidStar
-                : FontAwesomeIcons.star,
-            color: MyColors.purple,
-            size: rs.getSize(20),
+        Theme(
+          data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
+          child: IconButton(
+            padding: EdgeInsets.all(rs.getSize(5, bigger: 1.2)),
+            constraints: const BoxConstraints(),
+            onPressed: () {
+              if (controller.hasFlashcard[itemId]) {
+                FlashCard().removeFlashcard(itemId: itemId);
+                controller.hasFlashcard[itemId] = false;
+              } else {
+                FlashCard().addFlashcard(context,
+                  rs,
+                  itemId: itemId,
+                  front: front,
+                  back: back,
+                  audio: audio,
+                  fn: () {
+                    controller.hasFlashcard[itemId] = true;
+                  },
+                );
+              }
+            },
+            icon: Icon(
+              controller.hasFlashcard[itemId]
+                  ? FontAwesomeIcons.solidStar
+                  : FontAwesomeIcons.star,
+              color: Theme.of(context).primaryColor,
+              size: rs.getSize(20),
+            ),
           ),
         ),
         controller.hasFlashcard[itemId]
             ? const SizedBox.shrink()
             : Icon(CupertinoIcons.plus_circle_fill,
-                color: MyColors.purple, size: rs.getSize(13)),
+                color: Theme.of(context).primaryColor, size: rs.getSize(13)),
       ],
     );
   }

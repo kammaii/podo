@@ -32,35 +32,17 @@ class Logo extends StatelessWidget {
     ResponsiveSize rs = ResponsiveSize(context);
 
     getInitData() async {
-      await user.User().getUser();
-      await LocalStorage().getPrefs();
-      final courseController = Get.put(LessonCourseController());
-      await courseController.loadCourses();
-      await PodoMessage().getPodoMessage();
-      Get.put(WritingController());
-      Get.toNamed(MyStrings.routeMainFrame);
-      if (user.User().os.isEmpty) {
-        String os = '';
-        if(Platform.isIOS) {
-          os = 'iOS';
-        } else if (Platform.isAndroid) {
-          os = 'android';
-        } else if (Platform.isWindows) {
-          os = 'windows';
-        } else if (Platform.isMacOS) {
-          os = 'macOS';
-        } else if (Platform.isLinux) {
-          os = 'linux';
-        } else {
-          os = 'others';
-        }
-        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
-      }
       final settings = await FirebaseMessaging.instance.getNotificationSettings();
       bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
       if (user.User().fcmPermission != permission) {
         Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
       }
+
+      final courseController = Get.put(LessonCourseController());
+      await courseController.loadCourses();
+      await PodoMessage().getPodoMessage();
+      Get.put(WritingController());
+      Get.toNamed(MyStrings.routeMainFrame);
     }
 
     void runDeepLink(Uri deepLink) async {
@@ -156,44 +138,45 @@ class Logo extends StatelessWidget {
     });
 
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          color: Colors.white,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              FutureBuilder(
-                future: PackageInfo.fromPlatform(),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.hasData) {
-                    return Positioned(
-                        top: rs.getSize(20),
-                        right: rs.getSize(20),
-                        child: MyWidget().getTextWidget(rs, text: 'version : ${snapshot.data.version}'));
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
-              Center(child: Image.asset('assets/images/logo.png')),
-              Positioned(
-                bottom: 100.0,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: rs.getSize(20),
-                      width: rs.getSize(20),
-                      child: CircularProgressIndicator(
-                        strokeWidth: rs.getSize(1),
-                      ),
+      body: Container(
+        color: Theme.of(context).cardColor,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            FutureBuilder(
+              future: PackageInfo.fromPlatform(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.hasData) {
+                  return Positioned(
+                      top: rs.getSize(20),
+                      right: rs.getSize(20),
+                      child: MyWidget().getTextWidget(rs,
+                          text: 'version : ${snapshot.data.version}',
+                          color: Theme.of(context).secondaryHeaderColor));
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            ),
+            Center(child: Image.asset('assets/images/logo.png')),
+            Positioned(
+              bottom: 100.0,
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: rs.getSize(20),
+                    width: rs.getSize(20),
+                    child: CircularProgressIndicator(
+                      strokeWidth: rs.getSize(1),
                     ),
-                    const SizedBox(width: 20.0),
-                    MyWidget().getTextWidget(rs, text: 'Loading...'),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 20.0),
+                  MyWidget()
+                      .getTextWidget(rs, text: 'Loading...', color: Theme.of(context).secondaryHeaderColor),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

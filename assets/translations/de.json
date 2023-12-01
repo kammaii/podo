@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Möchten Sie eine Korrektur anfordern?",
   "cancel": "Abbrechen",
   "writingStatus0": "Eingereicht",
-  "writingStatus1": "Überarbeitet",
+  "writingStatus1": "Korrigiert",
   "writingStatus2": "Perfekt",
   "writingStatus3": "Unkorrigierbar",
   "requestedCorrection": "Sie haben eine Korrektur angefordert",
@@ -153,5 +153,7 @@
   "wantUnlockDetail": "Möchten Sie sich abonnieren, um detaillierte Erklärungen freizuschalten?",
   "wantUnlockReading": "Möchten Sie sich abonnieren, um Leseinhalte freizuschalten?",
   "wantUnlockWriting": "Möchten Sie sich abonnieren, um die Schreibübung freizuschalten?",
-  "premiumOnly": "Nur Premium"
+  "premiumOnly": "Nur Premium",
+  "on": "on",
+  "off": "off"
 }

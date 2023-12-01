@@ -101,22 +101,24 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         fontFamily: 'EnglishFont',
         fontSize: rs.getSize(17),
         height: 1.3,
+        color: Theme.of(context).secondaryHeaderColor
       ),
     );
   }
 
   void openDetail(String title, String content) {
     Get.dialog(AlertDialog(
+      backgroundColor: Theme.of(context).cardColor,
       title: Row(
         children: [
           GestureDetector(
               onTap: () {
                 Get.back();
               },
-              child: Icon(Icons.arrow_back_ios_rounded, color: MyColors.purple, size: rs.getSize(20))),
+              child: Icon(Icons.arrow_back_ios_rounded, color: Theme.of(context).primaryColor, size: rs.getSize(20))),
           SizedBox(width: rs.getSize(10)),
           Expanded(
-              child: MyWidget().getTextWidget(rs, text: title, color: MyColors.purple, isBold: true, size: 18)),
+              child: MyWidget().getTextWidget(rs, text: title, color: Theme.of(context).primaryColor, isBold: true, size: 18)),
         ],
       ),
       content: SingleChildScrollView(child: getHtmlWidget(content)),
@@ -134,9 +136,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                Icon(Icons.flag_outlined, size: rs.getSize(18)),
+                Icon(Icons.flag_outlined, size: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor),
                 SizedBox(height: rs.getSize(10)),
-                MyWidget().getTextWidget(rs, text: tr('newExpression')),
+                MyWidget().getTextWidget(rs, text: tr('newExpression'), color: Theme.of(context).secondaryHeaderColor),
               ],
             ),
             Expanded(
@@ -145,7 +147,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   rs,
                   text: card.content[KO],
                   size: 30,
-                  color: Colors.black,
+                  color: Theme.of(context).secondaryHeaderColor,
                   isKorean: true,
                 ),
               ),
@@ -158,7 +160,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.feed_outlined, size: rs.getSize(18)),
+            Icon(Icons.feed_outlined, size: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor),
             SizedBox(height: rs.getSize(10)),
             Expanded(
               child: SingleChildScrollView(
@@ -174,9 +176,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                Icon(Icons.hearing, size: rs.getSize(18)),
+                Icon(Icons.hearing, size: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor),
                 SizedBox(width: rs.getSize(8)),
-                MyWidget().getTextWidget(rs, text: tr('listenAndRepeat')),
+                MyWidget().getTextWidget(rs, text: tr('listenAndRepeat'), color: Theme.of(context).secondaryHeaderColor),
               ],
             ),
             SizedBox(height: rs.getSize(50)),
@@ -189,7 +191,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Obx(() => FlashcardIcon().getIconButton(rs,
+                          Obx(() => FlashcardIcon().getIconButton(context, rs,
                               controller: controller,
                               itemId: card.id,
                               front: card.content[KO],
@@ -201,7 +203,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: MyWidget().getTextWidget(rs,
-                            text: card.content[KO], size: 30, color: Colors.black, isKorean: true),
+                            text: card.content[KO], size: 30, color: Theme.of(context).secondaryHeaderColor, isKorean: true),
                       ),
                       SizedBox(height: rs.getSize(20)),
                       card.content[PRONUN] != null && card.content[PRONUN].toString().isNotEmpty
@@ -210,7 +212,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                               child: MyWidget().getTextWidget(rs,
                                   text: '[${card.content[PRONUN]}]',
                                   size: 18,
-                                  color: Colors.black,
+                                  color: Theme.of(context).secondaryHeaderColor,
                                   isKorean: true),
                             )
                           : const SizedBox.shrink(),
@@ -220,7 +222,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   MyWidget().getTextWidget(
                     rs,
                     text: card.content[fo],
-                    color: Colors.black,
+                    color: Theme.of(context).secondaryHeaderColor,
                   ),
                 ],
               ),
@@ -240,7 +242,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.chat_bubble_outline, size: rs.getSize(18)),
+            Icon(Icons.chat_bubble_outline, size: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor),
             Expanded(
               child: Center(
                 child: SingleChildScrollView(
@@ -251,9 +253,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           offstage: card.content[KO] == null,
                           child: Padding(
                             padding: EdgeInsets.only(bottom: rs.getSize(20)),
-                            child: MyWidget().getTextWidget(rs, text: card.content[KO], isKorean: true, size: 20),
+                            child: MyWidget().getTextWidget(rs, text: card.content[KO], isKorean: true, size: 20, color: Theme.of(context).secondaryHeaderColor),
                           )),
-                      MyWidget().getTextWidget(rs, text: card.content[fo], size: 20),
+                      MyWidget().getTextWidget(rs, text: card.content[fo], size: 20, color: Theme.of(context).secondaryHeaderColor),
                       card.content[VIDEO] != null && index == thisIndex
                           ? Column(
                             children: [
@@ -286,9 +288,9 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
 
                                   }, child: Row(
                                     children: [
-                                      const Icon(FontAwesomeIcons.youtube, color: MyColors.red,),
+                                      Icon(FontAwesomeIcons.youtube, color: Theme.of(context).focusColor),
                                       const SizedBox(width: 8),
-                                      Text(tr('watchOnYoutube'), style: const TextStyle(color: MyColors.red)),
+                                      Text(tr('watchOnYoutube'), style: TextStyle(color: Theme.of(context).focusColor)),
                                     ],
                                   )
                                   ),
@@ -304,7 +306,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(User().status == 1 ? CupertinoIcons.lock_circle : Icons.ads_click,
-                                      color: MyColors.purple, size: rs.getSize(20)),
+                                      color: Theme.of(context).primaryColor, size: rs.getSize(20)),
                                   Expanded(
                                     child: Align(
                                       alignment: Alignment.centerLeft,
@@ -313,7 +315,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                           if (User().status != 1) {
                                             openDetail(card.detailTitle![fo], card.detailContent![fo]);
                                           } else {
-                                            MyWidget().showDialog(rs, content: tr('wantUnlockDetail'), yesFn: () {
+                                            MyWidget().showDialog(context, rs, content: tr('wantUnlockDetail'), yesFn: () {
                                               Get.toNamed(MyStrings.routePremiumMain);
                                             }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
                                           }
@@ -321,7 +323,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                         child: MyWidget().getTextWidget(
                                           rs,
                                           text: card.detailTitle![fo],
-                                          color: MyColors.purple,
+                                          color: Theme.of(context).primaryColor,
                                           size: 17,
                                           hasUnderline: true,
                                         ),
@@ -346,14 +348,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                Icon(Icons.lightbulb_outline, size: rs.getSize(18)),
+                Icon(Icons.lightbulb_outline, size: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor),
                 SizedBox(width: rs.getSize(8)),
-                MyWidget().getTextWidget(rs, text: tr('teachersTip')),
+                MyWidget().getTextWidget(rs, text: tr('teachersTip'), color: Theme.of(context).secondaryHeaderColor),
               ],
             ),
             Expanded(
               child: Center(
-                child: MyWidget().getTextWidget(rs, text: card.content[fo], size: 20),
+                child: MyWidget().getTextWidget(rs, text: card.content[fo], size: 20, color: Theme.of(context).secondaryHeaderColor),
               ),
             )
           ],
@@ -377,13 +379,13 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
           children: [
             Row(
               children: [
-                Icon(Icons.question_mark_rounded, size: rs.getSize(18)),
+                Icon(Icons.question_mark_rounded, size: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor),
                 SizedBox(width: rs.getSize(8)),
-                MyWidget().getTextWidget(rs, text: tr('takeQuiz')),
+                MyWidget().getTextWidget(rs, text: tr('takeQuiz'), color: Theme.of(context).secondaryHeaderColor),
               ],
             ),
             SizedBox(height: rs.getSize(50)),
-            MyWidget().getTextWidget(rs, text: question, color: Colors.black),
+            MyWidget().getTextWidget(rs, text: question, color: Theme.of(context).secondaryHeaderColor),
             SizedBox(height: rs.getSize(20)),
             Expanded(
               child: ListView.builder(
@@ -398,14 +400,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           effectAudioPlay(isCorrect: true);
                           Future.delayed(const Duration(seconds: 1), () {
                             swiperController.move(thisIndex + 1);
-                            quizBorderColor = Colors.white;
+                            quizBorderColor = Theme.of(context).cardColor;
                           });
                         } else {
                           quizBorderColor = MyColors.red;
                           effectAudioPlay(isCorrect: false);
                           Future.delayed(const Duration(seconds: 1), () {
                             setState(() {
-                              quizBorderColor = Colors.white;
+                              quizBorderColor = Theme.of(context).cardColor;
                             });
                           });
                         }
@@ -415,8 +417,8 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       padding: EdgeInsets.only(bottom: rs.getSize(20)),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: selectedAnswer == index ? quizBorderColor : Colors.white),
+                            color: Theme.of(context).cardColor,
+                            border: Border.all(color: selectedAnswer == index ? quizBorderColor : Theme.of(context).cardColor),
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
@@ -429,7 +431,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: rs.getSize(15), horizontal: rs.getSize(10)),
                           child: MyWidget()
-                              .getTextWidget(rs, text: '${index + 1}. ${examples[index]}', isKorean: true),
+                              .getTextWidget(rs, text: '${index + 1}. ${examples[index]}', isKorean: true, color: Theme.of(context).secondaryHeaderColor),
                         ),
                       ),
                     ),
@@ -500,7 +502,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       CloudStorage().downloadAudios(folderName: 'LessonAudios', folderId: lesson.id),
     ]).then((snapshots) async {
       int totalCards = snapshots[0].length;
-      double incrementPerCard = 0.2 / totalCards;
+      double incrementPerCard = 0.4 / totalCards;
 
       Map<String, bool> flashcardMap = {};
       bool videoEnded = false;
@@ -563,45 +565,43 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       for (dynamic snapshot in snapshots[1]) {
         audios.addAll(snapshot);
       }
-      await cacheFiles(audios);
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+        await cacheFiles(audios);
+      });
     });
   }
 
   Future<void> cacheFiles(Map<String, String> snapshots) async {
     final directory = await getTemporaryDirectory();
     audioPaths = {};
-    double incrementPerFile = 0.8 / snapshots.length;
+    double incrementPerFile = 0.6 / 2;
 
-    for (var fileName in snapshots.keys) {
-      final url = snapshots[fileName];
-      final response = await http.get(Uri.parse(url!));
-      final File file = File('${directory.path}/$fileName.m4a');
-      await file.writeAsBytes(response.bodyBytes);
-      audioPaths[fileName] = file.path;
-      progressValue += incrementPerFile;
+    for (var card in cards) {
+      String? audioId = card.content[AUDIO];
+      if (audioId != null && audioPaths[audioId] == null) {
+        final url = snapshots[audioId];
+        final response = await http.get(Uri.parse(url!));
+        final File file = File('${directory.path}/$audioId.m4a');
+        await file.writeAsBytes(response.bodyBytes);
+        audioPaths[audioId] = file.path;
+        progressValue += incrementPerFile;
 
-      if (firstAudioCards == null) {
-        if (mounted && isLoading) {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      } else {
-        if (firstAudioCards!.contains(fileName)) {
-          firstAudioCards!.remove(fileName);
-        }
+        if(firstAudioCards != null) {
+          if (firstAudioCards!.contains(audioId)) {
+            firstAudioCards!.remove(audioId);
+          }
 
-        if (firstAudioCards!.isEmpty) {
-          progressValue = 1;
-          firstAudioCards = null;
-        }
-        if (mounted) {
-          setState(() {});
+          if (firstAudioCards!.isEmpty && mounted) {
+            setState(() {
+              progressValue = 1;
+              firstAudioCards = null;
+              isLoading = false;
+            });
+          }
+
+          if (mounted && isLoading) {
+            setState(() {});
+          }
         }
       }
     }
@@ -635,142 +635,144 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
     return Scaffold(
-      appBar: MyWidget().getAppbar(rs, title: lesson.title[KO], isKorean: true),
+      appBar: MyWidget().getAppbar(context, rs, title: lesson.title[KO], isKorean: true),
       body: isLoading
-          ? MyWidget().getLoading(rs, progressValue)
-          : SafeArea(
-              child: Column(
-                children: [
-                  LinearPercentIndicator(
-                    animateFromLastPercent: true,
-                    animation: true,
-                    lineHeight: rs.getSize(3),
-                    percent: thisIndex / cards.length,
-                    backgroundColor: MyColors.navyLight,
-                    progressColor: MyColors.purple,
-                  ),
-                  Expanded(
-                    child: Swiper(
-                      controller: swiperController,
-                      itemBuilder: (context, index) {
-                        if (index < cards.length) {
-                          return getCards(index);
+          ? MyWidget().getLoading(context, rs, progressValue)
+          : Column(
+            children: [
+              LinearPercentIndicator(
+                animateFromLastPercent: true,
+                animation: true,
+                lineHeight: rs.getSize(3),
+                percent: thisIndex / cards.length,
+                backgroundColor: Theme.of(context).primaryColorLight,
+                progressColor: Theme.of(context).primaryColor,
+              ),
+              Expanded(
+                child: Swiper(
+                  controller: swiperController,
+                  itemBuilder: (context, index) {
+                    if (index < cards.length) {
+                      return getCards(index);
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                  loop: false,
+                  itemCount: cards.length + 1,
+                  viewportFraction: 0.8,
+                  scale: 0.8,
+                  onIndexChanged: (index) {
+                    if (index >= cards.length) {
+                      Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
+                      return;
+                    } else {
+                      setState(() {
+                        thisIndex = index;
+                        examples.clear();
+                        autoPlayAudio();
+                      });
+                    }
+                  },
+                ),
+              ),
+              SizedBox(
+                height: rs.getSize(170),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      bottom: 0,
+                      child: SlideTransition(
+                        position: animationOffset,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: rs.getSize(30)),
+                            child: GetBuilder<LessonController>(
+                              builder: (_) {
+                                LessonCard card = cards[thisIndex];
+                                if (card.content.containsKey(AUDIO)) {
+                                  toggleBottomAudioWidget(true);
+                                  return Column(
+                                    children: [
+                                      Visibility(
+                                        visible: card.type == MyStrings.repeat,
+                                        child: MyWidget().getTextWidget(
+                                          rs,
+                                          text: tr('practiceSeveralTimes'),
+                                          color: Theme.of(context).disabledColor,
+                                        ),
+                                      ),
+                                      SizedBox(height: rs.getSize(20)),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          getSpeedBtn(isNormal: true),
+                                          SizedBox(width: rs.getSize(20)),
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              CircularPercentIndicator(
+                                                radius: rs.getSize(30),
+                                                lineWidth: rs.getSize(4),
+                                                percent: controller.audioProgress,
+                                                animateFromLastPercent: true,
+                                                progressColor: Theme.of(context).primaryColor,
+                                                backgroundColor: Theme.of(context).cardColor,
+                                              ),
+                                              Theme(
+                                                data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
+                                                child: IconButton(
+                                                  iconSize: rs.getSize(60),
+                                                  onPressed: () {
+                                                    controller.playAudio();
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.play_arrow_rounded,
+                                                    color: Theme.of(context).primaryColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(width: rs.getSize(20)),
+                                          getSpeedBtn(isNormal: false),
+                                        ],
+                                      )
+                                    ],
+                                  );
+                                } else {
+                                  toggleBottomAudioWidget(false);
+                                  return const SizedBox.shrink();
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              User().status == 1
+                  ? GetBuilder<AdsController>(
+                      builder: (controller) {
+                        FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
+                        if (controller.bannerAd != null && controller.isBannerAdLoaded) {
+                          return Container(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            width: controller.bannerAd!.size.width.toDouble(),
+                            height: controller.bannerAd!.size.height.toDouble(),
+                            child: AdWidget(ad: controller.bannerAd!),
+                          );
                         } else {
                           return const SizedBox.shrink();
                         }
                       },
-                      loop: false,
-                      itemCount: cards.length + 1,
-                      viewportFraction: 0.8,
-                      scale: 0.8,
-                      onIndexChanged: (index) {
-                        if (index >= cards.length) {
-                          Get.toNamed(MyStrings.routeLessonComplete, arguments: lesson);
-                          return;
-                        } else {
-                          setState(() {
-                            thisIndex = index;
-                            examples.clear();
-                            autoPlayAudio();
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: rs.getSize(170),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          bottom: 0,
-                          child: SlideTransition(
-                            position: animationOffset,
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: rs.getSize(30)),
-                                child: GetBuilder<LessonController>(
-                                  builder: (_) {
-                                    LessonCard card = cards[thisIndex];
-                                    if (card.content.containsKey(AUDIO)) {
-                                      toggleBottomAudioWidget(true);
-                                      return Column(
-                                        children: [
-                                          Visibility(
-                                            visible: card.type == MyStrings.repeat,
-                                            child: MyWidget().getTextWidget(
-                                              rs,
-                                              text: tr('practiceSeveralTimes'),
-                                              color: MyColors.grey,
-                                            ),
-                                          ),
-                                          SizedBox(height: rs.getSize(20)),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              getSpeedBtn(isNormal: true),
-                                              SizedBox(width: rs.getSize(20)),
-                                              Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  CircularPercentIndicator(
-                                                    radius: rs.getSize(30),
-                                                    lineWidth: rs.getSize(4),
-                                                    percent: controller.audioProgress,
-                                                    animateFromLastPercent: true,
-                                                    progressColor: MyColors.purple,
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: rs.getSize(60),
-                                                    onPressed: () {
-                                                      controller.playAudio();
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.play_arrow_rounded,
-                                                      color: MyColors.purple,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(width: rs.getSize(20)),
-                                              getSpeedBtn(isNormal: false),
-                                            ],
-                                          )
-                                        ],
-                                      );
-                                    } else {
-                                      toggleBottomAudioWidget(false);
-                                      return const SizedBox.shrink();
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  User().status == 1
-                      ? GetBuilder<AdsController>(
-                          builder: (controller) {
-                            FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
-                            if (controller.bannerAd != null && controller.isBannerAdLoaded) {
-                              return Container(
-                                color: MyColors.purpleLight,
-                                width: controller.bannerAd!.size.width.toDouble(),
-                                height: controller.bannerAd!.size.height.toDouble(),
-                                child: AdWidget(ad: controller.bannerAd!),
-                              );
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          },
-                        )
-                      : const SizedBox.shrink(),
-                ],
-              ),
-            ),
+                    )
+                  : const SizedBox.shrink(),
+            ],
+          ),
     );
   }
 
@@ -789,11 +791,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     Color containerColor;
     Color borderColor;
     if (isNormal && controller.audioSpeedToggle[0] || !isNormal && controller.audioSpeedToggle[1]) {
-      containerColor = MyColors.navyLight;
-      borderColor = Colors.white;
+      containerColor = Theme.of(context).primaryColorLight;
+      borderColor = Theme.of(context).cardColor;
     } else {
-      containerColor = Colors.white;
-      borderColor = MyColors.purple;
+      containerColor = Theme.of(context).cardColor;
+      borderColor = Theme.of(context).primaryColor;
     }
 
     return GestureDetector(
@@ -812,7 +814,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         padding: EdgeInsets.symmetric(vertical: rs.getSize(5)),
         child: Center(
           child: MyWidget().getTextWidget(rs,
-              text: isNormal ? tr('normal') : tr('speedDown'), color: MyColors.purple, isBold: true),
+              text: isNormal ? tr('normal') : tr('speedDown'), color: Theme.of(context).primaryColor, isBold: true),
         ),
       ),
     );

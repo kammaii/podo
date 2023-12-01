@@ -171,8 +171,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         readings.add(reading);
         progressValue += incrementPerReading;
         controller.hasFlashcard[reading.id] = LocalStorage().hasFlashcard(itemId: reading.id);
-        playStopIcons[reading.id] = PlayStopIcon(rs, this);
-        setState(() {});
+        if(mounted) {
+          playStopIcons[reading.id] = PlayStopIcon(rs, this);
+          setState(() {});
+        }
       }
       controller.initIsExpanded(readings.length);
 
@@ -181,9 +183,11 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         audios.addAll(snapshot);
       }
       await cacheFiles(audios);
-      setState(() {
-        isLoading = false;
-      });
+      if(mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
   }
 
@@ -214,7 +218,9 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       await file.writeAsBytes(response.bodyBytes);
       audioPaths[fileName] = file.path;
       progressValue += incrementPerFile;
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -265,16 +271,19 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     }
 
     return SliverAppBar(
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-        color: Colors.white,
-        onPressed: () {
-          if (User().status == 0 && User().trialStart == null) {
-            showMessagePermission();
-          } else {
-            Navigator.pop(context);
-          }
-        },
+      leading: Theme(
+        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
+        child: IconButton(
+          icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+          color: Colors.white,
+          onPressed: () {
+            if (User().status == 0 && User().trialStart == null) {
+              showMessagePermission();
+            } else {
+              Navigator.pop(context);
+            }
+          },
+        ),
       ),
       expandedHeight: rs.getSize(sliverAppBarHeight),
       collapsedHeight: rs.getSize(60),
@@ -290,31 +299,32 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       flexibleSpace: Stack(
         children: [
           Container(
-            color: MyColors.navyLight,
+            color: Theme.of(context).primaryColorLight,
           ),
-          readingTitle.image != null && readingTitle.image!.isNotEmpty ?
-          Positioned(
-            top: 0,
-            right: -30,
-            child: Hero(
-              tag: 'readingImage:${readingTitle.id}',
-              child: FadeTransition(
-                opacity: animation,
-                child:
-                    Image.memory(base64Decode(readingTitle.image!), width: rs.getSize(250), gaplessPlayback: true),
-              ),
-            ),
-          ) : const SizedBox.shrink(),
+          readingTitle.image != null && readingTitle.image!.isNotEmpty
+              ? Positioned(
+                  top: 0,
+                  right: -30,
+                  child: Hero(
+                    tag: 'readingImage:${readingTitle.id}',
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: Image.memory(base64Decode(readingTitle.image!),
+                          width: rs.getSize(250), gaplessPlayback: true),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
           Opacity(
             opacity: 0.2,
             child: Container(
-              color: Colors.black,
+              color: Theme.of(context).secondaryHeaderColor,
             ),
           ),
           LinearProgressIndicator(
             value: currentScrollPercent,
-            color: MyColors.purple,
-            backgroundColor: MyColors.purpleLight,
+            color: Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           ),
           FadeTransition(
             opacity: animation,
@@ -371,7 +381,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                           } else {
                             Get.back();
                           }
-                        }),
+                        }, bgColor: Theme.of(context).primaryColor, fontColor: Theme.of(context).cardColor),
                       )
                     : const SizedBox.shrink(),
               ],
@@ -395,10 +405,10 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             Expanded(
                 child: Padding(
               padding: EdgeInsets.only(left: rs.getSize(10)),
-              child:
-                  MyWidget().getTextWidget(rs, text: (index + 1).toString(), color: MyColors.purple, isBold: true),
+              child: MyWidget().getTextWidget(rs,
+                  text: (index + 1).toString(), color: Theme.of(context).primaryColor, isBold: true),
             )),
-            Obx(() => FlashcardIcon().getIconButton(rs,
+            Obx(() => FlashcardIcon().getIconButton(context, rs,
                 controller: controller,
                 itemId: reading.id,
                 front: reading.content[KO],
@@ -411,7 +421,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                   setPlayStopIcon(index, isForward: false);
                 } else {
                   String fileName = reading.id;
-                  if(audioPaths.containsKey(fileName)) {
+                  if (audioPaths.containsKey(fileName)) {
                     String path = audioPaths[fileName]!;
                     PlayAudio().player.setFilePath(path);
                     PlayAudio().player.setVolume(1);
@@ -436,10 +446,15 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(15),
           ),
-          child: MyWidget().getTextWidget(rs, text: contentKo, size: 18, height: 1.8, isKorean: true),
+          child: MyWidget().getTextWidget(rs,
+              text: contentKo,
+              size: 18,
+              height: 1.8,
+              isKorean: true,
+              color: Theme.of(context).secondaryHeaderColor),
         ),
       ],
     );
@@ -452,11 +467,12 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         controller.setIsExpanded(index, value);
       },
       leading: Icon(CupertinoIcons.globe, size: rs.getSize(20)),
-      iconColor: MyColors.purple,
+      iconColor: Theme.of(context).primaryColor,
+      collapsedIconColor: Theme.of(context).disabledColor,
       title: const Text(''),
       childrenPadding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
       children: [
-        MyWidget().getTextWidget(rs, text: contentFo, color: MyColors.grey),
+        MyWidget().getTextWidget(rs, text: contentFo, color: Theme.of(context).disabledColor),
         SizedBox(height: rs.getSize(20)),
       ],
     );
@@ -476,17 +492,22 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 10,
                   child: VerticalDivider(
-                    color: MyColors.purple,
+                    color: Theme.of(context).primaryColor,
                     thickness: 1,
                     width: 18,
                   ),
                 ),
-                MyWidget().getTextWidget(rs, text: wordKoList[index], isKorean: true, size: 18),
+                MyWidget().getTextWidget(rs,
+                    text: wordKoList[index],
+                    isKorean: true,
+                    size: 18,
+                    color: Theme.of(context).secondaryHeaderColor),
                 const Text(' : '),
-                MyWidget().getTextWidget(rs, text: wordFoList[index])
+                MyWidget()
+                    .getTextWidget(rs, text: wordFoList[index], color: Theme.of(context).secondaryHeaderColor)
               ],
             ),
           );
@@ -498,54 +519,52 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     rs = ResponsiveSize(context);
     return Scaffold(
       body: isLoading
-          ? MyWidget().getLoading(rs, progressValue)
-          : SafeArea(
-              child: Container(
-                color: MyColors.purpleLight,
-                child: readings.isEmpty
-                    ? Center(
-                        child: MyWidget().getTextWidget(
-                          rs,
-                          text: tr('noReading'),
-                          color: MyColors.purple,
-                          size: 20,
-                          isTextAlignCenter: true,
-                        ),
-                      )
-                    : Stack(
-                        children: [
-                          CustomScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            controller: scrollController,
-                            slivers: [
-                              sliverAppBar(),
-                              sliverList(),
-                            ],
-                          ),
-                          User().status == 1
-                              ? Positioned(
-                                  bottom: 0,
-                                  child: GetBuilder<AdsController>(
-                                    builder: (controller) {
-                                      FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
-                                      if(controller.bannerAd != null && controller.isBannerAdLoaded) {
-                                        return Container(
-                                          color: MyColors.purpleLight,
-                                          width: controller.bannerAd!.size.width.toDouble(),
-                                          height: controller.bannerAd!.size.height.toDouble(),
-                                          child: AdWidget(ad: controller.bannerAd!),
-                                        );
-                                      } else {
-                                        return const SizedBox.shrink();
-                                      }
-                                    },
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
+          ? MyWidget().getLoading(context, rs, progressValue)
+          : Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: readings.isEmpty
+                ? Center(
+                    child: MyWidget().getTextWidget(
+                      rs,
+                      text: tr('noReading'),
+                      color: Theme.of(context).primaryColor,
+                      size: 20,
+                      isTextAlignCenter: true,
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      CustomScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        controller: scrollController,
+                        slivers: [
+                          sliverAppBar(),
+                          sliverList(),
                         ],
                       ),
-              ),
-            ),
+                      User().status == 1
+                          ? Positioned(
+                              bottom: 0,
+                              child: GetBuilder<AdsController>(
+                                builder: (controller) {
+                                  FirebaseCrashlytics.instance.log('bannerAd : ${controller.bannerAd}');
+                                  if (controller.bannerAd != null && controller.isBannerAdLoaded) {
+                                    return Container(
+                                      color: Theme.of(context).scaffoldBackgroundColor,
+                                      width: controller.bannerAd!.size.width.toDouble(),
+                                      height: controller.bannerAd!.size.height.toDouble(),
+                                      child: AdWidget(ad: controller.bannerAd!),
+                                    );
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                },
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+          ),
     );
   }
 }

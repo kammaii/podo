@@ -8,13 +8,13 @@ import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
-import 'package:podo/fcm_controller.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
+import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -43,6 +43,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final lessonController = Get.put(LessonController());
   bool isAdmin = false;
   late ResponsiveSize rs;
+  bool isDarkMode = Get.find<MyPageController>().isDarkMode;
 
   @override
   void initState() {
@@ -105,93 +106,99 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
 
     return isReleased
-        ? Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                  ),
-                  color: Colors.white,
-                  child: InkWell(
-                    onTap: () {
-                      if (isLocked) {
-                        MyWidget().showDialog(rs, content: tr('wantUnlockLesson'), yesFn: () {
-                          Get.toNamed(MyStrings.routePremiumMain);
-                        }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
-                      } else {
-                        if (User().status == 1 && !lesson.hasOptions) {
-                          MyWidget().showDialog(rs, content: tr('watchRewardAdLesson'), yesFn: () {
-                            AdsController().showRewardAd();
-                            runLesson(lesson);
-                          }, hasNoBtn: false, hasTextBtn: true);
+        ? Theme(
+            data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(cardBorderRadius),
+                    ),
+                    color: Theme.of(context).cardColor,
+                    child: InkWell(
+                      onTap: () {
+                        if (isLocked) {
+                          MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                            Get.toNamed(MyStrings.routePremiumMain);
+                          }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
                         } else {
-                          runLesson(lesson);
+                          if (User().status == 1 && !lesson.hasOptions) {
+                            MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
+                              AdsController().showRewardAd();
+                              runLesson(lesson);
+                            }, hasNoBtn: false, hasTextBtn: true);
+                          } else {
+                            runLesson(lesson);
+                          }
                         }
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(rs.getSize(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  MyWidget().getTextWidget(rs,
-                                      text: '$index. ${lesson.type}',
-                                      color: lesson.type == LESSON ? MyColors.navy : MyColors.wine),
-                                  Obx(
-                                    () => lessonController.getIsCompleted(lesson.id)
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(rs.getSize(10)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    MyWidget().getTextWidget(rs,
+                                        text: '$index. ${lesson.type}', color: Theme.of(context).primaryColorDark),
+                                    Obx(
+                                      () => lessonController.getIsCompleted(lesson.id)
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(left: 10),
+                                              child: Icon(
+                                                Icons.check_circle,
+                                                color: Theme.of(context).highlightColor,
+                                                size: rs.getSize(20),
+                                              ),
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                    lesson.tag != null && lesson.tag.toString().isNotEmpty
                                         ? Padding(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          child: Icon(
-                                              Icons.check_circle,
-                                              color: MyColors.green,
-                                              size: rs.getSize(20),
-                                            ),
-                                        )
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: MyWidget().getRoundedContainer(
+                                                widget: MyWidget().getTextWidget(rs,
+                                                    text: lesson.tag,
+                                                    color: Theme.of(context).focusColor,
+                                                    size: 13),
+                                                bgColor: Theme.of(context).shadowColor,
+                                                radius: 30,
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
+                                          )
                                         : const SizedBox.shrink(),
-                                  ),
-                                  lesson.tag != null && lesson.tag.toString().isNotEmpty
-                                      ? Padding(
-                                        padding: const EdgeInsets.only(left: 10),
-                                        child: MyWidget().getRoundedContainer(
-                                            widget:
-                                                MyWidget().getTextWidget(rs, text: lesson.tag, color: MyColors.red, size: 13),
-                                            bgColor: MyColors.pink,
-                                            radius: 30,
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
-                                      )
-                                      : const SizedBox.shrink(),
-                                ],
-                              ),
-                              isLocked
-                                  ? const Icon(CupertinoIcons.lock_fill, color: MyColors.grey, size: 15)
-                                  : const SizedBox.shrink()
-                            ],
-                          ),
-                          SizedBox(height: rs.getSize(10)),
-                          MyWidget().getTextWidget(
-                            rs,
-                            text: lesson.title[KO],
-                            size: 20,
-                            color: MyColors.purple,
-                          ),
-                          SizedBox(height: rs.getSize(10)),
-                          course.isTopicMode
-                              ? MyWidget().getTextWidget(rs, text: lesson.title[language], color: MyColors.grey)
-                              : const SizedBox.shrink(),
-                        ],
+                                  ],
+                                ),
+                                isLocked
+                                    ? Icon(CupertinoIcons.lock_fill,
+                                        color: Theme.of(context).disabledColor, size: 15)
+                                    : const SizedBox.shrink()
+                              ],
+                            ),
+                            SizedBox(height: rs.getSize(10)),
+                            MyWidget().getTextWidget(
+                              rs,
+                              text: lesson.title[KO],
+                              size: 20,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            SizedBox(height: rs.getSize(10)),
+                            course.isTopicMode
+                                ? MyWidget().getTextWidget(rs,
+                                    text: lesson.title[language], color: Theme.of(context).disabledColor)
+                                : const SizedBox.shrink(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
         : const SizedBox.shrink();
   }
@@ -209,7 +216,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     return SliverAppBar(
       leading: IconButton(
         icon: Icon(Icons.menu, size: rs.getSize(25)),
-        color: MyColors.purple,
+        color: Theme.of(context).primaryColor,
         onPressed: () {
           courseController.setVisibility(true);
           Future.delayed(const Duration(milliseconds: 500), () {
@@ -225,13 +232,13 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         rs,
         text: '${course.title[language]} ($lessonCount ${tr('lessons')})',
         size: 18,
-        color: MyColors.purple,
+        color: Theme.of(context).primaryColor,
         isBold: true,
       ),
       flexibleSpace: Stack(
         children: [
           Container(
-            color: MyColors.purpleLight,
+            color: Theme.of(context).scaffoldBackgroundColor,
           ),
           course.image != null
               ? Positioned(
@@ -251,8 +258,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   ? 0
                   : lessonController.isCompleted.values.where((value) => value == true).length /
                       lessonController.isCompleted.length,
-              color: MyColors.purple,
-              backgroundColor: MyColors.purpleLight,
+              color: Theme.of(context).primaryColor,
+              backgroundColor: Theme.of(context).cardColor,
             ),
           )
         ],
@@ -306,81 +313,82 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         setState(() {});
       },
       child: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              GetBuilder<LessonController>(
-                builder: (_) {
-                  return Visibility(
-                    visible: User().status != 0 && PodoMessage().isActive,
-                    child: InkWell(
-                      onTap: () {
-                        Get.toNamed(MyStrings.routePodoMessageMain);
-                      },
-                      child: Container(
-                        color: MyColors.navyLight,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
-                          child: Row(
-                            children: [
-                              Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
-                              SizedBox(width: rs.getSize(15)),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    MyWidget().getTextWidget(rs,
-                                        text: PodoMessage().title?[KO] ?? '',
-                                        isKorean: true,
-                                        size: 18,
-                                        color: MyColors.purple,
-                                        maxLine: 1),
-                                    SizedBox(height: rs.getSize(5)),
-                                    MyWidget().getTextWidget(rs,
-                                        text: PodoMessage().title?[User().language] ?? '',
-                                        color: MyColors.grey,
-                                        size: 13,
-                                        maxLine: 1),
-                                  ],
+        body: Column(
+          children: [
+            GetBuilder<LessonController>(
+              builder: (_) {
+                return Visibility(
+                  visible: User().status != 0 && PodoMessage().isActive,
+                  child: InkWell(
+                    onTap: () {
+                      Get.toNamed(MyStrings.routePodoMessageMain);
+                    },
+                    child: Container(
+                      color: Theme.of(context).primaryColorLight,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
+                        child: Row(
+                          children: [
+                            Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
+                            SizedBox(width: rs.getSize(15)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  MyWidget().getTextWidget(rs,
+                                      text: PodoMessage().title?[KO] ?? '',
+                                      isKorean: true,
+                                      size: 18,
+                                      color: Theme.of(context).primaryColor,
+                                      maxLine: 1),
+                                  SizedBox(height: rs.getSize(5)),
+                                  MyWidget().getTextWidget(rs,
+                                      text: PodoMessage().title?[User().language] ?? '',
+                                      color: Theme.of(context).disabledColor,
+                                      size: 13,
+                                      maxLine: 1),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: rs.getSize(10)),
+                            Center(
+                              child: Obx(
+                                () => MyWidget().getRoundedContainer(
+                                  radius: 30,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
+                                  bgColor: cloudController.podoMsgBtnActive.value
+                                      ? Theme.of(context).highlightColor
+                                      : Theme.of(context).disabledColor,
+                                  widget: MyWidget().getTextWidget(rs,
+                                      text: cloudController.podoMsgBtnText,
+                                      color: Theme.of(context).cardColor,
+                                      size: 13),
                                 ),
                               ),
-                              SizedBox(width: rs.getSize(10)),
-                              Center(
-                                child: Obx(
-                                  () => MyWidget().getRoundedContainer(
-                                    radius: 30,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
-                                    bgColor:
-                                        cloudController.podoMsgBtnActive.value ? MyColors.green : MyColors.grey,
-                                    widget: MyWidget().getTextWidget(rs,
-                                        text: cloudController.podoMsgBtnText, color: Colors.white, size: 13),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
-              Expanded(
-                child: Container(
-                  color: MyColors.purpleLight,
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: scrollController,
-                    slivers: [
-                      sliverAppBar(),
-                      sliverList(),
-                    ],
                   ),
+                );
+              },
+            ),
+            Expanded(
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: scrollController,
+                  slivers: [
+                    sliverAppBar(),
+                    sliverList(),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

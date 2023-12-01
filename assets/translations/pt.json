@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Você deseja solicitar uma correção?",
   "cancel": "Cancelar",
   "writingStatus0": "Enviado",
-  "writingStatus1": "Revisado",
+  "writingStatus1": "Corrigido",
   "writingStatus2": "Perfeito",
   "writingStatus3": "Irreparável",
   "requestedCorrection": "Você solicitou uma correção",
@@ -153,5 +153,7 @@
   "wantUnlockDetail": "Gostaria de se inscrever para desbloquear explicações detalhadas?",
   "wantUnlockReading": "Gostaria de se inscrever para desbloquear os conteúdos de leitura?",
   "wantUnlockWriting": "Gostaria de se inscrever para desbloquear a prática de escrita?",
-  "premiumOnly": "Apenas Premium"
+  "premiumOnly": "Apenas Premium",
+  "on": "on",
+  "off": "off"
 }

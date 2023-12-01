@@ -112,14 +112,14 @@ class _PremiumMainState extends State<PremiumMain> {
   DataColumn getDataColumn(String label) {
     return DataColumn(
       label: Expanded(
-        child: Center(child: MyWidget().getTextWidget(rs, text: label)),
+        child: Center(child: MyWidget().getTextWidget(rs, text: label, color: Theme.of(context).secondaryHeaderColor)),
       ),
     );
   }
 
   DataRow getDataRow(String title, Widget basic, Widget premium, {bool isLimited = false}) {
     return DataRow(cells: <DataCell>[
-      DataCell(MyWidget().getTextWidget(rs, text: title)),
+      DataCell(MyWidget().getTextWidget(rs, text: title, color: Theme.of(context).secondaryHeaderColor)),
       isLimited ?
       DataCell(Center(child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -137,306 +137,304 @@ class _PremiumMainState extends State<PremiumMain> {
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
     return Scaffold(
-      appBar: MyWidget().getAppbar(rs, title: ''),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                msgForTrial != null ?
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  color: MyColors.purple,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      MyWidget().getTextWidget(
-                          rs, text: msgForTrial, color: Colors.white, isTextAlignCenter: true, size: 16),
-                    ],
-                  ),
-                ) : const SizedBox.shrink(),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          left: rs.getSize(15),
-                          right: rs.getSize(15),
-                          bottom: rs.getSize(50),
-                          top: rs.getSize(20)),
-                      child: Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Image.asset('assets/images/quote_upper.png', color: MyColors.purple),
-                              SizedBox(width: rs.getSize(5)),
-                              Expanded(
-                                  child: MyWidget().getTextWidget(rs,
-                                      text: tr('premiumComment'),
-                                      color: MyColors.purple,
-                                      isTextAlignCenter: true,
-                                      size: 20)),
-                              SizedBox(width: rs.getSize(5)),
-                              Image.asset('assets/images/quote_lower.png', color: MyColors.purple),
-                            ],
-                          ),
-                          SizedBox(height: rs.getSize(20)),
-                          DataTable(
-                            horizontalMargin: 0,
-                            columns: <DataColumn>[
-                              getDataColumn(''),
-                              getDataColumn('Basic'),
-                              getDataColumn('Premium'),
-                            ],
-                            rows: <DataRow>[
-                              getDataRow(
-                                  tr('lesson'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                              getDataRow(
-                                  tr('reading'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                              getDataRow(
-                                  tr('flashcard'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                              getDataRow(
-                                  tr('writingCorrection'),
-                                  const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(
-                                  tr('podosMsg'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                              getDataRow(
-                                  tr('adFree'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                  const Icon(Icons.check_circle_outline, color: MyColors.green))
-                            ],
-                          ),
-                          Divider(height: rs.getSize(30), thickness: rs.getSize(2), color: MyColors.purple),
-                          RichText(
-                            text: TextSpan(children: [
-                              TextSpan(
-                                  text: tr('premiumDetail'),
-                                  style:
-                                  TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
-                              TextSpan(
-                                text: tr('termOfUse'),
-                                style: TextStyle(
-                                    color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    launchUrl(
-                                        Uri.parse(
-                                            'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
-                                  },
-                              ),
-                              TextSpan(
-                                  text: tr('and'),
-                                  style:
-                                  TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
-                              TextSpan(
-                                text: tr('privacyPolicy'),
-                                style: TextStyle(
-                                    color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    launchUrl(Uri.parse('https://podo-49335.web.app/privacyPolicy.html'));
-                                  },
-                              )
-                            ]),
-                          )
-                        ],
-                      ),
+      appBar: MyWidget().getAppbar(context, rs, title: ''),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              msgForTrial != null ?
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                color: Theme.of(context).primaryColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    MyWidget().getTextWidget(
+                        rs, text: msgForTrial, color: Theme.of(context).cardColor, isTextAlignCenter: true, size: 16),
+                  ],
+                ),
+              ) : const SizedBox.shrink(),
+              const SizedBox(height: 10),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        left: rs.getSize(15),
+                        right: rs.getSize(15),
+                        bottom: rs.getSize(50),
+                        top: rs.getSize(20)),
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset('assets/images/quote_upper.png', color: Theme.of(context).primaryColor),
+                            SizedBox(width: rs.getSize(5)),
+                            Expanded(
+                                child: MyWidget().getTextWidget(rs,
+                                    text: tr('premiumComment'),
+                                    color: Theme.of(context).primaryColor,
+                                    isTextAlignCenter: true,
+                                    size: 20)),
+                            SizedBox(width: rs.getSize(5)),
+                            Image.asset('assets/images/quote_lower.png', color: Theme.of(context).primaryColor),
+                          ],
+                        ),
+                        SizedBox(height: rs.getSize(20)),
+                        DataTable(
+                          horizontalMargin: 0,
+                          columns: <DataColumn>[
+                            getDataColumn(''),
+                            getDataColumn('Basic'),
+                            getDataColumn('Premium'),
+                          ],
+                          rows: <DataRow>[
+                            getDataRow(
+                                tr('lesson'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
+                            getDataRow(
+                                tr('reading'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
+                            getDataRow(
+                                tr('flashcard'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
+                            getDataRow(
+                                tr('writingCorrection'),
+                                const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                            getDataRow(
+                                tr('podosMsg'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                            getDataRow(
+                                tr('adFree'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                const Icon(Icons.check_circle_outline, color: MyColors.green))
+                          ],
+                        ),
+                        Divider(height: rs.getSize(30), thickness: rs.getSize(2), color: Theme.of(context).primaryColor),
+                        RichText(
+                          text: TextSpan(children: [
+                            TextSpan(
+                                text: tr('premiumDetail'),
+                                style:
+                                TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                            TextSpan(
+                              text: tr('termOfUse'),
+                              style: TextStyle(
+                                  color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  launchUrl(
+                                      Uri.parse(
+                                          'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
+                                },
+                            ),
+                            TextSpan(
+                                text: tr('and'),
+                                style:
+                                TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                            TextSpan(
+                              text: tr('privacyPolicy'),
+                              style: TextStyle(
+                                  color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  launchUrl(Uri.parse('https://podo-49335.web.app/privacyPolicy.html'));
+                                },
+                            )
+                          ]),
+                        )
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                FutureBuilder<Offerings>(
-                  future: Purchases.getOfferings(),
-                  builder: (context, snapshot) {
-                    Package? package;
-                    if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                      final offering = snapshot.data?.current;
-                      package = offering?.availablePackages[0];
-                      return Stack(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(20)),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(0),
-                                elevation: 5,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                backgroundColor: Colors.transparent,
-                              ),
-                              onPressed: () async {
-                                FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
-                                FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
-                                final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
-                                purchaseTrace.start();
+              ),
+              const SizedBox(height: 10),
+              FutureBuilder<Offerings>(
+                future: Purchases.getOfferings(),
+                builder: (context, snapshot) {
+                  Package? package;
+                  if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                    final offering = snapshot.data?.current;
+                    package = offering?.availablePackages[0];
+                    return Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(20)),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.all(0),
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: Colors.transparent,
+                            ),
+                            onPressed: () async {
+                              FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
+                              FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
+                              final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
+                              purchaseTrace.start();
 
-                                setState(() {
-                                  isPurchasing = true;
-                                });
-                                try {
-                                  CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
-                                  purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
-                                  if (purchaserInfo.entitlements.active.isNotEmpty) {
-                                    Purchases.setEmail(User().email);
-                                    Purchases.setDisplayName(User().name);
-                                    Purchases.setPushToken(User().fcmToken ?? '');
-                                    String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
-                                    Purchases.setFirebaseAppInstanceId(appInstanceId!);
-                                    Database()
-                                        .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-                                    MyWidget().showSnackbarWithPodo(rs,
-                                        title: tr('purchaseTitle'), content: tr('purchaseContent'));
-                                    User().getUser();
-                                    Get.offNamedUntil(
-                                        MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-                                  }
-                                } on PlatformException catch (e) {
-                                  setState(() {
-                                    isPurchasing = false;
-                                  });
-                                  var errorCode = PurchasesErrorHelper.getErrorCode(e);
-                                  purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
-                                  purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
-                                  if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-                                    FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
-                                    MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
-                                  }
+                              setState(() {
+                                isPurchasing = true;
+                              });
+                              try {
+                                CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
+                                purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
+                                if (purchaserInfo.entitlements.active.isNotEmpty) {
+                                  Purchases.setEmail(User().email);
+                                  Purchases.setDisplayName(User().name);
+                                  Purchases.setPushToken(User().fcmToken ?? '');
+                                  String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
+                                  Purchases.setFirebaseAppInstanceId(appInstanceId!);
+                                  Database()
+                                      .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
+                                  MyWidget().showSnackbarWithPodo(rs,
+                                      title: tr('purchaseTitle'), content: tr('purchaseContent'));
+                                  User().getUser();
+                                  Get.offNamedUntil(
+                                      MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
                                 }
-                                await FirebaseAnalytics.instance.logPurchase();
-                                purchaseTrace.stop();
-                              },
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: rs.getSize(23), vertical: rs.getSize(10)),
-                                        decoration: BoxDecoration(
-                                            gradient: const LinearGradient(
-                                                colors: [MyColors.purple, MyColors.green]),
-                                            borderRadius: BorderRadius.circular(15)),
-                                        child: offering != null
-                                            ? Row(
-                                          children: [
-                                            Icon(
-                                                FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(30)),
-                                            SizedBox(width: rs.getSize(18)),
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      MyWidget().getTextWidget(rs,
-                                                          text: 'Get Podo Premium!',
-                                                          color: Colors.white,
-                                                          size: rs.getSize(16),
-                                                          isBold: true),
-                                                      Row(
-                                                        children: [
-                                                          MyWidget().getTextWidget(rs,
-                                                              text: snapshot.data?.getOffering('default')?.twoMonth?.storeProduct.priceString,
-                                                              color: Colors.white,
-                                                              hasCancelLine: true,
-                                                              size: 15),
-                                                          const SizedBox(width: 10),
-                                                          const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
-                                                          const SizedBox(width: 10),
-                                                          MyWidget().getTextWidget(rs,
-                                                              text: offering.availablePackages[0].storeProduct.priceString,
-                                                              color: Colors.white,
-                                                              size: 18,
-                                                              isBold: true),
-                                                          MyWidget().getTextWidget(rs,
-                                                              text: ' / ${offering.identifier}',
-                                                              color: Colors.white,
-                                                              size: 18),
-                                                        ],
-                                                      ),
-                                                      MyWidget().getTextWidget(rs,
-                                                        text: offering.serverDescription,
-                                                        color: Colors.white,
-                                                        size: rs.getSize(15)
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                            : Center(
-                                            child: MyWidget()
-                                                .getTextWidget(
-                                                rs, text: tr('failedOffering'), color: Colors.white)),
-                                      )),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                              top: rs.getSize(3),
-                              right: rs.getSize(30),
-                              child: MyWidget().getRoundedContainer(widget: const Text('50% off',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),),
-                                  bgColor: MyColors.red,
-                                  radius: 20,
-                                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10))
-                          ),
-                          Visibility(
-                              visible: msgForTrial != null,
-                              child: Positioned(
-                                top: rs.getSize(0),
-                                left: rs.getSize(30),
-                                child: StreamBuilder<String>(
-                                  stream: getTimeLeftStream(),
-                                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Row(
+                              } on PlatformException catch (e) {
+                                setState(() {
+                                  isPurchasing = false;
+                                });
+                                var errorCode = PurchasesErrorHelper.getErrorCode(e);
+                                purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
+                                purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
+                                if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+                                  FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
+                                  MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
+                                }
+                              }
+                              await FirebaseAnalytics.instance.logPurchase();
+                              purchaseTrace.stop();
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: rs.getSize(23), vertical: rs.getSize(10)),
+                                      decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                              colors: [MyColors.purple, MyColors.green]),
+                                          borderRadius: BorderRadius.circular(15)),
+                                      child: offering != null
+                                          ? Row(
                                         children: [
-                                          const Icon(CupertinoIcons.clock_fill, size: 15, color: MyColors.red),
-                                          const SizedBox(width: 5),
-                                          MyWidget().getTextWidget(
-                                              rs, text: snapshot.data!, color: MyColors.red, isBold: true),
+                                          Icon(
+                                              FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(30)),
+                                          SizedBox(width: rs.getSize(18)),
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    MyWidget().getTextWidget(rs,
+                                                        text: 'Get Podo Premium!',
+                                                        color: Colors.white,
+                                                        size: rs.getSize(16),
+                                                        isBold: true),
+                                                    Row(
+                                                      children: [
+                                                        MyWidget().getTextWidget(rs,
+                                                            text: snapshot.data?.getOffering('default')?.twoMonth?.storeProduct.priceString,
+                                                            color: Colors.white,
+                                                            hasCancelLine: true,
+                                                            size: 15),
+                                                        const SizedBox(width: 10),
+                                                        const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                                                        const SizedBox(width: 10),
+                                                        MyWidget().getTextWidget(rs,
+                                                            text: offering.availablePackages[0].storeProduct.priceString,
+                                                            color: Colors.white,
+                                                            size: 18,
+                                                            isBold: true),
+                                                        MyWidget().getTextWidget(rs,
+                                                            text: ' / ${offering.identifier}',
+                                                            color: Colors.white,
+                                                            size: 18),
+                                                      ],
+                                                    ),
+                                                    MyWidget().getTextWidget(rs,
+                                                      text: offering.serverDescription,
+                                                      color: Colors.white,
+                                                      size: rs.getSize(15)
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ],
-                                      );
-                                    } else {
-                                      return const SizedBox.shrink();
-                                    }
-                                  },
-                                ),
-                              )),
-                          Visibility(
-                            visible: isPurchasing,
-                            child: Positioned(
-                              top: rs.getSize(20),
-                              right: rs.getSize(20),
-                              child: SizedBox(
-                                  width: rs.getSize(18),
-                                  height: rs.getSize(18),
-                                  child: const CircularProgressIndicator(strokeWidth: 3)),
+                                      )
+                                          : Center(
+                                          child: MyWidget()
+                                              .getTextWidget(
+                                              rs, text: tr('failedOffering'), color: Colors.white)),
+                                    )),
+                              ],
                             ),
                           ),
-                        ],
-                      );
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
-              ],
-            ),
-            Offstage(
-              offstage: !isPurchasing,
-              child: const Opacity(opacity: 0.2, child: ModalBarrier(dismissible: false, color: Colors.black)),
-            ),
-          ],
-        ),
+                        ),
+                        Positioned(
+                            top: rs.getSize(3),
+                            right: rs.getSize(30),
+                            child: MyWidget().getRoundedContainer(widget: const Text('50% off',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),),
+                                bgColor: MyColors.red,
+                                radius: 20,
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10))
+                        ),
+                        Visibility(
+                            visible: msgForTrial != null,
+                            child: Positioned(
+                              top: rs.getSize(0),
+                              left: rs.getSize(30),
+                              child: StreamBuilder<String>(
+                                stream: getTimeLeftStream(),
+                                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Row(
+                                      children: [
+                                        const Icon(CupertinoIcons.clock_fill, size: 15, color: MyColors.red),
+                                        const SizedBox(width: 5),
+                                        MyWidget().getTextWidget(
+                                            rs, text: snapshot.data!, color: MyColors.red, isBold: true),
+                                      ],
+                                    );
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                },
+                              ),
+                            )),
+                        Visibility(
+                          visible: isPurchasing,
+                          child: Positioned(
+                            top: rs.getSize(20),
+                            right: rs.getSize(20),
+                            child: SizedBox(
+                                width: rs.getSize(18),
+                                height: rs.getSize(18),
+                                child: const CircularProgressIndicator(strokeWidth: 3)),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ],
+          ),
+          Offstage(
+            offstage: !isPurchasing,
+            child: const Opacity(opacity: 0.2, child: ModalBarrier(dismissible: false, color: Colors.black)),
+          ),
+        ],
       ),
     );
   }

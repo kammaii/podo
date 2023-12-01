@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Apakah Anda ingin meminta koreksi?",
   "cancel": "Batal",
   "writingStatus0": "Dikirim",
-  "writingStatus1": "Direvisi",
+  "writingStatus1": "Diperbaiki",
   "writingStatus2": "Sempurna",
   "writingStatus3": "Tidak dapat diperbaiki",
   "requestedCorrection": "Anda telah mengajukan permintaan koreksi",
@@ -153,5 +153,7 @@
   "wantUnlockDetail": "Apakah Anda ingin berlangganan untuk membuka penjelasan detail?",
   "wantUnlockReading": "Apakah Anda ingin berlangganan untuk membuka konten bacaan?",
   "wantUnlockWriting": "Apakah Anda ingin berlangganan untuk membuka latihan menulis?",
-  "premiumOnly": "Hanya Premium"
+  "premiumOnly": "Hanya Premium",
+  "on": "on",
+  "off": "off"
 }

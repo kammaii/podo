@@ -17,4 +17,10 @@ class MyColors {
   static const Color pink = Color(0xffFFD8DD);
   static const Color pinkDark = Color(0xffFF98A5);
   static const Color grey = Colors.grey;
+
+  static const Color darkBlack = Color(0xff090A0D);
+  static const Color darkWhite = Color(0xffE5E9F3);
+  static const Color darkNavy = Color(0xff1B1C24);
+  static const Color darkGrey = Color(0xff878A97);
+  static const Color darkPurple = Color(0xff8389be);
 }

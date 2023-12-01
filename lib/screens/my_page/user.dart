@@ -14,6 +14,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class User {
@@ -80,6 +81,10 @@ class User {
   }
 
   Future<void> getUser() async {
+    final currentUser = auth.FirebaseAuth.instance.currentUser;
+    if(currentUser == null) {
+      return;
+    }
     id = auth.FirebaseAuth.instance.currentUser!.uid;
     FirebaseCrashlytics.instance.setUserIdentifier(id);
     DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: id);

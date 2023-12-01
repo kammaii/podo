@@ -58,8 +58,8 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     return PersistentBottomNavBarItem(
       icon: icon,
       title: title,
-      activeColorPrimary: MyColors.purple,
-      inactiveColorPrimary: MyColors.grey,
+      activeColorPrimary: Theme.of(context).primaryColor,
+      inactiveColorPrimary: Theme.of(context).disabledColor,
       iconSize: rs.getSize(23),
       textStyle: TextStyle(fontSize: rs.getSize(13)),
     );
@@ -85,6 +85,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
 
   Widget getLessonCourseList({required LessonCourse lessonCourse}) {
     return Card(
+      color: Theme.of(context).cardColor,
       child: InkWell(
         onTap: () {
           LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
@@ -110,7 +111,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                       rs,
                       text: lessonCourse.title[setLanguage],
                       size: modeToggle[0] ? 25 : 20,
-                      color: MyColors.purple,
+                      color: Theme.of(context).primaryColor,
                       isBold: true,
                     ),
                   ),
@@ -121,7 +122,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   ? MyWidget().getTextWidget(
                       rs,
                       text: lessonCourse.description[setLanguage],
-                      color: MyColors.grey,
+                      color: Theme.of(context).disabledColor,
                     )
                   : const SizedBox.shrink(),
             ],
@@ -211,6 +212,11 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarIconBrightness: Brightness.light, // 상태바 아이콘 색상
+      statusBarColor: Theme.of(context).canvasColor,
+    ));
+
     rs = ResponsiveSize(context);
     return GetBuilder<LessonCourseController>(
       builder: (_) {
@@ -247,7 +253,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   screens: _buildScreens(),
                   items: _navBarsItems(),
                   confineInSafeArea: true,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).cardColor,
                   // Default is Colors.white.
                   handleAndroidBackButtonPress: true,
                   // Default is true.
@@ -259,7 +265,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
                   decoration: NavBarDecoration(
                     borderRadius: BorderRadius.circular(10.0),
-                    colorBehindNavBar: Colors.white,
+                    colorBehindNavBar: Theme.of(context).cardColor,
                   ),
                   popAllScreensOnTapOfSelectedTab: true,
                   popActionScreens: PopActionScreensType.all,
@@ -291,11 +297,12 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                       height: MediaQuery.of(context).size.height,
                       child: SafeArea(
                         child: Container(
-                          color: MyColors.purpleLight,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           child: Padding(
                             padding: EdgeInsets.all(rs.getSize(10)),
                             child: Column(
                               children: [
+                                SizedBox(height: rs.getSize(20)),
                                 Row(
                                   children: [
                                     Expanded(
@@ -303,7 +310,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                         rs,
                                         text: tr('selectCourse'),
                                         size: 20,
-                                        color: MyColors.purple,
+                                        color: Theme.of(context).primaryColor,
                                         isBold: true,
                                       ),
                                     ),
@@ -312,7 +319,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                         MyWidget().getTextWidget(
                                           rs,
                                           text: tr('mode'),
-                                          color: MyColors.purple,
+                                          color: Theme.of(context).primaryColor,
                                           isBold: true,
                                         ),
                                         SizedBox(width: rs.getSize(10)),
@@ -326,17 +333,13 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                           constraints:
                                               BoxConstraints(minHeight: rs.getSize(30), minWidth: rs.getSize(50)),
                                           borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                          selectedBorderColor: MyColors.purple,
-                                          selectedColor: Colors.white,
-                                          fillColor: MyColors.purple,
-                                          color: MyColors.purple,
+                                          selectedBorderColor: Theme.of(context).primaryColor,
+                                          selectedColor: Theme.of(context).cardColor,
+                                          fillColor: Theme.of(context).primaryColor,
+                                          color: Theme.of(context).primaryColor,
                                           children: [
-                                            Text(tr('topic'), style: TextStyle(fontSize: rs.getSize(15))),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
-                                              child:
-                                                  Text(tr('grammar'), style: TextStyle(fontSize: rs.getSize(15))),
-                                            ),
+                                            Text(tr('on'), style: TextStyle(fontSize: rs.getSize(15))),
+                                            Text(tr('off'), style: TextStyle(fontSize: rs.getSize(15))),
                                           ],
                                         ),
                                       ],
@@ -399,7 +402,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                         showTrialLeftDate = false;
                       });
                     },
-                    icon: Icon(Icons.remove_circle, color: MyColors.red, size: rs.getSize(20)),
+                    icon: Icon(Icons.remove_circle, color: Theme.of(context).focusColor, size: rs.getSize(20)),
                   ),
                 ) : const SizedBox.shrink(),
               ],

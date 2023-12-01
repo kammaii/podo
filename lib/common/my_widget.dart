@@ -8,24 +8,29 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class MyWidget {
-  AppBar getAppbar(ResponsiveSize rs,
+  AppBar getAppbar(BuildContext context, ResponsiveSize rs,
       {required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true}) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       elevation: 0,
-      leading: IconButton(
-        onPressed: () {
-          Get.back();
-        },
-        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-        color: MyColors.purple,
+      leading: Theme(
+        data: Theme.of(context).copyWith(
+          highlightColor: MyColors.navyLight
+        ),
+        child: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+          color: Theme.of(context).primaryColor,
+        ),
       ),
       title: Padding(
         padding: EdgeInsets.symmetric(vertical: rs.getSize(10, bigger: 1.5)),
         child: MyWidget().getTextWidget(
           rs,
           text: title,
-          color: MyColors.purple,
+          color: Theme.of(context).primaryColor,
           isKorean: isKorean,
           isBold: isBold,
           size: 18,
@@ -35,17 +40,17 @@ class MyWidget {
     );
   }
 
-  Widget getSearchWidget(ResponsiveSize rs,
+  Widget getSearchWidget(BuildContext context, ResponsiveSize rs,
       {required FocusNode focusNode,
       required TextEditingController controller,
       required String hint,
       required Function(String?) onChanged}) {
     return TextField(
-      style: TextStyle(fontSize: rs.getSize(15)),
+      style: TextStyle(fontSize: rs.getSize(15), color: Theme.of(context).secondaryHeaderColor),
       focusNode: focusNode,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: rs.getSize(10)),
-        prefixIcon: Icon(Icons.search, size: rs.getSize(20)),
+        prefixIcon: Icon(Icons.search, size: rs.getSize(20), color: Theme.of(context).disabledColor),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
           borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
@@ -55,8 +60,9 @@ class MyWidget {
           borderSide: BorderSide(color: MyColors.navyLight, width: 1.0),
         ),
         hintText: hint,
+        hintStyle: TextStyle(color: Theme.of(context).disabledColor),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).cardColor,
       ),
       controller: controller,
       onChanged: onChanged,
@@ -126,28 +132,8 @@ class MyWidget {
     );
   }
 
-  Widget getCircleImageWidget({
-    required String image,
-    required double size,
-  }) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          image: DecorationImage(
-            image: AssetImage(image),
-            fit: BoxFit.cover,
-          ),
-          boxShadow: [
-            BoxShadow(
-                color: MyColors.grey.withOpacity(0.5), spreadRadius: 1, blurRadius: 5, offset: const Offset(0, 1)),
-          ]),
-    );
-  }
-
   Widget getTextFieldWidget(
+    BuildContext context,
     ResponsiveSize rs, {
     String hint = '',
     double fontSize = 15,
@@ -167,25 +153,26 @@ class MyWidget {
       enabled: enabled,
       maxLines: maxLines,
       maxLength: maxLength,
-      cursorColor: Colors.black,
-      style: TextStyle(fontSize: rs.getSize(fontSize)),
+      cursorColor: Theme.of(context).secondaryHeaderColor,
+      style: TextStyle(fontSize: rs.getSize(fontSize), color: Theme.of(context).secondaryHeaderColor),
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       decoration: InputDecoration(
+        counterStyle: TextStyle(color: Theme.of(context).secondaryHeaderColor),
         hintMaxLines: 2,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).cardColor,
         border: InputBorder.none,
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(color: MyColors.navyLight, width: 1),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          borderSide: BorderSide(color: Theme.of(context).primaryColorLight, width: 1),
         ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          borderSide: BorderSide(color: MyColors.navyLight, width: 1),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          borderSide: BorderSide(color: Theme.of(context).primaryColorLight, width: 1),
         ),
         hintText: hint,
-        hintStyle: TextStyle(fontSize: rs.getSize(fontSize)),
+        hintStyle: TextStyle(fontSize: rs.getSize(fontSize), color: Theme.of(context).disabledColor),
         contentPadding: EdgeInsets.all(rs.getSize(10)),
       ),
     );
@@ -218,37 +205,43 @@ class MyWidget {
     );
   }
 
-  showDialog(ResponsiveSize rs,
+  showDialog(BuildContext context, ResponsiveSize rs,
       {required String content,
       required Function yesFn,
       bool hasTextBtn = false,
       bool hasNoBtn = true,
-      bool hasPremiumTag = false, String? yesText}) {
+      bool hasPremiumTag = false,
+      String? yesText}) {
     Get.dialog(AlertDialog(
+      backgroundColor: Theme.of(context).cardColor,
       iconPadding: const EdgeInsets.only(bottom: 20),
-      icon: hasPremiumTag ? Row(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: MyColors.purpleLight,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(5),
-                bottomRight: Radius.circular(5),
-              ),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: rs.getSize(8), vertical: rs.getSize(3)),
-            child: Row(
+      icon: hasPremiumTag
+          ? Row(
               children: [
-                const Icon(Icons.workspace_premium, color: MyColors.purple, size: 15),
-                const SizedBox(width: 5),
-                MyWidget().getTextWidget(rs, text: tr('premiumOnly'), color: MyColors.purple, size: 13, isBold: true),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      bottomRight: Radius.circular(5),
+                    ),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(8), vertical: rs.getSize(3)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.workspace_premium, color: Theme.of(context).primaryColor, size: 15),
+                      const SizedBox(width: 5),
+                      MyWidget().getTextWidget(rs,
+                          text: tr('premiumOnly'), color: Theme.of(context).primaryColor, size: 13, isBold: true),
+                    ],
+                  ),
+                ),
               ],
-            ),
-          ),
-        ],
-      ) : const SizedBox.shrink(),
+            )
+          : const SizedBox.shrink(),
       title: Center(child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
-      content: MyWidget().getTextWidget(rs, text: content, isTextAlignCenter: true, size: 16),
+      content: MyWidget().getTextWidget(rs,
+          text: content, isTextAlignCenter: true, size: 16, color: Theme.of(context).secondaryHeaderColor),
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: EdgeInsets.only(
           left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
@@ -262,14 +255,15 @@ class MyWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          side: const BorderSide(color: MyColors.purple, width: 1),
-                          backgroundColor: Colors.white),
+                          side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
+                          backgroundColor: Theme.of(context).cardColor),
                       onPressed: () {
                         Get.back();
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                        child: Text(tr('no'), style: TextStyle(color: MyColors.purple, fontSize: rs.getSize(15))),
+                        child: Text(tr('no'),
+                            style: TextStyle(color: Theme.of(context).primaryColor, fontSize: rs.getSize(15))),
                       ),
                     ),
                   )
@@ -281,15 +275,16 @@ class MyWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    side: const BorderSide(color: MyColors.purple, width: 1),
-                    backgroundColor: MyColors.purple),
+                    side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
+                    backgroundColor: Theme.of(context).canvasColor),
                 onPressed: () {
                   Get.back();
                   yesFn();
                 },
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                  child: Text(yesText ?? tr('yes'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
+                  child: Text(yesText ?? tr('yes'),
+                      style: TextStyle(color: Theme.of(context).cardColor, fontSize: rs.getSize(15))),
                 ),
               ),
             ),
@@ -303,7 +298,8 @@ class MyWidget {
                   onPressed: () {
                     Get.toNamed(MyStrings.routePremiumMain);
                   },
-                  child: MyWidget().getTextWidget(rs, text: tr('explorePremium'), color: MyColors.purple),
+                  child: MyWidget()
+                      .getTextWidget(rs, text: tr('explorePremium'), color: Theme.of(context).primaryColor),
                 ),
               ))
             : const SizedBox.shrink(),
@@ -359,7 +355,7 @@ class MyWidget {
     );
   }
 
-  Widget getLoading(ResponsiveSize rs, double progressValue) {
+  Widget getLoading(BuildContext context, ResponsiveSize rs, double progressValue) {
     return Stack(
       children: [
         Padding(
@@ -370,16 +366,17 @@ class MyWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  MyWidget().getTextWidget(rs, text: 'Loading', color: MyColors.purple),
+                  MyWidget().getTextWidget(rs, text: 'Loading', color: Theme.of(context).primaryColor),
                   SizedBox(width: rs.getSize(5)),
-                  SpinKitThreeBounce(color: MyColors.purple, size: rs.getSize(10)),
+                  SpinKitThreeBounce(color: Theme.of(context).primaryColor, size: rs.getSize(10)),
                 ],
               ),
               SizedBox(height: rs.getSize(10)),
               LinearProgressIndicator(
                 value: progressValue,
-                valueColor: const AlwaysStoppedAnimation<Color>(MyColors.purple),
-                backgroundColor: MyColors.navyLight,
+                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                color: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).cardColor,
               ),
             ],
           ),

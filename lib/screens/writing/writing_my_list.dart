@@ -85,7 +85,7 @@ class _WritingMyListState extends State<WritingMyList> {
       padding: EdgeInsets.symmetric(vertical: tag == 'A' ? rs.getSize(10) : 0),
       child: Row(
         children: [
-          MyWidget().getTextWidget(rs, text: '$tag. ', isBold: true),
+          MyWidget().getTextWidget(rs, text: '$tag. ', isBold: true, color: Theme.of(context).secondaryHeaderColor),
           SizedBox(width: rs.getSize(15)),
           Expanded(
             child: HtmlWidget(
@@ -94,13 +94,14 @@ class _WritingMyListState extends State<WritingMyList> {
                 fontFamily: 'KoreanFont',
                 fontSize: rs.getSize(15),
                 height: 1.5,
+                color: Theme.of(context).secondaryHeaderColor
               ),
             ),
           ),
           Visibility(
             visible: writing.status == 1 && tag.contains('C') || writing.status == 2 && tag.contains('A'),
             child: Obx(() =>
-                FlashcardIcon().getIconButton(rs, controller: controller, itemId: writing.id, front: extractedText)),
+                FlashcardIcon().getIconButton(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
           )
         ],
       ),
@@ -125,7 +126,7 @@ class _WritingMyListState extends State<WritingMyList> {
           children: [
             GestureDetector(
               onTap: () {
-                MyWidget().showDialog(rs, content: tr('wantRemoveWriting'), yesFn: () {
+                MyWidget().showDialog(context, rs, content: tr('wantRemoveWriting'), yesFn: () {
                   String id = writing.id;
                   Database().deleteDoc(collection: 'Writings', docId: id).then((value) {
                     writings.removeWhere((element) => element.id == id);
@@ -138,7 +139,7 @@ class _WritingMyListState extends State<WritingMyList> {
                 child: Icon(
                   Icons.remove_circle_outline_rounded,
                   size: rs.getSize(15),
-                  color: Colors.red,
+                  color: Theme.of(context).focusColor,
                 ),
               ),
             )
@@ -151,34 +152,34 @@ class _WritingMyListState extends State<WritingMyList> {
               Row(
                 children: [
                   MyWidget().getRoundedContainer(
-                      widget: MyWidget().getTextWidget(rs, text: statusList[status], color: Colors.white, size: 13),
+                      widget: MyWidget().getTextWidget(rs, text: statusList[status], color: Theme.of(context).cardColor, size: 13),
                       radius: 20,
                       padding: EdgeInsets.symmetric(vertical: rs.getSize(2), horizontal: rs.getSize(10)),
                       bgColor: statusColors[status]),
                   SizedBox(width: rs.getSize(10)),
                   Expanded(
                       child: MyWidget().getTextWidget(rs,
-                          text: 'Lv.${(writing.questionLevel + 1).toString()}', color: MyColors.grey)),
+                          text: 'Lv.${(writing.questionLevel + 1).toString()}', color: Theme.of(context).disabledColor)),
                   Column(
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.keyboard_double_arrow_left_rounded, size: rs.getSize(13), color: MyColors.grey),
+                          Icon(Icons.keyboard_double_arrow_left_rounded, size: rs.getSize(13), color: Theme.of(context).disabledColor),
                           const SizedBox(width: 5),
                           MyWidget().getTextWidget(rs,
-                              text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: MyColors.grey),
+                              text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: Theme.of(context).disabledColor),
                         ],
                       ),
                       writing.dateReply != null
                           ? Row(
                               children: [
                                 Icon(Icons.keyboard_double_arrow_right_rounded,
-                                    size: rs.getSize(13), color: MyColors.grey),
+                                    size: rs.getSize(13), color: Theme.of(context).disabledColor),
                                 const SizedBox(width: 5),
                                 MyWidget().getTextWidget(rs,
                                     text: MyDateFormat().getDateFormat(writing.dateReply!),
                                     size: 12,
-                                    color: MyColors.grey),
+                                    color: Theme.of(context).disabledColor),
                               ],
                             )
                           : const SizedBox.shrink(),
@@ -193,7 +194,7 @@ class _WritingMyListState extends State<WritingMyList> {
               ),
             ],
           ),
-        ),
+        bgColor: Theme.of(context).cardColor),
       ],
     );
   }
@@ -241,66 +242,64 @@ class _WritingMyListState extends State<WritingMyList> {
         });
       },
       child: Scaffold(
-        appBar: hasBackBtn != null && hasBackBtn! ? MyWidget().getAppbar(rs, title: '') : null,
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: rs.getSize(20), top: rs.getSize(15)),
-                child: MyWidget()
-                    .getTextWidget(rs, text: tr('myWritings'), color: MyColors.purple, isBold: true, size: 18),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    GetBuilder<WritingController>(
-                      builder: (_) {
-                        return Padding(
-                          padding: EdgeInsets.all(rs.getSize(15)),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: isLoaded && writings.isEmpty
-                                    ? Center(
-                                        child: MyWidget().getTextWidget(
-                                          rs,
-                                          text: tr('noMyWritings'),
-                                          isTextAlignCenter: true,
-                                          size: 18,
-                                        ),
-                                      )
-                                    : ListView.builder(
-                                        itemCount: writings.length,
-                                        itemBuilder: (BuildContext context, int index) {
-                                          return Padding(
-                                            padding: EdgeInsets.only(bottom: rs.getSize(30)),
-                                            child: getWritingList(index),
-                                          );
-                                        },
+        appBar: hasBackBtn != null && hasBackBtn! ? MyWidget().getAppbar(context, rs, title: '') : null,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: rs.getSize(20), top: rs.getSize(15)),
+              child: MyWidget()
+                  .getTextWidget(rs, text: tr('myWritings'), color: Theme.of(context).primaryColor, isBold: true, size: 18),
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  GetBuilder<WritingController>(
+                    builder: (_) {
+                      return Padding(
+                        padding: EdgeInsets.all(rs.getSize(15)),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: isLoaded && writings.isEmpty
+                                  ? Center(
+                                      child: MyWidget().getTextWidget(
+                                        rs,
+                                        text: tr('noMyWritings'),
+                                        isTextAlignCenter: true,
+                                        size: 18,
                                       ),
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    Obx(() => Offstage(
-                          offstage: !controller.isLoading.value,
-                          child: const Stack(
-                            children: [
-                              Opacity(opacity: 0.3, child: ModalBarrier(dismissible: false, color: Colors.black)),
-                              Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            ],
-                          ),
-                        ))
-                  ],
-                ),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: writings.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(bottom: rs.getSize(30)),
+                                          child: getWritingList(index),
+                                        );
+                                      },
+                                    ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  Obx(() => Offstage(
+                        offstage: !controller.isLoading.value,
+                        child: const Stack(
+                          children: [
+                            Opacity(opacity: 0.3, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                            Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          ],
+                        ),
+                      ))
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

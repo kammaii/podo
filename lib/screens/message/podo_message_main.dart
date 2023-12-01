@@ -50,7 +50,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
       setState(() {
         isLoaded = true;
         if (isBasicUser) {
-          MyWidget().showDialog(rs, content: tr('wantReplyPodo'), yesFn: () {
+          MyWidget().showDialog(context, rs, content: tr('wantReplyPodo'), yesFn: () {
             Get.toNamed(MyStrings.routePremiumMain);
           }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
         }
@@ -191,10 +191,10 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: Padding(
-          padding: EdgeInsets.all(rs.getSize(8)),
+        child: Theme(
+          data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
           child: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).cardColor,
             elevation: 0,
             leading: IconButton(
               onPressed: () {
@@ -204,283 +204,295 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                 Get.back();
               },
               icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-              color: MyColors.purple,
+              color: Theme.of(context).primaryColor,
             ),
             title: MyWidget().getTextWidget(
               rs,
               text: PodoMessage().title![KO],
-              color: MyColors.purple,
+              color: Theme.of(context).primaryColor,
               isKorean: true,
             ),
             actions: [
               IconButton(
                 onPressed: () {
                   Get.dialog(AlertDialog(
-                    title: MyWidget().getTextWidget(rs, text: tr('howToUse'), size: 18),
-                    content: MyWidget().getTextWidget(rs, text: tr('replyDetail'), color: MyColors.grey),
+                    backgroundColor: Theme.of(context).cardColor,
+                    title: MyWidget().getTextWidget(rs,
+                        text: tr('howToUse'), size: 18, color: Theme.of(context).secondaryHeaderColor),
+                    content: MyWidget()
+                        .getTextWidget(rs, text: tr('replyDetail'), color: Theme.of(context).disabledColor),
                   ));
                 },
-                icon: Icon(CupertinoIcons.info_circle, color: MyColors.purple, size: rs.getSize(23, bigger: 1.2)),
+                icon: Icon(CupertinoIcons.info_circle,
+                    color: Theme.of(context).primaryColor, size: rs.getSize(23, bigger: 1.2)),
               )
             ],
           ),
         ),
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  left: rs.getSize(10), right: rs.getSize(10), top: rs.getSize(20), bottom: rs.getSize(100)),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    PodoMessage().content != null
-                        ? Column(
-                            children: [
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(maxHeight: 3000),
-                                child: HtmlWidget(
-                                  PodoMessage().content!,
-                                  textStyle: TextStyle(
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+                left: rs.getSize(10), right: rs.getSize(10), top: rs.getSize(20), bottom: rs.getSize(100)),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  PodoMessage().content != null
+                      ? Column(
+                          children: [
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxHeight: 3000),
+                              child: HtmlWidget(
+                                PodoMessage().content!,
+                                textStyle: TextStyle(
                                     fontFamily: 'EnglishFont',
                                     fontSize: rs.getSize(18),
                                     height: 1.5,
-                                  ),
-                                  customWidgetBuilder: (element) {
-                                    if (element.localName == 'audio') {
-                                      final String audioSrc = element.attributes['src']!;
-                                      return getAudioPlayer(audioSrc);
-                                    } else if (element.localName == 'video') {
-                                      final String videoSrc = element.attributes['src']!;
-                                      return getVideoPlayer(videoSrc);
-                                    } else if (element.localName == 'img') {
-                                      final String imageSrc = element.attributes['src']!;
-                                      final UriData imageData = UriData.fromUri(Uri.parse(imageSrc));
-                                      final Uint8List bytes = imageData.contentAsBytes();
-                                      return Image.memory(bytes, width: rs.getSize(200), height: rs.getSize(200));
-                                    }
-                                    return null;
-                                  },
-                                ),
+                                    color: Theme.of(context).secondaryHeaderColor),
+                                customWidgetBuilder: (element) {
+                                  if (element.localName == 'audio') {
+                                    final String audioSrc = element.attributes['src']!;
+                                    return getAudioPlayer(audioSrc);
+                                  } else if (element.localName == 'video') {
+                                    final String videoSrc = element.attributes['src']!;
+                                    return getVideoPlayer(videoSrc);
+                                  } else if (element.localName == 'img') {
+                                    final String imageSrc = element.attributes['src']!;
+                                    final UriData imageData = UriData.fromUri(Uri.parse(imageSrc));
+                                    final Uint8List bytes = imageData.contentAsBytes();
+                                    return Image.memory(bytes, width: rs.getSize(200), height: rs.getSize(200));
+                                  }
+                                  return null;
+                                },
                               ),
-                              const Divider(),
-                            ],
-                          )
-                        : const SizedBox.shrink(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.thumb_up_off_alt, color: MyColors.purple, size: rs.getSize(20)),
-                        SizedBox(width: rs.getSize(10)),
-                        MyWidget().getTextWidget(rs, text: tr('bestReplies'), color: MyColors.purple, size: 20),
-                      ],
-                    ),
-                    SizedBox(height: rs.getSize(20)),
-                    PodoMessage().hasBestReply
-                        ? FutureBuilder(
-                            future: Database().getDocs(
-                                query: FirebaseFirestore.instance
-                                    .collection('PodoMessages/${PodoMessage().id}/Replies')
-                                    .where('isSelected', isEqualTo: true)
-                                    .orderBy('date', descending: true)),
-                            builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                                List<PodoMessageReply> replies = [];
-                                controller.hasFlashcard.value = {};
+                            ),
+                            const Divider(),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.thumb_up_off_alt, color: Theme.of(context).primaryColor, size: rs.getSize(20)),
+                      SizedBox(width: rs.getSize(10)),
+                      MyWidget().getTextWidget(rs,
+                          text: tr('bestReplies'), color: Theme.of(context).primaryColor, size: 20),
+                    ],
+                  ),
+                  SizedBox(height: rs.getSize(20)),
+                  PodoMessage().hasBestReply
+                      ? FutureBuilder(
+                          future: Database().getDocs(
+                              query: FirebaseFirestore.instance
+                                  .collection('PodoMessages/${PodoMessage().id}/Replies')
+                                  .where('isSelected', isEqualTo: true)
+                                  .orderBy('date', descending: true)),
+                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                              List<PodoMessageReply> replies = [];
+                              controller.hasFlashcard.value = {};
 
-                                for (dynamic snapshot in snapshot.data) {
-                                  replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
-                                }
-                                return ListView.builder(
-                                  itemCount: replies.length,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    PodoMessageReply reply = replies[index];
-                                    controller.hasFlashcard[reply.id] =
-                                        LocalStorage().hasFlashcard(itemId: reply.id);
-                                    return Padding(
-                                      padding: EdgeInsets.only(bottom: rs.getSize(5)),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Card(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              color: Colors.white,
-                                              child: Padding(
-                                                padding: EdgeInsets.all(rs.getSize(10)),
-                                                child: Column(
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Container(
-                                                          width: 6,
-                                                          height: 6,
-                                                          decoration: BoxDecoration(
-                                                            color: index % 2 == 0
-                                                                ? MyColors.navyLight
-                                                                : MyColors.pink,
-                                                            shape: BoxShape.circle,
-                                                          ),
+                              for (dynamic snapshot in snapshot.data) {
+                                replies.add(PodoMessageReply.fromJson(snapshot.data() as Map<String, dynamic>));
+                              }
+                              return ListView.builder(
+                                itemCount: replies.length,
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  PodoMessageReply reply = replies[index];
+                                  controller.hasFlashcard[reply.id] =
+                                      LocalStorage().hasFlashcard(itemId: reply.id);
+                                  return Padding(
+                                    padding: EdgeInsets.only(bottom: rs.getSize(5)),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            color: Theme.of(context).cardColor,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(rs.getSize(10)),
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 6,
+                                                        height: 6,
+                                                        decoration: BoxDecoration(
+                                                          color: index % 2 == 0
+                                                              ? Theme.of(context).primaryColorLight
+                                                              : Theme.of(context).shadowColor,
+                                                          shape: BoxShape.circle,
                                                         ),
-                                                        SizedBox(width: rs.getSize(10)),
-                                                        Expanded(
-                                                            child: MyWidget().getTextWidget(rs,
-                                                                text: reply.reply,
-                                                                isKorean: true,
-                                                                size: 16,
-                                                                height: 1.5)),
-                                                        SizedBox(width: rs.getSize(10)),
-                                                        isLoaded
-                                                            ? Obx(() => FlashcardIcon().getIconButton(rs,
-                                                                controller: controller,
-                                                                itemId: reply.id,
-                                                                front: reply.reply))
-                                                            : const SizedBox.shrink()
+                                                      ),
+                                                      SizedBox(width: rs.getSize(10)),
+                                                      Expanded(
+                                                          child: MyWidget().getTextWidget(rs,
+                                                              text: reply.reply,
+                                                              isKorean: true,
+                                                              size: 16,
+                                                              height: 1.5,
+                                                              color: Theme.of(context).secondaryHeaderColor)),
+                                                      SizedBox(width: rs.getSize(10)),
+                                                      isLoaded
+                                                          ? Obx(() => FlashcardIcon().getIconButton(context, rs,
+                                                              controller: controller,
+                                                              itemId: reply.id,
+                                                              front: reply.reply))
+                                                          : const SizedBox.shrink()
+                                                    ],
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 10),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        reply.isCorrected
+                                                            ? MyWidget().getRoundedContainer(
+                                                                widget: Row(
+                                                                  children: [
+                                                                    Icon(Icons.rate_review_outlined,
+                                                                        color: Theme.of(context).highlightColor,
+                                                                        size: 15),
+                                                                    const SizedBox(width: 5),
+                                                                    MyWidget().getTextWidget(rs,
+                                                                        text: tr('writingStatus1'),
+                                                                        color: Theme.of(context).highlightColor,
+                                                                        size: 13)
+                                                                  ],
+                                                                ),
+                                                                bgColor: MyColors.greenLight,
+                                                                radius: 30,
+                                                                padding: const EdgeInsets.symmetric(
+                                                                    vertical: 3, horizontal: 10))
+                                                            : const SizedBox.shrink(),
+                                                        MyWidget().getTextWidget(
+                                                          rs,
+                                                          text: reply.userName.isEmpty
+                                                              ? tr('unNamed')
+                                                              : reply.userName,
+                                                          color: Theme.of(context).disabledColor,
+                                                        ),
                                                       ],
                                                     ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(top: 10),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          reply.isCorrected
-                                                              ? MyWidget().getRoundedContainer(
-                                                                  widget: Row(
-                                                                    children: [
-                                                                      const Icon(Icons.rate_review_outlined,
-                                                                          color: MyColors.green, size: 15),
-                                                                      const SizedBox(width: 5),
-                                                                      MyWidget().getTextWidget(rs,
-                                                                          text: tr('writingStatus1'),
-                                                                          color: MyColors.green,
-                                                                          size: 13)
-                                                                    ],
-                                                                  ),
-                                                                  bgColor: MyColors.greenLight,
-                                                                  radius: 30,
-                                                                  padding: const EdgeInsets.symmetric(
-                                                                      vertical: 3, horizontal: 10))
-                                                              : const SizedBox.shrink(),
-                                                          MyWidget().getTextWidget(
-                                                            rs,
-                                                            text: reply.userName.isEmpty
-                                                                ? tr('unNamed')
-                                                                : reply.userName,
-                                                            color: MyColors.grey,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              } else if (snapshot.hasError) {
-                                return Text('에러: ${snapshot.error}');
-                              } else {
-                                return const Center(child: CircularProgressIndicator());
-                              }
-                            },
-                          )
-                        : Padding(
-                            padding: EdgeInsets.symmetric(vertical: rs.getSize(100)),
-                            child: MyWidget().getTextWidget(rs,
-                                text: tr('noBestReply'), color: MyColors.navy, isTextAlignCenter: true),
-                          ),
-                  ],
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: rs.getSize(5), right: rs.getSize(15)),
-                    child: StreamBuilder<String>(
-                      stream: getTimeLeftStream(PodoMessage().dateEnd!),
-                      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                        if (snapshot.hasData) {
-                          return MyWidget().getTextWidget(rs, text: snapshot.data!, color: MyColors.purple);
-                        } else {
-                          return Text(tr('expired'));
-                        }
-                      },
-                    ),
-                  ),
-                  Container(
-                    color: MyColors.navyLight,
-                    height: rs.getSize(70),
-                    child: Padding(
-                      padding: EdgeInsets.only(left: rs.getSize(10)),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: MyWidget().getTextFieldWidget(
-                              rs,
-                              hint: replyHint,
-                              controller: replyController,
-                              enabled: isReplyAvailable,
-                            ),
-                          ),
-                          SizedBox(width: rs.getSize(20)),
-                          IgnorePointer(
-                            ignoring: !isReplyAvailable,
-                            child: IconButton(
-                              onPressed: () {
-                                MyWidget().showDialog(
-                                  rs,
-                                  content: tr('sendReply'),
-                                  yesFn: () async {
-                                    await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
-                                    PodoMessageReply reply = PodoMessageReply(replyController.text);
-                                    await Database().setDoc(
-                                        collection: 'PodoMessages/${PodoMessage().id}/Replies',
-                                        doc: reply,
-                                        thenFn: (value) {
-                                          print('Podo message reply completed');
-                                        });
-                                    await History().addHistory(
-                                        itemIndex: 2, itemId: PodoMessage().id!, content: replyController.text);
-                                    Get.find<PodoMessageController>().setPodoMsgBtn();
-                                    setState(() {});
-                                  },
-                                );
-                              },
-                              icon: Icon(Icons.send,
-                                  color: !isReplyAvailable ? MyColors.grey : MyColors.purple,
-                                  size: rs.getSize(20)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('에러: ${snapshot.error}');
+                            } else {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          },
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(vertical: rs.getSize(100)),
+                          child: MyWidget().getTextWidget(rs,
+                              text: tr('noBestReply'),
+                              color: Theme.of(context).primaryColorDark,
+                              isTextAlignCenter: true),
+                        ),
                 ],
               ),
             ),
-            isBasicUser
-                ? const Positioned.fill(
-                    child: Blur(
-                      blur: 2.3,
-                      child: SizedBox.shrink(),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: rs.getSize(5), right: rs.getSize(15)),
+                  child: StreamBuilder<String>(
+                    stream: getTimeLeftStream(PodoMessage().dateEnd!),
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      if (snapshot.hasData) {
+                        return MyWidget()
+                            .getTextWidget(rs, text: snapshot.data!, color: Theme.of(context).primaryColor);
+                      } else {
+                        return Text(tr('expired'));
+                      }
+                    },
+                  ),
+                ),
+                Container(
+                  color: Theme.of(context).primaryColorLight,
+                  height: rs.getSize(70),
+                  child: Padding(
+                    padding: EdgeInsets.only(left: rs.getSize(10)),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: MyWidget().getTextFieldWidget(
+                            context,
+                            rs,
+                            hint: replyHint,
+                            controller: replyController,
+                            enabled: isReplyAvailable,
+                          ),
+                        ),
+                        SizedBox(width: rs.getSize(20)),
+                        IgnorePointer(
+                          ignoring: !isReplyAvailable,
+                          child: IconButton(
+                            onPressed: () {
+                              MyWidget().showDialog(
+                                context,
+                                rs,
+                                content: tr('sendReply'),
+                                yesFn: () async {
+                                  await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
+                                  PodoMessageReply reply = PodoMessageReply(replyController.text);
+                                  await Database().setDoc(
+                                      collection: 'PodoMessages/${PodoMessage().id}/Replies',
+                                      doc: reply,
+                                      thenFn: (value) {
+                                        print('Podo message reply completed');
+                                      });
+                                  await History().addHistory(
+                                      itemIndex: 2, itemId: PodoMessage().id!, content: replyController.text);
+                                  Get.find<PodoMessageController>().setPodoMsgBtn();
+                                  setState(() {});
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.send,
+                                color: !isReplyAvailable
+                                    ? Theme.of(context).disabledColor
+                                    : Theme.of(context).primaryColor,
+                                size: rs.getSize(20)),
+                          ),
+                        ),
+                      ],
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ],
-        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          isBasicUser
+              ? const Positioned.fill(
+                  child: Blur(
+                    blur: 2.3,
+                    child: SizedBox.shrink(),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ],
       ),
     );
   }

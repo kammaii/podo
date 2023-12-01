@@ -44,7 +44,7 @@ class LessonSummaryMain extends StatelessWidget {
               heroTag: 'learningBtn',
               onPressed: () {
                 if (User().status == 1) {
-                  MyWidget().showDialog(rs, content: tr('watchRewardAdLesson'), yesFn: () {
+                  MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                     Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                     AdsController().showRewardAd();
                   }, hasNoBtn: false, hasTextBtn: true);
@@ -73,7 +73,7 @@ class LessonSummaryMain extends StatelessWidget {
                     heroTag: 'wiringBtn',
                     onPressed: () {
                       isBasicUser
-                          ? MyWidget().showDialog(rs, content: tr('wantUnlockLesson'), yesFn: () {
+                          ? MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
                               Get.toNamed(MyStrings.routePremiumMain);
                             }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'))
                           : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
@@ -95,55 +95,53 @@ class LessonSummaryMain extends StatelessWidget {
           SizedBox(height: rs.getSize(10)),
         ],
       ),
-      appBar: MyWidget().getAppbar(rs, title: tr('lessonSummary')),
-      body: SafeArea(
-        child: FutureBuilder(
-            future: Database().getDocs(query: query),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                for (dynamic snapshot in snapshot.data) {
-                  summaries.add(LessonSummary.fromJson(snapshot.data() as Map<String, dynamic>));
-                }
-                return Padding(
-                  padding: EdgeInsets.all(rs.getSize(20)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(height: rs.getSize(10), width: rs.getSize(10), color: MyColors.purple),
-                          SizedBox(width: rs.getSize(10)),
-                          MyWidget().getTextWidget(
-                            rs,
-                            text: lesson.title[KO],
-                            size: 18,
-                            color: MyColors.purple,
-                            isKorean: true,
-                            isBold: true,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: rs.getSize(30)),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: summaries.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return getSummary(index);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
+      appBar: MyWidget().getAppbar(context, rs, title: tr('lessonSummary')),
+      body: FutureBuilder(
+          future: Database().getDocs(query: query),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+              for (dynamic snapshot in snapshot.data) {
+                summaries.add(LessonSummary.fromJson(snapshot.data() as Map<String, dynamic>));
               }
-            }),
-      ),
+              return Padding(
+                padding: EdgeInsets.all(rs.getSize(20)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(height: rs.getSize(10), width: rs.getSize(10), color: Theme.of(context).primaryColor),
+                        SizedBox(width: rs.getSize(10)),
+                        MyWidget().getTextWidget(
+                          rs,
+                          text: lesson.title[KO],
+                          size: 18,
+                          color: Theme.of(context).primaryColor,
+                          isKorean: true,
+                          isBold: true,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: rs.getSize(30)),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: summaries.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return getSummary(context, index);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }),
     );
   }
 
-  Widget getSummary(int index) {
+  Widget getSummary(BuildContext context, int index) {
     LessonSummary summary = summaries[index];
     double bottomPadding;
     index == summaries.length - 1 ? bottomPadding = rs.getSize(200) : bottomPadding = rs.getSize(40);
@@ -154,20 +152,20 @@ class LessonSummaryMain extends StatelessWidget {
         children: [
           MyWidget().getTextWidget(rs,
               text: '${(index + 1).toString()}. ${summary.content[KO]} ',
-              color: MyColors.purple,
+              color: Theme.of(context).primaryColor,
               isBold: true,
               isKorean: true),
           SizedBox(height: rs.getSize(15)),
           Container(
             padding: EdgeInsets.all(rs.getSize(10)),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MyWidget().getTextWidget(rs, text: summary.content[fo]),
+                MyWidget().getTextWidget(rs, text: summary.content[fo], color: Theme.of(context).secondaryHeaderColor),
                 SizedBox(height: rs.getSize(15)),
                 summary.examples.isNotEmpty
                     ? ListView.builder(
@@ -179,15 +177,15 @@ class LessonSummaryMain extends StatelessWidget {
                             padding: EdgeInsets.only(bottom: rs.getSize(10)),
                             child: Row(
                               children: [
-                                const SizedBox(
+                                SizedBox(
                                   height: 10,
                                   child: VerticalDivider(
-                                    color: MyColors.purple,
+                                    color: Theme.of(context).primaryColor,
                                     thickness: 1,
                                     width: 18,
                                   ),
                                 ),
-                                MyWidget().getTextWidget(rs, text: summary.examples[index], isKorean: true),
+                                MyWidget().getTextWidget(rs, text: summary.examples[index], isKorean: true, color: Theme.of(context).secondaryHeaderColor),
                               ],
                             ),
                           );

@@ -64,163 +64,162 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
+    return Scaffold(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                MyWidget().getSearchWidget(context, rs,
+                    focusNode: _focusNode, controller: searchController, hint: tr('search'), onChanged: (text) {
+                  searchText = searchController.text;
+                  controller.update();
+                }),
+                SizedBox(height: rs.getSize(20)),
+                Expanded(
+                  child: GetBuilder<FlashCardController>(
+                    builder: (_) {
+                      for (FlashCard card in controller.cards) {
+                        if (card.audio != null) {
+                          playStopIcons[card.id] = PlayStopIcon(rs, this);
+                        }
+                      }
+                      cardsLength = controller.cards.length;
+
+                      if (searchText.isNotEmpty) {
+                        cardsSearch = [];
+                        for (FlashCard card in controller.cards) {
+                          if (searchText.isNotEmpty &&
+                              (card.front.toLowerCase().contains(searchText) ||
+                                  card.back.toLowerCase().contains(searchText))) {
+                            cardsSearch.add(card);
+                          }
+                        }
+                        cardsLength = cardsSearch.length;
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                animationWidget(
+                                    MyWidget().getCheckBox(rs, value: controller.isCheckedAll, onChanged: (value) {
+                                  controller.isCheckedAllClicked(value!);
+                                })),
+                                Row(
+                                  children: [
+                                    animationWidget(IconButton(
+                                        onPressed: () {
+                                          MyWidget().showDialog(context, rs, content: tr('wantRemoveFlashcard'), yesFn: () {
+                                            List<String> ids = [];
+                                            for (int i = 0; i < controller.isChecked.length; i++) {
+                                              controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
+                                            }
+                                            FlashCard().removeFlashcards(ids: ids);
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: MyColors.red,
+                                          size: rs.getSize(20),
+                                        ))),
+                                    SizedBox(width: rs.getSize(20)),
+                                    InkWell(
+                                      onTap: isBasicUser
+                                          ? () {
+                                              Get.toNamed(MyStrings.routePremiumMain);
+                                            }
+                                          : null,
+                                      child: Row(
+                                        children: [
+                                          MyWidget().getTextWidget(rs,
+                                              text: '$cardsLength ', color: Theme.of(context).secondaryHeaderColor),
+                                          isBasicUser
+                                              ? MyWidget().getTextWidget(
+                                                  rs,
+                                                  text: '/ ${limit.toString()} ',
+                                                  color: Theme.of(context).focusColor,
+                                                  isBold: true,
+                                                )
+                                              : const SizedBox.shrink(),
+                                          MyWidget().getTextWidget(rs,
+                                              text: tr('cards'), color: Theme.of(context).secondaryHeaderColor),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: cardsLength <= 0
+                                  ? Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        FlashcardIcon().getIconOnly(rs),
+                                        SizedBox(height: rs.getSize(10)),
+                                        MyWidget().getTextWidget(rs,
+                                            text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),
+                                        SizedBox(height: rs.getSize(50)),
+                                      ],
+                                    )
+                                  : GestureDetector(
+                                      onTap: () {
+                                        _focusNode.unfocus();
+                                      },
+                                      onLongPress: () {
+                                        controller.isLongClicked = !controller.isLongClicked;
+                                        controller.update();
+                                      },
+                                      child: ListView.builder(
+                                        padding: EdgeInsets.only(top: rs.getSize(10), bottom: rs.getSize(80)),
+                                        itemCount: cardsLength,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          return Padding(
+                                            padding: EdgeInsets.only(bottom: rs.getSize(8)),
+                                            child: getFlashCardItem(index),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: rs.getSize(20), vertical: rs.getSize(30)),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
                 children: [
-                  MyWidget().getSearchWidget(rs,
-                      focusNode: _focusNode, controller: searchController, hint: tr('search'), onChanged: (text) {
-                    searchText = searchController.text;
-                    controller.update();
-                  }),
-                  SizedBox(height: rs.getSize(20)),
                   Expanded(
                     child: GetBuilder<FlashCardController>(
                       builder: (_) {
-                        for (FlashCard card in controller.cards) {
-                          if (card.audio != null) {
-                            playStopIcons[card.id] = PlayStopIcon(rs, this);
-                          }
-                        }
-                        cardsLength = controller.cards.length;
-
-                        if (searchText.isNotEmpty) {
-                          cardsSearch = [];
-                          for (FlashCard card in controller.cards) {
-                            if (searchText.isNotEmpty &&
-                                (card.front.toLowerCase().contains(searchText) ||
-                                    card.back.toLowerCase().contains(searchText))) {
-                              cardsSearch.add(card);
-                            }
-                          }
-                          cardsLength = cardsSearch.length;
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  animationWidget(
-                                      MyWidget().getCheckBox(rs, value: controller.isCheckedAll, onChanged: (value) {
-                                    controller.isCheckedAllClicked(value!);
-                                  })),
-                                  Row(
-                                    children: [
-                                      animationWidget(IconButton(
-                                          onPressed: () {
-                                            MyWidget().showDialog(rs, content: tr('wantRemoveFlashcard'), yesFn: () {
-                                              List<String> ids = [];
-                                              for (int i = 0; i < controller.isChecked.length; i++) {
-                                                controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
-                                              }
-                                              FlashCard().removeFlashcards(ids: ids);
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: MyColors.red,
-                                            size: rs.getSize(20),
-                                          ))),
-                                      SizedBox(width: rs.getSize(20)),
-                                      InkWell(
-                                        onTap: isBasicUser
-                                            ? () {
-                                                Get.toNamed(MyStrings.routePremiumMain);
-                                              }
-                                            : null,
-                                        child: Row(
-                                          children: [
-                                            MyWidget().getTextWidget(rs,
-                                                text: '$cardsLength ', color: Colors.black),
-                                            isBasicUser
-                                                ? MyWidget().getTextWidget(
-                                                    rs,
-                                                    text: '/ ${limit.toString()} ',
-                                                    color: MyColors.red,
-                                                    isBold: true,
-                                                  )
-                                                : const SizedBox.shrink(),
-                                            MyWidget().getTextWidget(rs,
-                                                text: tr('cards'), color: Colors.black),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Expanded(
-                                child: cardsLength <= 0
-                                    ? Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          FlashcardIcon().getIconOnly(rs),
-                                          SizedBox(height: rs.getSize(10)),
-                                          MyWidget().getTextWidget(rs,
-                                              text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),
-                                          SizedBox(height: rs.getSize(50)),
-                                        ],
-                                      )
-                                    : GestureDetector(
-                                        onTap: () {
-                                          _focusNode.unfocus();
-                                        },
-                                        onLongPress: () {
-                                          controller.isLongClicked = !controller.isLongClicked;
-                                          controller.update();
-                                        },
-                                        child: ListView.builder(
-                                          padding: EdgeInsets.only(top: rs.getSize(10), bottom: rs.getSize(80)),
-                                          itemCount: cardsLength,
-                                          itemBuilder: (BuildContext context, int index) {
-                                            return Padding(
-                                              padding: EdgeInsets.only(bottom: rs.getSize(8)),
-                                              child: getFlashCardItem(index),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                              ),
-                            ],
-                          ),
+                        return MyWidget().getRoundBtnWidget(
+                          rs,
+                          text: tr('review'),
+                          bgColor: controller.cards.isNotEmpty ? Theme.of(context).canvasColor : Theme.of(context).disabledColor,
+                          f: onReviewBtn,
+                          hasNullFunction: true,
+                          fontColor: Theme.of(context).cardColor
                         );
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: rs.getSize(20), vertical: rs.getSize(30)),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GetBuilder<FlashCardController>(
-                        builder: (_) {
-                          return MyWidget().getRoundBtnWidget(
-                            rs,
-                            text: tr('review'),
-                            bgColor: controller.cards.isNotEmpty ? MyColors.purple : MyColors.grey,
-                            f: onReviewBtn,
-                            hasNullFunction: true,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -271,16 +270,16 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                     child: Text(front,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2)))),
+                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2), color: Theme.of(context).secondaryHeaderColor))),
                 SizedBox(
                     width: rs.getSize(20),
                     height: rs.getSize(20),
-                    child: VerticalDivider(thickness: rs.getSize(1), color: MyColors.grey)),
+                    child: VerticalDivider(thickness: rs.getSize(1), color: Theme.of(context).disabledColor)),
                 Expanded(
                     child: Text(back,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2)))),
+                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2), color: Theme.of(context).secondaryHeaderColor))),
               ],
             ),
           ),

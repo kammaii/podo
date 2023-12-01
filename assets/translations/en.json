@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Do you want to request a correction?",
   "cancel": "Cancel",
   "writingStatus0": "Submitted",
-  "writingStatus1": "Revised",
+  "writingStatus1": "Corrected",
   "writingStatus2": "Perfect",
   "writingStatus3": "Uncorrectable",
   "requestedCorrection": "Requested a correction",
@@ -153,5 +153,7 @@
   "wantUnlockDetail": "Would you like to subscribe \nto unlock detail explanations?",
   "wantUnlockReading": "Would you like to subscribe \nto unlock reading contents?",
   "wantUnlockWriting": "Would you like to subscribe \nto unlock writing practice?",
-  "premiumOnly": "Premium Only"
+  "premiumOnly": "Premium Only",
+  "on": "on",
+  "off": "off"
 }

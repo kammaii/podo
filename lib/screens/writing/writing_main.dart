@@ -84,7 +84,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        MyWidget().showDialog(rs, content: tr('wantRequestCorrection'), yesFn: () async {
+        MyWidget().showDialog(context, rs, content: tr('wantRequestCorrection'), yesFn: () async {
           await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
           Writing writing = Writing(selectedQuestion!);
           writing.userWriting = textEditController.text;
@@ -110,7 +110,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: InkWell(
         onTap: () {
           if (controller.leftRequestCount.value > 0) {
@@ -119,15 +119,17 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
           } else {
             Get.dialog(
               AlertDialog(
-                title: Text(tr('requestNotAvailableTitle'), style: TextStyle(fontSize: rs.getSize(18))),
-                content: Text(tr('requestNotAvailableContent'), style: TextStyle(fontSize: rs.getSize(15))),
+                title: Text(tr('requestNotAvailableTitle'),
+                    style: TextStyle(fontSize: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor)),
+                content: Text(tr('requestNotAvailableContent'),
+                    style: TextStyle(fontSize: rs.getSize(15), color: Theme.of(context).secondaryHeaderColor)),
                 actions: [
                   ElevatedButton(
                     onPressed: () {
                       Get.back();
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: MyColors.purple),
-                    child: MyWidget().getTextWidget(rs, text: tr('ok'), color: Colors.white),
+                    style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+                    child: MyWidget().getTextWidget(rs, text: tr('ok'), color: Theme.of(context).cardColor),
                   ),
                 ],
               ),
@@ -149,13 +151,13 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                 rs,
                 text: question.title[KO] ?? '',
                 size: 20,
-                color: MyColors.navy,
+                color: Theme.of(context).primaryColorDark,
               ),
               SizedBox(height: rs.getSize(10)),
               MyWidget().getTextWidget(
                 rs,
                 text: question.title[fo] ?? '',
-                color: MyColors.grey,
+                color: Theme.of(context).disabledColor,
               ),
             ],
           ),
@@ -170,6 +172,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: MyWidget().getAppbar(
+        context,
         rs,
         title: tr('writing'),
         actions: [
@@ -181,152 +184,154 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
               ),
               Padding(
                   padding: EdgeInsets.only(right: rs.getSize(20), top: rs.getSize(10)),
-                  child: Obx(() =>
-                      MyWidget().getTextWidget(rs, text: 'x ${controller.leftRequestCount}', color: MyColors.purple))),
+                  child: Obx(() => MyWidget().getTextWidget(rs,
+                      text: 'x ${controller.leftRequestCount}', color: Theme.of(context).primaryColor))),
             ],
           )
         ],
       ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(rs.getSize(10)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
-                    child: MyWidget()
-                        .getTextWidget(rs, text: tr('selectQuestion'), isTextAlignCenter: true, color: MyColors.purple),
-                  ),
-                  Expanded(
-                    child: FutureBuilder(
-                      future: futures,
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        questions = [];
-                        if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                          for (dynamic snapshot in snapshot.data[0]) {
-                            questions.add(WritingQuestion.fromJson(snapshot.data() as Map<String, dynamic>));
-                          }
-                          WidgetsBinding.instance!.addPostFrameCallback((_) {
-                            controller.leftRequestCount.value = maxRequestCount - snapshot.data[1].count as int;
-                          });
-                          return ListView.builder(
-                            itemCount: questions.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return getWritingList(index);
-                            },
-                          );
-                        } else {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Visibility(
-              visible: isVisible,
-              child: GestureDetector(
-                onTap: () {
-                  if (isVisible) {
-                    toggleVisibility();
-                  }
-                },
-                child: Container(
-                  color: Colors.black.withOpacity(0.3),
-                  constraints: const BoxConstraints.expand(),
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(rs.getSize(10)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
+                  child: MyWidget().getTextWidget(rs,
+                      text: tr('selectQuestion'),
+                      isTextAlignCenter: true,
+                      color: Theme.of(context).primaryColor),
                 ),
+                Expanded(
+                  child: FutureBuilder(
+                    future: futures,
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      questions = [];
+                      if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                        for (dynamic snapshot in snapshot.data[0]) {
+                          questions.add(WritingQuestion.fromJson(snapshot.data() as Map<String, dynamic>));
+                        }
+                        WidgetsBinding.instance!.addPostFrameCallback((_) {
+                          controller.leftRequestCount.value = maxRequestCount - snapshot.data[1].count as int;
+                        });
+                        return ListView.builder(
+                          itemCount: questions.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return getWritingList(index);
+                          },
+                        );
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+          Visibility(
+            visible: isVisible,
+            child: GestureDetector(
+              onTap: () {
+                if (isVisible) {
+                  toggleVisibility();
+                }
+              },
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                constraints: const BoxConstraints.expand(),
               ),
             ),
-            Positioned(
-              bottom: 0,
-              child: SlideTransition(
-                position: animationOffset,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 2 / 3,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(topLeft: borderRadius, topRight: borderRadius),
-                    color: Colors.white,
-                  ),
-                  child: GetBuilder<WritingController>(
-                    builder: (_) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: rs.getSize(15)),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                    onPressed: () {
-                                      Get.toNamed(MyStrings.routeOtherWritingList, arguments: selectedQuestion!.id);
-                                    },
-                                    child: MyWidget().getTextWidget(
-                                      rs,
-                                      text: tr('viewOtherUsersWriting'),
-                                      color: MyColors.purple,
-                                      hasUnderline: true,
-                                      isBold: true,
-                                    )),
-                              ],
-                            ),
-                            SizedBox(height: rs.getSize(20)),
-                            MyWidget().getTextWidget(
-                              rs,
+          ),
+          Positioned(
+            bottom: 0,
+            child: SlideTransition(
+              position: animationOffset,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 2 / 3,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(topLeft: borderRadius, topRight: borderRadius),
+                  color: Theme.of(context).cardColor,
+                ),
+                child: GetBuilder<WritingController>(
+                  builder: (_) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: rs.getSize(15)),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                  onPressed: () {
+                                    Get.toNamed(MyStrings.routeOtherWritingList,
+                                        arguments: selectedQuestion!.id);
+                                  },
+                                  child: MyWidget().getTextWidget(
+                                    rs,
+                                    text: tr('viewOtherUsersWriting'),
+                                    color: Theme.of(context).primaryColor,
+                                    hasUnderline: true,
+                                    isBold: true,
+                                  )),
+                            ],
+                          ),
+                          SizedBox(height: rs.getSize(20)),
+                          MyWidget().getTextWidget(rs,
                               text: selectedQuestion != null ? selectedQuestion!.title[KO] : '',
                               isKorean: true,
                               size: 20,
-                            ),
-                            SizedBox(height: rs.getSize(30)),
-                            MyWidget().getTextFieldWidget(rs,
-                                controller: textEditController,
-                                maxLength: maxLength,
-                                maxLines: 1,
-                                hint: tr('writeYourAnswerInKorean'), onSubmitted: (value) {
-                              FocusScope.of(context).unfocus();
-                            }),
-                            SizedBox(height: rs.getSize(30)),
-                            MyWidget().getRoundBtnWidget(
-                              rs,
+                              color: Theme.of(context).secondaryHeaderColor),
+                          SizedBox(height: rs.getSize(30)),
+                          MyWidget().getTextFieldWidget(context, rs,
+                              controller: textEditController,
+                              maxLength: maxLength,
+                              maxLines: 1,
+                              hint: tr('writeYourAnswerInKorean'), onSubmitted: (value) {
+                            FocusScope.of(context).unfocus();
+                          }),
+                          SizedBox(height: rs.getSize(30)),
+                          MyWidget().getRoundBtnWidget(rs,
                               text: tr('correction'),
                               textSize: 15,
                               f: onSendBtn,
                               hasNullFunction: true,
+                              bgColor: Theme.of(context).primaryColor,
+                              fontColor: Theme.of(context).cardColor),
+                          SizedBox(height: rs.getSize(10)),
+                          GestureDetector(
+                            onTap: () {
+                              controller.setCheckbox(!controller.isChecked);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                MyWidget().getCheckBox(rs,
+                                    value: controller.isChecked, onChanged: controller.setCheckbox),
+                                MyWidget().getTextWidget(rs,
+                                    text: tr('iveReadTheFollowing'),
+                                    color: Theme.of(context).secondaryHeaderColor),
+                              ],
                             ),
-                            SizedBox(height: rs.getSize(10)),
-                            GestureDetector(
-                              onTap: () {
-                                controller.setCheckbox(!controller.isChecked);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  MyWidget()
-                                      .getCheckBox(rs, value: controller.isChecked, onChanged: controller.setCheckbox),
-                                  MyWidget().getTextWidget(rs, text: tr('iveReadTheFollowing')),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: rs.getSize(20)),
-                            Expanded(
-                                child: SingleChildScrollView(
-                                    child: MyWidget()
-                                        .getTextWidget(rs, text: tr('writingComment'), color: MyColors.grey))),
-                            SizedBox(height: rs.getSize(20)),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          ),
+                          SizedBox(height: rs.getSize(20)),
+                          Expanded(
+                              child: SingleChildScrollView(
+                                  child: MyWidget().getTextWidget(rs,
+                                      text: tr('writingComment'), color: Theme.of(context).disabledColor))),
+                          SizedBox(height: rs.getSize(20)),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

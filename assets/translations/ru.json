@@ -44,7 +44,7 @@
   "wantRequestCorrection": "Хотите запросить исправление?",
   "cancel": "Отмена",
   "writingStatus0": "Отправлено",
-  "writingStatus1": "Пересмотрено",
+  "writingStatus1": "Исправлено",
   "writingStatus2": "Идеально",
   "writingStatus3": "Невозможно исправить",
   "requestedCorrection": "Вы запросили исправление",
@@ -153,5 +153,7 @@
   "wantUnlockDetail": "Хотите подписаться, чтобы разблокировать подробные объяснения?",
   "wantUnlockReading": "Хотите подписаться, чтобы разблокировать содержание для чтения?",
   "wantUnlockWriting": "Хотите подписаться, чтобы разблокировать практику письма?",
-  "premiumOnly": "Только для Премиум"
+  "premiumOnly": "Только для Премиум",
+  "on": "on",
+  "off": "off"
 }

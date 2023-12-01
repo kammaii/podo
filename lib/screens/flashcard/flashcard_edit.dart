@@ -71,7 +71,7 @@ class FlashCardEdit extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Center(
-                            child: MyWidget().getTextFieldWidget(rs,
+                            child: MyWidget().getTextFieldWidget(context, rs,
                                 focusNode: _focusNodeFront,
                                 controller: TextEditingController(text: front),
                                 hint: 'front',
@@ -85,7 +85,7 @@ class FlashCardEdit extends StatelessWidget {
                         const Divider(height: 10),
                         Expanded(
                           child: Center(
-                            child: MyWidget().getTextFieldWidget(rs,
+                            child: MyWidget().getTextFieldWidget(context, rs,
                                 focusNode: _focusNodeBack,
                                 controller: TextEditingController(text: back),
                                 hint: 'back',

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -69,7 +70,7 @@ class FlashCard {
 
   final controller = Get.put(FlashCardController());
 
-  void addFlashcard(ResponsiveSize rs,
+  void addFlashcard(BuildContext context, ResponsiveSize rs,
       {required String itemId,
       required String front,
       String? back,
@@ -95,7 +96,7 @@ class FlashCard {
       setAndUpdate();
       print('플래시카드 추가');
     } else {
-      MyWidget().showDialog(rs, content: tr('unLimitFlashcard'), yesFn: () {
+      MyWidget().showDialog(context, rs, content: tr('unLimitFlashcard'), yesFn: () {
         Get.toNamed(MyStrings.routePremiumMain);
       });
     }
