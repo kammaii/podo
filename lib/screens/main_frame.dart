@@ -84,48 +84,69 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   }
 
   Widget getLessonCourseList({required LessonCourse lessonCourse}) {
-    return Card(
-      color: Theme.of(context).cardColor,
-      child: InkWell(
-        onTap: () {
-          LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
-          controller.setVisibility(false);
-        },
-        child: Padding(
-          padding: EdgeInsets.all(rs.getSize(15)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  lessonCourse.image != null
-                      ? Padding(
-                          padding: EdgeInsets.only(right: rs.getSize(20)),
-                          child: Image.memory(base64Decode(lessonCourse.image!),
-                              height: rs.getSize(80), width: rs.getSize(80)),
-                        )
-                      : const SizedBox.shrink(),
-                  Expanded(
-                    child: MyWidget().getTextWidget(
-                      rs,
-                      text: lessonCourse.title[setLanguage],
-                      size: modeToggle[0] ? 25 : 20,
-                      color: Theme.of(context).primaryColor,
-                      isBold: true,
+    return Theme(
+      data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
+      child: Card(
+        color: Theme.of(context).cardColor,
+        child: InkWell(
+          onTap: () {
+            LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
+            controller.setVisibility(false);
+          },
+          child: Padding(
+            padding: EdgeInsets.all(rs.getSize(15)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    lessonCourse.image != null
+                        ? Padding(
+                            padding: EdgeInsets.only(right: rs.getSize(20)),
+                            child: Image.memory(base64Decode(lessonCourse.image!),
+                                height: rs.getSize(80), width: rs.getSize(80)),
+                          )
+                        : const SizedBox.shrink(),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              const Icon(Icons.play_lesson_rounded, color: MyColors.navy, size: 18),
+                              const SizedBox(width: 5),
+                              MyWidget().getTextWidget(rs, text: lessonCourse.lessons.length.toString(), color: MyColors.navy),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: MyWidget().getTextWidget(
+                                  rs,
+                                  text: lessonCourse.title[setLanguage],
+                                  size: modeToggle[0] ? 25 : 20,
+                                  color: Theme.of(context).primaryColor,
+                                  isBold: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: modeToggle[0] ? rs.getSize(20) : 0),
-              modeToggle[0]
-                  ? MyWidget().getTextWidget(
-                      rs,
-                      text: lessonCourse.description[setLanguage],
-                      color: Theme.of(context).disabledColor,
-                    )
-                  : const SizedBox.shrink(),
-            ],
+                  ],
+                ),
+                SizedBox(height: modeToggle[0] ? rs.getSize(20) : 0),
+                modeToggle[0]
+                    ? MyWidget().getTextWidget(
+                        rs,
+                        text: lessonCourse.description[setLanguage],
+                        color: Theme.of(context).disabledColor,
+                      )
+                    : const SizedBox.shrink(),
+              ],
+            ),
           ),
         ),
       ),
@@ -338,8 +359,12 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                           fillColor: Theme.of(context).primaryColor,
                                           color: Theme.of(context).primaryColor,
                                           children: [
-                                            Text(tr('on'), style: TextStyle(fontSize: rs.getSize(15))),
-                                            Text(tr('off'), style: TextStyle(fontSize: rs.getSize(15))),
+                                            Text(tr('topic'), style: TextStyle(fontSize: rs.getSize(15))),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
+                                              child:
+                                              Text(tr('grammar'), style: TextStyle(fontSize: rs.getSize(15))),
+                                            ),
                                           ],
                                         ),
                                       ],

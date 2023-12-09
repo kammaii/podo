@@ -354,23 +354,19 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                                                       children: [
                                                         reply.isCorrected
                                                             ? MyWidget().getRoundedContainer(
-                                                                widget: Row(
-                                                                  children: [
-                                                                    Icon(Icons.rate_review_outlined,
-                                                                        color: Theme.of(context).highlightColor,
-                                                                        size: 15),
-                                                                    const SizedBox(width: 5),
-                                                                    MyWidget().getTextWidget(rs,
-                                                                        text: tr('writingStatus1'),
-                                                                        color: Theme.of(context).highlightColor,
-                                                                        size: 13)
-                                                                  ],
-                                                                ),
+                                                                widget: const Icon(Icons.auto_fix_high_rounded,
+                                                                    color: MyColors.greenDark, size: 15),
                                                                 bgColor: MyColors.greenLight,
-                                                                radius: 30,
+                                                                radius: 10,
                                                                 padding: const EdgeInsets.symmetric(
-                                                                    vertical: 3, horizontal: 10))
-                                                            : const SizedBox.shrink(),
+                                                                    vertical: 3, horizontal: 5))
+                                                            : MyWidget().getRoundedContainer(
+                                                                widget: const Icon(Icons.thumb_up_alt_rounded,
+                                                                    color: MyColors.mustard, size: 15),
+                                                                bgColor: MyColors.mustardLight,
+                                                                radius: 10,
+                                                                padding: const EdgeInsets.symmetric(
+                                                                    vertical: 3, horizontal: 5)),
                                                         MyWidget().getTextWidget(
                                                           rs,
                                                           text: reply.userName.isEmpty

@@ -133,7 +133,7 @@ class LessonComplete extends StatelessWidget {
       if (User().status == 0 && User().trialStart == null) {
         showMessagePermission();
       }
-      if (LocalStorage().histories.length % 5 == 0) {
+      if (LocalStorage().histories.length % 3 == 0) {
         showReviewRequest();
       }
     });

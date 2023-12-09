@@ -47,9 +47,9 @@ class _PremiumMainState extends State<PremiumMain> {
   void initState() {
     super.initState();
     if (trialLeftDate != null) {
-      if (trialLeftDate! > 7) {
+      if (trialLeftDate! > 5) {
         msgForTrial = tr('msgForTrial1');
-      } else if (trialLeftDate! <= 7) {
+      } else if (trialLeftDate! <= 5) {
         msgForTrial = tr('msgForTrial2');
       }
     }

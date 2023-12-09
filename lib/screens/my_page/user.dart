@@ -50,6 +50,11 @@ class User {
   static const String DATESIGNIN = 'dateSignIn';
   static const String TRIAL_START = 'trialStart';
   static const String TRIAL_END = 'trialEnd';
+  static const String PREMIUM_START = 'premiumStart';
+  static const String PREMIUM_END = 'premiumEnd';
+  static const String PREMIUM_LATEST_PURCHASE = 'premiumLatestPurchase';
+  static const String PREMIUM_UNSUBSCRIBE_DETECTED = 'premiumUnsubscribeDetected';
+  static const String PREMIUM_WILL_RENEW = 'premiumWillRenew';
   static const String LANGUAGE = 'language';
   static const String FCM_TOKEN = 'fcmToken';
   static const String FCM_PERMISSION = 'fcmPermission';
@@ -82,7 +87,7 @@ class User {
 
   Future<void> getUser() async {
     final currentUser = auth.FirebaseAuth.instance.currentUser;
-    if(currentUser == null) {
+    if (currentUser == null) {
       return;
     }
     id = auth.FirebaseAuth.instance.currentUser!.uid;
@@ -127,16 +132,26 @@ class User {
       if (status == 1 || status == 2) {
         try {
           CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-          final entitlement = customerInfo.entitlements.active;
-          if (entitlement['premium'] != null) {
-            expirationDate =
-                entitlement['premium']!.expirationDate.toString().substring(0, 10).replaceAll('-', '.');
-          }
-          if (entitlement.isNotEmpty) {
+          print('ENTITLEMENT: ${customerInfo.entitlements.active}');
+          final premiumEntitlement = customerInfo.entitlements.active['premium'];
+          if (premiumEntitlement != null) {
+            String premiumStart = premiumEntitlement.originalPurchaseDate;
+            String premiumEnd = premiumEntitlement.expirationDate ?? 'Lifetime';
+            String premiumLatestPurchase = premiumEntitlement.latestPurchaseDate;
+            bool premiumWillRenew = premiumEntitlement.willRenew;
+            String? premiumUnsubscribeDetected = premiumEntitlement.unsubscribeDetectedAt;
+            expirationDate = premiumEnd.substring(0, 10).replaceAll('-', '.');
+            Database().updateFields(collection: 'Users', docId: id, fields: {
+              PREMIUM_START: premiumStart,
+              PREMIUM_END: premiumEnd,
+              PREMIUM_LATEST_PURCHASE: premiumLatestPurchase,
+              PREMIUM_UNSUBSCRIBE_DETECTED: premiumUnsubscribeDetected,
+              PREMIUM_WILL_RENEW: premiumWillRenew,
+            });
             FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
             status = 2;
           } else {
-            if(status == 2) {
+            if (status == 2) {
               FirebaseMessaging.instance.unsubscribeFromTopic('premiumUsers');
               FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
             }
@@ -212,7 +227,8 @@ class User {
 
   Future<void> setTrialAuthorized(ResponsiveSize rs, bool permission) async {
     FirebaseMessaging.instance.subscribeToTopic('trialUsers');
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').where('fcmToken', isEqualTo: fcmToken).get();
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('Users').where('fcmToken', isEqualTo: fcmToken).get();
     status = 3;
     fcmPermission = permission;
     DateTime now = DateTime.now();
@@ -224,7 +240,7 @@ class User {
       TRIAL_START: trialStart,
       TRIAL_END: trialEnd,
     };
-    if(querySnapshot.docs.isNotEmpty) {
+    if (querySnapshot.docs.isNotEmpty) {
       map['fakeUser'] = true;
     }
     await Database().updateFields(collection: 'Users', docId: id, fields: map);

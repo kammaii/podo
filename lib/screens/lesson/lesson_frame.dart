@@ -567,7 +567,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         audios.addAll(snapshot);
       }
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-        await cacheFiles(audios);
+        if(firstAudioCards!.isNotEmpty) {
+          await cacheFiles(audios);
+        } else {
+          setState(() {
+            progressValue = 1;
+            isLoading = false;
+          });
+        }
       });
     });
   }
