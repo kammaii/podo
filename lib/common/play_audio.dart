@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podo/common/cloud_storage.dart';
@@ -40,6 +41,16 @@ class PlayAudio {
         await player.setUrl(url);
         await player.play();
       }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void playWorkbook(String workbookId, String audio) async {
+    try {
+        String url = await FirebaseStorage.instance.ref().child('Workbooks/$workbookId/$audio.m4a').getDownloadURL();
+        await player.setUrl(url);
+        await player.play();
     } catch (e) {
       print('Error: $e');
     }

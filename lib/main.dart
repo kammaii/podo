@@ -12,6 +12,7 @@ import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
+import 'package:podo/screens/lesson/workbook_main.dart';
 import 'package:podo/screens/login/login.dart';
 import 'package:podo/screens/login/logo.dart';
 import 'package:podo/screens/main_frame.dart';
@@ -130,6 +131,7 @@ class MyApp extends StatelessWidget {
               GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),
               GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
               GetPage(name: MyStrings.routePodoMessageMain, page: () => PodoMessageMain()),
+              GetPage(name: MyStrings.routeWorkbookMain, page: () => const WorkbookMain()),
             ],
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,

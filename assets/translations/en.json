@@ -155,5 +155,14 @@
   "wantUnlockWriting": "Would you like to subscribe \nto unlock writing practice?",
   "premiumOnly": "Premium Only",
   "on": "on",
-  "off": "off"
+  "off": "off",
+  "buyBook": "Buy on Amazon",
+  "pdfDownload": "Download PDF",
+  "freeDownload": "Free PDF download for premium users",
+  "downloadComplete": "Download Complete",
+  "workbook": "Workbook",
+  "audios": "Audios",
+  "wantDownloadWorkbook": "Do you want to download the workbook?",
+  "downloadStart": "Starting the download",
+  "preview": "Preview"
 }

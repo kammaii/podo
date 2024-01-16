@@ -155,5 +155,14 @@
   "wantUnlockWriting": "¿Te gustaría suscribirte para desbloquear la práctica de escritura?",
   "premiumOnly": "Solo Premium",
   "on": "on",
-  "off": "off"
+  "off": "off",
+  "buyBook": "Compra en Amazon",
+  "pdfDownload": "Descargar PDF",
+  "freeDownload": "Descarga gratuita de PDF para usuarios premium",
+  "downloadComplete": "Descarga completada",
+  "workbook": "Cuaderno de trabajo",
+  "audios": "Audios",
+  "wantDownloadWorkbook": "¿Quieres descargar el libro de trabajo?",
+  "downloadStart": "Iniciando la descarga",
+  "preview": "Vista previa"
 }

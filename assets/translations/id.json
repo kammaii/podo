@@ -155,5 +155,14 @@
   "wantUnlockWriting": "Apakah Anda ingin berlangganan untuk membuka latihan menulis?",
   "premiumOnly": "Hanya Premium",
   "on": "on",
-  "off": "off"
+  "off": "off",
+  "buyBook": "Beli di Amazon",
+  "pdfDownload": "Unduh PDF",
+  "freeDownload": "Unduh PDF gratis untuk pengguna premium",
+  "downloadComplete": "Unduhan selesai",
+  "workbook": "Buku kerja",
+  "audios": "Audios",
+  "wantDownloadWorkbook": "Apakah Anda ingin mengunduh buku kerja?",
+  "downloadStart": "Memulai unduhan",
+  "preview": "Pratinjau"
 }

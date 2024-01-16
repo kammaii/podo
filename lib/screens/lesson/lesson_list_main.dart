@@ -14,10 +14,10 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
-import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LessonListMain extends StatefulWidget {
   LessonListMain({Key? key, required this.course}) : super(key: key);
@@ -315,6 +315,33 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         setState(() {});
       },
       child: Scaffold(
+        floatingActionButton: course.hasWorkbook
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: rs.getSize(56),
+                    height: rs.getSize(56),
+                    child: FloatingActionButton(
+                      heroTag: 'workbookBtn',
+                      onPressed: () {
+                        Get.toNamed(MyStrings.routeWorkbookMain, arguments: course.id);
+                      },
+                      backgroundColor: MyColors.pinkDark,
+                      child: Icon(FontAwesomeIcons.solidFileAudio, size: rs.getSize(30)),
+                    ),
+                  ),
+                  SizedBox(height: rs.getSize(5)),
+                  MyWidget().getTextWidget(
+                    rs,
+                    text: 'Workbook',
+                    color: MyColors.wine,
+                    isBold: true,
+                  ),
+                  SizedBox(height: rs.getSize(20)),
+                ],
+              )
+            : const SizedBox.shrink(),
         body: Column(
           children: [
             GetBuilder<LessonController>(

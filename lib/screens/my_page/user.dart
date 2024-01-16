@@ -132,7 +132,6 @@ class User {
       if (status == 1 || status == 2) {
         try {
           CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-          print('ENTITLEMENT: ${customerInfo.entitlements.active}');
           final premiumEntitlement = customerInfo.entitlements.active['premium'];
           if (premiumEntitlement != null) {
             String premiumStart = premiumEntitlement.originalPurchaseDate;

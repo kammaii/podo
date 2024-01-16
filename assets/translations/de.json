@@ -155,5 +155,14 @@
   "wantUnlockWriting": "Möchten Sie sich abonnieren, um die Schreibübung freizuschalten?",
   "premiumOnly": "Nur Premium",
   "on": "on",
-  "off": "off"
+  "off": "off",
+  "buyBook": "Kaufen bei Amazon",
+  "pdfDownload": "PDF herunterladen",
+  "freeDownload": "Kostenloser Download für Premium-Nutzer.",
+  "downloadComplete": "Kostenloser PDF-Download für Premium-Nutzer",
+  "workbook": "Arbeitsbuch",
+  "audios": "Audios",
+  "wantDownloadWorkbook": "Möchten Sie das Arbeitsbuch herunterladen?",
+  "downloadStart": "Download wird gestartet",
+  "preview": "Vorschau"
 }

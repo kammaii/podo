@@ -155,5 +155,14 @@
   "wantUnlockWriting": "Хотите подписаться, чтобы разблокировать практику письма?",
   "premiumOnly": "Только для Премиум",
   "on": "on",
-  "off": "off"
+  "off": "off",
+  "buyBook": "Купить на Amazon",
+  "pdfDownload": "Скачать PDF",
+  "freeDownload": "Бесплатная загрузка PDF для премиум-пользователей",
+  "downloadComplete": "Загрузка завершена",
+  "workbook": "Рабочая тетрадь",
+  "audios": "Аудиозаписи",
+  "wantDownloadWorkbook": "Вы хотите скачать рабочую тетрадь?",
+  "downloadStart": "Начинается загрузка",
+  "preview": "Предпросмотр"
 }

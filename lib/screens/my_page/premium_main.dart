@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -270,6 +269,7 @@ class _PremiumMainState extends State<PremiumMain> {
                             onPressed: () async {
                               FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
                               FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
+                              FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');
                               final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
                               purchaseTrace.start();
 

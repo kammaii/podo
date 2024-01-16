@@ -21,6 +21,7 @@ class MyStrings {
   static const String routeFlashcardReview = '/flashcardReview';
   static const String routePremiumMain = '/premiumMain';
   static const String routePodoMessageMain = '/podoMessageMain';
+  static const String routeWorkbookMain = '/workbookMain';
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String repeat = 'repeat';
