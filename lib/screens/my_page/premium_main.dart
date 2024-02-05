@@ -40,6 +40,8 @@ class _PremiumMainState extends State<PremiumMain> {
   String? msgForTrial;
   late Timer timer;
   StreamController<String> streamController = StreamController();
+  bool isAboutDannyExpanded = false;
+  final ScrollController scrollController = ScrollController();
 
 
   @override
@@ -52,6 +54,69 @@ class _PremiumMainState extends State<PremiumMain> {
         msgForTrial = tr('msgForTrial2');
       }
     }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if(User().showPremiumDialog) {
+        Get.dialog(
+            AlertDialog(
+              title: Center(
+                  child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  MyWidget().getTextWidget(rs,
+                      text: tr('premiumDialog1'), color: Theme
+                          .of(context)
+                          .primaryColor, isBold: true, size: 18),
+                  SizedBox(height: rs.getSize(10)),
+                  MyWidget().getTextWidget(rs,
+                      text: tr('premiumDialog2'),
+                      isTextAlignCenter: true, color: Theme
+                          .of(context)
+                          .secondaryHeaderColor),
+                  SizedBox(height: rs.getSize(10)),
+                  MyWidget().getTextWidget(rs,
+                      text: tr('premiumDialog3'),
+                      isTextAlignCenter: true, color: Theme
+                          .of(context)
+                          .primaryColor, size: 13),
+                ],
+              ),
+              backgroundColor: Theme
+                  .of(context)
+                  .cardColor,
+              actionsAlignment: MainAxisAlignment.center,
+              actionsPadding: EdgeInsets.only(
+                  left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      side: BorderSide(color: Theme
+                          .of(context)
+                          .canvasColor, width: 1),
+                      backgroundColor: Theme
+                          .of(context)
+                          .canvasColor),
+                  onPressed: () {
+                    User().showPremiumDialog = false;
+                    Get.back();
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: rs.getSize(13), horizontal: rs.getSize(20)),
+                    child: Text(tr('premiumDialog4'),
+                        style: TextStyle(color: Theme
+                            .of(context)
+                            .cardColor, fontSize: rs.getSize(15))),
+                  ),
+                ),
+              ],
+            ),
+            barrierDismissible: false);
+      }
+    });
   }
 
   Stream<String> getTimeLeftStream() {
@@ -98,36 +163,38 @@ class _PremiumMainState extends State<PremiumMain> {
     return streamController.stream;
   }
 
-
   @override
   void dispose() {
     if (msgForTrial != null) {
       timer.cancel();
       streamController.close();
     }
+    scrollController.dispose();
     super.dispose();
   }
 
   DataColumn getDataColumn(String label) {
     return DataColumn(
       label: Expanded(
-        child: Center(child: MyWidget().getTextWidget(rs, text: label, color: Theme.of(context).secondaryHeaderColor)),
+        child: Center(
+            child: MyWidget().getTextWidget(rs, text: label)),
       ),
     );
   }
 
   DataRow getDataRow(String title, Widget basic, Widget premium, {bool isLimited = false}) {
     return DataRow(cells: <DataCell>[
-      DataCell(MyWidget().getTextWidget(rs, text: title, color: Theme.of(context).secondaryHeaderColor)),
-      isLimited ?
-      DataCell(Center(child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          basic,
-          MyWidget().getTextWidget(rs, text: tr('limited'), size: 10, color: MyColors.mustard),
-        ],
-      ))) :
-      DataCell(Center(child: basic)),
+      DataCell(MyWidget().getTextWidget(rs, text: title)),
+      isLimited
+          ? DataCell(Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                basic,
+                MyWidget().getTextWidget(rs, text: tr('limited'), size: 10, color: MyColors.mustard),
+              ],
+            )))
+          : DataCell(Center(child: basic)),
       DataCell(Center(child: premium)),
     ]);
   }
@@ -141,109 +208,459 @@ class _PremiumMainState extends State<PremiumMain> {
         children: [
           Column(
             children: [
-              msgForTrial != null ?
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                color: Theme.of(context).primaryColor,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    MyWidget().getTextWidget(
-                        rs, text: msgForTrial, color: Theme.of(context).cardColor, isTextAlignCenter: true, size: 16),
-                  ],
-                ),
-              ) : const SizedBox.shrink(),
+              msgForTrial != null
+                  ? Column(
+                    children: [
+                      Container(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          color: trialLeftDate! > 5 ? MyColors.purple : MyColors.red,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              MyWidget().getTextWidget(rs,
+                                  text: msgForTrial,
+                                  color: Colors.white,
+                                  isTextAlignCenter: true,
+                                  size: 16),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                    ],
+                  )
+                  : const SizedBox.shrink(),
               const SizedBox(height: 10),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: rs.getSize(15),
-                        right: rs.getSize(15),
-                        bottom: rs.getSize(50),
-                        top: rs.getSize(20)),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset('assets/images/quote_upper.png', color: Theme.of(context).primaryColor),
-                            SizedBox(width: rs.getSize(5)),
-                            Expanded(
-                                child: MyWidget().getTextWidget(rs,
-                                    text: tr('premiumComment'),
-                                    color: Theme.of(context).primaryColor,
-                                    isTextAlignCenter: true,
-                                    size: 20)),
-                            SizedBox(width: rs.getSize(5)),
-                            Image.asset('assets/images/quote_lower.png', color: Theme.of(context).primaryColor),
-                          ],
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3)
+                            )
+                          ]
                         ),
-                        SizedBox(height: rs.getSize(20)),
-                        DataTable(
-                          horizontalMargin: 0,
-                          columns: <DataColumn>[
-                            getDataColumn(''),
-                            getDataColumn('Basic'),
-                            getDataColumn('Premium'),
-                          ],
-                          rows: <DataRow>[
-                            getDataRow(
-                                tr('lesson'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
-                                const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                            getDataRow(
-                                tr('reading'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
-                                const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                            getDataRow(
-                                tr('flashcard'), const Icon(Icons.check_circle_outline, color: MyColors.mustard),
-                                const Icon(Icons.check_circle_outline, color: MyColors.green), isLimited: true),
-                            getDataRow(
-                                tr('writingCorrection'),
-                                const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                            getDataRow(
-                                tr('podosMsg'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                            getDataRow(
-                                tr('adFree'), const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                const Icon(Icons.check_circle_outline, color: MyColors.green))
-                          ],
+                        child: Image.asset('assets/images/danny.png', width: rs.getSize(100), height: rs.getSize(100))
+                      ),
+                      SizedBox(height: rs.getSize(20)),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(children: [
+                          TextSpan(
+                              text: '안녕하세요?\n\n',
+                              style: TextStyle(
+                                  fontFamily: 'KoreanFont',
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: ResponsiveSize(context).getSize(20),
+                                  fontWeight: FontWeight.bold)),
+                          TextSpan(
+                              text: tr('premium1'),
+                              style: TextStyle(
+                                  fontFamily: 'EnglishFont',
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: ResponsiveSize(context).getSize(15))),
+                          TextSpan(
+                            text: tr('premium2'),
+                            style: TextStyle(
+                                fontFamily: 'EnglishFont',
+                                color: Colors.blue,
+                                fontSize: ResponsiveSize(context).getSize(15)),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                setState(() {
+                                  isAboutDannyExpanded = !isAboutDannyExpanded;
+                                });
+                              },
+                          ),
+                        ]),
+                      ),
+                      SizedBox(height: rs.getSize(30)),
+                      AnimatedSize(
+                        duration: const Duration(seconds: 1),
+                        curve: Curves.fastOutSlowIn,
+                        child: Visibility(
+                          visible: isAboutDannyExpanded,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColorLight,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Image.asset('assets/images/quote_upper.png', color: Theme.of(context).primaryColor),
+                                        SizedBox(width: rs.getSize(5)),
+                                        Expanded(
+                                            child: MyWidget().getTextWidget(rs,
+                                                text: tr('premium2'),
+                                                color: Theme.of(context).primaryColor,
+                                                size: 18,
+                                                isBold: true,
+                                                isTextAlignCenter: true)),
+                                        SizedBox(width: rs.getSize(5)),
+                                        Image.asset('assets/images/quote_lower.png', color: Theme.of(context).primaryColor),
+                                      ],
+                                    ),
+                                    Divider(color: Theme.of(context).primaryColor, thickness: 1.3),
+                                    const SizedBox(height: 20),
+                                    MyWidget().getTextWidget(
+                                        height: 1.5,
+                                        rs,
+                                        text: tr('aboutDanny1'),
+                                        color: Theme.of(context).primaryColor,
+                                        isTextAlignCenter: true),
+                                    const SizedBox(height: 10),
+                                    MyWidget().getTextWidget(
+                                        height: 1.5,
+                                        rs,
+                                        text: tr('aboutDanny2'),
+                                        color: Theme.of(context).primaryColor,
+                                        isTextAlignCenter: true,
+                                        isBold: true,
+                                        size: 18),
+                                    const SizedBox(height: 10),
+                                    MyWidget().getTextWidget(
+                                        height: 1.5,
+                                        rs,
+                                        text: tr('aboutDanny3'),
+                                        color: Theme.of(context).primaryColor,
+                                        isTextAlignCenter: true),
+                                    const SizedBox(height: 10),
+                                    MyWidget().getTextWidget(
+                                        height: 1.5,
+                                        rs,
+                                        text: tr('aboutDanny4'),
+                                        color: Theme.of(context).primaryColor,
+                                        isTextAlignCenter: true,
+                                        isBold: true,
+                                        size: 18),
+                                    const SizedBox(height: 10),
+                                    MyWidget().getTextWidget(
+                                        height: 1.5,
+                                        rs,
+                                        text: tr('aboutDanny5'),
+                                        color: Theme.of(context).primaryColor,
+                                        isTextAlignCenter: true),
+                                    const SizedBox(height: 10),
+                                    IconButton(onPressed: (){
+                                      setState(() {
+                                        isAboutDannyExpanded = false;
+                                        scrollController.animateTo(0, duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
+                                      });
+                                    }, icon: Icon(Icons.keyboard_arrow_up_rounded, color: Theme.of(context).primaryColor))
+                                  ],
+                                ),
+                              )),
                         ),
-                        Divider(height: rs.getSize(30), thickness: rs.getSize(2), color: Theme.of(context).primaryColor),
-                        RichText(
+                      ),
+                      Stack(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            color: isAboutDannyExpanded ? MyColors.navyLight : MyColors.navyLightLight,
+                            height: 100,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              color: MyColors.pink,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Image.asset('assets/images/quote_upper.png', color: MyColors.pinkDark),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Expanded(
+                                          child: MyWidget().getTextWidget(rs,
+                                              text: tr('premium3'),
+                                              color: MyColors.pinkDark,
+                                              size: 18,
+                                              isBold: true,
+                                              isTextAlignCenter: true)),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Image.asset('assets/images/quote_lower.png', color: MyColors.pinkDark),
+                                    ],
+                                  ),
+                                  const Divider(color: MyColors.pinkDark, thickness: 1.3),
+                                  const SizedBox(height: 20),
+                                  MyWidget().getTextWidget(rs, text: tr('premium4'), color: MyColors.pinkDark),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                      decoration: const BoxDecoration(
+                                          color: MyColors.pinkDark,
+                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: MyWidget().getTextWidget(
+                                            height: 1.5, rs, text: tr('premium5'), color: MyColors.pink),
+                                      )),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                      decoration: const BoxDecoration(
+                                          color: MyColors.pinkDark,
+                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: MyWidget().getTextWidget(
+                                            height: 1.5, rs, text: tr('premium6'), color: MyColors.pink),
+                                      )),
+                                  const SizedBox(height: 20),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium7'),
+                                      color: MyColors.pinkDark,
+                                      isTextAlignCenter: true),
+                                  const SizedBox(height: 10),
+                                  MyWidget()
+                                      .getTextWidget(rs, text: tr('premium8'), color: MyColors.pinkDark, isBold: true),
+                                  MyWidget().getTextWidget(rs, text: tr('premium9'), color: MyColors.pinkDark),
+                                  MyWidget().getTextWidget(rs, text: tr('premium10'), color: MyColors.pinkDark),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(rs, text: tr('premium11'), color: MyColors.pinkDark),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(rs,
+                                      text: tr('premium12'), color: MyColors.pinkDark, isBold: true, size: 20),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Stack(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            color: MyColors.pink,
+                            height: 100,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              color: MyColors.mustardLight,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Image.asset('assets/images/quote_upper.png', color: MyColors.mustard),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Expanded(
+                                          child: MyWidget().getTextWidget(rs,
+                                              text: tr('premium13'),
+                                              color: MyColors.mustard,
+                                              size: 18,
+                                              isBold: true,
+                                              isTextAlignCenter: true)),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Image.asset('assets/images/quote_lower.png', color: MyColors.mustard),
+                                    ],
+                                  ),
+                                  const Divider(color: MyColors.mustard, thickness: 1.3),
+                                  const SizedBox(height: 20),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium14'),
+                                      color: MyColors.mustard,
+                                      isTextAlignCenter: true),
+                                  MyWidget().getTextWidget(rs, text: tr('premium15'), color: MyColors.mustard),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(rs,
+                                      text: tr('premium16'), color: MyColors.mustard, size: 18, isBold: true),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium17'),
+                                      color: MyColors.mustard,
+                                      isTextAlignCenter: true),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Stack(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            color: MyColors.mustardLight,
+                            height: 100,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              color: MyColors.navyLightLight,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Image.asset('assets/images/quote_upper.png', color: MyColors.purple),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Expanded(
+                                          child: MyWidget().getTextWidget(rs,
+                                              text: tr('premium18'),
+                                              color: MyColors.purple,
+                                              size: 18,
+                                              isBold: true,
+                                              isTextAlignCenter: true)),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Image.asset('assets/images/quote_lower.png', color: MyColors.purple),
+                                    ],
+                                  ),
+                                  const Divider(color: MyColors.purple, thickness: 1.3),
+                                  const SizedBox(height: 20),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium19'),
+                                      color: MyColors.purple,
+                                      isTextAlignCenter: true),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium20'),
+                                      color: MyColors.purple,
+                                      isTextAlignCenter: true,
+                                      isBold: true),
+                                  const SizedBox(height: 20),
+                                  DataTable(
+                                    horizontalMargin: 0,
+                                    columns: <DataColumn>[
+                                      getDataColumn(''),
+                                      getDataColumn('Basic'),
+                                      getDataColumn('Premium'),
+                                    ],
+                                    rows: <DataRow>[
+                                      getDataRow(
+                                          tr('lesson'),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green),
+                                          isLimited: true),
+                                      getDataRow(
+                                          tr('reading'),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green),
+                                          isLimited: true),
+                                      getDataRow(
+                                          tr('flashcard'),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.mustard),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green),
+                                          isLimited: true),
+                                      getDataRow(
+                                          tr('writingCorrection'),
+                                          const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                                      getDataRow(
+                                          tr('podosMsg'),
+                                          const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                                      getDataRow(
+                                          tr('adFree'),
+                                          const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green))
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                                    decoration: const BoxDecoration(
+                                      color: MyColors.red,
+                                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                                      child: MyWidget().getTextWidget(
+                                        rs,
+                                        text: tr('premium21'),
+                                        color: Colors.white,
+                                        isTextAlignCenter: true,
+                                        size: 20,
+                                        isBold: true),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Divider(
+                          height: rs.getSize(30), thickness: rs.getSize(2), color: Theme.of(context).primaryColor),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: RichText(
                           text: TextSpan(children: [
                             TextSpan(
                                 text: tr('premiumDetail'),
-                                style:
-                                TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                                style: TextStyle(
+                                    color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
                             TextSpan(
                               text: tr('termOfUse'),
-                              style: TextStyle(
-                                  color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
+                              style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  launchUrl(
-                                      Uri.parse(
-                                          'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
+                                  launchUrl(Uri.parse(
+                                      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
                                 },
                             ),
                             TextSpan(
                                 text: tr('and'),
-                                style:
-                                TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                                style: TextStyle(
+                                    color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
                             TextSpan(
                               text: tr('privacyPolicy'),
-                              style: TextStyle(
-                                  color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
+                              style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   launchUrl(Uri.parse('https://podo-49335.web.app/privacyPolicy.html'));
                                 },
                             )
                           ]),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
@@ -312,68 +729,71 @@ class _PremiumMainState extends State<PremiumMain> {
                               children: [
                                 Expanded(
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: rs.getSize(23), vertical: rs.getSize(10)),
-                                      decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                              colors: [MyColors.purple, MyColors.green]),
-                                          borderRadius: BorderRadius.circular(15)),
-                                      child: offering != null
-                                          ? Row(
-                                        children: [
-                                          Icon(
-                                              FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(30)),
-                                          SizedBox(width: rs.getSize(18)),
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    MyWidget().getTextWidget(rs,
-                                                        text: 'Get Podo Premium!',
-                                                        color: Colors.white,
-                                                        size: rs.getSize(16),
-                                                        isBold: true),
-                                                    Row(
-                                                      children: [
-                                                        MyWidget().getTextWidget(rs,
-                                                            text: snapshot.data?.getOffering('default')?.twoMonth?.storeProduct.priceString,
-                                                            color: Colors.white,
-                                                            hasCancelLine: true,
-                                                            size: 15),
-                                                        const SizedBox(width: 10),
-                                                        const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
-                                                        const SizedBox(width: 10),
-                                                        MyWidget().getTextWidget(rs,
-                                                            text: offering.availablePackages[0].storeProduct.priceString,
-                                                            color: Colors.white,
-                                                            size: 18,
-                                                            isBold: true),
-                                                        MyWidget().getTextWidget(rs,
-                                                            text: ' / ${offering.identifier}',
-                                                            color: Colors.white,
-                                                            size: 18),
-                                                      ],
-                                                    ),
-                                                    MyWidget().getTextWidget(rs,
-                                                      text: offering.serverDescription,
-                                                      color: Colors.white,
-                                                      size: rs.getSize(15)
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: rs.getSize(23), vertical: rs.getSize(10)),
+                                  decoration: BoxDecoration(
+                                      gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: offering != null
+                                      ? Row(
+                                          children: [
+                                            Icon(FontAwesomeIcons.crown,
+                                                color: Colors.white, size: rs.getSize(30)),
+                                            SizedBox(width: rs.getSize(18)),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      MyWidget().getTextWidget(rs,
+                                                          text: 'Get Podo Premium!',
+                                                          color: Colors.white,
+                                                          size: rs.getSize(16),
+                                                          isBold: true),
+                                                      Row(
+                                                        children: [
+                                                          MyWidget().getTextWidget(rs,
+                                                              text: snapshot.data
+                                                                  ?.getOffering('default')
+                                                                  ?.twoMonth
+                                                                  ?.storeProduct
+                                                                  .priceString,
+                                                              color: Colors.white,
+                                                              hasCancelLine: true,
+                                                              size: 15),
+                                                          const SizedBox(width: 10),
+                                                          const Icon(Icons.arrow_forward_rounded,
+                                                              color: Colors.white, size: 18),
+                                                          const SizedBox(width: 10),
+                                                          MyWidget().getTextWidget(rs,
+                                                              text: offering
+                                                                  .availablePackages[0].storeProduct.priceString,
+                                                              color: Colors.white,
+                                                              size: 18,
+                                                              isBold: true),
+                                                          MyWidget().getTextWidget(rs,
+                                                              text: ' / ${offering.identifier}',
+                                                              color: Colors.white,
+                                                              size: 18),
+                                                        ],
+                                                      ),
+                                                      MyWidget().getTextWidget(rs,
+                                                          text: offering.serverDescription,
+                                                          color: Colors.white,
+                                                          size: rs.getSize(15)),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      )
-                                          : Center(
+                                          ],
+                                        )
+                                      : Center(
                                           child: MyWidget()
-                                              .getTextWidget(
-                                              rs, text: tr('failedOffering'), color: Colors.white)),
-                                    )),
+                                              .getTextWidget(rs, text: tr('failedOffering'), color: Colors.white)),
+                                )),
                               ],
                             ),
                           ),
@@ -385,8 +805,7 @@ class _PremiumMainState extends State<PremiumMain> {
                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),),
                                 bgColor: MyColors.red,
                                 radius: 20,
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10))
-                        ),
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10))),
                         Visibility(
                             visible: msgForTrial != null,
                             child: Positioned(
@@ -400,8 +819,8 @@ class _PremiumMainState extends State<PremiumMain> {
                                       children: [
                                         const Icon(CupertinoIcons.clock_fill, size: 15, color: MyColors.red),
                                         const SizedBox(width: 5),
-                                        MyWidget().getTextWidget(
-                                            rs, text: snapshot.data!, color: MyColors.red, isBold: true),
+                                        MyWidget().getTextWidget(rs,
+                                            text: snapshot.data!, color: MyColors.red, isBold: true),
                                       ],
                                     );
                                   } else {

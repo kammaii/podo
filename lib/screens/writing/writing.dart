@@ -16,6 +16,7 @@ class Writing {
   late DateTime dateWriting;
   DateTime? dateReply;
   late int status;
+  String? comments;
 
   Writing(WritingQuestion question) {
     id = const Uuid().v4();
@@ -42,6 +43,7 @@ class Writing {
   static const String DATEWRITING = 'dateWriting';
   static const String DATEREPLY = 'dateReply';
   static const String STATUS = 'status';
+  static const String COMMENTS = 'comments';
 
   Writing.fromJson(Map<String, dynamic> json) {
     id = json[ID];
@@ -59,6 +61,9 @@ class Writing {
       dateReply = replyStamp.toDate();
     }
     status = json[STATUS];
+    if (json[COMMENTS] != null) {
+      comments = json[COMMENTS];
+    }
   }
 
   Map<String, dynamic> toJson() {

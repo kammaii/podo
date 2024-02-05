@@ -39,6 +39,7 @@ class User {
   late bool fcmPermission;
   late int status;
   String? expirationDate; // only for MyPage
+  bool showPremiumDialog = true;
   final admin = 'gabmanpark@gmail.com';
   bool isConvertedBasic = false;
 

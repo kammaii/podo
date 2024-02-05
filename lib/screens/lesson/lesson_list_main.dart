@@ -83,7 +83,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   runLesson(Lesson lesson) async {
     LocalStorage().setLessonScrollPosition(scrollController.offset);
-    await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.id);
+    await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.title[KO]);
     if (!lesson.hasOptions) {
       Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
     } else {

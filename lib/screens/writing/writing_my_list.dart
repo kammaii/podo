@@ -17,8 +17,6 @@ import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:html/parser.dart' as htmlParser;
 
-import '../../values/my_strings.dart';
-
 class WritingMyList extends StatefulWidget {
   WritingMyList({Key? key}) : super(key: key);
 
@@ -192,6 +190,17 @@ class _WritingMyListState extends State<WritingMyList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: items,
               ),
+              const Divider(),
+              Visibility(
+                visible: writing.comments != null,
+                child: Column(
+                  children: [
+                    MyWidget().getTextWidget(rs, text: 'Comments', isBold: true),
+                    const SizedBox(height: 10),
+                    MyWidget().getTextWidget(rs, text: writing.comments),
+                  ],
+                ),
+              )
             ],
           ),
         bgColor: Theme.of(context).cardColor),

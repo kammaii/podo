@@ -62,7 +62,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
               } else {
                 MyWidget().showDialog(context, rs, content: tr('watchRewardAdReading'), yesFn: () {
                   AdsController().showRewardAd();
-                  FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.id);
+                  FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.title[KO]);
                   Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle);
                 }, hasNoBtn: false, hasTextBtn: true);
               }

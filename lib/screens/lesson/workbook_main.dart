@@ -372,6 +372,11 @@ class _WorkbookMainState extends State<WorkbookMain> {
                                     horizontalPadding: 5,
                                     borderRadius: 20,
                                     bgColor: Theme.of(context).canvasColor),
+                                const SizedBox(height: 5),
+                                FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: MyWidget().getTextWidget(rs,
+                                        text: tr('workbookPdfInfo'), color: MyColors.red)),
                                 Obx(() => controller.downloadState.value != 0
                                     ? Row(
                                         mainAxisAlignment: MainAxisAlignment.start,
