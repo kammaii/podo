@@ -51,6 +51,7 @@
 		D185979060C27608196C53C8 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F20ED51A2A8FBB3B00BC79CD /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F25345652A695E89007E02C9 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		F26957E72B6367E000BEFE27 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		F28A41632ADEC46F001BB306 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -70,6 +71,7 @@
 		7459B4D0BE9CAB1D01A0A2CE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F26957E72B6367E000BEFE27 /* libsqlite3.tbd */,
 				F20ED51A2A8FBB3B00BC79CD /* StoreKit.framework */,
 				D185979060C27608196C53C8 /* Pods_Runner.framework */,
 			);
