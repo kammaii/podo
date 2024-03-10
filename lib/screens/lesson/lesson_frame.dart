@@ -160,6 +160,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         break;
 
       case MyStrings.explain:
+        String html = card.content[fo] ?? card.content['en'];
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -167,7 +168,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
             SizedBox(height: rs.getSize(10)),
             Expanded(
               child: SingleChildScrollView(
-                child: getHtmlWidget(card.content[fo]),
+                child: getHtmlWidget(html),
               ),
             ),
           ],

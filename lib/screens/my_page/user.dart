@@ -38,6 +38,7 @@ class User {
   String? fcmToken;
   late bool fcmPermission;
   late int status;
+  int? buildNumber;
   String? expirationDate; // only for MyPage
   bool showPremiumDialog = true;
   final admin = 'gabmanpark@gmail.com';
@@ -60,6 +61,7 @@ class User {
   static const String FCM_TOKEN = 'fcmToken';
   static const String FCM_PERMISSION = 'fcmPermission';
   static const String STATUS = 'status';
+  static const String BUILD_NUMBER = 'buildNumber';
   static const String ALL_USERS = 'allUsers';
 
   Map<String, dynamic> toJson() {
@@ -119,6 +121,9 @@ class User {
         trialEnd = stamp.toDate();
       }
       status = json[STATUS];
+      if (json[BUILD_NUMBER] != null) {
+        buildNumber = json[BUILD_NUMBER];
+      }
 
       if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
         FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');

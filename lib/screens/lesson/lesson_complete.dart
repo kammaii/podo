@@ -36,7 +36,7 @@ class LessonComplete extends StatelessWidget {
             backgroundColor: Theme.of(context).cardColor),
         onPressed: fn,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: rs.getSize(50), vertical: rs.getSize(13)),
+          padding: EdgeInsets.symmetric(horizontal: rs.getSize(30), vertical: rs.getSize(13)),
           child: Row(
             children: [
               Icon(icon, color: Theme.of(context).primaryColor, size: rs.getSize(20)),

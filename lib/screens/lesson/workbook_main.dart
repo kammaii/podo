@@ -227,7 +227,12 @@ class _WorkbookMainState extends State<WorkbookMain> {
       await Permission.storage.request();
     }
     controller.setDownloadState(1);
-    final extDir = await getExternalStorageDirectory();
+    final extDir;
+    if(Platform.isAndroid) {
+      extDir = await getExternalStorageDirectory();
+    } else {
+      extDir = await getApplicationDocumentsDirectory();
+    }
     final filePath = "${extDir!.path}/${workbook.pdfFile}";
     final file = File(filePath);
     if (await file.exists()) {

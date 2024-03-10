@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -23,7 +22,6 @@ import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
-import 'login.dart';
 
 class Logo extends StatelessWidget {
   Logo({Key? key}) : super(key: key);
@@ -169,6 +167,10 @@ class Logo extends StatelessWidget {
               future: PackageInfo.fromPlatform(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (snapshot.hasData) {
+                  int buildNumber = int.parse(snapshot.data.buildNumber);
+                  if(user.User().buildNumber == null || user.User().buildNumber != buildNumber) {
+                    Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'buildNumber', value: buildNumber);
+                  }
                   return Positioned(
                       top: rs.getSize(20),
                       right: rs.getSize(20),
