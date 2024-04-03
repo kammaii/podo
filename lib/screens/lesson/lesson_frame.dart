@@ -22,6 +22,7 @@ import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson_card.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
+import 'package:podo/screens/lesson/trans_feedback.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -469,14 +470,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
         widget = const SizedBox.shrink();
     }
 
-    return Padding(
-      padding: EdgeInsets.only(top: rs.getSize(50)),
-      child: Card(
-          child: Padding(
-        padding: EdgeInsets.all(rs.getSize(20)),
-        child: widget,
-      )),
-    );
+    return Card(
+        child: Padding(
+      padding: EdgeInsets.all(rs.getSize(20)),
+      child: widget,
+    ));
   }
 
   toggleBottomAudioWidget(bool isForward) {
@@ -670,6 +668,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
       body: isLoading
           ? MyWidget().getLoading(context, rs, progressValue)
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 LinearPercentIndicator(
                   animateFromLastPercent: true,
@@ -678,6 +677,60 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                   percent: thisIndex / cards.length,
                   backgroundColor: Theme.of(context).primaryColorLight,
                   progressColor: Theme.of(context).primaryColor,
+                ),
+                Padding(
+                  padding: EdgeInsets.all(rs.getSize(10)),
+                  child: IconButton(
+                      onPressed: () {
+                        String textWithoutHtml =
+                            cards[thisIndex].content[fo].replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), '');
+                        TextEditingController feedbackController = TextEditingController(text: textWithoutHtml);
+                        String feedback = '';
+                        Get.dialog(AlertDialog(
+                          backgroundColor: Theme.of(context).cardColor,
+                          title: Center(
+                            child: Column(
+                              children: [
+                                MyWidget().getTextWidget(rs, text: tr('transFeedback'), isBold: true),
+                                const SizedBox(height: 10),
+                                MyWidget()
+                                    .getTextWidget(rs, text: tr('transFeedbackExplain'), isTextAlignCenter: true),
+                              ],
+                            ),
+                          ),
+                          content: MyWidget().getTextFieldWidget(context, rs,
+                              controller: feedbackController, maxLines: 5, onChanged: (value) {
+                            feedback = value;
+                          }),
+                          actions: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
+                                  backgroundColor: Theme.of(context).canvasColor),
+                              onPressed: () async {
+                                TransFeedback transFeedback = TransFeedback(
+                                    lessonId: lesson.id,
+                                    lessonTitle: lesson.title[KO],
+                                    cardId: cards[thisIndex].id,
+                                    feedback: feedback);
+                                await Database().setDoc(collection: 'TransFeedbacks', doc: transFeedback);
+                                Get.back();
+                                MyWidget().showSnackbarWithPodo(rs, title: tr('thanksFeedback'));
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                                child: Text(tr('send'),
+                                    style:
+                                        TextStyle(color: Theme.of(context).cardColor, fontSize: rs.getSize(15))),
+                              ),
+                            )
+                          ],
+                        ));
+                      },
+                      icon: Image.asset('assets/images/trans_feedback_icon.png')),
                 ),
                 Expanded(
                   child: Swiper(

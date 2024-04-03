@@ -196,5 +196,7 @@
   "premiumDialog2": "Pour ceux dont l'objectif est la conversation simple, les leçons gratuites sont suffisantes.",
   "premiumDialog3": "Podo Korean est une application pour les apprenants sérieux du coréen.",
   "premiumDialog4": "Je suis un apprenant sérieux",
-  "workbookPdfInfo": "Paiement unique. Téléchargeable à nouveau."
+  "workbookPdfInfo": "Paiement unique. Téléchargeable à nouveau.",
+  "transFeedback": "Retour sur la traduction",
+  "transFeedbackExplain": "Y a-t-il une erreur dans la traduction ? N'hésitez pas à nous en faire part."
 }

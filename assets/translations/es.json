@@ -196,5 +196,7 @@
   "premiumDialog2": "Para aquellos cuyo objetivo es la conversación simple, las lecciones gratuitas son suficientes.",
   "premiumDialog3": "Podo Korean es una aplicación para estudiantes serios del idioma coreano.",
   "premiumDialog4": "Soy un aprendiz serio",
-  "workbookPdfInfo": "Pago único. Se puede volver a descargar."
+  "workbookPdfInfo": "Pago único. Se puede volver a descargar.",
+  "transFeedback": "Retroalimentación de la traducción",
+  "transFeedbackExplain": "¿Hay algún error en la traducción? Háganoslo saber."
 }
