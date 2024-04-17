@@ -105,7 +105,7 @@ class User {
       Timestamp stamp = json[DATESIGNUP];
       dateSignUp = stamp.toDate();
       dateSignIn = DateTime.now();
-      Database().updateDoc(collection: 'Users', docId: id, key: 'dateSignIn', value: DateTime.now());
+      FirebaseFirestore.instance.collection('Users').doc(id).update({'dateSignIn': DateTime.now(), 'dateEmailSend': FieldValue.delete()});
       language = json[LANGUAGE];
       if (json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
