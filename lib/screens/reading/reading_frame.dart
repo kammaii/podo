@@ -59,59 +59,6 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   late ResponsiveSize rs;
   Map<String, PlayStopIcon> playStopIcons = {};
 
-  void showMessagePermission() async {
-    await FirebaseAnalytics.instance.logEvent(name: 'first_lesson_complete');
-    Get.dialog(
-        AlertDialog(
-          title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
-          content: MyWidget().getTextWidget(rs, text: tr('trialComment'), isTextAlignCenter: true, size: 16),
-          actionsAlignment: MainAxisAlignment.center,
-          actionsPadding: EdgeInsets.all(rs.getSize(20)),
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  backgroundColor: MyColors.purple),
-              onPressed: () async {
-                Get.back();
-                FirebaseMessaging messaging = FirebaseMessaging.instance;
-                NotificationSettings settings = await messaging.requestPermission();
-                if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-                  await FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
-                  await User().setTrialAuthorized(rs, true);
-                  MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
-                  Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-                } else {
-                  await FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
-                  await User().setTrialAuthorized(rs, false);
-                  Get.defaultDialog(
-                      title: tr('trialDenyTitle'),
-                      content: Center(child: Text(tr('trialDenyContent'), textAlign: TextAlign.center)),
-                      titlePadding: const EdgeInsets.all(10),
-                      contentPadding: const EdgeInsets.all(10),
-                      buttonColor: MyColors.purple,
-                      confirmTextColor: Colors.white,
-                      barrierDismissible: false,
-                      onConfirm: () {
-                        Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-                      });
-                }
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(15), vertical: rs.getSize(3)),
-                  child: MyWidget().getTextWidget(rs, text: tr('cool'), color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        ),
-        barrierDismissible: false);
-  }
-
   @override
   void dispose() {
     scrollController.dispose();
@@ -277,11 +224,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
           color: Colors.white,
           onPressed: () {
-            if (User().status == 0 && User().trialStart == null) {
-              showMessagePermission();
-            } else {
-              Navigator.pop(context);
-            }
+            Navigator.pop(context);
           },
         ),
       ),
@@ -376,11 +319,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                           History().addHistory(itemIndex: 1, itemId: readingTitle.id);
                           LocalStorage().prefs!.remove(readingTitle.id);
                           controller.isCompleted[readingTitle.id] = true;
-                          if (User().status == 0 && User().trialStart == null) {
-                            showMessagePermission();
-                          } else {
-                            Get.back();
-                          }
+                          Get.back();
                         }, bgColor: Theme.of(context).primaryColor, fontColor: Theme.of(context).cardColor),
                       )
                     : const SizedBox.shrink(),

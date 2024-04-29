@@ -93,16 +93,14 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   Widget lessonListWidget(int index) {
     late Lesson lesson;
-    bool isReleased = true;
 
     lesson = Lesson.fromJson(course.lessons[index] as Map<String, dynamic>);
-    if (!isAdmin && !lesson.isReleased) {
-      isReleased = false;
-    }
-    bool isLocked = false;
-    if (User().status == 1 && !lesson.isFree) {
-      isLocked = true;
-    }
+    bool isReleased = lesson.isReleased;
+
+    isAdmin ? isReleased = true : null;
+
+    bool isLocked = !lesson.isFree;
+    User().status == 2 || User().status == 3 ? isLocked = false : null;
 
     return isReleased
         ? Theme(

@@ -40,7 +40,6 @@ class _PremiumMainState extends State<PremiumMain> {
   String? msgForTrial;
   late Timer timer;
   StreamController<String> streamController = StreamController();
-  bool isAboutDannyExpanded = false;
   final ScrollController scrollController = ScrollController();
 
 
@@ -266,113 +265,87 @@ class _PremiumMainState extends State<PremiumMain> {
                                   fontFamily: 'EnglishFont',
                                   color: Theme.of(context).primaryColor,
                                   fontSize: ResponsiveSize(context).getSize(15))),
-                          TextSpan(
-                            text: tr('premium2'),
-                            style: TextStyle(
-                                fontFamily: 'EnglishFont',
-                                color: Colors.blue,
-                                fontSize: ResponsiveSize(context).getSize(15)),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                setState(() {
-                                  isAboutDannyExpanded = !isAboutDannyExpanded;
-                                });
-                              },
-                          ),
                         ]),
                       ),
                       SizedBox(height: rs.getSize(30)),
-                      AnimatedSize(
-                        duration: const Duration(seconds: 1),
-                        curve: Curves.fastOutSlowIn,
-                        child: Visibility(
-                          visible: isAboutDannyExpanded,
-                          child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColorLight,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  topRight: Radius.circular(20),
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                                child: Column(
+                      Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColorLight,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Image.asset('assets/images/quote_upper.png', color: Theme.of(context).primaryColor),
-                                        SizedBox(width: rs.getSize(5)),
-                                        Expanded(
-                                            child: MyWidget().getTextWidget(rs,
-                                                text: tr('premium2'),
-                                                color: Theme.of(context).primaryColor,
-                                                size: 18,
-                                                isBold: true,
-                                                isTextAlignCenter: true)),
-                                        SizedBox(width: rs.getSize(5)),
-                                        Image.asset('assets/images/quote_lower.png', color: Theme.of(context).primaryColor),
-                                      ],
-                                    ),
-                                    Divider(color: Theme.of(context).primaryColor, thickness: 1.3),
-                                    const SizedBox(height: 20),
-                                    MyWidget().getTextWidget(
-                                        height: 1.5,
-                                        rs,
-                                        text: tr('aboutDanny1'),
-                                        color: Theme.of(context).primaryColor,
-                                        isTextAlignCenter: true),
-                                    const SizedBox(height: 10),
-                                    MyWidget().getTextWidget(
-                                        height: 1.5,
-                                        rs,
-                                        text: tr('aboutDanny2'),
-                                        color: Theme.of(context).primaryColor,
-                                        isTextAlignCenter: true,
-                                        isBold: true,
-                                        size: 18),
-                                    const SizedBox(height: 10),
-                                    MyWidget().getTextWidget(
-                                        height: 1.5,
-                                        rs,
-                                        text: tr('aboutDanny3'),
-                                        color: Theme.of(context).primaryColor,
-                                        isTextAlignCenter: true),
-                                    const SizedBox(height: 10),
-                                    MyWidget().getTextWidget(
-                                        height: 1.5,
-                                        rs,
-                                        text: tr('aboutDanny4'),
-                                        color: Theme.of(context).primaryColor,
-                                        isTextAlignCenter: true,
-                                        isBold: true,
-                                        size: 18),
-                                    const SizedBox(height: 10),
-                                    MyWidget().getTextWidget(
-                                        height: 1.5,
-                                        rs,
-                                        text: tr('aboutDanny5'),
-                                        color: Theme.of(context).primaryColor,
-                                        isTextAlignCenter: true),
-                                    const SizedBox(height: 10),
-                                    IconButton(onPressed: (){
-                                      setState(() {
-                                        isAboutDannyExpanded = false;
-                                        scrollController.animateTo(0, duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
-                                      });
-                                    }, icon: Icon(Icons.keyboard_arrow_up_rounded, color: Theme.of(context).primaryColor))
+                                    Image.asset('assets/images/quote_upper.png', color: Theme.of(context).primaryColor),
+                                    SizedBox(width: rs.getSize(5)),
+                                    Expanded(
+                                        child: MyWidget().getTextWidget(rs,
+                                            text: tr('premium2'),
+                                            color: Theme.of(context).primaryColor,
+                                            size: 18,
+                                            isBold: true,
+                                            isTextAlignCenter: true)),
+                                    SizedBox(width: rs.getSize(5)),
+                                    Image.asset('assets/images/quote_lower.png', color: Theme.of(context).primaryColor),
                                   ],
                                 ),
-                              )),
-                        ),
-                      ),
+                                Divider(color: Theme.of(context).primaryColor, thickness: 1.3),
+                                const SizedBox(height: 20),
+                                MyWidget().getTextWidget(
+                                    height: 1.5,
+                                    rs,
+                                    text: tr('aboutDanny1'),
+                                    color: Theme.of(context).primaryColor,
+                                    isTextAlignCenter: true),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                    height: 1.5,
+                                    rs,
+                                    text: tr('aboutDanny2'),
+                                    color: Theme.of(context).primaryColor,
+                                    isTextAlignCenter: true,
+                                    isBold: true,
+                                    size: 18),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                    height: 1.5,
+                                    rs,
+                                    text: tr('aboutDanny3'),
+                                    color: Theme.of(context).primaryColor,
+                                    isTextAlignCenter: true),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                    height: 1.5,
+                                    rs,
+                                    text: tr('aboutDanny4'),
+                                    color: Theme.of(context).primaryColor,
+                                    isTextAlignCenter: true,
+                                    isBold: true,
+                                    size: 18),
+                                const SizedBox(height: 10),
+                                MyWidget().getTextWidget(
+                                    height: 1.5,
+                                    rs,
+                                    text: tr('aboutDanny5'),
+                                    color: Theme.of(context).primaryColor,
+                                    isTextAlignCenter: true),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
+                          )),
                       Stack(
                         children: [
                           Container(
                             width: MediaQuery.of(context).size.width,
-                            color: isAboutDannyExpanded ? MyColors.navyLight : MyColors.navyLightLight,
+                            color: MyColors.navyLight,
                             height: 100,
                           ),
                           Container(

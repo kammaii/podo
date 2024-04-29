@@ -22,12 +22,17 @@ class LessonSummaryMain extends StatelessWidget {
   String fo = User().language;
   bool isBasicUser = User().status == 1;
   bool isNewUser = User().status == 0;
+  bool isOptionsActive = true;
   late ResponsiveSize rs;
 
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
     Lesson lesson = Get.arguments;
+    bool isFreeOptions = lesson.isFreeOptions ?? false;
+    if(isNewUser || isBasicUser) {
+      isFreeOptions == false ? isOptionsActive = false : null;
+    }
     summaries = [];
     final Query query = FirebaseFirestore.instance
         .collection('Lessons/${lesson.id}/LessonSummaries')
@@ -43,7 +48,7 @@ class LessonSummaryMain extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: 'learningBtn',
               onPressed: () {
-                if (User().status == 1) {
+                if (User().status == 1) { // basic
                   MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                     Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                     AdsController().showRewardAd();
@@ -64,34 +69,30 @@ class LessonSummaryMain extends StatelessWidget {
             isBold: true,
           ),
           SizedBox(height: rs.getSize(15)),
-          isNewUser
-              ? const SizedBox.shrink()
-              : SizedBox(
-                  width: rs.getSize(56),
-                  height: rs.getSize(56),
-                  child: FloatingActionButton(
-                    heroTag: 'wiringBtn',
-                    onPressed: () {
-                      isBasicUser
-                          ? MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
-                              Get.toNamed(MyStrings.routePremiumMain);
-                            }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'))
-                          : Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id);
-                    },
-                    backgroundColor: isBasicUser ? MyColors.grey : MyColors.pinkDark,
-                    child: Icon(isBasicUser ? FontAwesomeIcons.lock : FontAwesomeIcons.penToSquare,
-                        size: rs.getSize(25)),
-                  ),
-                ),
+          SizedBox(
+            width: rs.getSize(56),
+            height: rs.getSize(56),
+            child: FloatingActionButton(
+              heroTag: 'wiringBtn',
+              onPressed: () {
+                isOptionsActive
+                    ? Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id)
+                    : MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                  Get.toNamed(MyStrings.routePremiumMain);
+                }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+              },
+              backgroundColor: isOptionsActive ? MyColors.pinkDark : MyColors.grey,
+              child: Icon(isOptionsActive ? FontAwesomeIcons.penToSquare : FontAwesomeIcons.lock,
+                  size: rs.getSize(25)),
+            ),
+          ),
           SizedBox(height: rs.getSize(5)),
-          isNewUser
-              ? const SizedBox.shrink()
-              : MyWidget().getTextWidget(
-                  rs,
-                  text: tr('writing'),
-                  color: isBasicUser ? MyColors.grey : MyColors.wine,
-                  isBold: true,
-                ),
+          MyWidget().getTextWidget(
+            rs,
+            text: tr('writing'),
+            color: isOptionsActive ? MyColors.wine : MyColors.grey,
+            isBold: true,
+          ),
           SizedBox(height: rs.getSize(10)),
         ],
       ),

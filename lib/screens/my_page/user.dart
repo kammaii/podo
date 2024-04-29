@@ -121,6 +121,9 @@ class User {
         trialEnd = stamp.toDate();
       }
       status = json[STATUS];
+      if(status == 0) {
+        status = 1;
+      }
       if (json[BUILD_NUMBER] != null) {
         buildNumber = json[BUILD_NUMBER];
       }
@@ -128,12 +131,8 @@ class User {
       if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
         FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');
         status = 1;
-        isConvertedBasic = true;
       }
-
-      if (status != 0) {
-        await initRevenueCat();
-      }
+      await initRevenueCat();
 
       if (status == 1 || status == 2) {
         try {
@@ -168,12 +167,22 @@ class User {
           print('CustomerInfo Error: $e');
         }
       }
-
       if (json[STATUS] != status) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
-      fcmToken = await FirebaseMessaging.instance.getToken();
-      Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      fcmToken = await messaging.getToken();
+      if(json[FCM_TOKEN] != fcmToken) {
+        Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
+      }
+
+      // fcm 승인 요청
+      NotificationSettings settings = await messaging.requestPermission();
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
+      } else {
+        FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
+      }
 
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       await analytics.setUserId(id: id);
@@ -228,26 +237,5 @@ class User {
       print('SIgn up method : $method');
       FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
     }
-  }
-
-  Future<void> setTrialAuthorized(ResponsiveSize rs, bool permission) async {
-    FirebaseMessaging.instance.subscribeToTopic('trialUsers');
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('Users').where('fcmToken', isEqualTo: fcmToken).get();
-    status = 3;
-    fcmPermission = permission;
-    DateTime now = DateTime.now();
-    trialStart = now;
-    trialEnd = now.add(const Duration(days: 10));
-    Map<String, dynamic> map = {
-      STATUS: status,
-      FCM_PERMISSION: fcmPermission,
-      TRIAL_START: trialStart,
-      TRIAL_END: trialEnd,
-    };
-    if (querySnapshot.docs.isNotEmpty) {
-      map['fakeUser'] = true;
-    }
-    await Database().updateFields(collection: 'Users', docId: id, fields: map);
   }
 }
