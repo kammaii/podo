@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info/package_info.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
@@ -14,6 +15,7 @@ import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
+import 'package:podo/screens/login/credentials.dart';
 import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
@@ -61,6 +63,19 @@ class _MyPageState extends State<MyPage> {
   ];
   late bool hasUserName;
   late ResponsiveSize rs;
+
+  void removeUserAccount(UserCredential? userCredential) {
+    if (userCredential != null) {
+      User user = userCredential.user!;
+      Database().deleteDoc(
+          collection: 'Users',
+          docId: user.uid);
+      user.delete().then((value) =>
+          print('User deleted'));
+    } else {
+      MyWidget().showSnackbar(rs, title: 'Failed');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -489,7 +504,7 @@ class _MyPageState extends State<MyPage> {
                                                       child: MyWidget().getTextWidget(rs,
                                                           text: tr('yes'),
                                                           color: Theme.of(context).secondaryHeaderColor),
-                                                      onPressed: () {
+                                                      onPressed: () async {
                                                         User? user = auth.currentUser;
                                                         if (user != null) {
                                                           String providerId = '';
@@ -497,35 +512,34 @@ class _MyPageState extends State<MyPage> {
                                                             providerId = providerData.providerId;
                                                           }
                                                           print('PROVIDER: $providerId');
+                                                          Get.back();
+
+                                                          UserCredential? userCredential;
                                                           switch (providerId) {
                                                             case 'password':
                                                               String password = '';
-                                                              Get.back();
                                                               Get.dialog(AlertDialog(
                                                                 title: MyWidget().getTextFieldWidget(context, rs,
                                                                     hint: tr('passwordAgain'), onChanged: (value) {
-                                                                  password = value;
-                                                                }),
+                                                                      password = value;
+                                                                    }),
                                                                 actions: [
                                                                   TextButton(
                                                                     child: Text(tr('send'),
                                                                         style: TextStyle(
                                                                             fontSize: rs.getSize(15),
-                                                                            color: Theme.of(context)
+                                                                            color: Theme
+                                                                                .of(context)
                                                                                 .secondaryHeaderColor)),
                                                                     onPressed: () async {
                                                                       Get.back();
                                                                       try {
-                                                                        await user.reauthenticateWithCredential(
+                                                                        userCredential = await user.reauthenticateWithCredential(
                                                                           EmailAuthProvider.credential(
                                                                               email: user.email!,
                                                                               password: password),
                                                                         );
-                                                                        await Database().deleteDoc(
-                                                                            collection: 'Users',
-                                                                            docId: auth.currentUser!.uid);
-                                                                        await user.delete();
-                                                                        print('User deleted');
+                                                                        removeUserAccount(userCredential);
                                                                       } catch (e) {
                                                                         showErrorSnackbar(e);
                                                                       }
@@ -535,18 +549,18 @@ class _MyPageState extends State<MyPage> {
                                                               ));
                                                               break;
 
-                                                            default:
-                                                              Database().deleteDoc(
-                                                                  collection: 'Users',
-                                                                  docId: auth.currentUser!.uid);
-                                                              user
-                                                                  .delete()
-                                                                  .then((value) => print('User deleted'))
-                                                                  .catchError((e) {
-                                                                print('User delete failed : $e');
-                                                              });
+                                                            case 'google.com':
+                                                              userCredential = await Credentials().getGoogleCredential();
+                                                              removeUserAccount(userCredential);
+                                                              break;
+
+                                                            case 'apple.com':
+                                                              userCredential = await Credentials().getAppleCredential();
+                                                              removeUserAccount(userCredential);
                                                               break;
                                                           }
+
+
                                                         }
                                                       },
                                                     ),

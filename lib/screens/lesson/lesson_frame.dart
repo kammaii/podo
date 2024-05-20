@@ -711,14 +711,18 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                   side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
                                   backgroundColor: Theme.of(context).canvasColor),
                               onPressed: () async {
-                                TransFeedback transFeedback = TransFeedback(
-                                    lessonId: lesson.id,
-                                    lessonTitle: lesson.title[KO],
-                                    cardId: cards[thisIndex].id,
-                                    feedback: feedback);
-                                await Database().setDoc(collection: 'TransFeedbacks', doc: transFeedback);
-                                Get.back();
-                                MyWidget().showSnackbarWithPodo(rs, title: tr('thanksFeedback'));
+                                if(feedback.isNotEmpty) {
+                                  TransFeedback transFeedback = TransFeedback(
+                                      lessonId: lesson.id,
+                                      lessonTitle: lesson.title[KO],
+                                      cardId: cards[thisIndex].id,
+                                      feedback: feedback);
+                                  await Database().setDoc(collection: 'TransFeedbacks', doc: transFeedback);
+                                  Get.back();
+                                  MyWidget().showSnackbarWithPodo(rs, title: tr('thanksFeedback'));
+                                } else {
+                                  Get.back();
+                                }
                               },
                               child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
@@ -730,7 +734,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           ],
                         ));
                       },
-                      icon: Image.asset('assets/images/trans_feedback_icon.png')),
+                      icon: Image.asset('assets/images/trans_feedback_icon.png', width: rs.getSize(30), height: rs.getSize(30),)),
                 ),
                 Expanded(
                   child: Swiper(

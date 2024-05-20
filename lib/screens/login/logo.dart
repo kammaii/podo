@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -62,10 +63,11 @@ class Logo extends StatelessWidget {
       if (user.User().fcmPermission != permission) {
         Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
       }
+      print('STATUS: ${user.User().status}');
     }
 
     void runDeepLink(Uri deepLink) async {
-      print('RUN DEEPLINK');
+      print('RUN DEEPLINK: $deepLink');
       Uri uri = Uri.parse(deepLink.toString());
       String mode = uri.queryParameters['mode']!;
       await FirebaseAuth.instance.currentUser!.reload();
@@ -168,9 +170,6 @@ class Logo extends StatelessWidget {
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (snapshot.hasData) {
                   int buildNumber = int.parse(snapshot.data.buildNumber);
-                  if(user.User().buildNumber == null || user.User().buildNumber != buildNumber) {
-                    Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'buildNumber', value: buildNumber);
-                  }
                   return Positioned(
                       top: rs.getSize(20),
                       right: rs.getSize(20),

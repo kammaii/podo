@@ -187,7 +187,7 @@
   "premium19": "Podo Korean ist eine App für ernsthafte Koreanischlerner.\nSie bietet einfache und gründlich detaillierte Lektionen basierend auf meiner echten Unterrichtserfahrung.\n\nMit nur den kostenlosen Lektionen kannst du Hangul meistern und einfache Gespräche führen.\n\nWenn du mehr vielfältige und tiefgehende Ausdrücke zu verschiedenen Themen lernen möchtest, solltest du das Premium-Service abonnieren.",
   "premium20": "Du kannst die Wirksamkeit teurer Lektionen zu einem erschwinglichen Preis erreichen.",
   "premium21": "Abonniere jetzt!",
-  "aboutDanny1": "Ich bin ein professioneller Koreanischlehrer, der seit 2017 Koreanisch unterrichtet.\n\n(Ich habe über 2000 Lektionen mit mehr als 200 Schülern durchgeführt und tue dies weiterhin.)\n\nGleichzeitig bin ich auch ein Sprachenlerner wie ihr.\n\n(Ich habe Englisch, Japanisch, Chinesisch und Thai gelernt.)\n\nAm meisten genoss ich es, Sprachen durch Apps zu lernen.\nUnd ich versuchte, Ausdrücke, die ich aus Apps gelernt hatte, mit Muttersprachlern zu verwenden.\n\nJedoch\nsagten meine muttersprachlichen Freunde, dass meine Ausdrücke ungeschickt waren.\nEs gab sogar einige Wörter, die nicht mehr verwendet werden.",
+  "aboutDanny1": "Ich bin ein zertifizierter professioneller Koreanischlehrer, der seit 2017 Koreanisch unterrichtet.\n\n(Ich habe über 2000 Lektionen mit mehr als 200 Schülern durchgeführt und tue dies weiterhin.)\n\nGleichzeitig bin ich auch ein Sprachenlerner wie ihr.\n\n(Ich habe Englisch, Japanisch, Chinesisch und Thai gelernt.)\n\nAm meisten genoss ich es, Sprachen durch Apps zu lernen.\nUnd ich versuchte, Ausdrücke, die ich aus Apps gelernt hatte, mit Muttersprachlern zu verwenden.\n\nJedoch\nsagten meine muttersprachlichen Freunde, dass meine Ausdrücke ungeschickt waren.\nEs gab sogar einige Wörter, die nicht mehr verwendet werden.",
   "aboutDanny2": "Ich konnte Sprach-Apps nicht mehr vertrauen.",
   "aboutDanny3": "Ich wurde neugierig auf koreanische Sprach-Apps.\n\nEs war schockierend.\nEs gab so viele seltsame Ausdrücke.\n\nAls koreanischer Lehrer nahm ich dieses Problem sehr ernst.\nUnd ich traf eine Entscheidung.",
   "aboutDanny4": "Ich würde es selbst erstellen!",
@@ -198,5 +198,8 @@
   "premiumDialog4": "Ich bin ein ernsthafter Lerner",
   "workbookPdfInfo": "Einmalige Zahlung. Erneut herunterladbar.",
   "transFeedback": "Übersetzungsfeedback",
-  "transFeedbackExplain": "Gibt es einen Fehler in der Übersetzung? Bitte lassen Sie es uns wissen."
+  "transFeedbackExplain": "Gibt es einen Fehler in der Übersetzung? Bitte lassen Sie es uns wissen.",
+  "beginner": "",
+  "intermediate": "",
+  "advanced": ""
 }

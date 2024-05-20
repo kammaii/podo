@@ -187,7 +187,7 @@
   "premium19": "Podo Korean é um aplicativo para aprendizes sérios de coreano.\nFornece aulas fáceis e detalhadamente detalhadas com base na minha experiência real de ensino.\n\nCom apenas as aulas gratuitas, você pode dominar o Hangul e participar de conversas simples.\n\nSe você deseja aprender expressões mais diversas e aprofundadas sobre vários tópicos, considere assinar o serviço premium.",
   "premium20": "Você pode alcançar a eficácia de aulas caras a um custo acessível.",
   "premium21": "Assine Agora!",
-  "aboutDanny1": "Sou um professor coreano profissional que ensina coreano desde 2017.\n\n(Conduzi mais de 2000 aulas com mais de 200 alunos e continuo fazendo isso.)\n\nAo mesmo tempo, também sou um aprendiz de idiomas como você.\n\n(Estudei inglês, japonês, chinês e tailandês.)\n\nEu gostava mais de aprender línguas através de aplicativos.\nE tentei usar expressões aprendidas de aplicativos com falantes nativos.\n\nNo entanto,\nmeus amigos nativos disseram que minhas expressões eram desajeitadas.\nHavia até algumas palavras que não são mais usadas.",
+  "aboutDanny1": "Sou um professor de coreano certificado e profissional que ensina coreano desde 2017.\n\n(Conduzi mais de 2000 aulas com mais de 200 alunos e continuo fazendo isso.)\n\nAo mesmo tempo, também sou um aprendiz de idiomas como você.\n\n(Estudei inglês, japonês, chinês e tailandês.)\n\nEu gostava mais de aprender línguas através de aplicativos.\nE tentei usar expressões aprendidas de aplicativos com falantes nativos.\n\nNo entanto,\nmeus amigos nativos disseram que minhas expressões eram desajeitadas.\nHavia até algumas palavras que não são mais usadas.",
   "aboutDanny2": "Eu não podia mais confiar em aplicativos de idiomas.",
   "aboutDanny3": "Fiquei curioso sobre aplicativos da língua coreana.\n\nFoi chocante.\nHavia tantas expressões estranhas.\n\nComo professor de coreano, levei este problema muito a sério.\nE tomei uma decisão.",
   "aboutDanny4": "Eu mesmo criaria!",
@@ -198,5 +198,8 @@
   "premiumDialog4": "Sou um aprendiz sério",
   "workbookPdfInfo": "Pagamento único. Pode ser baixado novamente.",
   "transFeedback": "Feedback de tradução",
-  "transFeedbackExplain": "Há algum erro na tradução? Por favor, informe-nos."
+  "transFeedbackExplain": "Há algum erro na tradução? Por favor, informe-nos.",
+  "beginner": "Iniciante",
+  "intermediate": "Intermediário",
+  "advanced": "Avançado"
 }

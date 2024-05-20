@@ -187,7 +187,7 @@
   "premium19": "Podo Korean adalah aplikasi untuk pembelajar bahasa Korea yang serius.\nIni menyediakan pelajaran yang mudah dan sangat rinci berdasarkan pengalaman mengajar saya yang sebenarnya.\n\nDengan hanya pelajaran gratis, Anda dapat menguasai Hangul dan terlibat dalam percakapan sederhana.\n\nJika Anda ingin belajar ekspresi yang lebih beragam dan mendalam tentang berbagai topik, pertimbangkan untuk berlangganan layanan premium.",
   "premium20": "Anda dapat mencapai efektivitas pelajaran mahal dengan biaya yang terjangkau.",
   "premium21": "Berlangganan Sekarang!",
-  "aboutDanny1": "Saya adalah guru bahasa Korea profesional yang telah mengajar bahasa Korea sejak 2017.\n\n(Saya telah melakukan lebih dari 2000 pelajaran dengan lebih dari 200 siswa dan terus melakukannya.)\n\nPada saat yang sama, saya juga seorang pembelajar bahasa seperti Anda.\n\n(Saya telah belajar bahasa Inggris, Jepang, Cina, dan Thailand.)\nSaya paling menikmati belajar bahasa melalui aplikasi.\nDan saya mencoba menggunakan ekspresi yang dipelajari dari aplikasi dengan penutur asli.\n\nNamun,\nteman-teman saya yang penutur asli mengatakan bahwa ekspresi saya canggung.\nBahkan ada beberapa kata yang tidak lagi digunakan.",
+  "aboutDanny1": "Saya adalah guru bahasa Korea profesional yang bersertifikat dan telah mengajar bahasa Korea sejak tahun 2017.\n\n(Saya telah melakukan lebih dari 2000 pelajaran dengan lebih dari 200 siswa dan terus melakukannya.)\n\nPada saat yang sama, saya juga seorang pembelajar bahasa seperti Anda.\n\n(Saya telah belajar bahasa Inggris, Jepang, Cina, dan Thailand.)\nSaya paling menikmati belajar bahasa melalui aplikasi.\nDan saya mencoba menggunakan ekspresi yang dipelajari dari aplikasi dengan penutur asli.\n\nNamun,\nteman-teman saya yang penutur asli mengatakan bahwa ekspresi saya canggung.\nBahkan ada beberapa kata yang tidak lagi digunakan.",
   "aboutDanny2": "Saya tidak bisa lagi mempercayai aplikasi bahasa.",
   "aboutDanny3": "Saya menjadi penasaran tentang aplikasi bahasa Korea.\n\nItu mengejutkan.\nAda begitu banyak ekspresi aneh.\n\nSebagai guru bahasa Korea, saya menganggap masalah ini sangat serius.\nDan saya membuat keputusan.",
   "aboutDanny4": "Saya akan membuatnya sendiri!",
@@ -198,5 +198,8 @@
   "premiumDialog4": "Saya seorang pembelajar yang serius",
   "workbookPdfInfo": "Pembayaran sekali. Dapat diunduh ulang.",
   "transFeedback": "Umpan balik terjemahan",
-  "transFeedbackExplain": "Apakah ada kesalahan dalam penerjemahan? Mohon beri tahu kami."
+  "transFeedbackExplain": "Apakah ada kesalahan dalam penerjemahan? Mohon beri tahu kami.",
+  "beginner": "Pemula",
+  "intermediate": "Menengah",
+  "advanced": "Lanjutan"
 }

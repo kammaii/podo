@@ -8,10 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:podo/screens/login/credentials.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
-import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:crypto/crypto.dart';
 
@@ -32,51 +30,6 @@ class Login extends StatelessWidget {
       dynamicLinkDomain: 'newpodo.page.link',
     ));
     print('EMAIL SNT');
-  }
-
-  String generateNonce([int length = 32]) {
-    final charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
-  }
-
-  /// Returns the sha256 hash of [input] in hex notation.
-  String sha256ofString(String input) {
-    final bytes = utf8.encode(input);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  Future<UserCredential> signInWithApple() async {
-    // To prevent replay attacks with the credential returned from Apple, we
-    // include a nonce in the credential request. When signing in with
-    // Firebase, the nonce in the id token returned by Apple, is expected to
-    // match the sha256 hash of `rawNonce`.
-    final rawNonce = generateNonce();
-    final nonce = sha256ofString(rawNonce);
-
-    // Request credential for the currently signed in Apple account.
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      webAuthenticationOptions: WebAuthenticationOptions(
-        clientId: 'net.awesomekorean.newpodo',
-        redirectUri: Uri.parse('https://newpodo.page.link/?mode=verifyEmail'),
-      ),
-      nonce: nonce,
-    );
-
-    // Create an `OAuthCredential` from the credential returned by Apple.
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
-
-    // Sign in the user with Firebase. If the nonce we generated earlier does
-    // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-    return await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   }
 
   @override
@@ -101,25 +54,13 @@ class Login extends StatelessWidget {
             LoginProvider(
               icon: FontAwesomeIcons.google,
               callback: () async {
-                try {
-                  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-                  final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-                  final credential = GoogleAuthProvider.credential(
-                    accessToken: googleAuth?.accessToken,
-                    idToken: googleAuth?.idToken,
-                  );
-                  await _auth.signInWithCredential(credential);
-                  return null;
-                } catch (e) {
-                  print('Error: $e');
-                  return 'Error: $e';
-                }
+                await Credentials().getGoogleCredential();
               },
             ),
             LoginProvider(
               icon: FontAwesomeIcons.apple,
               callback: () async {
-                signInWithApple();
+                await Credentials().getAppleCredential();
               },
             )
           ],

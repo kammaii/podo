@@ -187,7 +187,7 @@
   "premium19": "Podo Korean est une application pour les apprenants sérieux du coréen.\nElle fournit des leçons faciles et détaillées basées sur mon expérience réelle d'enseignement.\n\nAvec juste les leçons gratuites, vous pouvez maîtriser le Hangul et participer à des conversations simples.\n\nSi vous souhaitez apprendre des expressions plus diverses et approfondies sur divers sujets, envisagez de vous abonner au service premium.",
   "premium20": "Vous pouvez atteindre l'efficacité des leçons coûteuses à un coût abordable.",
   "premium21": "Abonnez-vous maintenant !",
-  "aboutDanny1": "Je suis un professeur de coréen professionnel qui enseigne le coréen depuis 2017.\n\n(J'ai conduit plus de 2000 leçons avec plus de 200 étudiants et je continue de le faire.)\n\nEn même temps, je suis aussi un apprenant de langues comme vous.\n\n(J'ai étudié l'anglais, le japonais, le chinois et le thaï.)\n\nJ'ai le plus apprécié apprendre les langues à travers des applications.\nEt j'ai essayé d'utiliser des expressions apprises à partir des applications avec des locuteurs natifs.\n\nCependant,\nmes amis natifs ont dit que mes expressions étaient maladroites.\nIl y avait même des mots qui ne sont plus utilisés.",
+  "aboutDanny1": "Je suis un professeur de coréen certifié et professionnel qui enseigne le coréen depuis 2017.\n\n(J'ai conduit plus de 2000 leçons avec plus de 200 étudiants et je continue de le faire.)\n\nEn même temps, je suis aussi un apprenant de langues comme vous.\n\n(J'ai étudié l'anglais, le japonais, le chinois et le thaï.)\n\nJ'ai le plus apprécié apprendre les langues à travers des applications.\nEt j'ai essayé d'utiliser des expressions apprises à partir des applications avec des locuteurs natifs.\n\nCependant,\nmes amis natifs ont dit que mes expressions étaient maladroites.\nIl y avait même des mots qui ne sont plus utilisés.",
   "aboutDanny2": "Je ne pouvais plus faire confiance aux applications de langue.",
   "aboutDanny3": "Je suis devenu curieux à propos des applications de langue coréenne.\n\nC'était choquant.\nIl y avait tellement d'expressions étranges.\n\nEn tant que professeur de coréen, j'ai pris cette question très au sérieux.\nEt j'ai pris une décision.",
   "aboutDanny4": "Je le créerais moi-même !",
@@ -198,5 +198,8 @@
   "premiumDialog4": "Je suis un apprenant sérieux",
   "workbookPdfInfo": "Paiement unique. Téléchargeable à nouveau.",
   "transFeedback": "Retour sur la traduction",
-  "transFeedbackExplain": "Y a-t-il une erreur dans la traduction ? N'hésitez pas à nous en faire part."
+  "transFeedbackExplain": "Y a-t-il une erreur dans la traduction ? N'hésitez pas à nous en faire part.",
+  "beginner": "Débutant",
+  "intermediate": "Intermédiaire",
+  "advanced": "Avancé"
 }

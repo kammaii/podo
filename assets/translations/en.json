@@ -187,7 +187,7 @@
   "premium19": "Podo Korean is an app for serious Korean learners.\nIt provides easy and thoroughly detailed lessons based on my real teaching experience.\n\nWith just the free lessons, you can master Hangul and engage in simple conversations.\n\nIf you wish to learn more diverse and in-depth expressions on various topics, consider subscribing to the premium service.",
   "premium20": "You can achieve the effectiveness of expensive lessons at an affordable cost.",
   "premium21": "Subscribe Now!",
-  "aboutDanny1": "I am a professional Korean teacher who has been teaching Korean since 2017.\n\n(I have conducted over 2000 lessons with more than 200 students and am continuing to do so.)\n\nAt the same time, I am also a language learner like you.\n\n(I have studied English, Japanese, Chinese, and Thai.)\n\nI enjoyed learning languages through apps the most.\nAnd I tried using expressions learned from apps with native speakers.\n\nHowever,\nmy native friends said my expressions were awkward.\nThere were even some words that are no longer used.",
+  "aboutDanny1": "I am a certified professional Korean teacher who has been teaching Korean since 2017.\n\n(I have conducted over 2000 lessons with more than 200 students and am continuing to do so.)\n\nAt the same time, I am also a language learner like you.\n\n(I have studied English, Japanese, Chinese, and Thai.)\n\nI enjoyed learning languages through apps the most.\nAnd I tried using expressions learned from apps with native speakers.\n\nHowever,\nmy native friends said my expressions were awkward.\nThere were even some words that are no longer used.",
   "aboutDanny2": "I couldn't trust language apps anymore.",
   "aboutDanny3": "I became curious about Korean language apps.\n\nIt was shocking.\nThere were so many strange expressions.\n\nAs a Korean teacher, I took this issue very seriously.\nAnd I made a decision.",
   "aboutDanny4": "I would create it myself!",
@@ -198,5 +198,8 @@
   "premiumDialog4": "I'm a serious learner",
   "workbookPdfInfo": "One-time payment. Re-downloadable.",
   "transFeedback": "Translation Feedback",
-  "transFeedbackExplain": "Is there an error in the translation? Please let us know."
+  "transFeedbackExplain": "Is there an error in the translation? Please let us know.",
+  "beginner": "Beginner",
+  "intermediate": "Intermediate",
+  "advanced": "Advanced"
 }

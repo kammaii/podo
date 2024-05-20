@@ -9,9 +9,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:package_info/package_info.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
+import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
@@ -88,6 +90,8 @@ class User {
     return map;
   }
 
+
+
   Future<void> getUser() async {
     final currentUser = auth.FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -121,6 +125,7 @@ class User {
         trialEnd = stamp.toDate();
       }
       status = json[STATUS];
+
       if(status == 0) {
         status = 1;
       }
@@ -176,12 +181,10 @@ class User {
         Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
       }
 
-      // fcm 승인 요청
-      NotificationSettings settings = await messaging.requestPermission();
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
-      } else {
-        FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      int buildNum = int.parse(packageInfo.buildNumber);
+      if(buildNumber == null || buildNumber != buildNum) {
+        Database().updateDoc(collection: 'Users', docId: id, key: 'buildNumber', value: buildNumber);
       }
 
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
@@ -236,6 +239,13 @@ class User {
       }
       print('SIgn up method : $method');
       FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
+    }
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
+    } else {
+      FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
     }
   }
 }
