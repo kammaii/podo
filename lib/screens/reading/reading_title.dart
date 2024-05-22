@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ReadingTitle {
 
   late String id;
-  late int orderId;
   String? image;
   late Map<String,dynamic> title;
   late int level;
@@ -9,6 +10,8 @@ class ReadingTitle {
   late String tag;
   late bool isReleased;
   late bool isFree;
+  Map<String,dynamic>? summary;
+  DateTime? date; // Favorite Readings 정렬용
 
   static const String ID = 'id';
   static const String ORDERID = 'orderId';
@@ -19,16 +22,37 @@ class ReadingTitle {
   static const String TAG = 'tag';
   static const String ISRELEASED = 'isReleased';
   static const String ISFREE = 'isFree';
+  static const String SUMMARY = 'summary';
+  static const String DATE = 'date';
 
   ReadingTitle.fromJson(Map<String, dynamic> json) {
     id = json[ID];
-    orderId = json[ORDERID];
     image = json[IMAGE] ?? null;
     title = json[TITLE];
     level = json[LEVEL];
     category = json[CATEGORY];
     tag = json[TAG] ?? '';
-    isReleased = json[ISRELEASED];
+    isReleased = json[ISRELEASED] ?? false;
     isFree = json[ISFREE];
+    if(json[SUMMARY] != null) {
+      summary = json[SUMMARY];
+    }
+    if(json[DATE] != null) {
+      Timestamp replyStamp = json[DATE];
+      date = replyStamp.toDate();
+    }
   }
+
+  // Favorite 읽기 저장용
+  Map<String, dynamic> toJson() => {
+    ID: id,
+    IMAGE: image ?? null,
+    TITLE: title,
+    LEVEL: level,
+    CATEGORY: category,
+    TAG: tag,
+    ISFREE: isFree,
+    SUMMARY: summary ?? null,
+    DATE: DateTime.now(),
+  };
 }

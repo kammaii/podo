@@ -7,6 +7,10 @@ class Lesson {
   String? tag;
   late bool hasOptions;
   late bool isFree;
+  bool? isFreeOptions;
+  String? speakingId;
+  String? readingId;
+  late bool adFree; // 광고 제거 (For 한글,한자 레슨 Intro)
 
   static const String ID = 'id';
   static const String TYPE = 'type';
@@ -15,6 +19,10 @@ class Lesson {
   static const String TAG = 'tag';
   static const String HAS_OPTIONS = 'hasOptions';
   static const String IS_FREE = 'isFree';
+  static const String IS_FREE_OPTIONS = 'isFreeOptions';
+  static const String SPEAKING_ID = 'speakingId';
+  static const String READING_ID = 'readingId';
+  static const String AD_FREE = 'adFree';
 
   Lesson.fromJson(Map<String, dynamic> json) {
     id = json[ID];
@@ -24,5 +32,15 @@ class Lesson {
     tag = json[TAG] ?? null;
     hasOptions = json[HAS_OPTIONS];
     isFree = json[IS_FREE];
+    if(json[IS_FREE_OPTIONS] != null) {
+      isFreeOptions = json[IS_FREE_OPTIONS];
+    }
+    if(json[SPEAKING_ID] != null) {
+      speakingId = json[SPEAKING_ID];
+    }
+    if(json[READING_ID] != null) {
+      readingId = json[READING_ID];
+    }
+    adFree = json[AD_FREE] ?? false;
   }
 }

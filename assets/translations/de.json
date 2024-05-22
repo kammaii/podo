@@ -199,7 +199,10 @@
   "workbookPdfInfo": "Einmalige Zahlung. Erneut herunterladbar.",
   "transFeedback": "Übersetzungsfeedback",
   "transFeedbackExplain": "Gibt es einen Fehler in der Übersetzung? Bitte lassen Sie es uns wissen.",
-  "beginner": "",
-  "intermediate": "",
-  "advanced": ""
+  "beginner": "Anfänger",
+  "intermediate": "Fortgeschritten",
+  "advanced": "Erfahren",
+  "noMyReadings": "Klicken Sie auf dieses Symbol im Titel des Lesematerials. Sie können sie hier sammeln und überprüfen.",
+  "wantRemoveReading": "Möchten Sie diese Lesung entfernen?",
+  "wantRemoveSpeaking": "Möchten Sie diese Sprache entfernen?"
 }

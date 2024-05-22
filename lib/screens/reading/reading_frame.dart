@@ -4,30 +4,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/flashcard_icon.dart';
+import 'package:podo/common/favorite_icon.dart';
+import 'package:podo/common/history.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
-import 'package:podo/common/history.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:podo/values/my_strings.dart';
 
 class ReadingFrame extends StatefulWidget {
   const ReadingFrame({Key? key}) : super(key: key);
@@ -40,7 +39,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
-  ReadingTitle readingTitle = Get.arguments;
+  String readingTitleId = Get.arguments;
+  late ReadingTitle readingTitle;
   String fo = User().language;
   final KO = 'ko';
   final AUDIO = 'audio';
@@ -105,15 +105,19 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
         }));
 
     final Query query =
-        FirebaseFirestore.instance.collection('ReadingTitles/${readingTitle.id}/Readings').orderBy('orderId');
+        FirebaseFirestore.instance.collection('ReadingTitles/$readingTitleId/Readings').orderBy('orderId');
     Future.wait([
+      Database().getDoc(collection: 'ReadingTitles', docId: readingTitleId),
       Database().getDocs(query: query),
-      CloudStorage().downloadAudios(folderName: 'ReadingAudios', folderId: readingTitle.id),
+      CloudStorage().downloadAudios(folderName: 'ReadingAudios', folderId: readingTitleId),
+      Database().getDoc(collection: 'Users/${User().id}/Readings', docId: readingTitleId),
     ]).then((snapshots) async {
-      int totalReadings = snapshots[0].length;
+      readingTitle = ReadingTitle.fromJson(snapshots[0].data() as Map<String,dynamic>);
+      FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.title[KO]);
+      int totalReadings = snapshots[1].length;
       double incrementPerReading = 0.2 / totalReadings;
       controller.hasFlashcard.value = {};
-      for (dynamic snapshot in snapshots[0]) {
+      for (dynamic snapshot in snapshots[1]) {
         Reading reading = Reading.fromJson(snapshot.data() as Map<String, dynamic>);
         readings.add(reading);
         progressValue += incrementPerReading;
@@ -126,7 +130,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       controller.initIsExpanded(readings.length);
 
       Map<String, String> audios = {};
-      for (dynamic snapshot in snapshots[1]) {
+      for (dynamic snapshot in snapshots[2]) {
         audios.addAll(snapshot);
       }
       await cacheFiles(audios);
@@ -135,6 +139,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           isLoading = false;
         });
       }
+      controller.hasFavoriteLesson.value = snapshots[3].exists;
     });
   }
 
@@ -189,34 +194,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
     AdsController().loadBannerAd(size);
   }
 
-  Widget letterContainer(String text) {
-    return Container(
-      width: rs.getSize(28),
-      height: rs.getSize(28),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          )),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(1),
-          child: MyWidget().getTextWidget(rs, text: text, color: Colors.white, isBold: true),
-        ),
-      ),
-    );
-  }
-
   sliverAppBar() {
-    int wordsLength = 0;
-    for (Reading reading in readings) {
-      if (reading.words[KO] != null) {
-        int length = reading.words[KO].length;
-        wordsLength = wordsLength + length;
-      }
-    }
-
     return SliverAppBar(
       leading: Theme(
         data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
@@ -232,12 +210,19 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       collapsedHeight: rs.getSize(60),
       pinned: true,
       stretch: true,
-      title: MyWidget().getTextWidget(
-        rs,
-        text: '${readingTitle.title[KO]}',
-        size: 18,
-        color: Colors.white,
-        isBold: true,
+      title: Row(
+        children: [
+          Expanded(
+            child: MyWidget().getTextWidget(
+              rs,
+              text: '${readingTitle.title[KO]}',
+              size: 18,
+              color: Colors.white,
+              isBold: true,
+            ),
+          ),
+          Obx(() => FavoriteIcon().getFavoriteLessonIcon(context, rs, controller: controller, item: readingTitle, isReading: true))
+        ],
       ),
       flexibleSpace: Stack(
         children: [
@@ -269,26 +254,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
             color: Theme.of(context).primaryColor,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           ),
+          readingTitle.summary != null ?
           FadeTransition(
             opacity: animation,
             child: FlexibleSpaceBar(
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  letterContainer('S'),
-                  SizedBox(width: rs.getSize(10)),
-                  MyWidget().getTextWidget(rs, text: '${readings.length}', color: Colors.white),
-                  SizedBox(width: rs.getSize(20)),
-                  MyWidget().getTextWidget(rs, text: '|', color: Colors.white),
-                  SizedBox(width: rs.getSize(20)),
-                  letterContainer('V'),
-                  SizedBox(width: rs.getSize(10)),
-                  MyWidget().getTextWidget(rs, text: '$wordsLength', color: Colors.white),
-                ],
-              ),
+              title: MyWidget().getTextWidget(rs, text: readingTitle.summary![fo], color: Colors.white),
               expandedTitleScale: 1.0,
             ),
-          ),
+          ) : const SizedBox.shrink(),
         ],
       ),
     );
@@ -316,7 +289,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                     ? Padding(
                         padding: EdgeInsets.only(bottom: rs.getSize(100)),
                         child: MyWidget().getRoundBtnWidget(rs, text: tr('complete'), f: () {
-                          History().addHistory(itemIndex: 1, itemId: readingTitle.id);
+                          History().addHistory(itemIndex: 1, itemId: readingTitle.id, content: readingTitle.title['ko']);
                           LocalStorage().prefs!.remove(readingTitle.id);
                           controller.isCompleted[readingTitle.id] = true;
                           Get.back();
@@ -347,7 +320,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               child: MyWidget().getTextWidget(rs,
                   text: (index + 1).toString(), color: Theme.of(context).primaryColor, isBold: true),
             )),
-            Obx(() => FlashcardIcon().getIconButton(context, rs,
+            Obx(() => FavoriteIcon().getFlashcardIcon(context, rs,
                 controller: controller,
                 itemId: reading.id,
                 front: reading.content[KO],

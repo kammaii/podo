@@ -15,7 +15,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/cloud_storage.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/flashcard_icon.dart';
+import 'package:podo/common/favorite_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
@@ -197,7 +197,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Obx(() => FlashcardIcon().getIconButton(context, rs,
+                          Obx(() => FavoriteIcon().getFlashcardIcon(context, rs,
                               controller: controller,
                               itemId: card.id,
                               front: card.content[KO],

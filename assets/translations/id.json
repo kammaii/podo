@@ -201,5 +201,8 @@
   "transFeedbackExplain": "Apakah ada kesalahan dalam penerjemahan? Mohon beri tahu kami.",
   "beginner": "Pemula",
   "intermediate": "Menengah",
-  "advanced": "Lanjutan"
+  "advanced": "Lanjutan",
+  "noMyReadings": "Klik ikon ini pada judul konten bacaan. Anda dapat mengumpulkan dan meninjaunya di sini.",
+  "wantRemoveReading": "Apakah Anda ingin menghapus bacaan ini?",
+  "wantRemoveSpeaking": "Apakah Anda ingin menghapus percakapan ini?"
 }

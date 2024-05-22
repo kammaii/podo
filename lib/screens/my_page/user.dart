@@ -90,8 +90,6 @@ class User {
     return map;
   }
 
-
-
   Future<void> getUser() async {
     final currentUser = auth.FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -109,7 +107,10 @@ class User {
       Timestamp stamp = json[DATESIGNUP];
       dateSignUp = stamp.toDate();
       dateSignIn = DateTime.now();
-      FirebaseFirestore.instance.collection('Users').doc(id).update({'dateSignIn': DateTime.now(), 'dateEmailSend': FieldValue.delete()});
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(id)
+          .update({'dateSignIn': DateTime.now(), 'dateEmailSend': FieldValue.delete()});
       language = json[LANGUAGE];
       if (json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
@@ -126,9 +127,6 @@ class User {
       }
       status = json[STATUS];
 
-      if(status == 0) {
-        status = 1;
-      }
       if (json[BUILD_NUMBER] != null) {
         buildNumber = json[BUILD_NUMBER];
       }
@@ -139,51 +137,51 @@ class User {
       }
       await initRevenueCat();
 
-      if (status == 1 || status == 2) {
-        try {
-          CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-          final premiumEntitlement = customerInfo.entitlements.active['premium'];
-          if (premiumEntitlement != null) {
-            String premiumStart = premiumEntitlement.originalPurchaseDate;
-            String premiumEnd = premiumEntitlement.expirationDate ?? 'Lifetime';
-            String premiumLatestPurchase = premiumEntitlement.latestPurchaseDate;
-            bool premiumWillRenew = premiumEntitlement.willRenew;
-            String? premiumUnsubscribeDetected = premiumEntitlement.unsubscribeDetectedAt;
-            expirationDate = premiumEnd.substring(0, 10).replaceAll('-', '.');
-            Database().updateFields(collection: 'Users', docId: id, fields: {
-              PREMIUM_START: premiumStart,
-              PREMIUM_END: premiumEnd,
-              PREMIUM_LATEST_PURCHASE: premiumLatestPurchase,
-              PREMIUM_UNSUBSCRIBE_DETECTED: premiumUnsubscribeDetected,
-              PREMIUM_WILL_RENEW: premiumWillRenew,
-            });
-            FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
-            status = 2;
-          } else {
-            if (status == 2) {
-              FirebaseMessaging.instance.unsubscribeFromTopic('premiumUsers');
-              FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
-            }
+      try {
+        CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+        final premiumEntitlement = customerInfo.entitlements.active['premium'];
+        if (premiumEntitlement != null) {
+          String premiumStart = premiumEntitlement.originalPurchaseDate;
+          String premiumEnd = premiumEntitlement.expirationDate ?? 'Lifetime';
+          String premiumLatestPurchase = premiumEntitlement.latestPurchaseDate;
+          bool premiumWillRenew = premiumEntitlement.willRenew;
+          String? premiumUnsubscribeDetected = premiumEntitlement.unsubscribeDetectedAt;
+          expirationDate = premiumEnd.substring(0, 10).replaceAll('-', '.');
+          Database().updateFields(collection: 'Users', docId: id, fields: {
+            PREMIUM_START: premiumStart,
+            PREMIUM_END: premiumEnd,
+            PREMIUM_LATEST_PURCHASE: premiumLatestPurchase,
+            PREMIUM_UNSUBSCRIBE_DETECTED: premiumUnsubscribeDetected,
+            PREMIUM_WILL_RENEW: premiumWillRenew,
+          });
+          FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
+          status = 2;
+        } else {
+          if (status == 2) {
+            FirebaseMessaging.instance.unsubscribeFromTopic('premiumUsers');
+            FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
+          }
+          if(status != 3) {
             status = 1;
             FirebaseMessaging.instance.subscribeToTopic('basicUsers');
             Get.put(AdsController());
           }
-        } on PlatformException catch (e) {
-          print('CustomerInfo Error: $e');
         }
+      } on PlatformException catch (e) {
+        print('CustomerInfo Error: $e');
       }
       if (json[STATUS] != status) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
       FirebaseMessaging messaging = FirebaseMessaging.instance;
       fcmToken = await messaging.getToken();
-      if(json[FCM_TOKEN] != fcmToken) {
+      if (json[FCM_TOKEN] != fcmToken) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
       }
 
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       int buildNum = int.parse(packageInfo.buildNumber);
-      if(buildNumber == null || buildNumber != buildNum) {
+      if (buildNumber == null || buildNumber != buildNum) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'buildNumber', value: buildNumber);
       }
 

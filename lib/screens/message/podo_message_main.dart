@@ -10,7 +10,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
 import 'package:podo/common/database.dart';
-import 'package:podo/common/flashcard_icon.dart';
+import 'package:podo/common/favorite_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -340,7 +340,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                                                               color: Theme.of(context).secondaryHeaderColor)),
                                                       SizedBox(width: rs.getSize(10)),
                                                       isLoaded
-                                                          ? Obx(() => FlashcardIcon().getIconButton(context, rs,
+                                                          ? Obx(() => FavoriteIcon().getFlashcardIcon(context, rs,
                                                               controller: controller,
                                                               itemId: reply.id,
                                                               front: reply.reply))

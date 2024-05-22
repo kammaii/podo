@@ -43,6 +43,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final lessonController = Get.put(LessonController());
   bool isAdmin = false;
   late ResponsiveSize rs;
+  late bool isPremiumUser;
 
   @override
   void initState() {
@@ -50,6 +51,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     if (User().email == User().admin) {
       isAdmin = true;
     }
+    User().status == 2 || User().status == 3 ? isPremiumUser = true : isPremiumUser = false;
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -99,8 +101,20 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
     isAdmin ? isReleased = true : null;
 
-    bool isLocked = !lesson.isFree;
-    User().status == 2 || User().status == 3 ? isLocked = false : null;
+    bool isLocked = !lesson.isFree && !isPremiumUser;
+
+    List<Widget> optionIcons = [];
+    if(lesson.hasOptions) {
+      optionIcons.add(Icon(FontAwesomeIcons.pen, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+    }
+    if(lesson.readingId != null) {
+      optionIcons.add(SizedBox(width: rs.getSize(8)));
+      optionIcons.add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+    }
+    if(lesson.speakingId != null) {
+      optionIcons.add(SizedBox(width: rs.getSize(8)));
+      optionIcons.add(Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+    }
 
     return isReleased
         ? Theme(
@@ -121,7 +135,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                             Get.toNamed(MyStrings.routePremiumMain);
                           }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
                         } else {
-                          if (User().status == 1 && !lesson.hasOptions) {
+                          if (!isPremiumUser && !lesson.hasOptions && !lesson.adFree) {
                             MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                               AdsController().showRewardAd();
                               runLesson(lesson);
@@ -170,10 +184,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                         : const SizedBox.shrink(),
                                   ],
                                 ),
-                                isLocked
-                                    ? Icon(CupertinoIcons.lock_fill,
-                                        color: Theme.of(context).disabledColor, size: 15)
-                                    : const SizedBox.shrink()
+                                Row(
+                                  children: [
+                                    Row(children: optionIcons),
+                                    isLocked
+                                        ? Padding(
+                                          padding: EdgeInsets.only(left: rs.getSize(8)),
+                                          child: Icon(CupertinoIcons.lock_fill,
+                                              color: Theme.of(context).disabledColor, size: 15),
+                                        )
+                                        : const SizedBox.shrink(),
+                                  ],
+                                )
                               ],
                             ),
                             SizedBox(height: rs.getSize(10)),

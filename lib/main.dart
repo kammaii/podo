@@ -84,7 +84,9 @@ class MyApp extends StatelessWidget {
             ),
             title: 'Podo Korean app',
             debugShowCheckedModeBanner: false,
+
             theme: ThemeData(
+              useMaterial3: false,
               primaryColor: MyColors.purple,
               primaryColorDark: MyColors.navy,
               primaryColorLight: MyColors.navyLight,

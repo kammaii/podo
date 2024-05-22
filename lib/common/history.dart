@@ -69,6 +69,10 @@ class History {
   }
 
   Future<void> addHistory({required int itemIndex, required String itemId, String? content}) async {
+    if(User().status == 0 && LocalStorage().histories.isEmpty) {
+      User().status = 1;
+      Database().updateFields(collection: 'Users', docId: User().id, fields: {'status': 1});
+    }
     if(!LocalStorage().hasHistory(itemId: itemId)) {
       History history = History();
       history.item = historyItem[itemIndex];

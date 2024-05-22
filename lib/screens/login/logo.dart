@@ -20,6 +20,7 @@ import 'package:podo/screens/lesson/lesson_course_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/my_page/my_page_controller.dart';
+import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
@@ -40,6 +41,7 @@ class Logo extends StatelessWidget {
       await courseController.loadCourses();
       await PodoMessage().getPodoMessage();
       Get.put(WritingController());
+      Get.put(ReadingController());
       Get.toNamed(MyStrings.routeMainFrame);
       if (user.User().os.isEmpty) {
         String os = '';

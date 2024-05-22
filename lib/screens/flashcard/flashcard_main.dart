@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podo/common/flashcard_icon.dart';
+import 'package:podo/common/favorite_icon.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/play_stop_icon.dart';
@@ -159,7 +159,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                   ? Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        FlashcardIcon().getIconOnly(rs),
+                                        FavoriteIcon().getIcon(context, rs),
                                         SizedBox(height: rs.getSize(10)),
                                         MyWidget().getTextWidget(rs,
                                             text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),

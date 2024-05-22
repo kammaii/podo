@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/flashcard_icon.dart';
+import 'package:podo/common/favorite_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
@@ -99,7 +99,7 @@ class _WritingMyListState extends State<WritingMyList> {
           Visibility(
             visible: writing.status == 1 && tag.contains('C') || writing.status == 2 && tag.contains('A'),
             child: Obx(() =>
-                FlashcardIcon().getIconButton(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
+                FavoriteIcon().getFlashcardIcon(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
           )
         ],
       ),

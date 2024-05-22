@@ -1,8 +1,7 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:confetti/confetti.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +22,8 @@ class LessonComplete extends StatelessWidget {
   LessonComplete({Key? key}) : super(key: key);
 
   late ResponsiveSize rs;
+  bool isPremiumUser = false;
+  bool isFreeOptions = false;
 
   Widget getBtn(BuildContext context, String title, IconData icon, Function() fn) {
     return Row(children: [
@@ -74,10 +75,16 @@ class LessonComplete extends StatelessWidget {
     controller.play();
     final lesson = Get.arguments;
     final lessonController = Get.find<LessonController>();
-    History().addHistory(itemIndex: 0, itemId: lesson.id);
+    if(User().status == 2 || User().status == 3) {
+      isPremiumUser = true;
+    }
+    if(lesson.isFreeOptions != null && lesson.isFreeOptions) {
+      isFreeOptions = true;
+    }
+    History().addHistory(itemIndex: 0, itemId: lesson.id, content: lesson.title['ko']);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       lessonController.isCompleted[lesson.id] = true;
-      if (LocalStorage().histories.length % 10 == 0) {
+      if (LocalStorage().histories.length % 7 == 0) {
         showReviewRequest();
       }
     });
@@ -115,14 +122,8 @@ class LessonComplete extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              TextLiquidFill(
-                loadDuration: const Duration(seconds: 2),
-                text: tr('congratulations'),
-                textStyle: TextStyle(fontSize: rs.getSize(30), fontWeight: FontWeight.bold, color: Colors.white),
-                waveColor: Theme.of(context).primaryColor,
-                boxBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                boxHeight: rs.getSize(100),
-              ),
+              SizedBox(height: rs.getSize(20)),
+              MyWidget().getTextWidget(rs, text: tr('congratulations'), size: 30, isBold: true, color: Theme.of(context).primaryColor),
               Divider(
                 thickness: rs.getSize(1),
                 indent: rs.getSize(30),
@@ -150,16 +151,36 @@ class LessonComplete extends StatelessWidget {
                                 }),
                                 SizedBox(height: rs.getSize(20)),
                                 getBtn(context, tr('writing'), CupertinoIcons.pen, () {
-                                  if (User().status == 2 || User().status == 3) {
+                                  if (isPremiumUser || isFreeOptions) {
                                     Get.offNamedUntil(MyStrings.routeWritingMain,
                                         ModalRoute.withName(MyStrings.routeLessonSummaryMain),
                                         arguments: lesson.id);
                                   } else {
-                                    Get.toNamed(MyStrings.routePremiumMain);
+                                    MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                                      Get.toNamed(MyStrings.routePremiumMain);
+                                    }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
                                   }
                                 }),
                                 SizedBox(height: rs.getSize(20)),
+                                lesson.readingId != null ?
+                                getBtn(context, tr('reading'), CupertinoIcons.book, () {
+                                  if (isPremiumUser || isFreeOptions) {
+                                    Get.offNamedUntil(MyStrings.routeReadingFrame,
+                                        ModalRoute.withName(MyStrings.routeLessonSummaryMain),
+                                        arguments: lesson.readingId);
+                                  } else {
+                                    MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                                      Get.toNamed(MyStrings.routePremiumMain);
+                                    }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+                                  }
+                                }) : const SizedBox.shrink(),
                                 //todo: speaking, reading 버튼 추가
+                                Divider(
+                                  thickness: rs.getSize(1),
+                                  indent: rs.getSize(30),
+                                  endIndent: rs.getSize(30),
+                                  height: rs.getSize(30),
+                                ),
                               ],
                             )
                           : const SizedBox.shrink(),

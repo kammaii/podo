@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:html/parser.dart' as htmlParser;
 import 'package:podo/common/database.dart';
-import 'package:podo/common/flashcard_icon.dart';
+import 'package:podo/common/favorite_icon.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -60,7 +60,7 @@ class WritingOtherList extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: MyWidget().getTextWidget(rs, text: extractedText, color: Theme.of(context).secondaryHeaderColor)),
-        Obx(() => FlashcardIcon().getIconButton(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
+        Obx(() => FavoriteIcon().getFlashcardIcon(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
       ],
     );
   }

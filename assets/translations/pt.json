@@ -201,5 +201,8 @@
   "transFeedbackExplain": "Há algum erro na tradução? Por favor, informe-nos.",
   "beginner": "Iniciante",
   "intermediate": "Intermediário",
-  "advanced": "Avançado"
+  "advanced": "Avançado",
+  "noMyReadings": "Clique neste ícone no título do conteúdo de leitura. Você pode coletá-los e revisá-los aqui.",
+  "wantRemoveReading": "Você quer remover esta leitura?",
+  "wantRemoveSpeaking": "Você quer remover esta fala?"
 }

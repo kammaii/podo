@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -11,7 +12,6 @@ import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-
 import '../my_page/user.dart';
 
 class LessonSummaryMain extends StatelessWidget {
@@ -20,19 +20,91 @@ class LessonSummaryMain extends StatelessWidget {
   late List<LessonSummary> summaries;
   final KO = 'ko';
   String fo = User().language;
-  bool isBasicUser = User().status == 1;
-  bool isNewUser = User().status == 0;
-  bool isOptionsActive = true;
+  late bool isOptionsActive;
   late ResponsiveSize rs;
+  late BuildContext cont;
+  static const LEARNING = 'learning';
+  static const WRITING = 'writing';
+  static const READING = 'reading';
+  static const SPEAKING = 'speaking';
+
+  Widget getFloatingBtn({required String btnName, required Function() fn}) {
+    String tag = '${btnName}Btn';
+    IconData iconData = Icons.play_arrow_rounded;
+    double iconSize = 50;
+    Color bgColor = MyColors.green;
+    Color nameColor = MyColors.greenDark;
+
+    switch (btnName) {
+      case WRITING:
+        iconData = FontAwesomeIcons.penToSquare;
+        iconSize = 23;
+        bgColor = MyColors.pink;
+        nameColor = MyColors.wine;
+        break;
+
+      case SPEAKING:
+        iconData = CupertinoIcons.text_bubble;
+        iconSize = 25;
+        bgColor = MyColors.mustardLight;
+        nameColor = MyColors.mustard;
+        break;
+
+      case READING:
+        iconData = CupertinoIcons.book;
+        iconSize = 23;
+        bgColor = MyColors.navyLight;
+        nameColor = MyColors.purple;
+        break;
+    }
+
+    if (btnName != LEARNING && !isOptionsActive) {
+      iconData = FontAwesomeIcons.lock;
+      fn = () {
+        MyWidget().showDialog(cont, rs, content: tr('wantUnlockLesson'), yesFn: () {
+          Get.toNamed(MyStrings.routePremiumMain);
+        }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+      };
+    }
+
+    return Column(
+      children: [
+        SizedBox(
+          width: rs.getSize(btnName == LEARNING ? 60 : 45),
+          height: rs.getSize(btnName == LEARNING ? 60 : 45),
+          child: Theme(
+            data: Theme.of(cont).copyWith(highlightColor: MyColors.navyLight),
+            child: FloatingActionButton(
+              shape: const CircleBorder(),
+              heroTag: tag,
+              onPressed: fn,
+              backgroundColor: bgColor,
+              child: Icon(iconData, size: rs.getSize(iconSize)),
+            ),
+          ),
+        ),
+        SizedBox(height: rs.getSize(5)),
+        MyWidget().getTextWidget(
+          rs,
+          size: 13,
+          text: tr(btnName),
+          color: nameColor,
+          isBold: true,
+        ),
+        SizedBox(height: rs.getSize(15)),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    cont = context;
     rs = ResponsiveSize(context);
+    bool isPremiumUser = User().status == 2 || User().status == 3;
     Lesson lesson = Get.arguments;
     bool isFreeOptions = lesson.isFreeOptions ?? false;
-    if(isNewUser || isBasicUser) {
-      isFreeOptions == false ? isOptionsActive = false : null;
-    }
+    isFreeOptions || isPremiumUser ? isOptionsActive = true : isOptionsActive = false;
+
     summaries = [];
     final Query query = FirebaseFirestore.instance
         .collection('Lessons/${lesson.id}/LessonSummaries')
@@ -42,13 +114,27 @@ class LessonSummaryMain extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          SizedBox(
-            width: rs.getSize(56),
-            height: rs.getSize(56),
-            child: FloatingActionButton(
-              heroTag: 'learningBtn',
-              onPressed: () {
-                if (User().status == 1) { // basic
+          lesson.speakingId != null ? getFloatingBtn(btnName: SPEAKING, fn: () {}) : const SizedBox.shrink(),
+          lesson.readingId != null
+              ? getFloatingBtn(
+                  btnName: READING,
+                  fn: () async {
+                    Get.toNamed(MyStrings.routeReadingFrame, arguments: lesson.readingId!);
+                  })
+              : const SizedBox.shrink(),
+          getFloatingBtn(
+              btnName: WRITING,
+              fn: () {
+                isOptionsActive
+                    ? Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id)
+                    : MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                        Get.toNamed(MyStrings.routePremiumMain);
+                      }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+              }),
+          getFloatingBtn(
+              btnName: LEARNING,
+              fn: () {
+                if (!isPremiumUser && !lesson.adFree) {
                   MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                     Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                     AdsController().showRewardAd();
@@ -56,44 +142,7 @@ class LessonSummaryMain extends StatelessWidget {
                 } else {
                   Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                 }
-              },
-              backgroundColor: MyColors.green,
-              child: Icon(Icons.play_arrow_rounded, size: rs.getSize(40)),
-            ),
-          ),
-          SizedBox(height: rs.getSize(5)),
-          MyWidget().getTextWidget(
-            rs,
-            text: tr('learning'),
-            color: MyColors.greenDark,
-            isBold: true,
-          ),
-          SizedBox(height: rs.getSize(15)),
-          SizedBox(
-            width: rs.getSize(56),
-            height: rs.getSize(56),
-            child: FloatingActionButton(
-              heroTag: 'wiringBtn',
-              onPressed: () {
-                isOptionsActive
-                    ? Get.toNamed(MyStrings.routeWritingMain, arguments: lesson.id)
-                    : MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
-                  Get.toNamed(MyStrings.routePremiumMain);
-                }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
-              },
-              backgroundColor: isOptionsActive ? MyColors.pinkDark : MyColors.grey,
-              child: Icon(isOptionsActive ? FontAwesomeIcons.penToSquare : FontAwesomeIcons.lock,
-                  size: rs.getSize(25)),
-            ),
-          ),
-          SizedBox(height: rs.getSize(5)),
-          MyWidget().getTextWidget(
-            rs,
-            text: tr('writing'),
-            color: isOptionsActive ? MyColors.wine : MyColors.grey,
-            isBold: true,
-          ),
-          SizedBox(height: rs.getSize(10)),
+              }),
         ],
       ),
       appBar: MyWidget().getAppbar(context, rs, title: tr('lessonSummary')),
@@ -111,7 +160,8 @@ class LessonSummaryMain extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Container(height: rs.getSize(10), width: rs.getSize(10), color: Theme.of(context).primaryColor),
+                        Container(
+                            height: rs.getSize(10), width: rs.getSize(10), color: Theme.of(context).primaryColor),
                         SizedBox(width: rs.getSize(10)),
                         MyWidget().getTextWidget(
                           rs,
@@ -145,7 +195,7 @@ class LessonSummaryMain extends StatelessWidget {
   Widget getSummary(BuildContext context, int index) {
     LessonSummary summary = summaries[index];
     double bottomPadding;
-    index == summaries.length - 1 ? bottomPadding = rs.getSize(200) : bottomPadding = rs.getSize(40);
+    index == summaries.length - 1 ? bottomPadding = rs.getSize(500) : bottomPadding = rs.getSize(40);
     return Padding(
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: Column(
@@ -166,7 +216,8 @@ class LessonSummaryMain extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MyWidget().getTextWidget(rs, text: summary.content[fo], color: Theme.of(context).secondaryHeaderColor),
+                MyWidget()
+                    .getTextWidget(rs, text: summary.content[fo], color: Theme.of(context).secondaryHeaderColor),
                 SizedBox(height: rs.getSize(15)),
                 summary.examples.isNotEmpty
                     ? ListView.builder(
@@ -186,7 +237,12 @@ class LessonSummaryMain extends StatelessWidget {
                                     width: 18,
                                   ),
                                 ),
-                                MyWidget().getTextWidget(rs, text: summary.examples[index], isKorean: true, color: Theme.of(context).secondaryHeaderColor),
+                                Expanded(
+                                  child: MyWidget().getTextWidget(rs,
+                                      text: summary.examples[index],
+                                      isKorean: true,
+                                      color: Theme.of(context).secondaryHeaderColor),
+                                ),
                               ],
                             ),
                           );
