@@ -45,6 +45,7 @@ class User {
   bool showPremiumDialog = true;
   final admin = 'gabmanpark@gmail.com';
   bool isConvertedBasic = false;
+  bool needUpdate = false;
 
   static const String ID = 'id';
   static const String OS = 'os';
@@ -127,10 +128,6 @@ class User {
       }
       status = json[STATUS];
 
-      if (json[BUILD_NUMBER] != null) {
-        buildNumber = json[BUILD_NUMBER];
-      }
-
       if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
         FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');
         status = 1;
@@ -173,6 +170,7 @@ class User {
       if (json[STATUS] != status) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
+      buildNumber = json[BUILD_NUMBER];
       FirebaseMessaging messaging = FirebaseMessaging.instance;
       fcmToken = await messaging.getToken();
       if (json[FCM_TOKEN] != fcmToken) {
@@ -183,6 +181,14 @@ class User {
       int buildNum = int.parse(packageInfo.buildNumber);
       if (buildNumber == null || buildNumber != buildNum) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'buildNumber', value: buildNumber);
+      }
+
+      DocumentSnapshot<Map<String, dynamic>> buildNumSnapshot = await Database().getDoc(collection: 'BuildNumber', docId: 'latest');
+      if(buildNumSnapshot.exists) {
+        int lastBuildNum = buildNumSnapshot.data()!['buildNumber'];
+        if(lastBuildNum > buildNumber!) {
+          needUpdate = true;
+        }
       }
 
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;

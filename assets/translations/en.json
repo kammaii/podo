@@ -204,5 +204,8 @@
   "advanced": "Advanced",
   "noMyReadings": "Click on this icon in reading content title. You can collect and review them here.",
   "wantRemoveReading": "Do you want to remove this reading?",
-  "wantRemoveSpeaking": "Do you want to remove this speaking?"
+  "wantRemoveSpeaking": "Do you want to remove this speaking?",
+  "fcmRequest": "Please allow notifications to receive announcements and updates from Podo Korean.",
+  "clickHere": "Click Here",
+  "updateRequest": "Please update Podo Korean to the latest version for the best experience and new features."
 }

@@ -1,10 +1,16 @@
 import 'dart:convert';
+import 'dart:io' as io;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:marquee/marquee.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/ads_controller.dart';
+import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -18,6 +24,7 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LessonListMain extends StatefulWidget {
   LessonListMain({Key? key, required this.course}) : super(key: key);
@@ -28,7 +35,7 @@ class LessonListMain extends StatefulWidget {
   _LessonListMainState createState() => _LessonListMainState();
 }
 
-class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin {
+class _LessonListMainState extends State<LessonListMain> with TickerProviderStateMixin, WidgetsBindingObserver {
   ScrollController scrollController = ScrollController();
   double sliverAppBarHeight = 150.0;
   double sliverAppBarStretchOffset = 100.0;
@@ -75,12 +82,40 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       scrollController.jumpTo(LocalStorage().getLessonScrollPosition());
     });
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     scrollController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    // 알림 설정, 업데이트 완료 후 복귀했을 때 실행
+    super.didChangeAppLifecycleState(state);
+    if(state == AppLifecycleState.resumed) {
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      if (User().fcmPermission != permission) {
+        Database().updateDoc(collection: 'Users', docId: User().id, key: 'fcmPermission', value: permission);
+        User().fcmPermission = permission;
+      }
+      if(User().needUpdate) {
+        DocumentSnapshot<Map<String, dynamic>> buildNumSnapshot = await Database().getDoc(collection: 'BuildNumber', docId: 'latest');
+        if(buildNumSnapshot.exists) {
+          int lastBuildNum = buildNumSnapshot.data()!['buildNumber'];
+          if(User().buildNumber! >= lastBuildNum) {
+            User().needUpdate = false;
+          }
+        }
+      }
+
+      lessonController.update();
+    }
   }
 
   runLesson(Lesson lesson) async {
@@ -104,16 +139,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     bool isLocked = !lesson.isFree && !isPremiumUser;
 
     List<Widget> optionIcons = [];
-    if(lesson.hasOptions) {
+    if (lesson.hasOptions) {
       optionIcons.add(Icon(FontAwesomeIcons.pen, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
-    if(lesson.readingId != null) {
+    if (lesson.readingId != null) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
-      optionIcons.add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+      optionIcons
+          .add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
-    if(lesson.speakingId != null) {
+    if (lesson.speakingId != null) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
-      optionIcons.add(Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+      optionIcons.add(
+          Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
 
     return isReleased
@@ -189,10 +226,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                     Row(children: optionIcons),
                                     isLocked
                                         ? Padding(
-                                          padding: EdgeInsets.only(left: rs.getSize(8)),
-                                          child: Icon(CupertinoIcons.lock_fill,
-                                              color: Theme.of(context).disabledColor, size: 15),
-                                        )
+                                            padding: EdgeInsets.only(left: rs.getSize(8)),
+                                            child: Icon(CupertinoIcons.lock_fill,
+                                                color: Theme.of(context).disabledColor, size: 15),
+                                          )
                                         : const SizedBox.shrink(),
                                   ],
                                 )
@@ -328,117 +365,156 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       cloudController.setPodoMsgBtn();
     }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        await courseController.loadCourses();
-        await PodoMessage().getPodoMessage();
-        setState(() {});
-      },
-      child: Scaffold(
-        floatingActionButton: course.hasWorkbook
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: rs.getSize(56),
-                    height: rs.getSize(56),
-                    child: FloatingActionButton(
-                      heroTag: 'workbookBtn',
-                      onPressed: () {
-                        Get.toNamed(MyStrings.routeWorkbookMain, arguments: course.id);
-                      },
-                      backgroundColor: MyColors.pinkDark,
-                      child: Icon(FontAwesomeIcons.solidFileAudio, size: rs.getSize(30)),
-                    ),
-                  ),
-                  SizedBox(height: rs.getSize(5)),
-                  MyWidget().getTextWidget(
-                    rs,
-                    text: 'Workbook',
-                    color: MyColors.wine,
-                    isBold: true,
-                  ),
-                  SizedBox(height: rs.getSize(20)),
-                ],
-              )
-            : const SizedBox.shrink(),
-        body: Column(
-          children: [
-            GetBuilder<LessonController>(
-              builder: (_) {
-                return Visibility(
-                  visible: User().status != 0 && PodoMessage().isActive,
-                  child: InkWell(
-                    onTap: () {
-                      Get.toNamed(MyStrings.routePodoMessageMain);
+    return Scaffold(
+      floatingActionButton: course.hasWorkbook
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: rs.getSize(56),
+                  height: rs.getSize(56),
+                  child: FloatingActionButton(
+                    heroTag: 'workbookBtn',
+                    onPressed: () {
+                      Get.toNamed(MyStrings.routeWorkbookMain, arguments: course.id);
                     },
-                    child: Container(
-                      color: Theme.of(context).primaryColorLight,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
-                        child: Row(
-                          children: [
-                            Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
-                            SizedBox(width: rs.getSize(15)),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  MyWidget().getTextWidget(rs,
-                                      text: PodoMessage().title?[KO] ?? '',
-                                      isKorean: true,
-                                      size: 18,
-                                      color: Theme.of(context).primaryColor,
-                                      maxLine: 1),
-                                  SizedBox(height: rs.getSize(5)),
-                                  MyWidget().getTextWidget(rs,
-                                      text: PodoMessage().title?[User().language] ?? '',
-                                      color: Theme.of(context).disabledColor,
-                                      size: 13,
-                                      maxLine: 1),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: rs.getSize(10)),
-                            Center(
-                              child: Obx(
-                                () => MyWidget().getRoundedContainer(
-                                  radius: 30,
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
-                                  bgColor: cloudController.podoMsgBtnActive.value
-                                      ? Theme.of(context).highlightColor
-                                      : Theme.of(context).disabledColor,
-                                  widget: MyWidget().getTextWidget(rs,
-                                      text: cloudController.podoMsgBtnText,
-                                      color: Theme.of(context).cardColor,
-                                      size: 13),
+                    backgroundColor: MyColors.pinkDark,
+                    child: Icon(FontAwesomeIcons.solidFileAudio, size: rs.getSize(30)),
+                  ),
+                ),
+                SizedBox(height: rs.getSize(5)),
+                MyWidget().getTextWidget(
+                  rs,
+                  text: 'Workbook',
+                  color: MyColors.wine,
+                  isBold: true,
+                ),
+                SizedBox(height: rs.getSize(20)),
+              ],
+            )
+          : const SizedBox.shrink(),
+      body: Column(
+        children: [
+          GetBuilder<LessonController>(
+            builder: (_) {
+              return Column(
+                children: [
+                  Visibility(
+                      visible: !User().fcmPermission,
+                      child: GestureDetector(
+                        onTap: () {
+                          openAppSettings();
+                        },
+                        child: SizedBox(
+                          height: rs.getSize(30),
+                          child: Marquee(
+                            text: '${tr('fcmRequest')}   ${tr('clickHere')}',
+                            style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontFamily: 'EnglishFont'),
+                            blankSpace: 100,
+                          ),
+                        ),
+                      )),
+                  Visibility(
+                      visible: User().fcmPermission && User().needUpdate,
+                      child: GestureDetector(
+                        onTap: () async {
+                          Uri androidUrl = Uri.parse('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US');
+                          Uri iosUrl = Uri.parse('https://apps.apple.com/kr/app/podo-korean/id6451487431');
+                          if(io.Platform.isAndroid) {
+                            if(await canLaunchUrl(androidUrl)) {
+                              await launchUrl(androidUrl);
+                            }
+                          } else if(io.Platform.isIOS) {
+                            if(await canLaunchUrl(iosUrl)) {
+                              await launchUrl(iosUrl);
+                            }
+                          }
+                        },
+                        child: SizedBox(
+                          height: rs.getSize(30),
+                          child: Marquee(
+                            text: '${tr('updateRequest')}   ${tr('clickHere')}',
+                            style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontFamily: 'EnglishFont'),
+                            blankSpace: 100,
+                          ),
+                        ),
+                      )),
+                  Visibility(
+                    visible: PodoMessage().isActive,
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed(MyStrings.routePodoMessageMain);
+                      },
+                      child: Container(
+                        color: Theme.of(context).primaryColorLight,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
+                          child: Row(
+                            children: [
+                              Image.asset('assets/images/podo.png',
+                                  height: rs.getSize(40), width: rs.getSize(40)),
+                              SizedBox(width: rs.getSize(15)),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    MyWidget().getTextWidget(rs,
+                                        text: PodoMessage().title?[KO] ?? '',
+                                        isKorean: true,
+                                        size: 18,
+                                        color: Theme.of(context).primaryColor,
+                                        maxLine: 1),
+                                    SizedBox(height: rs.getSize(5)),
+                                    MyWidget().getTextWidget(rs,
+                                        text: PodoMessage().title?[User().language] ?? '',
+                                        color: Theme.of(context).disabledColor,
+                                        size: 13,
+                                        maxLine: 1),
+                                  ],
                                 ),
                               ),
-                            )
-                          ],
+                              SizedBox(width: rs.getSize(10)),
+                              Center(
+                                child: Obx(
+                                  () => MyWidget().getRoundedContainer(
+                                    radius: 30,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: rs.getSize(10), vertical: rs.getSize(5)),
+                                    bgColor: cloudController.podoMsgBtnActive.value
+                                        ? Theme.of(context).highlightColor
+                                        : Theme.of(context).disabledColor,
+                                    widget: MyWidget().getTextWidget(rs,
+                                        text: cloudController.podoMsgBtnText,
+                                        color: Theme.of(context).cardColor,
+                                        size: 13),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-            Expanded(
-              child: Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: scrollController,
-                  slivers: [
-                    sliverAppBar(),
-                    sliverList(),
-                  ],
-                ),
+                ],
+              );
+            },
+          ),
+          //todo: 업데이트 유도
+          Expanded(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                controller: scrollController,
+                slivers: [
+                  sliverAppBar(),
+                  sliverList(),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

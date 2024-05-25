@@ -25,6 +25,15 @@ class PodoMessage {
   static const String IS_ACTIVE = 'isActive';
   static const String HAS_BEST_REPLY = 'hasBestReply';
 
+  samplePodoMessage() {
+    id = '09f6218a-6fa9-4318-9f27-73503787491c';
+    dateStart = DateTime.now();
+    dateEnd = dateStart!.add(const Duration(days: 2));
+    title = {'en': 'what kind of food do you like?', 'ko': '어떤 음식을 좋아해요?'};
+    isActive = true;
+    hasBestReply = false;
+  }
+
   Future<void> getPodoMessage() async {
     final Query query = FirebaseFirestore.instance.collection('PodoMessages').where('isActive', isEqualTo: true);
     List<dynamic> snapshots = await Database().getDocs(query: query);

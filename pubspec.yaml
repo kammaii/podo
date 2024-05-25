@@ -30,17 +30,17 @@ dependencies:
   flutter:
     sdk: flutter
   package_info: ^2.0.2
-  flutter_login: ^4.0.0
+  flutter_login: ^5.0.0
   persistent_bottom_nav_bar: ^5.0.2
   percent_indicator: ^4.2.2
-  card_swiper : ^2.0.4
+  card_swiper : ^3.0.1
   animated_text_kit: ^4.2.1
   get: ^4.6.1
   just_audio: ^0.9.35
   confetti: ^0.7.0
   marquee: ^2.2.3
   flutter_spinkit: ^5.2.0
-  uuid: ^3.0.7
+  uuid: ^4.4.0
   html: ^0.15.0
   animated_icon: ^0.0.5
   firebase_auth: ^4.19.4
@@ -50,30 +50,30 @@ dependencies:
   shared_preferences: ^2.1.0
   google_sign_in: ^6.1.4
   mailer: ^6.0.1
-  google_mobile_ads: ^2.4.0
+  google_mobile_ads: ^5.1.0
   blur: ^3.1.0
   firebase_messaging: ^14.9.2
   easy_localization: ^3.0.2
   firebase_in_app_messaging: ^0.7.5+5
   purchases_flutter: ^6.1.0
-  sign_in_with_apple: ^5.0.0
+  sign_in_with_apple: ^6.1.0
   cupertino_icons: ^1.0.5
   firebase_core: ^2.31.0
-  youtube_player_flutter: ^8.1.2
+  youtube_player_flutter: ^9.0.1
   path_provider: ^2.1.0
-  flutter_widget_from_html: ^0.10.3
+  flutter_widget_from_html: ^0.15.0
   flutter_launcher_icons: ^0.13.1
   firebase_analytics: ^10.10.5
   firebase_crashlytics: ^3.5.5
   responsive_framework: ^1.1.1
   firebase_performance: ^0.9.2+7
   url_launcher: ^6.1.14
-  flutter_inappwebview: ^5.8.0
+  flutter_inappwebview: ^6.0.0
   in_app_review: ^2.0.8
   status_bar_control: ^3.2.1
   auto_size_text: ^3.0.0
   flutter_downloader: ^1.11.6
-  permission_handler: ^11.0.1
+  permission_handler: ^11.3.1
 
 
 flutter_launcher_icons:
@@ -91,7 +91,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.1
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

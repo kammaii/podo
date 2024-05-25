@@ -25,14 +25,24 @@ import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 
-class Logo extends StatelessWidget {
+class Logo extends StatefulWidget {
   Logo({Key? key}) : super(key: key);
+
+  @override
+  State<Logo> createState() => _LogoState();
+}
+
+class _LogoState extends State<Logo> {
+  bool initCalled = false;
 
   @override
   Widget build(BuildContext context) {
     ResponsiveSize rs = ResponsiveSize(context);
 
-    getInitData() async {
+    Future<void> getInitData() async {
+      if (initCalled) return;
+      initCalled = true;
+
       await user.User().getUser();
       await LocalStorage().getPrefs();
       final myPageController = Get.find<MyPageController>();
@@ -64,8 +74,8 @@ class Logo extends StatelessWidget {
       bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
       if (user.User().fcmPermission != permission) {
         Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
+        user.User().fcmPermission = permission;
       }
-      print('STATUS: ${user.User().status}');
     }
 
     void runDeepLink(Uri deepLink) async {
@@ -171,7 +181,6 @@ class Logo extends StatelessWidget {
               future: PackageInfo.fromPlatform(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (snapshot.hasData) {
-                  int buildNumber = int.parse(snapshot.data.buildNumber);
                   return Positioned(
                       top: rs.getSize(20),
                       right: rs.getSize(20),
@@ -196,8 +205,7 @@ class Logo extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 20.0),
-                  MyWidget()
-                      .getTextWidget(rs, text: 'Loading...', color: Theme.of(context).secondaryHeaderColor),
+                  MyWidget().getTextWidget(rs, text: 'Loading...', color: Theme.of(context).secondaryHeaderColor),
                 ],
               ),
             ),

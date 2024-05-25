@@ -204,5 +204,8 @@
   "advanced": "Lanjutan",
   "noMyReadings": "Klik ikon ini pada judul konten bacaan. Anda dapat mengumpulkan dan meninjaunya di sini.",
   "wantRemoveReading": "Apakah Anda ingin menghapus bacaan ini?",
-  "wantRemoveSpeaking": "Apakah Anda ingin menghapus percakapan ini?"
+  "wantRemoveSpeaking": "Apakah Anda ingin menghapus percakapan ini?",
+  "fcmRequest": "Silakan izinkan notifikasi untuk menerima pengumuman dan pembaruan dari Podo Korean.",
+  "clickHere": "Klik di sini",
+  "updateRequest": "Silakan perbarui Podo Korean ke versi terbaru untuk pengalaman terbaik dan fitur-fitur baru."
 }
