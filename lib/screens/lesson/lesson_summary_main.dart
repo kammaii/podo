@@ -114,8 +114,8 @@ class LessonSummaryMain extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          lesson.speakingId != null ? getFloatingBtn(btnName: SPEAKING, fn: () {}) : const SizedBox.shrink(),
-          lesson.readingId != null
+          lesson.isSpeakingReleased ? getFloatingBtn(btnName: SPEAKING, fn: () {}) : const SizedBox.shrink(),
+          lesson.isReadingReleased
               ? getFloatingBtn(
                   btnName: READING,
                   fn: () async {

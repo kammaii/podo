@@ -142,12 +142,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     if (lesson.hasOptions) {
       optionIcons.add(Icon(FontAwesomeIcons.pen, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
-    if (lesson.readingId != null) {
+    if (lesson.isReadingReleased) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
       optionIcons
           .add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
-    if (lesson.speakingId != null) {
+    if (lesson.isSpeakingReleased) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
       optionIcons.add(
           Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));

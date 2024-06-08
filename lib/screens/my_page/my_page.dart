@@ -109,7 +109,7 @@ class _MyPageState extends State<MyPage> {
         padding: EdgeInsets.all(rs.getSize(20)),
         child: Column(
           children: [
-            user.User().status == 1
+            user.User().status == 0 || user.User().status == 1
                 ? ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(0),

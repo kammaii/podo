@@ -10,6 +10,8 @@ class Lesson {
   bool? isFreeOptions;
   String? speakingId;
   String? readingId;
+  late bool isSpeakingReleased;
+  late bool isReadingReleased;
   late bool adFree; // 광고 제거 (For 한글,한자 레슨 Intro)
 
   static const String ID = 'id';
@@ -22,6 +24,8 @@ class Lesson {
   static const String IS_FREE_OPTIONS = 'isFreeOptions';
   static const String SPEAKING_ID = 'speakingId';
   static const String READING_ID = 'readingId';
+  static const String IS_SPEAKING_RELEASED = 'isSpeakingReleased';
+  static const String IS_READING_RELEASED = 'isReadingReleased';
   static const String AD_FREE = 'adFree';
 
   Lesson.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,8 @@ class Lesson {
     if(json[READING_ID] != null) {
       readingId = json[READING_ID];
     }
+    isReadingReleased = json[IS_READING_RELEASED] ?? false;
+    isSpeakingReleased = json[IS_SPEAKING_RELEASED] ?? false;
     adFree = json[AD_FREE] ?? false;
   }
 }

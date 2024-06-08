@@ -118,7 +118,8 @@ class _PremiumMainState extends State<PremiumMain> {
     });
   }
 
-  Stream<String> getTimeLeftStream() {
+  Stream<String>? getTimeLeftStream() {
+    if(User().trialEnd == null) return null;
     Duration calTimeLeft() {
       DateTime now = DateTime.now();
       Duration leftTime = User().trialEnd!.difference(now);
@@ -351,90 +352,6 @@ class _PremiumMainState extends State<PremiumMain> {
                           Container(
                             width: MediaQuery.of(context).size.width,
                             decoration: const BoxDecoration(
-                              color: MyColors.pink,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Image.asset('assets/images/quote_upper.png', color: MyColors.pinkDark),
-                                      SizedBox(width: rs.getSize(5)),
-                                      Expanded(
-                                          child: MyWidget().getTextWidget(rs,
-                                              text: tr('premium3'),
-                                              color: MyColors.pinkDark,
-                                              size: 18,
-                                              isBold: true,
-                                              isTextAlignCenter: true)),
-                                      SizedBox(width: rs.getSize(5)),
-                                      Image.asset('assets/images/quote_lower.png', color: MyColors.pinkDark),
-                                    ],
-                                  ),
-                                  const Divider(color: MyColors.pinkDark, thickness: 1.3),
-                                  const SizedBox(height: 20),
-                                  MyWidget().getTextWidget(rs, text: tr('premium4'), color: MyColors.pinkDark),
-                                  const SizedBox(height: 20),
-                                  Container(
-                                      decoration: const BoxDecoration(
-                                          color: MyColors.pinkDark,
-                                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: MyWidget().getTextWidget(
-                                            height: 1.5, rs, text: tr('premium5'), color: MyColors.pink),
-                                      )),
-                                  const SizedBox(height: 20),
-                                  Container(
-                                      decoration: const BoxDecoration(
-                                          color: MyColors.pinkDark,
-                                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: MyWidget().getTextWidget(
-                                            height: 1.5, rs, text: tr('premium6'), color: MyColors.pink),
-                                      )),
-                                  const SizedBox(height: 20),
-                                  MyWidget().getTextWidget(
-                                      height: 1.5,
-                                      rs,
-                                      text: tr('premium7'),
-                                      color: MyColors.pinkDark,
-                                      isTextAlignCenter: true),
-                                  const SizedBox(height: 10),
-                                  MyWidget()
-                                      .getTextWidget(rs, text: tr('premium8'), color: MyColors.pinkDark, isBold: true),
-                                  MyWidget().getTextWidget(rs, text: tr('premium9'), color: MyColors.pinkDark),
-                                  MyWidget().getTextWidget(rs, text: tr('premium10'), color: MyColors.pinkDark),
-                                  const SizedBox(height: 10),
-                                  MyWidget().getTextWidget(rs, text: tr('premium11'), color: MyColors.pinkDark),
-                                  const SizedBox(height: 10),
-                                  MyWidget().getTextWidget(rs,
-                                      text: tr('premium12'), color: MyColors.pinkDark, isBold: true, size: 20),
-                                  const SizedBox(height: 10),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Stack(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            color: MyColors.pink,
-                            height: 100,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: const BoxDecoration(
                               color: MyColors.mustardLight,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(20),
@@ -453,7 +370,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                       SizedBox(width: rs.getSize(5)),
                                       Expanded(
                                           child: MyWidget().getTextWidget(rs,
-                                              text: tr('premium13'),
+                                              text: tr('premium3'),
                                               color: MyColors.mustard,
                                               size: 18,
                                               isBold: true,
@@ -464,23 +381,44 @@ class _PremiumMainState extends State<PremiumMain> {
                                   ),
                                   const Divider(color: MyColors.mustard, thickness: 1.3),
                                   const SizedBox(height: 20),
+                                  MyWidget().getTextWidget(rs, text: tr('premium4'), color: MyColors.mustard),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                      decoration: const BoxDecoration(
+                                          color: MyColors.mustard,
+                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: MyWidget().getTextWidget(
+                                            height: 1.5, rs, text: tr('premium5'), color: MyColors.pink),
+                                      )),
+                                  const SizedBox(height: 20),
+                                  Container(
+                                      decoration: const BoxDecoration(
+                                          color: MyColors.mustard,
+                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: MyWidget().getTextWidget(
+                                            height: 1.5, rs, text: tr('premium6'), color: MyColors.pink),
+                                      )),
+                                  const SizedBox(height: 20),
                                   MyWidget().getTextWidget(
                                       height: 1.5,
                                       rs,
-                                      text: tr('premium14'),
+                                      text: tr('premium7'),
                                       color: MyColors.mustard,
                                       isTextAlignCenter: true),
-                                  MyWidget().getTextWidget(rs, text: tr('premium15'), color: MyColors.mustard),
+                                  const SizedBox(height: 10),
+                                  MyWidget()
+                                      .getTextWidget(rs, text: tr('premium8'), color: MyColors.mustard, isBold: true),
+                                  MyWidget().getTextWidget(rs, text: tr('premium9'), color: MyColors.mustard),
+                                  MyWidget().getTextWidget(rs, text: tr('premium10'), color: MyColors.mustard),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(rs, text: tr('premium11'), color: MyColors.mustard),
                                   const SizedBox(height: 10),
                                   MyWidget().getTextWidget(rs,
-                                      text: tr('premium16'), color: MyColors.mustard, size: 18, isBold: true),
-                                  const SizedBox(height: 10),
-                                  MyWidget().getTextWidget(
-                                      height: 1.5,
-                                      rs,
-                                      text: tr('premium17'),
-                                      color: MyColors.mustard,
-                                      isTextAlignCenter: true),
+                                      text: tr('premium12'), color: MyColors.mustard, isBold: true, size: 20),
                                   const SizedBox(height: 10),
                                 ],
                               ),
@@ -493,6 +431,69 @@ class _PremiumMainState extends State<PremiumMain> {
                           Container(
                             width: MediaQuery.of(context).size.width,
                             color: MyColors.mustardLight,
+                            height: 100,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              color: MyColors.pink,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Image.asset('assets/images/quote_upper.png', color: MyColors.pinkDark),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Expanded(
+                                          child: MyWidget().getTextWidget(rs,
+                                              text: tr('premium13'),
+                                              color: MyColors.pinkDark,
+                                              size: 18,
+                                              isBold: true,
+                                              isTextAlignCenter: true)),
+                                      SizedBox(width: rs.getSize(5)),
+                                      Image.asset('assets/images/quote_lower.png', color: MyColors.pinkDark),
+                                    ],
+                                  ),
+                                  const Divider(color: MyColors.pinkDark, thickness: 1.3),
+                                  const SizedBox(height: 20),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium14'),
+                                      color: MyColors.pinkDark,
+                                      isTextAlignCenter: true),
+                                  MyWidget().getTextWidget(rs, text: tr('premium15'), color: MyColors.pinkDark),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(rs,
+                                      text: tr('premium16'), color: MyColors.pinkDark, size: 18, isBold: true),
+                                  const SizedBox(height: 10),
+                                  MyWidget().getTextWidget(
+                                      height: 1.5,
+                                      rs,
+                                      text: tr('premium17'),
+                                      color: MyColors.pinkDark,
+                                      isTextAlignCenter: true),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Stack(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            color: MyColors.pink,
                             height: 100,
                           ),
                           Container(

@@ -78,6 +78,7 @@ class User {
       LANGUAGE: language,
       FCM_PERMISSION: fcmPermission,
       STATUS: status,
+      BUILD_NUMBER: buildNumber,
     };
     if (fcmToken != null) {
       map[FCM_TOKEN] = fcmToken;
@@ -138,29 +139,24 @@ class User {
         CustomerInfo customerInfo = await Purchases.getCustomerInfo();
         final premiumEntitlement = customerInfo.entitlements.active['premium'];
         if (premiumEntitlement != null) {
-          String premiumStart = premiumEntitlement.originalPurchaseDate;
           String premiumEnd = premiumEntitlement.expirationDate ?? 'Lifetime';
-          String premiumLatestPurchase = premiumEntitlement.latestPurchaseDate;
-          bool premiumWillRenew = premiumEntitlement.willRenew;
-          String? premiumUnsubscribeDetected = premiumEntitlement.unsubscribeDetectedAt;
           expirationDate = premiumEnd.substring(0, 10).replaceAll('-', '.');
-          Database().updateFields(collection: 'Users', docId: id, fields: {
-            PREMIUM_START: premiumStart,
-            PREMIUM_END: premiumEnd,
-            PREMIUM_LATEST_PURCHASE: premiumLatestPurchase,
-            PREMIUM_UNSUBSCRIBE_DETECTED: premiumUnsubscribeDetected,
-            PREMIUM_WILL_RENEW: premiumWillRenew,
-          });
           FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
           status = 2;
         } else {
           if (status == 2) {
             FirebaseMessaging.instance.unsubscribeFromTopic('premiumUsers');
             FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
-          }
-          if(status != 3) {
             status = 1;
-            FirebaseMessaging.instance.subscribeToTopic('basicUsers');
+          }
+          if(status == 3) {
+            FirebaseMessaging.instance.subscribeToTopic('trialUsers');
+          } else {
+            if(status == 0) {
+              FirebaseMessaging.instance.subscribeToTopic('newUsers');
+            } else {
+              FirebaseMessaging.instance.subscribeToTopic('basicUsers');
+            }
             Get.put(AdsController());
           }
         }
@@ -180,6 +176,7 @@ class User {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       int buildNum = int.parse(packageInfo.buildNumber);
       if (buildNumber == null || buildNumber != buildNum) {
+        buildNumber = buildNum;
         Database().updateDoc(collection: 'Users', docId: id, key: 'buildNumber', value: buildNumber);
       }
 
@@ -196,7 +193,7 @@ class User {
       await analytics.setUserProperty(name: 'status', value: status.toString());
     } else {
       print('신규유저입니다. DB를 생성합니다.');
-      makeNewUserOnDB();
+      await makeNewUserOnDB();
     }
   }
 
@@ -225,9 +222,9 @@ class User {
     if (!Languages().fos.contains(language)) {
       language = 'en';
     }
-    fcmPermission = false;
     status = 0;
-    Database().setDoc(collection: 'Users', doc: this);
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    buildNumber = int.parse(packageInfo.buildNumber);
 
     List<String> signInMethods = await auth.FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
     if (signInMethods.isNotEmpty) {
@@ -248,8 +245,14 @@ class User {
     NotificationSettings settings = await messaging.requestPermission();
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
+      fcmPermission = true;
     } else {
       FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
+      fcmPermission = false;
     }
+    await Database().setDoc(collection: 'Users', doc: this);
+
+    Get.put(AdsController());
+    await initRevenueCat();
   }
 }
