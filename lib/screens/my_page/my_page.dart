@@ -83,7 +83,6 @@ class _MyPageState extends State<MyPage> {
     rs = ResponsiveSize(context);
     feedback = '';
     currentUser = auth.currentUser;
-    print(currentUser);
 
     if (currentUser != null) {
       DateTime? date = auth.currentUser?.metadata.creationTime;
@@ -210,11 +209,7 @@ class _MyPageState extends State<MyPage> {
                           setState(() {
                             feedback = '';
                             closePanels();
-                            if (Platform.isIOS) {
-                              items[index].isExpanded = !isExpanded;
-                            } else {
-                              items[index].isExpanded = isExpanded;
-                            }
+                            items[index].isExpanded = isExpanded;
                           });
                         },
                         children: [

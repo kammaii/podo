@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +85,7 @@ class MyWidget {
     return Text(
       text ?? '',
       style: TextStyle(
-        fontFamily: isKorean ? 'KoreanFont' : 'EnglishFont',
+        fontFamily: isKorean ? 'KoreanFont' : (Platform.isIOS ? null : 'EnglishFont'),
         fontSize: rs.getSize(size),
         color: color,
         fontWeight: isBold ? FontWeight.bold : null,

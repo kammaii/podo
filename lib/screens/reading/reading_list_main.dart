@@ -38,7 +38,6 @@ class _ReadingListMainState extends State<ReadingListMain> {
   final IS_RELEASED = 'isReleased';
   final DATE = 'date';
   String fo = User().language;
-  late List<ReadingTitle> readingTitles;
   final controller = Get.find<ReadingController>();
   bool isBasicUser = User().status == 0 || User().status == 1;
   late Query query;
@@ -59,7 +58,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                   MyWidget().showDialog(context, rs, content: tr('wantRemoveReading'), yesFn: () {
                     String id = readingTitle.id;
                     Database().deleteDoc(collection: My_READINGS, docId: id).then((value) {
-                      readingTitles.removeWhere((element) => element.id == id);
+                      controller.readingTitles.removeWhere((element) => element.id == id);
                       controller.update();
                     });
                   });
@@ -198,16 +197,16 @@ class _ReadingListMainState extends State<ReadingListMain> {
     if (selectedToggle == 0) {
       query = firestore.collection(My_READINGS).orderBy(DATE, descending: true);
     } else {
-      query = firestore.collection(READING_TITLES).where(IS_RELEASED, isEqualTo: true);
+      query = firestore.collection(READING_TITLES).where('category', isNotEqualTo: 'Lesson');
     }
 
     if (shouldLoad) {
-      readingTitles = [];
+      controller.readingTitles = [];
       Map<String, bool> isCompletedMap = {};
       await Database().getDocs(query: query).then((snapshots) {
         for (dynamic snapshot in snapshots) {
           ReadingTitle title = ReadingTitle.fromJson(snapshot.data() as Map<String, dynamic>);
-          readingTitles.add(title);
+          controller.readingTitles.add(title);
           isCompletedMap[title.id] = LocalStorage().hasHistory(itemId: title.id);
           controller.isCompleted.value = isCompletedMap.obs;
         }
@@ -268,7 +267,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                   : GetBuilder<ReadingController>(
                     builder: (_){
                       return Expanded(
-                        child: readingTitles.isEmpty
+                        child: controller.readingTitles.isEmpty
                             ? selectedToggle == 0 ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -285,9 +284,9 @@ class _ReadingListMainState extends State<ReadingListMain> {
                                 size: rs.getSize(20),
                                 isTextAlignCenter: true))
                             : ListView.builder(
-                          itemCount: readingTitles.length,
+                          itemCount: controller.readingTitles.length,
                           itemBuilder: (BuildContext context, int index) {
-                            ReadingTitle readingTitle = readingTitles[index];
+                            ReadingTitle readingTitle = controller.readingTitles[index];
                             return getListItem(readingTitle: readingTitle);
                           },
                         ),

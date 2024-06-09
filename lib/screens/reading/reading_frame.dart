@@ -139,7 +139,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           isLoading = false;
         });
       }
-      controller.hasFavoriteLesson.value = snapshots[3].exists;
+      controller.hasFavoriteReading.value = snapshots[3].exists;
     });
   }
 
@@ -221,7 +221,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               isBold: true,
             ),
           ),
-          Obx(() => FavoriteIcon().getFavoriteLessonIcon(context, rs, controller: controller, item: readingTitle, isReading: true))
+          Obx(() => FavoriteIcon().getFavoriteReadingIcon(context, rs, item: readingTitle))
         ],
       ),
       flexibleSpace: Stack(

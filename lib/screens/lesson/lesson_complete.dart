@@ -84,7 +84,7 @@ class LessonComplete extends StatelessWidget {
     History().addHistory(itemIndex: 0, itemId: lesson.id, content: lesson.title['ko']);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       lessonController.isCompleted[lesson.id] = true;
-      if (LocalStorage().histories.length % 7 == 0) {
+      if (LocalStorage().histories.isNotEmpty && LocalStorage().histories.length % 7 == 0) {
         showReviewRequest();
       }
     });
@@ -162,7 +162,7 @@ class LessonComplete extends StatelessWidget {
                                   }
                                 }),
                                 SizedBox(height: rs.getSize(20)),
-                                lesson.readingId != null ?
+                                lesson.isReadingReleased ?
                                 getBtn(context, tr('reading'), CupertinoIcons.book, () {
                                   if (isPremiumUser || isFreeOptions) {
                                     Get.offNamedUntil(MyStrings.routeReadingFrame,

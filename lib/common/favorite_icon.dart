@@ -3,12 +3,14 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:podo/screens/my_page/user.dart';
+import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/values/my_colors.dart';
 
 class FavoriteIcon {
@@ -38,18 +40,22 @@ class FavoriteIcon {
     });
   }
 
-  Widget getFavoriteLessonIcon(BuildContext context, ResponsiveSize rs,
-      {required dynamic controller, required dynamic item, required bool isReading}) {
-    String ref = isReading ? 'Users/${User().id}/Readings' : 'Users/${User().id}/Speakings';
+  Widget getFavoriteReadingIcon(BuildContext context, ResponsiveSize rs,
+      {required dynamic item}) {
+    String ref = 'Users/${User().id}/Readings';
+    final controller = Get.find<ReadingController>();
 
-    return getIcon(context, rs, b: controller.hasFavoriteLesson.value, fn: () {
-      if (controller.hasFavoriteLesson.value) {
+    return getIcon(context, rs, b: controller.hasFavoriteReading.value, fn: () {
+      if (controller.hasFavoriteReading.value) {
         Database().deleteDoc(collection: ref, docId: item.id);
-        controller.hasFavoriteLesson.value = false;
+        controller.readingTitles.removeWhere((readingTitle) => readingTitle.id == item.id);
+        controller.hasFavoriteReading.value = false;
       } else {
         Database().setDoc(collection: ref, doc: item);
-        controller.hasFavoriteLesson.value = true;
+        controller.readingTitles.add(item);
+        controller.hasFavoriteReading.value = true;
       }
+      controller.update();
     }, isWhiteIcon: true);
   }
 
