@@ -18,6 +18,7 @@ import 'package:podo/common/responsive_size.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class User {
   User._init();
@@ -46,6 +47,7 @@ class User {
   final admin = 'gabmanpark@gmail.com';
   bool isConvertedBasic = false;
   bool needUpdate = false;
+  String? path;
 
   static const String ID = 'id';
   static const String OS = 'os';
@@ -66,6 +68,7 @@ class User {
   static const String STATUS = 'status';
   static const String BUILD_NUMBER = 'buildNumber';
   static const String ALL_USERS = 'allUsers';
+  static const String PATH = 'path';
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -88,6 +91,9 @@ class User {
     }
     if (trialEnd != null) {
       map[TRIAL_END] = trialEnd;
+    }
+    if (path != null) {
+      map[PATH] = path;
     }
     return map;
   }
@@ -225,6 +231,11 @@ class User {
     status = 0;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     buildNumber = int.parse(packageInfo.buildNumber);
+    final prefs = await SharedPreferences.getInstance();
+    String? p = prefs.getString('path');
+    if(p != null) {
+      path = p;
+    }
 
     List<String> signInMethods = await auth.FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
     if (signInMethods.isNotEmpty) {

@@ -162,7 +162,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                         FavoriteIcon().getIcon(context, rs),
                                         SizedBox(height: rs.getSize(10)),
                                         MyWidget().getTextWidget(rs,
-                                            text: tr('noFlashCards'), isTextAlignCenter: true, size: 18),
+                                            text: tr('noFlashCards'), isTextAlignCenter: true, size: 18, color: Theme.of(context).secondaryHeaderColor),
                                         SizedBox(height: rs.getSize(50)),
                                       ],
                                     )

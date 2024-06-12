@@ -76,10 +76,14 @@ class FavoriteIcon {
             ),
           ),
         ),
-        b
-            ? const SizedBox.shrink()
-            : Icon(CupertinoIcons.plus_circle_fill,
-                color: isWhiteIcon ? Colors.white : Theme.of(context).primaryColor, size: rs.getSize(13)),
+        Positioned(
+          left: rs.getSize(5),
+          top: rs.getSize(5),
+          child: b
+              ? const SizedBox.shrink()
+              : Icon(CupertinoIcons.plus_circle_fill,
+                  color: isWhiteIcon ? Colors.white : Theme.of(context).primaryColor, size: rs.getSize(13)),
+        ),
       ],
     );
   }

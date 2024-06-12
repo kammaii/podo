@@ -471,10 +471,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
     }
 
     return Card(
+        color: Theme.of(context).cardColor,
         child: Padding(
-      padding: EdgeInsets.all(rs.getSize(20)),
-      child: widget,
-    ));
+          padding: EdgeInsets.all(rs.getSize(20)),
+          child: widget,
+        ));
   }
 
   toggleBottomAudioWidget(bool isForward) {
@@ -691,10 +692,15 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           title: Center(
                             child: Column(
                               children: [
-                                MyWidget().getTextWidget(rs, text: tr('transFeedback'), isBold: true),
+                                MyWidget().getTextWidget(rs,
+                                    text: tr('transFeedback'),
+                                    isBold: true,
+                                    color: Theme.of(context).secondaryHeaderColor),
                                 const SizedBox(height: 10),
-                                MyWidget()
-                                    .getTextWidget(rs, text: tr('transFeedbackExplain'), isTextAlignCenter: true),
+                                MyWidget().getTextWidget(rs,
+                                    text: tr('transFeedbackExplain'),
+                                    isTextAlignCenter: true,
+                                    color: Theme.of(context).secondaryHeaderColor),
                               ],
                             ),
                           ),
@@ -711,7 +717,7 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                   side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
                                   backgroundColor: Theme.of(context).canvasColor),
                               onPressed: () async {
-                                if(feedback.isNotEmpty) {
+                                if (feedback.isNotEmpty) {
                                   TransFeedback transFeedback = TransFeedback(
                                       lessonId: lesson.id,
                                       lessonTitle: lesson.title[KO],
@@ -734,7 +740,11 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                           ],
                         ));
                       },
-                      icon: Image.asset('assets/images/trans_feedback_icon.png', width: rs.getSize(30), height: rs.getSize(30),)),
+                      icon: Image.asset(
+                        'assets/images/trans_feedback_icon.png',
+                        width: rs.getSize(30),
+                        height: rs.getSize(30),
+                      )),
                 ),
                 Expanded(
                   child: Swiper(

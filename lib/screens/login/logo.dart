@@ -24,6 +24,7 @@ import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Logo extends StatefulWidget {
   Logo({Key? key}) : super(key: key);
@@ -34,6 +35,7 @@ class Logo extends StatefulWidget {
 
 class _LogoState extends State<Logo> {
   bool initCalled = false;
+  Set<String> displayedMsg = {};
 
   @override
   Widget build(BuildContext context) {
@@ -81,19 +83,22 @@ class _LogoState extends State<Logo> {
     void runDeepLink(Uri deepLink) async {
       print('RUN DEEPLINK: $deepLink');
       Uri uri = Uri.parse(deepLink.toString());
-      String mode = uri.queryParameters['mode']!;
-      await FirebaseAuth.instance.currentUser!.reload();
-      User? currentUser = FirebaseAuth.instance.currentUser;
+      String? mode = uri.queryParameters['mode'];
+      String? path = uri.queryParameters['path'];
+      print('MODE: $mode');
+      print('PATH: $path');
+      if(path != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('path', path);
+      }
 
-      switch (mode) {
-        case 'verifyEmail':
-          if (currentUser != null && currentUser!.emailVerified) {
-            getInitData();
-          }
-          break;
+      if(mode != null && mode == 'verifyEmail') {
+        await FirebaseAuth.instance.currentUser!.reload();
+        User? currentUser = FirebaseAuth.instance.currentUser;
 
-        case 'cloudMessage':
-          break;
+        if (currentUser != null && currentUser.emailVerified) {
+          getInitData();
+        }
       }
     }
 
@@ -121,16 +126,18 @@ class _LogoState extends State<Logo> {
     FirebaseInAppMessaging.instance;
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print('Got a message whilst in the foreground!');
-      if (message.notification != null) {
+      print('Got a message whilst in the foreground!: ${message.data['tag']}');
+      print('MSG ID: ${message.messageId}');
+      print('1: $displayedMsg');
+      if(message.notification != null && !displayedMsg.contains(message.messageId)) {
         PlayAudio().playAlarm();
+        displayedMsg.add(message.messageId!);
+        print('2: $displayedMsg');
         switch (message.data['tag']) {
           case 'podo_message':
             MyWidget().showSnackbarWithPodo(rs,
                 title: tr('podosMsg'),
-                content: message.notification!.body!,
-                titleSize: rs.getSize(20),
-                contentSize: rs.getSize(18));
+                content: message.notification!.body!);
             await PodoMessage().getPodoMessage();
             final messageController = Get.put(PodoMessageController());
             messageController.setPodoMsgBtn();
@@ -141,9 +148,7 @@ class _LogoState extends State<Logo> {
           case 'writing':
             MyWidget().showSnackbarWithPodo(rs,
                 title: message.notification!.title!,
-                content: message.notification!.body!,
-                titleSize: rs.getSize(20),
-                contentSize: rs.getSize(18));
+                content: message.notification!.body!);
             break;
         }
       }

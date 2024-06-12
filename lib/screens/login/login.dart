@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -10,8 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/login/credentials.dart';
 import 'package:podo/values/my_colors.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:crypto/crypto.dart';
 
 // apple OAuth callback : https://podo-49335.firebaseapp.com/__/auth/handler
 
@@ -46,10 +41,11 @@ class Login extends StatelessWidget {
           logo: 'assets/images/logo.png',
           title: tr('welcome'),
           theme: LoginTheme(
-              primaryColor: MyColors.purple,
-              pageColorLight: MyColors.green,
-              accentColor: MyColors.purple,
-              titleStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+            primaryColor: MyColors.purple,
+            pageColorLight: MyColors.green,
+            accentColor: MyColors.purple,
+            titleStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           loginProviders: <LoginProvider>[
             LoginProvider(
               icon: FontAwesomeIcons.google,

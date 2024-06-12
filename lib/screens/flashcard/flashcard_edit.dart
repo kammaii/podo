@@ -43,29 +43,17 @@ class FlashCardEdit extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: const Icon(Icons.arrow_back_ios_rounded),
-            color: MyColors.purple,
-          ),
-          title: Text(tr('flashcardEdit'),
-              style: const TextStyle(color: MyColors.purple)),
-        ),
+        appBar: MyWidget().getAppbar(context, rs, title: tr('flashcardEdit')),
         body: Column(
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(20),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: Colors.white),
+                      color: Theme.of(context).cardColor),
                   child: Center(
                     child: Column(
                       children: [
@@ -118,6 +106,8 @@ class FlashCardEdit extends StatelessWidget {
                           child: MyWidget().getRoundBtnWidget(
                             rs,
                             text: tr('save'),
+                            bgColor: isCorrected ? Theme.of(context).canvasColor : Theme.of(context).disabledColor,
+                            fontColor: Theme.of(context).cardColor,
                             verticalPadding: 10,
                             hasNullFunction: true,
                             f: onSaveBtn,

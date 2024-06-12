@@ -15,7 +15,6 @@ import 'package:podo/common/play_stop_icon.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/flashcard/flashcard.dart';
 import 'package:podo/screens/flashcard/flashcard_controller.dart';
-import 'package:podo/values/my_colors.dart';
 
 class FlashCardReview extends StatefulWidget {
   const FlashCardReview({Key? key}) : super(key: key);

@@ -195,9 +195,9 @@ class _WritingMyListState extends State<WritingMyList> {
                 visible: writing.comments != null,
                 child: Column(
                   children: [
-                    MyWidget().getTextWidget(rs, text: 'Comments', isBold: true),
+                    MyWidget().getTextWidget(rs, text: 'Comments', isBold: true, color: Theme.of(context).primaryColor),
                     const SizedBox(height: 10),
-                    MyWidget().getTextWidget(rs, text: writing.comments),
+                    MyWidget().getTextWidget(rs, text: writing.comments, color: Theme.of(context).primaryColor),
                   ],
                 ),
               )
@@ -277,6 +277,7 @@ class _WritingMyListState extends State<WritingMyList> {
                                         text: tr('noMyWritings'),
                                         isTextAlignCenter: true,
                                         size: 18,
+                                        color: Theme.of(context).primaryColor,
                                       ),
                                     )
                                   : ListView.builder(

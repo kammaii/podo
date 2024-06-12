@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 
@@ -6,7 +7,7 @@ class ReadingController extends GetxController {
   RxMap<dynamic, dynamic> hasFlashcard = {}.obs;
   RxMap<dynamic, dynamic> isCompleted = {}.obs;
   RxBool hasFavoriteReading = false.obs;
-  late List<ReadingTitle> readingTitles;
+  List<ReadingTitle> readingTitles = [];
 
 
   initIsExpanded(int length) {

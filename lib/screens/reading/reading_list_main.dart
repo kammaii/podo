@@ -274,7 +274,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                             FavoriteIcon().getIcon(context, rs),
                             SizedBox(height: rs.getSize(10)),
                             MyWidget().getTextWidget(rs,
-                                text: tr('noMyReadings'), isTextAlignCenter: true, size: 18),
+                                text: tr('noMyReadings'), isTextAlignCenter: true, size: 18, color: Theme.of(context).secondaryHeaderColor),
                             SizedBox(height: rs.getSize(50)),
                           ],
                         ) : Center(
