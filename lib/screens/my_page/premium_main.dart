@@ -660,7 +660,6 @@ class _PremiumMainState extends State<PremiumMain> {
                             onPressed: () async {
                               FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
                               FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
-                              FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');
                               final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
                               purchaseTrace.start();
 
