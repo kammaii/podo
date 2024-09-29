@@ -207,5 +207,7 @@
   "wantRemoveSpeaking": "Voulez-vous supprimer cette parole?",
   "fcmRequest": "Veuillez autoriser les notifications pour recevoir des annonces et des mises à jour de Podo Korean.",
   "clickHere": "Cliquez ici",
-  "updateRequest": "Veuillez mettre à jour Podo Korean vers la dernière version pour bénéficier de la meilleure expérience et des nouvelles fonctionnalités."
+  "updateRequest": "Veuillez mettre à jour Podo Korean vers la dernière version pour bénéficier de la meilleure expérience et des nouvelles fonctionnalités.",
+  "blog": "Blog",
+  "community": "Communauté"
 }

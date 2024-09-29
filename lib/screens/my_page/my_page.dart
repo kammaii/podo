@@ -20,6 +20,7 @@ import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyPageItem {
   late IconData icon;
@@ -41,6 +42,8 @@ class _MyPageState extends State<MyPage> {
     MyPageItem(Icons.account_circle_rounded, tr('editName')),
     MyPageItem(CupertinoIcons.globe, tr('language')),
     MyPageItem(Icons.feedback_outlined, tr('feedback')),
+    MyPageItem(FontAwesomeIcons.blogger, tr('blog')),
+    MyPageItem(FontAwesomeIcons.reddit, tr('community')),
     MyPageItem(Icons.logout_rounded, tr('logOut')),
     MyPageItem(Icons.remove_circle_outline_rounded, tr('removeAccount')),
   ];
@@ -63,6 +66,17 @@ class _MyPageState extends State<MyPage> {
   ];
   late bool hasUserName;
   late ResponsiveSize rs;
+  final String blogUrl = "https://blog.podokorean.com";
+  final String redditUrl = "https://w"; //todo: Reddit 주소 입력
+
+  
+  Future<void> _launchUrl(Uri url) async {
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   void removeUserAccount(UserCredential? userCredential) {
     if (userCredential != null) {
@@ -402,9 +416,31 @@ class _MyPageState extends State<MyPage> {
                                 ],
                               ))),
 
-                          // Logout
+                          // Blog
                           getExpansionPanel(
                               items[3],
+                              const SizedBox.shrink(),
+                              onTap: () {
+                                items[3].isExpanded ?
+                                _launchUrl((Uri.parse(blogUrl))) : null;
+                              },
+                            isExpandable: false
+                          ),
+
+                          // Community
+                          // getExpansionPanel(
+                          //     items[4],
+                          //     const SizedBox.shrink(),
+                          //     onTap: () {
+                          //       items[4].isExpanded ?
+                          //       _launchUrl((Uri.parse(redditUrl))) : null;
+                          //     },
+                          //   isExpandable: false,
+                          // ),
+
+                          // Logout
+                          getExpansionPanel(
+                              items[5],
                               ListTile(
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,7 +494,7 @@ class _MyPageState extends State<MyPage> {
 
                           // Remove account
                           getExpansionPanel(
-                              items[4],
+                              items[6],
                               ListTile(
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,10 +715,10 @@ class _MyPageState extends State<MyPage> {
     print('ERROR: $e');
   }
 
-  ExpansionPanel getExpansionPanel(MyPageItem item, Widget body, {String? subTitle}) {
+  ExpansionPanel getExpansionPanel(MyPageItem item, Widget body, {String? subTitle, Function? onTap, bool isExpandable = true}) {
     return ExpansionPanel(
         canTapOnHeader: true,
-        isExpanded: item.isExpanded,
+        isExpanded: isExpandable ? item.isExpanded : false,
         headerBuilder: (context, isExpanded) {
           return subTitle == null
               ? Padding(
@@ -699,6 +735,7 @@ class _MyPageState extends State<MyPage> {
                       size: 18,
                       color: Theme.of(context).secondaryHeaderColor,
                     ),
+                    onTap: onTap?.call(),
                   ),
                 )
               : Padding(

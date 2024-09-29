@@ -207,5 +207,7 @@
   "wantRemoveSpeaking": "Do you want to remove this speaking?",
   "fcmRequest": "Please allow notifications to receive announcements and updates from Podo Korean.",
   "clickHere": "Click Here",
-  "updateRequest": "Please update Podo Korean to the latest version for the best experience and new features."
+  "updateRequest": "Please update Podo Korean to the latest version for the best experience and new features.",
+  "blog": "Blog",
+  "community": "Community"
 }
