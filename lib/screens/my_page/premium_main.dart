@@ -570,10 +570,10 @@ class _PremiumMainState extends State<PremiumMain> {
                                           tr('writingCorrection'),
                                           const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                           const Icon(Icons.check_circle_outline, color: MyColors.green)),
-                                      getDataRow(
-                                          tr('podosMsg'),
-                                          const Icon(Icons.remove_circle_outline, color: MyColors.red),
-                                          const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                                      // getDataRow(
+                                      //     tr('podosMsg'),
+                                      //     const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                      //     const Icon(Icons.check_circle_outline, color: MyColors.green)),
                                       getDataRow(
                                           tr('adFree'),
                                           const Icon(Icons.remove_circle_outline, color: MyColors.red),
@@ -675,7 +675,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                   Purchases.setPushToken(User().fcmToken ?? '');
                                   String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
                                   Purchases.setFirebaseAppInstanceId(appInstanceId!);
-                                  Database()
+                                  await Database()
                                       .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
                                   MyWidget().showSnackbarWithPodo(rs,
                                       title: tr('purchaseTitle'), content: tr('purchaseContent'));
