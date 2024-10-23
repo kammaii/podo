@@ -7,6 +7,7 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,6 +42,8 @@ class _PremiumMainState extends State<PremiumMain> {
   late Timer timer;
   StreamController<String> streamController = StreamController();
   final ScrollController scrollController = ScrollController();
+  Package? package;
+
 
 
   @override
@@ -198,6 +201,47 @@ class _PremiumMainState extends State<PremiumMain> {
       DataCell(Center(child: premium)),
     ]);
   }
+
+  runPurchase() async {
+      FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
+      FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
+      final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
+      purchaseTrace.start();
+      setState(() {
+        isPurchasing = true;
+      });
+      try {
+        CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
+        purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
+        if (purchaserInfo.entitlements.active.isNotEmpty) {
+          Purchases.setEmail(User().email);
+          Purchases.setDisplayName(User().name);
+          Purchases.setPushToken(User().fcmToken ?? '');
+          String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
+          Purchases.setFirebaseAppInstanceId(appInstanceId!);
+          await Database()
+              .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
+          MyWidget().showSnackbarWithPodo(rs,
+              title: tr('purchaseTitle'), content: tr('purchaseContent'));
+          User().getUser();
+          Get.offNamedUntil(
+              MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+        }
+      } on PlatformException catch (e) {
+        setState(() {
+          isPurchasing = false;
+        });
+        var errorCode = PurchasesErrorHelper.getErrorCode(e);
+        purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
+        purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
+        if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+          FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
+          MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
+        }
+      }
+      await FirebaseAnalytics.instance.logPurchase();
+      purchaseTrace.stop();
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -581,18 +625,23 @@ class _PremiumMainState extends State<PremiumMain> {
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                    decoration: const BoxDecoration(
-                                      color: MyColors.red,
-                                      borderRadius: BorderRadius.all(Radius.circular(5))),
-                                      child: MyWidget().getTextWidget(
-                                        rs,
-                                        text: tr('premium21'),
-                                        color: Colors.white,
-                                        isTextAlignCenter: true,
-                                        size: 20,
-                                        isBold: true),
+                                  GestureDetector(
+                                    onTap: () {
+                                      runPurchase();
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                                      decoration: const BoxDecoration(
+                                        color: MyColors.red,
+                                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                                        child: MyWidget().getTextWidget(
+                                          rs,
+                                          text: tr('premium21'),
+                                          color: Colors.white,
+                                          isTextAlignCenter: true,
+                                          size: 20,
+                                          isBold: true),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -642,7 +691,6 @@ class _PremiumMainState extends State<PremiumMain> {
               FutureBuilder<Offerings>(
                 future: Purchases.getOfferings(),
                 builder: (context, snapshot) {
-                  Package? package;
                   if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                     final offering = snapshot.data?.current;
                     package = offering?.availablePackages[0];
@@ -657,47 +705,7 @@ class _PremiumMainState extends State<PremiumMain> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                               backgroundColor: Colors.transparent,
                             ),
-                            onPressed: () async {
-                              FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
-                              FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
-                              final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
-                              purchaseTrace.start();
-
-                              setState(() {
-                                isPurchasing = true;
-                              });
-                              try {
-                                CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
-                                purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
-                                if (purchaserInfo.entitlements.active.isNotEmpty) {
-                                  Purchases.setEmail(User().email);
-                                  Purchases.setDisplayName(User().name);
-                                  Purchases.setPushToken(User().fcmToken ?? '');
-                                  String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
-                                  Purchases.setFirebaseAppInstanceId(appInstanceId!);
-                                  await Database()
-                                      .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-                                  MyWidget().showSnackbarWithPodo(rs,
-                                      title: tr('purchaseTitle'), content: tr('purchaseContent'));
-                                  User().getUser();
-                                  Get.offNamedUntil(
-                                      MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-                                }
-                              } on PlatformException catch (e) {
-                                setState(() {
-                                  isPurchasing = false;
-                                });
-                                var errorCode = PurchasesErrorHelper.getErrorCode(e);
-                                purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
-                                purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
-                                if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-                                  FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
-                                  MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
-                                }
-                              }
-                              await FirebaseAnalytics.instance.logPurchase();
-                              purchaseTrace.stop();
-                            },
+                            onPressed: () async {runPurchase();},
                             child: Row(
                               children: [
                                 Expanded(
