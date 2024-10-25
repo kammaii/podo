@@ -44,8 +44,6 @@ class _PremiumMainState extends State<PremiumMain> {
   final ScrollController scrollController = ScrollController();
   Package? package;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -57,36 +55,31 @@ class _PremiumMainState extends State<PremiumMain> {
       }
     }
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if(User().showPremiumDialog) {
+      if (User().showPremiumDialog) {
         Get.dialog(
             AlertDialog(
-              title: Center(
-                  child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
+              title:
+                  Center(child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MyWidget().getTextWidget(rs,
-                      text: tr('premiumDialog1'), color: Theme
-                          .of(context)
-                          .primaryColor, isBold: true, size: 18),
+                      text: tr('premiumDialog1'), color: Theme.of(context).primaryColor, isBold: true, size: 18),
                   SizedBox(height: rs.getSize(10)),
                   MyWidget().getTextWidget(rs,
                       text: tr('premiumDialog2'),
-                      isTextAlignCenter: true, color: Theme
-                          .of(context)
-                          .secondaryHeaderColor),
+                      isTextAlignCenter: true,
+                      color: Theme.of(context).secondaryHeaderColor),
                   SizedBox(height: rs.getSize(10)),
                   MyWidget().getTextWidget(rs,
                       text: tr('premiumDialog3'),
-                      isTextAlignCenter: true, color: Theme
-                          .of(context)
-                          .primaryColor, size: 13),
+                      isTextAlignCenter: true,
+                      color: Theme.of(context).primaryColor,
+                      size: 13),
                 ],
               ),
-              backgroundColor: Theme
-                  .of(context)
-                  .cardColor,
+              backgroundColor: Theme.of(context).cardColor,
               actionsAlignment: MainAxisAlignment.center,
               actionsPadding: EdgeInsets.only(
                   left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
@@ -96,12 +89,8 @@ class _PremiumMainState extends State<PremiumMain> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      side: BorderSide(color: Theme
-                          .of(context)
-                          .canvasColor, width: 1),
-                      backgroundColor: Theme
-                          .of(context)
-                          .canvasColor),
+                      side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
+                      backgroundColor: Theme.of(context).canvasColor),
                   onPressed: () {
                     User().showPremiumDialog = false;
                     Get.back();
@@ -109,9 +98,7 @@ class _PremiumMainState extends State<PremiumMain> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: rs.getSize(13), horizontal: rs.getSize(20)),
                     child: Text(tr('premiumDialog4'),
-                        style: TextStyle(color: Theme
-                            .of(context)
-                            .cardColor, fontSize: rs.getSize(15))),
+                        style: TextStyle(color: Theme.of(context).cardColor, fontSize: rs.getSize(15))),
                   ),
                 ),
               ],
@@ -122,7 +109,7 @@ class _PremiumMainState extends State<PremiumMain> {
   }
 
   Stream<String>? getTimeLeftStream() {
-    if(User().trialEnd == null) return null;
+    if (User().trialEnd == null) return null;
     Duration calTimeLeft() {
       DateTime now = DateTime.now();
       Duration leftTime = User().trialEnd!.difference(now);
@@ -179,8 +166,7 @@ class _PremiumMainState extends State<PremiumMain> {
   DataColumn getDataColumn(String label) {
     return DataColumn(
       label: Expanded(
-        child: Center(
-            child: MyWidget().getTextWidget(rs, text: label)),
+        child: Center(child: MyWidget().getTextWidget(rs, text: label)),
       ),
     );
   }
@@ -203,45 +189,42 @@ class _PremiumMainState extends State<PremiumMain> {
   }
 
   runPurchase() async {
-      FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
-      FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
-      final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
-      purchaseTrace.start();
-      setState(() {
-        isPurchasing = true;
-      });
-      try {
-        CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
-        purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
-        if (purchaserInfo.entitlements.active.isNotEmpty) {
-          Purchases.setEmail(User().email);
-          Purchases.setDisplayName(User().name);
-          Purchases.setPushToken(User().fcmToken ?? '');
-          String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
-          Purchases.setFirebaseAppInstanceId(appInstanceId!);
-          await Database()
-              .updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
-          MyWidget().showSnackbarWithPodo(rs,
-              title: tr('purchaseTitle'), content: tr('purchaseContent'));
-          User().getUser();
-          Get.offNamedUntil(
-              MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
-        }
-      } on PlatformException catch (e) {
-        setState(() {
-          isPurchasing = false;
-        });
-        var errorCode = PurchasesErrorHelper.getErrorCode(e);
-        purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
-        purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
-        if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-          FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
-          MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
-        }
+    FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
+    FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
+    final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
+    purchaseTrace.start();
+    setState(() {
+      isPurchasing = true;
+    });
+    try {
+      CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
+      purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
+      FirebaseAnalytics.instance.logPurchase();
+      if (purchaserInfo.entitlements.active.isNotEmpty) {
+        Purchases.setEmail(User().email);
+        Purchases.setDisplayName(User().name);
+        Purchases.setPushToken(User().fcmToken ?? '');
+        String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
+        Purchases.setFirebaseAppInstanceId(appInstanceId!);
+        await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
+        MyWidget().showSnackbarWithPodo(rs, title: tr('purchaseTitle'), content: tr('purchaseContent'));
+        User().getUser();
+        Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
       }
-      await FirebaseAnalytics.instance.logPurchase();
-      purchaseTrace.stop();
+    } on PlatformException catch (e) {
+      setState(() {
+        isPurchasing = false;
+      });
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
+      purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
+      if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
+        FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
+        MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());
+      }
     }
+    purchaseTrace.stop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -254,24 +237,21 @@ class _PremiumMainState extends State<PremiumMain> {
             children: [
               msgForTrial != null
                   ? Column(
-                    children: [
-                      Container(
+                      children: [
+                        Container(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           color: trialLeftDate! > 5 ? MyColors.purple : MyColors.red,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               MyWidget().getTextWidget(rs,
-                                  text: msgForTrial,
-                                  color: Colors.white,
-                                  isTextAlignCenter: true,
-                                  size: 16),
+                                  text: msgForTrial, color: Colors.white, isTextAlignCenter: true, size: 16),
                             ],
                           ),
                         ),
-                      const SizedBox(height: 10),
-                    ],
-                  )
+                        const SizedBox(height: 10),
+                      ],
+                    )
                   : const SizedBox.shrink(),
               const SizedBox(height: 10),
               Expanded(
@@ -280,19 +260,15 @@ class _PremiumMainState extends State<PremiumMain> {
                   child: Column(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
+                          decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
                             BoxShadow(
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 7,
-                                offset: const Offset(0, 3)
-                            )
-                          ]
-                        ),
-                        child: Image.asset('assets/images/danny.png', width: rs.getSize(100), height: rs.getSize(100))
-                      ),
+                                offset: const Offset(0, 3))
+                          ]),
+                          child:
+                              Image.asset('assets/images/danny.png', width: rs.getSize(100), height: rs.getSize(100))),
                       SizedBox(height: rs.getSize(20)),
                       RichText(
                         textAlign: TextAlign.center,
@@ -429,22 +405,20 @@ class _PremiumMainState extends State<PremiumMain> {
                                   const SizedBox(height: 20),
                                   Container(
                                       decoration: const BoxDecoration(
-                                          color: MyColors.mustard,
-                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                          color: MyColors.mustard, borderRadius: BorderRadius.all(Radius.circular(20))),
                                       child: Padding(
                                         padding: const EdgeInsets.all(10),
-                                        child: MyWidget().getTextWidget(
-                                            height: 1.5, rs, text: tr('premium5'), color: MyColors.pink),
+                                        child: MyWidget()
+                                            .getTextWidget(height: 1.5, rs, text: tr('premium5'), color: MyColors.pink),
                                       )),
                                   const SizedBox(height: 20),
                                   Container(
                                       decoration: const BoxDecoration(
-                                          color: MyColors.mustard,
-                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                          color: MyColors.mustard, borderRadius: BorderRadius.all(Radius.circular(20))),
                                       child: Padding(
                                         padding: const EdgeInsets.all(10),
-                                        child: MyWidget().getTextWidget(
-                                            height: 1.5, rs, text: tr('premium6'), color: MyColors.pink),
+                                        child: MyWidget()
+                                            .getTextWidget(height: 1.5, rs, text: tr('premium6'), color: MyColors.pink),
                                       )),
                                   const SizedBox(height: 20),
                                   MyWidget().getTextWidget(
@@ -632,10 +606,8 @@ class _PremiumMainState extends State<PremiumMain> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                                       decoration: const BoxDecoration(
-                                        color: MyColors.red,
-                                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                                        child: MyWidget().getTextWidget(
-                                          rs,
+                                          color: MyColors.red, borderRadius: BorderRadius.all(Radius.circular(5))),
+                                      child: MyWidget().getTextWidget(rs,
                                           text: tr('premium21'),
                                           color: Colors.white,
                                           isTextAlignCenter: true,
@@ -649,29 +621,26 @@ class _PremiumMainState extends State<PremiumMain> {
                           ),
                         ],
                       ),
-                      Divider(
-                          height: rs.getSize(30), thickness: rs.getSize(2), color: Theme.of(context).primaryColor),
+                      Divider(height: rs.getSize(30), thickness: rs.getSize(2), color: Theme.of(context).primaryColor),
                       Padding(
                         padding: const EdgeInsets.all(10),
                         child: RichText(
                           text: TextSpan(children: [
                             TextSpan(
                                 text: tr('premiumDetail'),
-                                style: TextStyle(
-                                    color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                                style: TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
                             TextSpan(
                               text: tr('termOfUse'),
                               style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  launchUrl(Uri.parse(
-                                      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
+                                  launchUrl(
+                                      Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'));
                                 },
                             ),
                             TextSpan(
                                 text: tr('and'),
-                                style: TextStyle(
-                                    color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
+                                style: TextStyle(color: MyColors.grey, fontSize: ResponsiveSize(context).getSize(15))),
                             TextSpan(
                               text: tr('privacyPolicy'),
                               style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
@@ -705,67 +674,62 @@ class _PremiumMainState extends State<PremiumMain> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                               backgroundColor: Colors.transparent,
                             ),
-                            onPressed: () async {runPurchase();},
+                            onPressed: () {
+                              runPurchase();
+                            },
                             child: Row(
                               children: [
                                 Expanded(
                                     child: Container(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: rs.getSize(23), vertical: rs.getSize(10)),
+                                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(23), vertical: rs.getSize(10)),
                                   decoration: BoxDecoration(
                                       gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
                                       borderRadius: BorderRadius.circular(15)),
                                   child: offering != null
                                       ? Row(
                                           children: [
-                                            Icon(FontAwesomeIcons.crown,
-                                                color: Colors.white, size: rs.getSize(30)),
+                                            Icon(FontAwesomeIcons.crown, color: Colors.white, size: rs.getSize(30)),
                                             SizedBox(width: rs.getSize(18)),
                                             Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                  MyWidget().getTextWidget(rs,
+                                                      text: 'Get Podo Premium!',
+                                                      color: Colors.white,
+                                                      size: rs.getSize(16),
+                                                      isBold: true),
+                                                  Row(
                                                     children: [
                                                       MyWidget().getTextWidget(rs,
-                                                          text: 'Get Podo Premium!',
+                                                          text: snapshot.data
+                                                              ?.getOffering('default')
+                                                              ?.twoMonth
+                                                              ?.storeProduct
+                                                              .priceString,
                                                           color: Colors.white,
-                                                          size: rs.getSize(16),
-                                                          isBold: true),
-                                                      Row(
-                                                        children: [
-                                                          MyWidget().getTextWidget(rs,
-                                                              text: snapshot.data
-                                                                  ?.getOffering('default')
-                                                                  ?.twoMonth
-                                                                  ?.storeProduct
-                                                                  .priceString,
-                                                              color: Colors.white,
-                                                              hasCancelLine: true,
-                                                              size: 15),
-                                                          const SizedBox(width: 10),
-                                                          const Icon(Icons.arrow_forward_rounded,
-                                                              color: Colors.white, size: 18),
-                                                          const SizedBox(width: 10),
-                                                          MyWidget().getTextWidget(rs,
-                                                              text: offering
-                                                                  .availablePackages[0].storeProduct.priceString,
-                                                              color: Colors.white,
-                                                              size: 18,
-                                                              isBold: true),
-                                                          MyWidget().getTextWidget(rs,
-                                                              text: ' / ${offering.identifier}',
-                                                              color: Colors.white,
-                                                              size: 18),
-                                                        ],
-                                                      ),
+                                                          hasCancelLine: true,
+                                                          size: 15),
+                                                      const SizedBox(width: 10),
+                                                      const Icon(Icons.arrow_forward_rounded,
+                                                          color: Colors.white, size: 18),
+                                                      const SizedBox(width: 10),
                                                       MyWidget().getTextWidget(rs,
-                                                          text: offering.serverDescription,
+                                                          text: offering
+                                                              .availablePackages[0].storeProduct.priceString,
                                                           color: Colors.white,
-                                                          size: rs.getSize(15)),
+                                                          size: 18,
+                                                          isBold: true),
+                                                      MyWidget().getTextWidget(rs,
+                                                          text: ' / ${offering.identifier}',
+                                                          color: Colors.white,
+                                                          size: 15),
                                                     ],
                                                   ),
+                                                  MyWidget().getTextWidget(rs,
+                                                      text: offering.serverDescription,
+                                                      color: Colors.white,
+                                                      size: rs.getSize(15)),
                                                 ],
                                               ),
                                             ),
@@ -782,8 +746,11 @@ class _PremiumMainState extends State<PremiumMain> {
                         Positioned(
                             top: rs.getSize(3),
                             right: rs.getSize(30),
-                            child: MyWidget().getRoundedContainer(widget: const Text('50% off',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),),
+                            child: MyWidget().getRoundedContainer(
+                                widget: const Text(
+                                  '50% off',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                ),
                                 bgColor: MyColors.red,
                                 radius: 20,
                                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10))),
@@ -800,8 +767,8 @@ class _PremiumMainState extends State<PremiumMain> {
                                       children: [
                                         const Icon(CupertinoIcons.clock_fill, size: 15, color: MyColors.red),
                                         const SizedBox(width: 5),
-                                        MyWidget().getTextWidget(rs,
-                                            text: snapshot.data!, color: MyColors.red, isBold: true),
+                                        MyWidget()
+                                            .getTextWidget(rs, text: snapshot.data!, color: MyColors.red, isBold: true),
                                       ],
                                     );
                                   } else {
