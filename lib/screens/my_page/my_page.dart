@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,8 @@ class _MyPageState extends State<MyPage> {
     MyPageItem(CupertinoIcons.globe, tr('language')),
     MyPageItem(Icons.feedback_outlined, tr('feedback')),
     MyPageItem(FontAwesomeIcons.blogger, tr('blog')),
-    MyPageItem(FontAwesomeIcons.reddit, tr('community')),
+    MyPageItem(FontAwesomeIcons.facebook, tr('community')),
+    MyPageItem(Icons.apps, tr('podoApps')),
     MyPageItem(Icons.logout_rounded, tr('logOut')),
     MyPageItem(Icons.remove_circle_outline_rounded, tr('removeAccount')),
   ];
@@ -64,10 +66,17 @@ class _MyPageState extends State<MyPage> {
     tr('indonesian'),
     tr('russian')
   ];
+  List<Map<String, String>> podoApps = [];
   late bool hasUserName;
   late ResponsiveSize rs;
   final String blogUrl = "https://blog.podokorean.com";
-  final String redditUrl = "https://w"; //todo: Reddit 주소 입력
+  final String communityUrl = "https://www.facebook.com/groups/1118612556651377";
+  final String TITLE = 'title';
+  final String ANDROID = 'android';
+  final String IOS = 'ios';
+  final String CLICK_BLOG = 'click_blog';
+  final String CLICK_COMMUNITY = 'click_community';
+  final String CLICK_APPS = 'click_apps';
 
   
   Future<void> _launchUrl(Uri url) async {
@@ -89,6 +98,19 @@ class _MyPageState extends State<MyPage> {
     } else {
       MyWidget().showSnackbar(rs, title: 'Failed');
     }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    podoApps.add(
+        {
+          TITLE: "Podo Words",
+          ANDROID: "https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words",
+          IOS: "https://apps.apple.com/us/app/podo-words/id1578269591",
+        }
+    );
   }
 
   @override
@@ -420,7 +442,10 @@ class _MyPageState extends State<MyPage> {
                           getExpansionPanel(
                               items[3],
                               const SizedBox.shrink(),
-                              onTap: () {
+                              onTap: () async {
+                                await FirebaseAnalytics.instance.logEvent(
+                                  name: CLICK_BLOG,
+                                );
                                 items[3].isExpanded ?
                                 _launchUrl((Uri.parse(blogUrl))) : null;
                               },
@@ -428,19 +453,77 @@ class _MyPageState extends State<MyPage> {
                           ),
 
                           // Community
-                          // getExpansionPanel(
-                          //     items[4],
-                          //     const SizedBox.shrink(),
-                          //     onTap: () {
-                          //       items[4].isExpanded ?
-                          //       _launchUrl((Uri.parse(redditUrl))) : null;
-                          //     },
-                          //   isExpandable: false,
-                          // ),
+                          getExpansionPanel(
+                              items[4],
+                              const SizedBox.shrink(),
+                              onTap: () async {
+                                await FirebaseAnalytics.instance.logEvent(
+                                  name: CLICK_COMMUNITY,
+                                );
+                                items[4].isExpanded ?
+                                _launchUrl((Uri.parse(communityUrl))) : null;
+                              },
+                            isExpandable: false,
+                          ),
+
+                          // Podo Apps
+                          getExpansionPanel(
+                            items[5],
+                            ListTile(
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  MyWidget().getTextWidget(
+                                    rs,
+                                    text: tr('discoverApps'),
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  SizedBox(height: rs.getSize(10)),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return Padding(
+                                        padding: EdgeInsets.only(bottom: rs.getSize(8)),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                              ),
+                                              side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+                                              backgroundColor: Theme.of(context).cardColor),
+                                          onPressed: () async {
+                                            await FirebaseAnalytics.instance.logEvent(
+                                              name: CLICK_APPS,
+                                              parameters: {
+                                                "app_title": podoApps[index][TITLE],
+                                              }
+                                            );
+                                            if(Platform.isAndroid) {
+                                              launchUrl(Uri.parse(podoApps[index][ANDROID]!));
+                                            } else {
+                                              launchUrl(Uri.parse(podoApps[index][IOS]!));
+                                            }
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                                            child: Text(podoApps[index][TITLE]!,
+                                                style: TextStyle(
+                                                    color: Theme.of(context).primaryColor,
+                                                    fontSize: rs.getSize(15))),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: podoApps.length,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
 
                           // Logout
                           getExpansionPanel(
-                              items[5],
+                              items[6],
                               ListTile(
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,7 +577,7 @@ class _MyPageState extends State<MyPage> {
 
                           // Remove account
                           getExpansionPanel(
-                              items[6],
+                              items[7],
                               ListTile(
                                 title: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

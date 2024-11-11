@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "1025269170157-fovkfgg9gf1o9iesghbgt6b077k773ke.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.awesomekorean.newpodo",
+            "certificate_hash": "f25bb9ec602c16ef0718064c97998497ddda83e6"
+          }
+        },
+        {
           "client_id": "1025269170157-vhvo2htl5old9cer0ehdnh45bil2fgoi.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -55,7 +63,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-2526130301535877~2249268822"
     }
   ],
   "configuration_version": "1"

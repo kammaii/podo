@@ -77,8 +77,8 @@ class FavoriteIcon {
           ),
         ),
         Positioned(
-          left: rs.getSize(5),
-          top: rs.getSize(5),
+          left: rs.getSize(1),
+          top: rs.getSize(1),
           child: b
               ? const SizedBox.shrink()
               : Icon(CupertinoIcons.plus_circle_fill,

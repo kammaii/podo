@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -147,6 +148,13 @@ class _WorkbookMainState extends State<WorkbookMain> {
   }
 
   void downloadWorkbook() async {
+    await FirebaseAnalytics.instance.logEvent(
+      name: "click_workbook_download",
+      parameters: {
+        "workbook_title": workbook.title,
+        "user_status": User().status,
+      }
+    );
     final ref = FirebaseStorage.instance.ref().child('Workbooks/${workbook.id}/${workbook.pdfFile}');
     final url = await ref.getDownloadURL();
     final workbookUrl = Uri.parse(url);
