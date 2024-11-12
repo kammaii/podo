@@ -482,9 +482,9 @@ class _MyPageState extends State<MyPage> {
                                               "app_title": podoApps[index][TITLE],
                                             });
                                             if (Platform.isAndroid) {
-                                              launchUrl(Uri.parse(podoApps[index][ANDROID]!));
+                                              _launchUrl(Uri.parse(podoApps[index][ANDROID]!));
                                             } else {
-                                              launchUrl(Uri.parse(podoApps[index][IOS]!));
+                                              _launchUrl(Uri.parse(podoApps[index][IOS]!));
                                             }
                                           },
                                           child: Padding(

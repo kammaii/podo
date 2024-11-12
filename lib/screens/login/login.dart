@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +70,7 @@ class Login extends StatelessWidget {
               final user = _auth.currentUser;
               if (user != null && !user.emailVerified) {
                 print('USER: $user');
+                FirebaseAnalytics.instance.logSignUp(signUpMethod: 'email');
                 await _sendEmailVerificationLink(user.email!);
                 Get.dialog(Stack(
                   children: [

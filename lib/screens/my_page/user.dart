@@ -240,31 +240,14 @@ class User {
     if(p != null) {
       path = p;
     }
-
-    List<String> signInMethods = await auth.FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-    if (signInMethods.isNotEmpty) {
-      String method = 'email';
-      for (String signInMethod in signInMethods) {
-        if (signInMethod == 'google.com') {
-          method = 'google';
-          break;
-        } else if (signInMethod == 'apple.com') {
-          method = 'apple';
-          break;
-        }
-      }
-      print('SIgn up method : $method');
-      FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
-    }
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     NotificationSettings settings = await messaging.requestPermission();
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      FirebaseAnalytics.instance.logEvent(name: 'fcm_approved');
       fcmPermission = true;
     } else {
-      FirebaseAnalytics.instance.logEvent(name: 'fcm_denied');
       fcmPermission = false;
     }
+    FirebaseAnalytics.instance.logEvent(name: 'fcm_approval', parameters: {'status': fcmPermission});
     await Database().setDoc(collection: 'Users', doc: this);
 
     Get.put(AdsController());

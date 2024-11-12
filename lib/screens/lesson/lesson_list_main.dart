@@ -101,6 +101,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       final settings = await FirebaseMessaging.instance.getNotificationSettings();
       bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
       if (User().fcmPermission != permission) {
+        FirebaseAnalytics.instance.logEvent(name: 'fcm_approval_alarm', parameters: {'status': permission});
         Database().updateDoc(collection: 'Users', docId: User().id, key: 'fcmPermission', value: permission);
         User().fcmPermission = permission;
       }
