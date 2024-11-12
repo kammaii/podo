@@ -174,7 +174,11 @@ class User {
       }
       buildNumber = json[BUILD_NUMBER];
       FirebaseMessaging messaging = FirebaseMessaging.instance;
-      fcmToken = await messaging.getToken();
+      if(Platform.isIOS) {
+        fcmToken = await messaging.getAPNSToken();
+      } else {
+        fcmToken = await messaging.getToken();
+      }
       if (json[FCM_TOKEN] != fcmToken) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
       }

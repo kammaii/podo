@@ -78,7 +78,6 @@ class _MyPageState extends State<MyPage> {
   final String CLICK_COMMUNITY = 'click_community';
   final String CLICK_APPS = 'click_apps';
 
-  
   Future<void> _launchUrl(Uri url) async {
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
@@ -90,27 +89,21 @@ class _MyPageState extends State<MyPage> {
   void removeUserAccount(UserCredential? userCredential) {
     if (userCredential != null) {
       User user = userCredential.user!;
-      Database().deleteDoc(
-          collection: 'Users',
-          docId: user.uid);
-      user.delete().then((value) =>
-          print('User deleted'));
+      Database().deleteDoc(collection: 'Users', docId: user.uid);
+      user.delete().then((value) => print('User deleted'));
     } else {
       MyWidget().showSnackbar(rs, title: 'Failed');
     }
   }
 
-
   @override
   void initState() {
     super.initState();
-    podoApps.add(
-        {
-          TITLE: "Podo Words",
-          ANDROID: "https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words",
-          IOS: "https://apps.apple.com/us/app/podo-words/id1578269591",
-        }
-    );
+    podoApps.add({
+      TITLE: "Podo Words",
+      ANDROID: "https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words",
+      IOS: "https://apps.apple.com/us/app/podo-words/id1578269591",
+    });
   }
 
   @override
@@ -439,30 +432,23 @@ class _MyPageState extends State<MyPage> {
                               ))),
 
                           // Blog
-                          getExpansionPanel(
-                              items[3],
-                              const SizedBox.shrink(),
-                              onTap: () async {
-                                await FirebaseAnalytics.instance.logEvent(
-                                  name: CLICK_BLOG,
-                                );
-                                items[3].isExpanded ?
-                                _launchUrl((Uri.parse(blogUrl))) : null;
-                              },
-                            isExpandable: false
-                          ),
+                          getExpansionPanel(items[3], const SizedBox.shrink(), onTap: () {
+                            FirebaseAnalytics.instance.logEvent(
+                              name: CLICK_BLOG,
+                            );
+                            items[3].isExpanded ? _launchUrl((Uri.parse(blogUrl))) : null;
+                          }, isExpandable: false),
 
                           // Community
                           getExpansionPanel(
-                              items[4],
-                              const SizedBox.shrink(),
-                              onTap: () async {
-                                await FirebaseAnalytics.instance.logEvent(
-                                  name: CLICK_COMMUNITY,
-                                );
-                                items[4].isExpanded ?
-                                _launchUrl((Uri.parse(communityUrl))) : null;
-                              },
+                            items[4],
+                            const SizedBox.shrink(),
+                            onTap: () {
+                              FirebaseAnalytics.instance.logEvent(
+                                name: CLICK_COMMUNITY,
+                              );
+                              items[4].isExpanded ? _launchUrl((Uri.parse(communityUrl))) : null;
+                            },
                             isExpandable: false,
                           ),
 
@@ -491,14 +477,11 @@ class _MyPageState extends State<MyPage> {
                                               ),
                                               side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
                                               backgroundColor: Theme.of(context).cardColor),
-                                          onPressed: () async {
-                                            await FirebaseAnalytics.instance.logEvent(
-                                              name: CLICK_APPS,
-                                              parameters: {
-                                                "app_title": podoApps[index][TITLE],
-                                              }
-                                            );
-                                            if(Platform.isAndroid) {
+                                          onPressed: () {
+                                            FirebaseAnalytics.instance.logEvent(name: CLICK_APPS, parameters: {
+                                              "app_title": podoApps[index][TITLE],
+                                            });
+                                            if (Platform.isAndroid) {
                                               launchUrl(Uri.parse(podoApps[index][ANDROID]!));
                                             } else {
                                               launchUrl(Uri.parse(podoApps[index][IOS]!));
@@ -635,20 +618,20 @@ class _MyPageState extends State<MyPage> {
                                                               Get.dialog(AlertDialog(
                                                                 title: MyWidget().getTextFieldWidget(context, rs,
                                                                     hint: tr('passwordAgain'), onChanged: (value) {
-                                                                      password = value;
-                                                                    }),
+                                                                  password = value;
+                                                                }),
                                                                 actions: [
                                                                   TextButton(
                                                                     child: Text(tr('send'),
                                                                         style: TextStyle(
                                                                             fontSize: rs.getSize(15),
-                                                                            color: Theme
-                                                                                .of(context)
+                                                                            color: Theme.of(context)
                                                                                 .secondaryHeaderColor)),
                                                                     onPressed: () async {
                                                                       Get.back();
                                                                       try {
-                                                                        userCredential = await user.reauthenticateWithCredential(
+                                                                        userCredential = await user
+                                                                            .reauthenticateWithCredential(
                                                                           EmailAuthProvider.credential(
                                                                               email: user.email!,
                                                                               password: password),
@@ -664,17 +647,17 @@ class _MyPageState extends State<MyPage> {
                                                               break;
 
                                                             case 'google.com':
-                                                              userCredential = await Credentials().getGoogleCredential();
+                                                              userCredential =
+                                                                  await Credentials().getGoogleCredential();
                                                               removeUserAccount(userCredential);
                                                               break;
 
                                                             case 'apple.com':
-                                                              userCredential = await Credentials().getAppleCredential();
+                                                              userCredential =
+                                                                  await Credentials().getAppleCredential();
                                                               removeUserAccount(userCredential);
                                                               break;
                                                           }
-
-
                                                         }
                                                       },
                                                     ),
@@ -798,49 +781,36 @@ class _MyPageState extends State<MyPage> {
     print('ERROR: $e');
   }
 
-  ExpansionPanel getExpansionPanel(MyPageItem item, Widget body, {String? subTitle, Function? onTap, bool isExpandable = true}) {
+  ExpansionPanel getExpansionPanel(MyPageItem item, Widget body,
+      {String? subTitle, Function? onTap, bool isExpandable = true}) {
     return ExpansionPanel(
         canTapOnHeader: true,
         isExpanded: isExpandable ? item.isExpanded : false,
         headerBuilder: (context, isExpanded) {
-          return subTitle == null
-              ? Padding(
-                  padding: EdgeInsets.all(rs.getSize(8)),
-                  child: ListTile(
-                    leading: Icon(
-                      item.icon,
-                      color: Theme.of(context).canvasColor,
-                      size: rs.getSize(30),
-                    ),
-                    title: MyWidget().getTextWidget(
+          return Padding(
+            padding: EdgeInsets.all(rs.getSize(8)),
+            child: ListTile(
+              leading: Icon(
+                item.icon,
+                color: Theme.of(context).canvasColor,
+                size: rs.getSize(30),
+              ),
+              title: MyWidget().getTextWidget(
+                rs,
+                text: item.title,
+                size: 18,
+                color: Theme.of(context).secondaryHeaderColor,
+              ),
+              onTap: onTap?.call(),
+              subtitle: subTitle != null
+                  ? MyWidget().getTextWidget(
                       rs,
-                      text: item.title,
-                      size: 18,
-                      color: Theme.of(context).secondaryHeaderColor,
-                    ),
-                    onTap: onTap?.call(),
-                  ),
-                )
-              : Padding(
-                  padding: EdgeInsets.all(rs.getSize(8)),
-                  child: ListTile(
-                      leading: Icon(
-                        item.icon,
-                        color: Theme.of(context).primaryColor,
-                        size: rs.getSize(30),
-                      ),
-                      title: MyWidget().getTextWidget(
-                        rs,
-                        text: item.title,
-                        size: 18,
-                        color: Theme.of(context).secondaryHeaderColor,
-                      ),
-                      subtitle: MyWidget().getTextWidget(
-                        rs,
-                        text: subTitle,
-                        color: Theme.of(context).focusColor,
-                      )),
-                );
+                      text: subTitle,
+                      color: Theme.of(context).focusColor,
+                    )
+                  : null,
+            ),
+          );
         },
         body: body);
   }
