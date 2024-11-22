@@ -479,7 +479,7 @@ class _MyPageState extends State<MyPage> {
                                               backgroundColor: Theme.of(context).cardColor),
                                           onPressed: () {
                                             FirebaseAnalytics.instance.logEvent(name: CLICK_APPS, parameters: {
-                                              "app_title": podoApps[index][TITLE],
+                                              "app_title": podoApps[index][TITLE]!,
                                             });
                                             if (Platform.isAndroid) {
                                               _launchUrl(Uri.parse(podoApps[index][ANDROID]!));

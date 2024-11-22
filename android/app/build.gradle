@@ -36,6 +36,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace = "net.awesomekorean.newpodo"
     compileSdkVersion 34
 
     compileOptions {
@@ -45,7 +46,7 @@ android {
 
     defaultConfig {
         applicationId "net.awesomekorean.newpodo"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -75,8 +76,10 @@ android {
             ]
         }
     }
+    namespace 'net.awesomekorean.newpodo'
 }
 
 flutter {
     source '../..'
 }
+tasks.register("prepareKotlinBuildScriptModel"){}

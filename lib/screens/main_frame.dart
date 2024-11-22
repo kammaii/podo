@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -62,7 +62,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       activeColorPrimary: Theme.of(context).primaryColor,
       inactiveColorPrimary: Theme.of(context).disabledColor,
       iconSize: rs.getSize(23),
-      textStyle: TextStyle(fontSize: rs.getSize(13)),
     );
   }
 
@@ -290,7 +289,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   controller: _controller,
                   screens: _buildScreens(),
                   items: _navBarsItems(),
-                  confineInSafeArea: true,
+                  confineToSafeArea: true,
                   backgroundColor: Theme.of(context).cardColor,
                   // Default is Colors.white.
                   handleAndroidBackButtonPress: true,
@@ -298,27 +297,25 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                   resizeToAvoidBottomInset: true,
                   // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
                   stateManagement: true,
-                  // Default is true.
-                  hideNavigationBarWhenKeyboardShows: true,
                   // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
                   decoration: NavBarDecoration(
                     borderRadius: BorderRadius.circular(10.0),
                     colorBehindNavBar: Theme.of(context).cardColor,
                   ),
-                  popAllScreensOnTapOfSelectedTab: true,
-                  popActionScreens: PopActionScreensType.all,
-                  itemAnimationProperties: const ItemAnimationProperties(
-                    // Navigation Bar's items animation properties.
-                    duration: Duration(milliseconds: 200),
-                    curve: Curves.ease,
-                  ),
-                  screenTransitionAnimation: const ScreenTransitionAnimation(
-                    // Screen transition animation on change of selected tab.
-                    animateTabTransition: true,
-                    curve: Curves.ease,
-                    duration: Duration(milliseconds: 200),
-                  ),
-                  navBarStyle: NavBarStyle.style6,
+                  // popAllScreensOnTapOfSelectedTab: true,
+                  // popActionScreens: PopActionScreensType.all,
+                  // itemAnimationProperties: const ItemAnimationProperties(
+                  //   // Navigation Bar's items animation properties.
+                  //   duration: Duration(milliseconds: 200),
+                  //   curve: Curves.ease,
+                  // ),
+                  // screenTransitionAnimation: const ScreenTransitionAnimation(
+                  //   // Screen transition animation on change of selected tab.
+                  //   animateTabTransition: true,
+                  //   curve: Curves.ease,
+                  //   duration: Duration(milliseconds: 200),
+                  // ),
+                  navBarStyle: NavBarStyle.style3,
                   // Choose the nav bar style with this property.
                   navBarHeight: rs.getSize(55),
                 ),
