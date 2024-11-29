@@ -1,7 +1,6 @@
 import 'package:confetti/confetti.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,6 +23,7 @@ class LessonComplete extends StatelessWidget {
   late ResponsiveSize rs;
   bool isPremiumUser = false;
   bool isFreeOptions = false;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   Widget getBtn(BuildContext context, String title, IconData icon, Function() fn) {
     return Row(children: [
@@ -60,10 +60,10 @@ class LessonComplete extends StatelessWidget {
   }
 
   void showReviewRequest() async {
-    FirebaseAnalytics.instance.logEvent(name: 'review_requested');
     final InAppReview inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
+      await analytics.logEvent(name: 'review_requested');
+      await inAppReview.requestReview();
     }
   }
 

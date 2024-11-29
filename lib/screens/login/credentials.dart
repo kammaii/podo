@@ -16,7 +16,7 @@ class Credentials {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google');
+      await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google');
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       print('Error: $e');
@@ -57,7 +57,7 @@ class Credentials {
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
     );
-    FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple');
+    await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple');
 
     // Sign in the user with Firebase. If the nonce we generated earlier does
     // not match the nonce in `appleCredential.identityToken`, sign in will fail.

@@ -68,6 +68,11 @@ class User {
   static const String STATUS = 'status';
   static const String BUILD_NUMBER = 'buildNumber';
   static const String ALL_USERS = 'allUsers';
+  static const String NEW_USERS = 'newUsers';
+  static const String BASIC_USERS = 'basicUsers';
+  static const String PREMIUM_USERS = 'premiumUsers';
+  static const String PREMIUM_EXPIRED_USERS = 'premiumExpiredUsers';
+  static const String TRIAL_USERS = 'trialUsers';
   static const String PATH = 'path';
 
   Map<String, dynamic> toJson() {
@@ -123,7 +128,6 @@ class User {
       if (json[FCM_TOKEN] != null) {
         fcmToken = json[FCM_TOKEN];
       }
-      FirebaseMessaging.instance.subscribeToTopic(ALL_USERS);
       fcmPermission = json[FCM_PERMISSION] ?? false;
       if (json[TRIAL_START] != null) {
         Timestamp stamp = json[TRIAL_START];
@@ -134,9 +138,11 @@ class User {
         trialEnd = stamp.toDate();
       }
       status = json[STATUS];
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      messaging.subscribeToTopic(ALL_USERS);
 
       if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
-        FirebaseMessaging.instance.unsubscribeFromTopic('trialUsers');
+        messaging.unsubscribeFromTopic(TRIAL_USERS);
         status = 1;
       }
       await initRevenueCat();
@@ -147,22 +153,26 @@ class User {
         if (premiumEntitlement != null) {
           String premiumEnd = premiumEntitlement.expirationDate ?? 'Lifetime';
           expirationDate = premiumEnd.substring(0, 10).replaceAll('-', '.');
-          FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
+          messaging.subscribeToTopic(PREMIUM_USERS);
+          messaging.unsubscribeFromTopic(NEW_USERS);
+          messaging.unsubscribeFromTopic(BASIC_USERS);
+          messaging.unsubscribeFromTopic(PREMIUM_EXPIRED_USERS);
           status = 2;
         } else {
           if (status == 2) {
-            FirebaseMessaging.instance.unsubscribeFromTopic('premiumUsers');
-            FirebaseMessaging.instance.subscribeToTopic('premiumExpiredUsers');
+            messaging.subscribeToTopic(PREMIUM_EXPIRED_USERS);
+            messaging.unsubscribeFromTopic(NEW_USERS);
+            messaging.unsubscribeFromTopic(PREMIUM_USERS);
             status = 1;
           }
-          if(status == 3) {
-            FirebaseMessaging.instance.subscribeToTopic('trialUsers');
-          } else {
-            if(status == 0) {
-              FirebaseMessaging.instance.subscribeToTopic('newUsers');
-            } else {
-              FirebaseMessaging.instance.subscribeToTopic('basicUsers');
-            }
+
+          if(status == 0) {
+            messaging.subscribeToTopic(NEW_USERS);
+            Get.put(AdsController());
+          }
+
+          if(status == 1) {
+            messaging.subscribeToTopic(BASIC_USERS);
             Get.put(AdsController());
           }
         }
@@ -173,12 +183,8 @@ class User {
         Database().updateDoc(collection: 'Users', docId: id, key: 'status', value: status);
       }
       buildNumber = json[BUILD_NUMBER];
-      FirebaseMessaging messaging = FirebaseMessaging.instance;
-      if(Platform.isIOS) {
-        fcmToken = await messaging.getAPNSToken();
-      } else {
-        fcmToken = await messaging.getToken();
-      }
+      fcmToken = await messaging.getToken();
+
       if (json[FCM_TOKEN] != fcmToken) {
         Database().updateDoc(collection: 'Users', docId: id, key: 'fcmToken', value: fcmToken);
       }
@@ -241,13 +247,15 @@ class User {
       path = p;
     }
     FirebaseMessaging messaging = FirebaseMessaging.instance;
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     NotificationSettings settings = await messaging.requestPermission();
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       fcmPermission = true;
+      await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'true', 'location': 'signUp'});
     } else {
       fcmPermission = false;
+      await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'false', 'location': 'signUp'});
     }
-    FirebaseAnalytics.instance.logEvent(name: 'fcm_approval', parameters: {'status': fcmPermission});
     await Database().setDoc(collection: 'Users', doc: this);
 
     Get.put(AdsController());

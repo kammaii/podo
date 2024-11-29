@@ -101,7 +101,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       final settings = await FirebaseMessaging.instance.getNotificationSettings();
       bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
       if (User().fcmPermission != permission) {
-        FirebaseAnalytics.instance.logEvent(name: 'fcm_approval_alarm', parameters: {'status': permission});
+        FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+        if(permission) {
+          await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'true', 'location': 'noticeBar'});
+        } else {
+          await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'false', 'location': 'noticeBar'});
+        }
         Database().updateDoc(collection: 'Users', docId: User().id, key: 'fcmPermission', value: permission);
         User().fcmPermission = permission;
       }
@@ -121,7 +126,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   runLesson(Lesson lesson) async {
     LocalStorage().setLessonScrollPosition(scrollController.offset);
-    await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.title[KO]);
+
+    await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.title[KO], parameters: {'course_title': course.title['en'], 'course_mode': course.isTopicMode ? 'Topic' : 'Grammar'});
     if (!lesson.hasOptions) {
       Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
     } else {

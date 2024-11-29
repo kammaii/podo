@@ -227,8 +227,8 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                           ),
                           side: const BorderSide(color: MyColors.purple, width: 1),
                           backgroundColor: MyColors.purple),
-                      onPressed: () {
-                        FirebaseAnalytics.instance.logEvent(name: 'trial_end_click');
+                      onPressed: () async {
+                        await FirebaseAnalytics.instance.logEvent(name: 'click_trial_end');
                         Get.back();
                         Get.toNamed('/premiumMain');
                       },
