@@ -70,7 +70,7 @@ class Login extends StatelessWidget {
               final user = _auth.currentUser;
               if (user != null && !user.emailVerified) {
                 print('USER: $user');
-                FirebaseAnalytics.instance.logSignUp(signUpMethod: 'email');
+                await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'email');
                 await _sendEmailVerificationLink(user.email!);
                 Get.dialog(Stack(
                   children: [

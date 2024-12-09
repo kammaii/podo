@@ -149,10 +149,9 @@ class _WorkbookMainState extends State<WorkbookMain> {
 
   void downloadWorkbook() async {
     await FirebaseAnalytics.instance.logEvent(
-      name: "click_workbook_download",
+      name: "workbook_download",
       parameters: {
-        "workbook_title": workbook.title,
-        "user_status": User().status,
+        "title": workbook.title,
       }
     );
     final ref = FirebaseStorage.instance.ref().child('Workbooks/${workbook.id}/${workbook.pdfFile}');

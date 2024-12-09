@@ -113,7 +113,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
       Database().getDoc(collection: 'Users/${User().id}/Readings', docId: readingTitleId),
     ]).then((snapshots) async {
       readingTitle = ReadingTitle.fromJson(snapshots[0].data() as Map<String,dynamic>);
-      FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.title[KO]);
+      await FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.title[KO]);
       int totalReadings = snapshots[1].length;
       double incrementPerReading = 0.2 / totalReadings;
       controller.hasFlashcard.value = {};

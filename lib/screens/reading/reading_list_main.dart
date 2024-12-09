@@ -87,9 +87,8 @@ class _ReadingListMainState extends State<ReadingListMain> {
                       Get.toNamed(MyStrings.routePremiumMain);
                     }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
                   } else {
-                    MyWidget().showDialog(context, rs, content: tr('watchRewardAdReading'), yesFn: () {
+                    MyWidget().showDialog(context, rs, content: tr('watchRewardAdReading'), yesFn: () async {
                       AdsController().showRewardAd();
-                      FirebaseAnalytics.instance.logSelectContent(contentType: 'reading', itemId: readingTitle.title[KO]);
                       Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle.id);
                     }, hasNoBtn: false, hasTextBtn: true);
                   }

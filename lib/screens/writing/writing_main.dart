@@ -85,7 +85,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     if (controller.isChecked) {
       return () {
         MyWidget().showDialog(context, rs, content: tr('wantRequestCorrection'), yesFn: () async {
-          await FirebaseAnalytics.instance.logEvent(name: 'correction_request');
+          await FirebaseAnalytics.instance.logEvent(name: 'correction_request', parameters: {'userId': User().id});
           Writing writing = Writing(selectedQuestion!);
           writing.userWriting = textEditController.text;
           Get.back();

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info/package_info.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
@@ -70,7 +68,7 @@ class _MyPageState extends State<MyPage> {
   late bool hasUserName;
   late ResponsiveSize rs;
   final String blogUrl = "https://blog.podokorean.com";
-  final String communityUrl = "https://www.facebook.com/groups/1118612556651377";
+  final String communityUrl = "https://www.facebook.com/share/g/1AsBwWqNpK/";
   final String TITLE = 'title';
   final String ANDROID = 'android';
   final String IOS = 'ios';
@@ -432,22 +430,22 @@ class _MyPageState extends State<MyPage> {
                               ))),
 
                           // Blog
-                          getExpansionPanel(items[3], const SizedBox.shrink(), onTap: () {
-                            FirebaseAnalytics.instance.logEvent(
+                          getExpansionPanel(items[3], const SizedBox.shrink(), onTap: () async {
+                            await FirebaseAnalytics.instance.logEvent(
                               name: CLICK_BLOG,
                             );
-                            items[3].isExpanded ? _launchUrl((Uri.parse(blogUrl))) : null;
+                            _launchUrl(Uri.parse(blogUrl));
                           }, isExpandable: false),
 
                           // Community
                           getExpansionPanel(
                             items[4],
                             const SizedBox.shrink(),
-                            onTap: () {
-                              FirebaseAnalytics.instance.logEvent(
+                            onTap: () async {
+                              await FirebaseAnalytics.instance.logEvent(
                                 name: CLICK_COMMUNITY,
                               );
-                              items[4].isExpanded ? _launchUrl((Uri.parse(communityUrl))) : null;
+                              _launchUrl(Uri.parse(communityUrl));
                             },
                             isExpandable: false,
                           ),
@@ -477,8 +475,8 @@ class _MyPageState extends State<MyPage> {
                                               ),
                                               side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
                                               backgroundColor: Theme.of(context).cardColor),
-                                          onPressed: () {
-                                            FirebaseAnalytics.instance.logEvent(name: CLICK_APPS, parameters: {
+                                          onPressed: () async {
+                                            await FirebaseAnalytics.instance.logEvent(name: CLICK_APPS, parameters: {
                                               "app_title": podoApps[index][TITLE]!,
                                             });
                                             if (Platform.isAndroid) {
@@ -801,7 +799,7 @@ class _MyPageState extends State<MyPage> {
                 size: 18,
                 color: Theme.of(context).secondaryHeaderColor,
               ),
-              onTap: onTap?.call(),
+              onTap: onTap != null ? () => onTap() : null,
               subtitle: subTitle != null
                   ? MyWidget().getTextWidget(
                       rs,

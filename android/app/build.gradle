@@ -72,7 +72,7 @@ android {
         debug {
             manifestPlaceholders = [
                     crashlytics_collection_enabled: "false",
-                    analytics_collection_enabled: "true"
+                    analytics_collection_enabled: "false"
             ]
         }
     }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -43,10 +44,12 @@ class _PremiumMainState extends State<PremiumMain> {
   StreamController<String> streamController = StreamController();
   final ScrollController scrollController = ScrollController();
   Package? package;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
+    await analytics.logViewItem(parameters: {'item': 'Premium'});
     if (trialLeftDate != null) {
       if (trialLeftDate! > 5) {
         msgForTrial = tr('msgForTrial1');
@@ -191,6 +194,14 @@ class _PremiumMainState extends State<PremiumMain> {
   runPurchase() async {
     FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
     FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
+    StoreProduct storeProduct = package!.storeProduct;
+    String store = '';
+    if(Platform.isIOS) {
+      store = 'iOS';
+    } else if (Platform.isAndroid) {
+      store = 'Android';
+    }
+    await analytics.logBeginCheckout(currency: storeProduct.currencyCode, value: storeProduct.price, parameters: {'item': storeProduct.identifier, 'store': store});
     final Trace purchaseTrace = FirebasePerformance.instance.newTrace(PURCHASE_TRACE);
     purchaseTrace.start();
     setState(() {
@@ -199,12 +210,12 @@ class _PremiumMainState extends State<PremiumMain> {
     try {
       CustomerInfo purchaserInfo = await Purchases.purchasePackage(package!);
       purchaseTrace.putAttribute(PURCHASE_STATUS, SUCCESS);
-      FirebaseAnalytics.instance.logPurchase();
+      await analytics.logPurchase(currency: storeProduct.currencyCode, value: storeProduct.price, parameters: {'item': storeProduct.identifier, 'store': store});
       if (purchaserInfo.entitlements.active.isNotEmpty) {
         Purchases.setEmail(User().email);
         Purchases.setDisplayName(User().name);
         Purchases.setPushToken(User().fcmToken ?? '');
-        String? appInstanceId = await FirebaseAnalytics.instance.appInstanceId;
+        String? appInstanceId = await analytics.appInstanceId;
         Purchases.setFirebaseAppInstanceId(appInstanceId!);
         await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
         MyWidget().showSnackbarWithPodo(rs, title: tr('purchaseTitle'), content: tr('purchaseContent'));
@@ -218,6 +229,7 @@ class _PremiumMainState extends State<PremiumMain> {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);
       purchaseTrace.putAttribute(PURCHASE_STATUS, FAILED);
       purchaseTrace.putAttribute(ERROR_CODE, errorCode.toString());
+      await analytics.logEvent(name: 'purchase_failed', parameters: {'error_code': errorCode.toString()});
       if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
         FirebaseCrashlytics.instance.log('Purchase error: $errorCode');
         MyWidget().showSnackbar(rs, title: tr('error'), message: errorCode.toString());

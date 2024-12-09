@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -68,10 +69,16 @@ class History {
     Database().updateDoc(collection: 'Users', docId: User().id, key: '${item}Count', value: count);
   }
 
-  Future<void> addHistory({required int itemIndex, required String itemId, String? content}) async {
-    if(User().status == 0 && LocalStorage().histories.isEmpty) {
-      User().status = 1;
-      Database().updateFields(collection: 'Users', docId: User().id, fields: {'status': 1});
+  Future<void> addHistory({required int itemIndex, required String itemId, required String content}) async {
+    // itemIndex 가 lesson, reading 일 때
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    if(itemIndex != 2) {
+      if(User().status == 0) {
+        await analytics.logEvent(name: 'first_complete', parameters: {'item': historyItem[itemIndex], 'content': content});
+        User().status = 1;
+        await Database().updateFields(collection: 'Users', docId: User().id, fields: {'status': 1});
+      }
+      await analytics.logEvent(name: 'content_complete', parameters: {'item': historyItem[itemIndex], 'content': content});
     }
     if(!LocalStorage().hasHistory(itemId: itemId)) {
       History history = History();

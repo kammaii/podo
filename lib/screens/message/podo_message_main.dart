@@ -451,7 +451,7 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
                                 rs,
                                 content: tr('sendReply'),
                                 yesFn: () async {
-                                  await FirebaseAnalytics.instance.logEvent(name: 'fcm_reply');
+                                  await FirebaseAnalytics.instance.logEvent(name: 'msg_reply', parameters: {'userId': User().id});
                                   PodoMessageReply reply = PodoMessageReply(replyController.text);
                                   await Database().setDoc(
                                       collection: 'PodoMessages/${PodoMessage().id}/Replies',
