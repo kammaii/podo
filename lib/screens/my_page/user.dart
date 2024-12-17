@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
@@ -202,6 +203,15 @@ class User {
         if(lastBuildNum > buildNumber!) {
           needUpdate = true;
         }
+      }
+
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+
+      print('SETTINGS: ${settings.authorizationStatus}');
+      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+        NotificationSettings notisetting = await messaging.requestPermission();
+        print('NOTI: $notisetting');
+        await Permission.notification.request();
       }
 
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
