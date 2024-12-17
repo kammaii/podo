@@ -84,11 +84,12 @@ class _MyPageState extends State<MyPage> {
     }
   }
 
-  void removeUserAccount(UserCredential? userCredential) {
+  void removeUserAccount(UserCredential? userCredential) async {
     if (userCredential != null) {
       User user = userCredential.user!;
-      Database().deleteDoc(collection: 'Users', docId: user.uid);
+      await Database().deleteDoc(collection: 'Users', docId: user.uid);
       user.delete().then((value) => print('User deleted'));
+      await FirebaseAnalytics.instance.logEvent(name: 'remove_account');
     } else {
       MyWidget().showSnackbar(rs, title: 'Failed');
     }
@@ -646,13 +647,13 @@ class _MyPageState extends State<MyPage> {
 
                                                             case 'google.com':
                                                               userCredential =
-                                                                  await Credentials().getGoogleCredential();
+                                                                  await Credentials().getGoogleCredential(isSignUp: false);
                                                               removeUserAccount(userCredential);
                                                               break;
 
                                                             case 'apple.com':
                                                               userCredential =
-                                                                  await Credentials().getAppleCredential();
+                                                                  await Credentials().getAppleCredential(isSignUp: false);
                                                               removeUserAccount(userCredential);
                                                               break;
                                                           }

@@ -8,7 +8,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 class Credentials {
   final _auth = FirebaseAuth.instance;
 
-  Future<UserCredential?> getGoogleCredential() async {
+  Future<UserCredential?> getGoogleCredential({bool isSignUp = true}) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -16,7 +16,9 @@ class Credentials {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google');
+      if(isSignUp) {
+        await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google');
+      }
       return await _auth.signInWithCredential(credential);
     } catch (e) {
       print('Error: $e');
@@ -31,7 +33,7 @@ class Credentials {
     return digest.toString();
   }
 
-  Future<UserCredential> getAppleCredential() async {
+  Future<UserCredential> getAppleCredential({bool isSignUp = true}) async {
     // To prevent replay attacks with the credential returned from Apple, we
     // include a nonce in the credential request. When signing in with
     // Firebase, the nonce in the id token returned by Apple, is expected to
@@ -57,8 +59,9 @@ class Credentials {
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
     );
-    await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple');
-
+    if(isSignUp) {
+      await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple');
+    }
     // Sign in the user with Firebase. If the nonce we generated earlier does
     // not match the nonce in `appleCredential.identityToken`, sign in will fail.
     return await _auth.signInWithCredential(oauthCredential);
