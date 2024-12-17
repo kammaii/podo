@@ -52,12 +52,14 @@ class Login extends StatelessWidget {
               icon: FontAwesomeIcons.google,
               callback: () async {
                 await Credentials().getGoogleCredential();
+                return null;
               },
             ),
             LoginProvider(
               icon: FontAwesomeIcons.apple,
               callback: () async {
                 await Credentials().getAppleCredential();
+                return null;
               },
             )
           ],
