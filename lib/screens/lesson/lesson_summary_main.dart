@@ -138,7 +138,7 @@ class LessonSummaryMain extends StatelessWidget {
                   MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                     Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                     AdsController().showRewardAd();
-                  }, hasNoBtn: false, hasTextBtn: true);
+                  }, hasNoBtn: false, textBtnText: tr('explorePremium'), textBtnFn: (){Get.toNamed(MyStrings.routePremiumMain);});
                 } else {
                   Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                 }

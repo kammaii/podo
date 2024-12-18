@@ -208,10 +208,9 @@ class MyWidget {
   showDialog(BuildContext context, ResponsiveSize rs,
       {required String content,
       required Function yesFn,
-      bool hasTextBtn = false,
       bool hasNoBtn = true,
       bool hasPremiumTag = false,
-      String? yesText}) {
+      String? yesText, String? noText, String? textBtnText, Function? textBtnFn}) {
     Get.dialog(AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       iconPadding: const EdgeInsets.only(bottom: 20),
@@ -262,7 +261,7 @@ class MyWidget {
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                        child: Text(tr('no'),
+                        child: Text(noText ?? tr('no'),
                             style: TextStyle(color: Theme.of(context).primaryColor, fontSize: rs.getSize(15))),
                       ),
                     ),
@@ -290,16 +289,18 @@ class MyWidget {
             ),
           ],
         ),
-        hasTextBtn
+        textBtnText != null
             ? Center(
                 child: Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: TextButton(
                   onPressed: () {
-                    Get.toNamed(MyStrings.routePremiumMain);
+                    if(textBtnFn != null) {
+                      textBtnFn();
+                    }
                   },
                   child: MyWidget()
-                      .getTextWidget(rs, text: tr('explorePremium'), color: Theme.of(context).primaryColor),
+                      .getTextWidget(rs, text: textBtnText, color: Theme.of(context).primaryColor),
                 ),
               ))
             : const SizedBox.shrink(),

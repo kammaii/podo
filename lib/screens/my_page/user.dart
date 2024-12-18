@@ -5,18 +5,15 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/languages.dart';
-import 'package:podo/common/my_widget.dart';
-import 'package:podo/common/responsive_size.dart';
-import 'package:podo/values/my_colors.dart';
-import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -129,6 +126,13 @@ class User {
         fcmToken = json[FCM_TOKEN];
       }
       fcmPermission = json[FCM_PERMISSION] ?? false;
+      bool p = await FcmRequest().getFcmRequest();
+
+      if(fcmPermission != p) {
+        fcmPermission = p;
+        await Database().updateDoc(collection: 'Users', docId: id, key: 'fcmPermission', value: fcmPermission);
+      }
+
       if (json[TRIAL_START] != null) {
         Timestamp stamp = json[TRIAL_START];
         trialStart = stamp.toDate();
@@ -246,17 +250,8 @@ class User {
     if(p != null) {
       path = p;
     }
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-    NotificationSettings settings = await messaging.requestPermission();
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      fcmPermission = true;
-      await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'true', 'location': 'signUp'});
-    } else {
-      fcmPermission = false;
-      await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'false', 'location': 'signUp'});
-    }
     await Database().setDoc(collection: 'Users', doc: this);
+    await FcmRequest().fcmRequest('signUp');
 
     Get.put(AdsController());
     await initRevenueCat();

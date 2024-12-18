@@ -212,5 +212,8 @@
   "community": "Comunidade",
   "workbookDialog": "Este caderno é apenas para usuários Premium.",
   "podoApps": "Apps da Podo",
-  "discoverApps": "Descubra mais aplicativos da Podo!"
+  "discoverApps": "Descubra mais aplicativos da Podo!",
+  "askFcmApproval": "Ative as notificações para verificar os resultados das suas correções de escrita.",
+  "askFcmApprovalYes": "Vou configurar isso agora.",
+  "later": "Mais tarde"
 }

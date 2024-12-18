@@ -212,5 +212,8 @@
   "community": "Community",
   "workbookDialog": "This workbook is for Premium users only.",
   "podoApps": "Podo Apps",
-  "discoverApps": "Discover more apps from Podo!"
+  "discoverApps": "Discover more apps from Podo!",
+  "askFcmApproval": "Please enable notifications to check your writing correction results.",
+  "askFcmApprovalYes": "I'll set it up now.",
+  "later": "later"
 }

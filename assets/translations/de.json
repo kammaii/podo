@@ -212,5 +212,8 @@
   "community": "Gemeinschaft",
   "workbookDialog": "Dieses Arbeitsbuch ist nur für Premium-Nutzer.",
   "podoApps": "Podo Apps",
-  "discoverApps": "Entdecken Sie weitere Apps von Podo!"
+  "discoverApps": "Entdecken Sie weitere Apps von Podo!",
+  "askFcmApproval": "Bitte aktivieren Sie die Benachrichtigungen, um Ihre Schreibkorrekturergebnisse zu überprüfen.",
+  "askFcmApprovalYes": "Ich richte es jetzt ein.",
+  "later": "Später"
 }

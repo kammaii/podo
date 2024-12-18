@@ -183,7 +183,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                             MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                               AdsController().showRewardAd();
                               runLesson(lesson);
-                            }, hasNoBtn: false, hasTextBtn: true);
+                            }, hasNoBtn: false, textBtnText: tr('explorePremium'), textBtnFn: (){Get.toNamed(MyStrings.routePremiumMain);});
                           } else {
                             runLesson(lesson);
                           }

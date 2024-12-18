@@ -90,7 +90,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
                     MyWidget().showDialog(context, rs, content: tr('watchRewardAdReading'), yesFn: () async {
                       AdsController().showRewardAd();
                       Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle.id);
-                    }, hasNoBtn: false, hasTextBtn: true);
+                    }, hasNoBtn: false, textBtnText: tr('explorePremium'), textBtnFn: (){Get.toNamed(MyStrings.routePremiumMain);});
                   }
                 } else {
                   Get.toNamed(MyStrings.routeReadingFrame, arguments: readingTitle.id);

@@ -212,5 +212,8 @@
   "community": "Komunitas",
   "workbookDialog": "Buku kerja ini hanya untuk pengguna Premium.",
   "podoApps": "Aplikasi Podo",
-  "discoverApps": "Temukan lebih banyak aplikasi dari Podo!"
+  "discoverApps": "Temukan lebih banyak aplikasi dari Podo!",
+  "askFcmApproval": "Harap aktifkan notifikasi untuk memeriksa hasil koreksi tulisan Anda.",
+  "askFcmApprovalYes": "Saya akan mengaturnya sekarang.",
+  "later": "Nanti"
 }
