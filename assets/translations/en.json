@@ -215,5 +215,9 @@
   "discoverApps": "Discover more apps from Podo!",
   "askFcmApproval": "Please enable notifications to check your writing correction results.",
   "askFcmApprovalYes": "I'll set it up now.",
-  "later": "later"
+  "later": "later",
+  "tutorial_course_1": "Nice to meet you! My name is Podo.\n'Podo' means 'Grape' in Korean.",
+  "tutorial_course_2": "In the Topic mode, you can learn Korean by following a structured curriculum.",
+  "tutorial_course_3": "If you're an intermediate learner, you can choose the Grammar mode to learn specific expressions.",
+  "tutorial_course_4": "Now, pick your desired course and start learning Korean!"
 }

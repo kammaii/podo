@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
@@ -61,19 +62,12 @@ class _LogoState extends State<Logo> {
           os = 'iOS';
         } else if (Platform.isAndroid) {
           os = 'android';
-        } else if (Platform.isWindows) {
-          os = 'windows';
-        } else if (Platform.isMacOS) {
-          os = 'macOS';
-        } else if (Platform.isLinux) {
-          os = 'linux';
         } else {
           os = 'others';
         }
         Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
       }
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      bool permission = await FcmRequest().getFcmRequest();
       if (user.User().fcmPermission != permission) {
         Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
         user.User().fcmPermission = permission;

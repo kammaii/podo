@@ -6,6 +6,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -23,7 +24,6 @@ import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LessonListMain extends StatefulWidget {
@@ -92,17 +92,16 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     super.dispose();
   }
 
-
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     // 알림 설정, 업데이트 완료 후 복귀했을 때 실행
     super.didChangeAppLifecycleState(state);
-    if(state == AppLifecycleState.resumed) {
+    if (state == AppLifecycleState.resumed) {
       final settings = await FirebaseMessaging.instance.getNotificationSettings();
       bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
       if (User().fcmPermission != permission) {
         FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-        if(permission) {
+        if (permission) {
           await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'true', 'location': 'noticeBar'});
         } else {
           await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'false', 'location': 'noticeBar'});
@@ -110,11 +109,12 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         Database().updateDoc(collection: 'Users', docId: User().id, key: 'fcmPermission', value: permission);
         User().fcmPermission = permission;
       }
-      if(User().needUpdate) {
-        DocumentSnapshot<Map<String, dynamic>> buildNumSnapshot = await Database().getDoc(collection: 'BuildNumber', docId: 'latest');
-        if(buildNumSnapshot.exists) {
+      if (User().needUpdate) {
+        DocumentSnapshot<Map<String, dynamic>> buildNumSnapshot =
+            await Database().getDoc(collection: 'BuildNumber', docId: 'latest');
+        if (buildNumSnapshot.exists) {
           int lastBuildNum = buildNumSnapshot.data()!['buildNumber'];
-          if(User().buildNumber! >= lastBuildNum) {
+          if (User().buildNumber! >= lastBuildNum) {
             User().needUpdate = false;
           }
         }
@@ -127,7 +127,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   runLesson(Lesson lesson) async {
     LocalStorage().setLessonScrollPosition(scrollController.offset);
 
-    await FirebaseAnalytics.instance.logSelectContent(contentType: 'lesson', itemId: lesson.title[KO], parameters: {'course_title': course.title['en'], 'course_mode': course.isTopicMode ? 'Topic' : 'Grammar'});
+    await FirebaseAnalytics.instance.logSelectContent(
+        contentType: 'lesson',
+        itemId: lesson.title[KO],
+        parameters: {'course_title': course.title['en'], 'course_mode': course.isTopicMode ? 'Topic' : 'Grammar'});
     if (!lesson.hasOptions) {
       Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
     } else {
@@ -151,117 +154,120 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
     if (lesson.isReadingReleased) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
-      optionIcons
-          .add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+      optionIcons.add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
     if (lesson.isSpeakingReleased) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
-      optionIcons.add(
-          Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+      optionIcons
+          .add(Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
 
     return isReleased
-        ? Theme(
-            data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(cardBorderRadius),
-                    ),
-                    color: Theme.of(context).cardColor,
-                    child: InkWell(
-                      onTap: () {
-                        if (isLocked) {
-                          MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
-                            Get.toNamed(MyStrings.routePremiumMain);
-                          }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+        ? Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(cardBorderRadius),
+                  ),
+                  color: Theme.of(context).cardColor,
+                  child: InkWell(
+                    onTap: () {
+                      if (isLocked) {
+                        MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                          Get.toNamed(MyStrings.routePremiumMain);
+                        }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+                      } else {
+                        if (!isPremiumUser && !lesson.hasOptions && !lesson.adFree) {
+                          MyWidget().showDialog(context, rs,
+                              content: tr('watchRewardAdLesson'),
+                              yesFn: () {
+                                AdsController().showRewardAd();
+                                runLesson(lesson);
+                              },
+                              hasNoBtn: false,
+                              textBtnText: tr('explorePremium'),
+                              textBtnFn: () {
+                                Get.toNamed(MyStrings.routePremiumMain);
+                              });
                         } else {
-                          if (!isPremiumUser && !lesson.hasOptions && !lesson.adFree) {
-                            MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
-                              AdsController().showRewardAd();
-                              runLesson(lesson);
-                            }, hasNoBtn: false, textBtnText: tr('explorePremium'), textBtnFn: (){Get.toNamed(MyStrings.routePremiumMain);});
-                          } else {
-                            runLesson(lesson);
-                          }
+                          runLesson(lesson);
                         }
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.all(rs.getSize(10)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    MyWidget().getTextWidget(rs,
-                                        text: '$index. ${lesson.type}', color: Theme.of(context).primaryColorDark),
-                                    Obx(
-                                      () => lessonController.getIsCompleted(lesson.id)
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child: Icon(
-                                                Icons.check_circle,
-                                                color: Theme.of(context).highlightColor,
-                                                size: rs.getSize(20),
-                                              ),
-                                            )
-                                          : const SizedBox.shrink(),
-                                    ),
-                                    lesson.tag != null && lesson.tag.toString().isNotEmpty
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(rs.getSize(10)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  MyWidget().getTextWidget(rs,
+                                      text: '$index. ${lesson.type}', color: Theme.of(context).primaryColorDark),
+                                  Obx(
+                                    () => lessonController.getIsCompleted(lesson.id)
                                         ? Padding(
                                             padding: const EdgeInsets.only(left: 10),
-                                            child: MyWidget().getRoundedContainer(
-                                                widget: MyWidget().getTextWidget(rs,
-                                                    text: lesson.tag,
-                                                    color: Theme.of(context).focusColor,
-                                                    size: 13),
-                                                bgColor: Theme.of(context).shadowColor,
-                                                radius: 30,
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
+                                            child: Icon(
+                                              Icons.check_circle,
+                                              color: Theme.of(context).brightness == Brightness.dark
+                                                  ? MyColors.darkPurple
+                                                  : MyColors.green,
+                                              size: rs.getSize(20),
+                                            ),
                                           )
                                         : const SizedBox.shrink(),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Row(children: optionIcons),
-                                    isLocked
-                                        ? Padding(
-                                            padding: EdgeInsets.only(left: rs.getSize(8)),
-                                            child: Icon(CupertinoIcons.lock_fill,
-                                                color: Theme.of(context).disabledColor, size: 15),
-                                          )
-                                        : const SizedBox.shrink(),
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(height: rs.getSize(10)),
-                            MyWidget().getTextWidget(
-                              rs,
-                              text: lesson.title[KO],
-                              size: 20,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            SizedBox(height: rs.getSize(10)),
-                            course.isTopicMode
-                                ? MyWidget().getTextWidget(rs,
-                                    text: lesson.title[language], color: Theme.of(context).disabledColor)
-                                : const SizedBox.shrink(),
-                          ],
-                        ),
+                                  ),
+                                  lesson.tag != null && lesson.tag.toString().isNotEmpty
+                                      ? Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: MyWidget().getRoundedContainer(
+                                              widget: MyWidget().getTextWidget(rs,
+                                                  text: lesson.tag, color: Theme.of(context).focusColor, size: 13),
+                                              bgColor: Theme.of(context).shadowColor,
+                                              radius: 30,
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
+                                        )
+                                      : const SizedBox.shrink(),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Row(children: optionIcons),
+                                  isLocked
+                                      ? Padding(
+                                          padding: EdgeInsets.only(left: rs.getSize(8)),
+                                          child: Icon(CupertinoIcons.lock_fill,
+                                              color: Theme.of(context).disabledColor, size: 15),
+                                        )
+                                      : const SizedBox.shrink(),
+                                ],
+                              )
+                            ],
+                          ),
+                          SizedBox(height: rs.getSize(10)),
+                          MyWidget().getTextWidget(
+                            rs,
+                            text: lesson.title[KO],
+                            size: 20,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          SizedBox(height: rs.getSize(10)),
+                          course.isTopicMode
+                              ? MyWidget().getTextWidget(rs,
+                                  text: lesson.title[language], color: Theme.of(context).disabledColor)
+                              : const SizedBox.shrink(),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           )
         : const SizedBox.shrink();
   }
@@ -277,18 +283,15 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       }
     }
     return SliverAppBar(
-      leading: Theme(
-        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-        child: IconButton(
-          icon: Icon(Icons.menu, size: rs.getSize(25)),
-          color: Theme.of(context).primaryColor,
-          onPressed: () {
-            courseController.setVisibility(true);
-            Future.delayed(const Duration(milliseconds: 500), () {
-              scrollController.jumpTo(0);
-            });
-          },
-        ),
+      leading: IconButton(
+        icon: Icon(Icons.menu, size: rs.getSize(25)),
+        color: Theme.of(context).primaryColor,
+        onPressed: () {
+          courseController.setVisibility(true);
+          Future.delayed(const Duration(milliseconds: 500), () {
+            scrollController.jumpTo(0);
+          });
+        },
       ),
       expandedHeight: rs.getSize(sliverAppBarHeight),
       collapsedHeight: rs.getSize(60),
@@ -416,7 +419,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                           height: rs.getSize(30),
                           child: Marquee(
                             text: '${tr('fcmRequest')}   ${tr('clickHere')}',
-                            style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontFamily: 'EnglishFont'),
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'EnglishFont'),
                             blankSpace: 100,
                           ),
                         ),
@@ -425,14 +431,15 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                       visible: User().fcmPermission && User().needUpdate,
                       child: GestureDetector(
                         onTap: () async {
-                          Uri androidUrl = Uri.parse('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US');
+                          Uri androidUrl = Uri.parse(
+                              'https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US');
                           Uri iosUrl = Uri.parse('https://apps.apple.com/kr/app/podo-korean/id6451487431');
-                          if(io.Platform.isAndroid) {
-                            if(await canLaunchUrl(androidUrl)) {
+                          if (io.Platform.isAndroid) {
+                            if (await canLaunchUrl(androidUrl)) {
                               await launchUrl(androidUrl);
                             }
-                          } else if(io.Platform.isIOS) {
-                            if(await canLaunchUrl(iosUrl)) {
+                          } else if (io.Platform.isIOS) {
+                            if (await canLaunchUrl(iosUrl)) {
                               await launchUrl(iosUrl);
                             }
                           }
@@ -441,7 +448,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                           height: rs.getSize(30),
                           child: Marquee(
                             text: '${tr('updateRequest')}   ${tr('clickHere')}',
-                            style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontFamily: 'EnglishFont'),
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'EnglishFont'),
                             blankSpace: 100,
                           ),
                         ),
@@ -458,8 +468,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                           padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(8)),
                           child: Row(
                             children: [
-                              Image.asset('assets/images/podo.png',
-                                  height: rs.getSize(40), width: rs.getSize(40)),
+                              Image.asset('assets/images/podo.png', height: rs.getSize(40), width: rs.getSize(40)),
                               SizedBox(width: rs.getSize(15)),
                               Expanded(
                                 child: Column(
@@ -485,10 +494,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                 child: Obx(
                                   () => MyWidget().getRoundedContainer(
                                     radius: 30,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: rs.getSize(10), vertical: rs.getSize(5)),
+                                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
                                     bgColor: cloudController.podoMsgBtnActive.value
-                                        ? Theme.of(context).highlightColor
+                                        ? Theme.of(context).brightness == Brightness.dark
+                                            ? MyColors.darkPurple
+                                            : MyColors.green
                                         : Theme.of(context).disabledColor,
                                     widget: MyWidget().getTextWidget(rs,
                                         text: cloudController.podoMsgBtnText,
