@@ -228,480 +228,475 @@ class _MyPageState extends State<MyPage> {
                         ),
                       ],
                     ),
-                    Theme(
-                      data: Theme.of(context).copyWith(
-                        highlightColor: MyColors.navyLight,
-                      ),
-                      child: ExpansionPanelList(
-                        expansionCallback: (index, isExpanded) {
-                          setState(() {
-                            feedback = '';
-                            closePanels();
-                            items[index].isExpanded = isExpanded;
-                          });
-                        },
-                        children: [
-                          // Edit Name
-                          getExpansionPanel(
-                              items[0],
-                              Padding(
-                                padding: EdgeInsets.all(rs.getSize(10)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 5),
-                                      child: MyWidget().getTextWidget(
-                                        rs,
-                                        text: tr('name'),
-                                        color: Theme.of(context).secondaryHeaderColor,
-                                        isBold: true,
-                                      ),
+                    ExpansionPanelList(
+                      expansionCallback: (index, isExpanded) {
+                        setState(() {
+                          feedback = '';
+                          closePanels();
+                          items[index].isExpanded = isExpanded;
+                        });
+                      },
+                      children: [
+                        // Edit Name
+                        getExpansionPanel(
+                            items[0],
+                            Padding(
+                              padding: EdgeInsets.all(rs.getSize(10)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: MyWidget().getTextWidget(
+                                      rs,
+                                      text: tr('name'),
+                                      color: Theme.of(context).secondaryHeaderColor,
+                                      isBold: true,
                                     ),
-                                    SizedBox(height: rs.getSize(5)),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: MyWidget().getTextFieldWidget(
-                                            context,
-                                            rs,
-                                            controller: TextEditingController(text: userName),
-                                            onChanged: (text) {
-                                              userName = text;
-                                            },
-                                          ),
+                                  ),
+                                  SizedBox(height: rs.getSize(5)),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: MyWidget().getTextFieldWidget(
+                                          context,
+                                          rs,
+                                          controller: TextEditingController(text: userName),
+                                          onChanged: (text) {
+                                            userName = text;
+                                          },
                                         ),
-                                        SizedBox(width: rs.getSize(10)),
-                                        MyWidget().getRoundBtnWidget(rs,
-                                            text: tr('edit'),
-                                            verticalPadding: 8,
-                                            horizontalPadding: 3,
-                                            textSize: 15, f: () async {
+                                      ),
+                                      SizedBox(width: rs.getSize(10)),
+                                      MyWidget().getRoundBtnWidget(rs,
+                                          text: tr('edit'),
+                                          verticalPadding: 8,
+                                          horizontalPadding: 3,
+                                          textSize: 15, f: () async {
+                                        try {
+                                          if (currentUser != null) {
+                                            closePanels();
+                                            await currentUser!.updateDisplayName(userName);
+                                            await Database().updateDoc(
+                                                collection: 'Users',
+                                                docId: currentUser!.uid,
+                                                key: 'name',
+                                                value: userName);
+                                            setState(() {
+                                              user.User().name = userName ?? '';
+                                              MyWidget().showSnackbar(rs, title: tr('nameChanged'));
+                                            });
+                                          }
+                                        } catch (e) {
+                                          MyWidget().showSnackbar(rs, title: tr('error'), message: e.toString());
+                                        }
+                                      },
+                                          bgColor: Theme.of(context).canvasColor,
+                                          fontColor: Theme.of(context).cardColor)
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            subTitle: hasUserName ? null : 'Please set your name'),
+
+                        // Language
+                        getExpansionPanel(
+                          items[1],
+                          ListTile(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MyWidget().getTextWidget(
+                                  rs,
+                                  text: tr('shouldRestart'),
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                SizedBox(height: rs.getSize(10)),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(bottom: rs.getSize(8)),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                            side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+                                            backgroundColor: Theme.of(context).cardColor),
+                                        onPressed: () async {
+                                          String lang = Languages().fos[index];
+                                          user.User().language = lang;
+                                          EasyLocalization.of(context)!.setLocale(Locale(lang));
+                                          await Database().updateDoc(
+                                              collection: 'Users',
+                                              docId: user.User().id,
+                                              key: 'language',
+                                              value: lang);
+                                          MyWidget().showSnackbarWithPodo(rs,
+                                              title: tr('languageChanged'),
+                                              content: tr('shouldRestart'),
+                                              duration: 5000);
+                                          setState(() {
+                                            closePanels();
+                                          });
+                                        },
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                                          child: Text(language[index],
+                                              style: TextStyle(
+                                                  color: Theme.of(context).primaryColor,
+                                                  fontSize: rs.getSize(15))),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: language.length,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Feedback
+                        getExpansionPanel(
+                            items[2],
+                            ListTile(
+                                title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MyWidget().getTextWidget(
+                                  rs,
+                                  text: tr('feedbackDetail'),
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: MyWidget().getTextFieldWidget(context, rs,
+                                            hint: tr('feedbackHint'),
+                                            controller: TextEditingController(text: feedback),
+                                            onChanged: (text) {
+                                          feedback = text;
+                                        }),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      MyWidget().getRoundBtnWidget(
+                                        rs,
+                                        text: tr('send'),
+                                        verticalPadding: 8,
+                                        horizontalPadding: 3,
+                                        textSize: 15,
+                                        bgColor: Theme.of(context).canvasColor,
+                                        fontColor: Theme.of(context).cardColor,
+                                        f: () async {
                                           try {
-                                            if (currentUser != null) {
-                                              closePanels();
-                                              await currentUser!.updateDisplayName(userName);
-                                              await Database().updateDoc(
-                                                  collection: 'Users',
-                                                  docId: currentUser!.uid,
-                                                  key: 'name',
-                                                  value: userName);
-                                              setState(() {
-                                                user.User().name = userName ?? '';
-                                                MyWidget().showSnackbar(rs, title: tr('nameChanged'));
-                                              });
+                                            if (feedback.isNotEmpty) {
+                                              fb.Feedback userFeedback = fb.Feedback();
+                                              userFeedback.userId = userId;
+                                              userFeedback.email = userEmail;
+                                              userFeedback.message = feedback;
+                                              await Database()
+                                                  .setDoc(collection: 'Feedbacks', doc: userFeedback);
+                                              MyWidget().showSnackbar(rs, title: tr('thanksFeedback'));
                                             }
                                           } catch (e) {
-                                            MyWidget().showSnackbar(rs, title: tr('error'), message: e.toString());
+                                            if (e is PlatformException && e.code == "not_available") {
+                                              MyWidget()
+                                                  .showSnackbar(rs, title: tr('error'), message: e.toString());
+                                            }
+                                          }
+                                          setState(() {
+                                            closePanels();
+                                          });
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ))),
+
+                        // Blog
+                        getExpansionPanel(items[3], const SizedBox.shrink(), onTap: () async {
+                          await FirebaseAnalytics.instance.logEvent(
+                            name: CLICK_BLOG,
+                          );
+                          _launchUrl(Uri.parse(blogUrl));
+                        }, isExpandable: false),
+
+                        // Community
+                        getExpansionPanel(
+                          items[4],
+                          const SizedBox.shrink(),
+                          onTap: () async {
+                            await FirebaseAnalytics.instance.logEvent(
+                              name: CLICK_COMMUNITY,
+                            );
+                            _launchUrl(Uri.parse(communityUrl));
+                          },
+                          isExpandable: false,
+                        ),
+
+                        // Podo Apps
+                        getExpansionPanel(
+                          items[5],
+                          ListTile(
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MyWidget().getTextWidget(
+                                  rs,
+                                  text: tr('discoverApps'),
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                SizedBox(height: rs.getSize(10)),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(bottom: rs.getSize(8)),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                            side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+                                            backgroundColor: Theme.of(context).cardColor),
+                                        onPressed: () async {
+                                          await FirebaseAnalytics.instance.logEvent(name: CLICK_APPS, parameters: {
+                                            "app_title": podoApps[index][TITLE]!,
+                                          });
+                                          if (Platform.isAndroid) {
+                                            _launchUrl(Uri.parse(podoApps[index][ANDROID]!));
+                                          } else {
+                                            _launchUrl(Uri.parse(podoApps[index][IOS]!));
                                           }
                                         },
-                                            bgColor: Theme.of(context).canvasColor,
-                                            fontColor: Theme.of(context).cardColor)
-                                      ],
-                                    ),
-                                  ],
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                                          child: Text(podoApps[index][TITLE]!,
+                                              style: TextStyle(
+                                                  color: Theme.of(context).primaryColor,
+                                                  fontSize: rs.getSize(15))),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: podoApps.length,
                                 ),
-                              ),
-                              subTitle: hasUserName ? null : 'Please set your name'),
+                              ],
+                            ),
+                          ),
+                        ),
 
-                          // Language
-                          getExpansionPanel(
-                            items[1],
+                        // Logout
+                        getExpansionPanel(
+                            items[6],
                             ListTile(
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   MyWidget().getTextWidget(
                                     rs,
-                                    text: tr('shouldRestart'),
+                                    text: tr('logOutDetail'),
                                     color: Theme.of(context).primaryColor,
-                                  ),
-                                  SizedBox(height: rs.getSize(10)),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return Padding(
-                                        padding: EdgeInsets.only(bottom: rs.getSize(8)),
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(30),
-                                              ),
-                                              side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
-                                              backgroundColor: Theme.of(context).cardColor),
-                                          onPressed: () async {
-                                            String lang = Languages().fos[index];
-                                            user.User().language = lang;
-                                            EasyLocalization.of(context)!.setLocale(Locale(lang));
-                                            await Database().updateDoc(
-                                                collection: 'Users',
-                                                docId: user.User().id,
-                                                key: 'language',
-                                                value: lang);
-                                            MyWidget().showSnackbarWithPodo(rs,
-                                                title: tr('languageChanged'),
-                                                content: tr('shouldRestart'),
-                                                duration: 5000);
-                                            setState(() {
-                                              closePanels();
-                                            });
-                                          },
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                                            child: Text(language[index],
-                                                style: TextStyle(
-                                                    color: Theme.of(context).primaryColor,
-                                                    fontSize: rs.getSize(15))),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    itemCount: language.length,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          // Feedback
-                          getExpansionPanel(
-                              items[2],
-                              ListTile(
-                                  title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  MyWidget().getTextWidget(
-                                    rs,
-                                    text: tr('feedbackDetail'),
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 10),
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Expanded(
-                                          child: MyWidget().getTextFieldWidget(context, rs,
-                                              hint: tr('feedbackHint'),
-                                              controller: TextEditingController(text: feedback),
-                                              onChanged: (text) {
-                                            feedback = text;
-                                          }),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        MyWidget().getRoundBtnWidget(
+                                            child: MyWidget().getRoundBtnWidget(
                                           rs,
-                                          text: tr('send'),
-                                          verticalPadding: 8,
-                                          horizontalPadding: 3,
+                                          text: tr('yes'),
                                           textSize: 15,
                                           bgColor: Theme.of(context).canvasColor,
                                           fontColor: Theme.of(context).cardColor,
                                           f: () async {
-                                            try {
-                                              if (feedback.isNotEmpty) {
-                                                fb.Feedback userFeedback = fb.Feedback();
-                                                userFeedback.userId = userId;
-                                                userFeedback.email = userEmail;
-                                                userFeedback.message = feedback;
-                                                await Database()
-                                                    .setDoc(collection: 'Feedbacks', doc: userFeedback);
-                                                MyWidget().showSnackbar(rs, title: tr('thanksFeedback'));
-                                              }
-                                            } catch (e) {
-                                              if (e is PlatformException && e.code == "not_available") {
-                                                MyWidget()
-                                                    .showSnackbar(rs, title: tr('error'), message: e.toString());
-                                              }
-                                            }
+                                            LocalStorage().isInit = false;
+                                            await auth.signOut();
+                                            print('User logged out');
+                                          },
+                                          verticalPadding: 10,
+                                        )),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Expanded(
+                                            child: MyWidget().getRoundBtnWidget(
+                                          rs,
+                                          text: tr('cancel'),
+                                          textSize: 15,
+                                          bgColor: Theme.of(context).focusColor,
+                                          fontColor: Theme.of(context).cardColor,
+                                          f: () {
                                             setState(() {
                                               closePanels();
                                             });
                                           },
-                                        )
+                                          verticalPadding: 10,
+                                        )),
                                       ],
                                     ),
                                   ),
                                 ],
-                              ))),
+                              ),
+                            )),
 
-                          // Blog
-                          getExpansionPanel(items[3], const SizedBox.shrink(), onTap: () async {
-                            await FirebaseAnalytics.instance.logEvent(
-                              name: CLICK_BLOG,
-                            );
-                            _launchUrl(Uri.parse(blogUrl));
-                          }, isExpandable: false),
-
-                          // Community
-                          getExpansionPanel(
-                            items[4],
-                            const SizedBox.shrink(),
-                            onTap: () async {
-                              await FirebaseAnalytics.instance.logEvent(
-                                name: CLICK_COMMUNITY,
-                              );
-                              _launchUrl(Uri.parse(communityUrl));
-                            },
-                            isExpandable: false,
-                          ),
-
-                          // Podo Apps
-                          getExpansionPanel(
-                            items[5],
+                        // Remove account
+                        getExpansionPanel(
+                            items[7],
                             ListTile(
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   MyWidget().getTextWidget(
                                     rs,
-                                    text: tr('discoverApps'),
-                                    color: Theme.of(context).primaryColor,
+                                    text: tr('removeDetail'),
+                                    color: Theme.of(context).focusColor,
                                   ),
-                                  SizedBox(height: rs.getSize(10)),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return Padding(
-                                        padding: EdgeInsets.only(bottom: rs.getSize(8)),
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(30),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                            child: MyWidget().getRoundBtnWidget(
+                                          rs,
+                                          text: tr('yes'),
+                                          textSize: 15,
+                                          bgColor: Theme.of(context).canvasColor,
+                                          fontColor: Theme.of(context).cardColor,
+                                          f: () {
+                                            Get.dialog(
+                                              AlertDialog(
+                                                backgroundColor: Theme.of(context).cardColor,
+                                                title: MyWidget().getTextWidget(
+                                                  rs,
+                                                  text: tr('areYouSure'),
+                                                  size: 20,
+                                                  color: Theme.of(context).secondaryHeaderColor,
+                                                ),
+                                                content: MyWidget().getTextWidget(
+                                                  rs,
+                                                  text: tr('removeDetail2'),
+                                                  color: Theme.of(context).focusColor,
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    child: MyWidget().getTextWidget(rs,
+                                                        text: tr('yes'),
+                                                        color: Theme.of(context).secondaryHeaderColor),
+                                                    onPressed: () async {
+                                                      User? user = auth.currentUser;
+                                                      if (user != null) {
+                                                        String providerId = '';
+                                                        for (UserInfo providerData in user.providerData) {
+                                                          providerId = providerData.providerId;
+                                                        }
+                                                        print('PROVIDER: $providerId');
+                                                        Get.back();
+
+                                                        UserCredential? userCredential;
+                                                        switch (providerId) {
+                                                          case 'password':
+                                                            String password = '';
+                                                            Get.dialog(AlertDialog(
+                                                              title: MyWidget().getTextFieldWidget(context, rs,
+                                                                  hint: tr('passwordAgain'), onChanged: (value) {
+                                                                password = value;
+                                                              }),
+                                                              actions: [
+                                                                TextButton(
+                                                                  child: Text(tr('send'),
+                                                                      style: TextStyle(
+                                                                          fontSize: rs.getSize(15),
+                                                                          color: Theme.of(context)
+                                                                              .secondaryHeaderColor)),
+                                                                  onPressed: () async {
+                                                                    Get.back();
+                                                                    try {
+                                                                      userCredential = await user
+                                                                          .reauthenticateWithCredential(
+                                                                        EmailAuthProvider.credential(
+                                                                            email: user.email!,
+                                                                            password: password),
+                                                                      );
+                                                                      removeUserAccount(userCredential);
+                                                                    } catch (e) {
+                                                                      showErrorSnackbar(e);
+                                                                    }
+                                                                  },
+                                                                )
+                                                              ],
+                                                            ));
+                                                            break;
+
+                                                          case 'google.com':
+                                                            userCredential =
+                                                                await Credentials().getGoogleCredential(isSignUp: false);
+                                                            removeUserAccount(userCredential);
+                                                            break;
+
+                                                          case 'apple.com':
+                                                            userCredential =
+                                                                await Credentials().getAppleCredential(isSignUp: false);
+                                                            removeUserAccount(userCredential);
+                                                            break;
+                                                        }
+                                                      }
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: MyWidget().getTextWidget(rs,
+                                                        text: tr('cancel'),
+                                                        color: Theme.of(context).secondaryHeaderColor),
+                                                    onPressed: () {
+                                                      Get.back();
+                                                      setState(() {
+                                                        closePanels();
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
                                               ),
-                                              side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
-                                              backgroundColor: Theme.of(context).cardColor),
-                                          onPressed: () async {
-                                            await FirebaseAnalytics.instance.logEvent(name: CLICK_APPS, parameters: {
-                                              "app_title": podoApps[index][TITLE]!,
-                                            });
-                                            if (Platform.isAndroid) {
-                                              _launchUrl(Uri.parse(podoApps[index][ANDROID]!));
-                                            } else {
-                                              _launchUrl(Uri.parse(podoApps[index][IOS]!));
-                                            }
+                                            );
                                           },
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                                            child: Text(podoApps[index][TITLE]!,
-                                                style: TextStyle(
-                                                    color: Theme.of(context).primaryColor,
-                                                    fontSize: rs.getSize(15))),
-                                          ),
+                                          verticalPadding: 10,
+                                        )),
+                                        const SizedBox(
+                                          width: 10,
                                         ),
-                                      );
-                                    },
-                                    itemCount: podoApps.length,
+                                        Expanded(
+                                            child: MyWidget().getRoundBtnWidget(
+                                          rs,
+                                          text: tr('cancel'),
+                                          textSize: 15,
+                                          bgColor: Theme.of(context).focusColor,
+                                          fontColor: Theme.of(context).cardColor,
+                                          f: () {
+                                            setState(() {
+                                              closePanels();
+                                            });
+                                          },
+                                          verticalPadding: 10,
+                                        )),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
-
-                          // Logout
-                          getExpansionPanel(
-                              items[6],
-                              ListTile(
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    MyWidget().getTextWidget(
-                                      rs,
-                                      text: tr('logOutDetail'),
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                              child: MyWidget().getRoundBtnWidget(
-                                            rs,
-                                            text: tr('yes'),
-                                            textSize: 15,
-                                            bgColor: Theme.of(context).canvasColor,
-                                            fontColor: Theme.of(context).cardColor,
-                                            f: () async {
-                                              LocalStorage().isInit = false;
-                                              await auth.signOut();
-                                              print('User logged out');
-                                            },
-                                            verticalPadding: 10,
-                                          )),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Expanded(
-                                              child: MyWidget().getRoundBtnWidget(
-                                            rs,
-                                            text: tr('cancel'),
-                                            textSize: 15,
-                                            bgColor: Theme.of(context).focusColor,
-                                            fontColor: Theme.of(context).cardColor,
-                                            f: () {
-                                              setState(() {
-                                                closePanels();
-                                              });
-                                            },
-                                            verticalPadding: 10,
-                                          )),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-
-                          // Remove account
-                          getExpansionPanel(
-                              items[7],
-                              ListTile(
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    MyWidget().getTextWidget(
-                                      rs,
-                                      text: tr('removeDetail'),
-                                      color: Theme.of(context).focusColor,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                              child: MyWidget().getRoundBtnWidget(
-                                            rs,
-                                            text: tr('yes'),
-                                            textSize: 15,
-                                            bgColor: Theme.of(context).canvasColor,
-                                            fontColor: Theme.of(context).cardColor,
-                                            f: () {
-                                              Get.dialog(
-                                                AlertDialog(
-                                                  backgroundColor: Theme.of(context).cardColor,
-                                                  title: MyWidget().getTextWidget(
-                                                    rs,
-                                                    text: tr('areYouSure'),
-                                                    size: 20,
-                                                    color: Theme.of(context).secondaryHeaderColor,
-                                                  ),
-                                                  content: MyWidget().getTextWidget(
-                                                    rs,
-                                                    text: tr('removeDetail2'),
-                                                    color: Theme.of(context).focusColor,
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      child: MyWidget().getTextWidget(rs,
-                                                          text: tr('yes'),
-                                                          color: Theme.of(context).secondaryHeaderColor),
-                                                      onPressed: () async {
-                                                        User? user = auth.currentUser;
-                                                        if (user != null) {
-                                                          String providerId = '';
-                                                          for (UserInfo providerData in user.providerData) {
-                                                            providerId = providerData.providerId;
-                                                          }
-                                                          print('PROVIDER: $providerId');
-                                                          Get.back();
-
-                                                          UserCredential? userCredential;
-                                                          switch (providerId) {
-                                                            case 'password':
-                                                              String password = '';
-                                                              Get.dialog(AlertDialog(
-                                                                title: MyWidget().getTextFieldWidget(context, rs,
-                                                                    hint: tr('passwordAgain'), onChanged: (value) {
-                                                                  password = value;
-                                                                }),
-                                                                actions: [
-                                                                  TextButton(
-                                                                    child: Text(tr('send'),
-                                                                        style: TextStyle(
-                                                                            fontSize: rs.getSize(15),
-                                                                            color: Theme.of(context)
-                                                                                .secondaryHeaderColor)),
-                                                                    onPressed: () async {
-                                                                      Get.back();
-                                                                      try {
-                                                                        userCredential = await user
-                                                                            .reauthenticateWithCredential(
-                                                                          EmailAuthProvider.credential(
-                                                                              email: user.email!,
-                                                                              password: password),
-                                                                        );
-                                                                        removeUserAccount(userCredential);
-                                                                      } catch (e) {
-                                                                        showErrorSnackbar(e);
-                                                                      }
-                                                                    },
-                                                                  )
-                                                                ],
-                                                              ));
-                                                              break;
-
-                                                            case 'google.com':
-                                                              userCredential =
-                                                                  await Credentials().getGoogleCredential(isSignUp: false);
-                                                              removeUserAccount(userCredential);
-                                                              break;
-
-                                                            case 'apple.com':
-                                                              userCredential =
-                                                                  await Credentials().getAppleCredential(isSignUp: false);
-                                                              removeUserAccount(userCredential);
-                                                              break;
-                                                          }
-                                                        }
-                                                      },
-                                                    ),
-                                                    TextButton(
-                                                      child: MyWidget().getTextWidget(rs,
-                                                          text: tr('cancel'),
-                                                          color: Theme.of(context).secondaryHeaderColor),
-                                                      onPressed: () {
-                                                        Get.back();
-                                                        setState(() {
-                                                          closePanels();
-                                                        });
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                            verticalPadding: 10,
-                                          )),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Expanded(
-                                              child: MyWidget().getRoundBtnWidget(
-                                            rs,
-                                            text: tr('cancel'),
-                                            textSize: 15,
-                                            bgColor: Theme.of(context).focusColor,
-                                            fontColor: Theme.of(context).cardColor,
-                                            f: () {
-                                              setState(() {
-                                                closePanels();
-                                              });
-                                            },
-                                            verticalPadding: 10,
-                                          )),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ],
-                      ),
+                            )),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     Row(

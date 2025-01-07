@@ -196,15 +196,12 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   sliverAppBar() {
     return SliverAppBar(
-      leading: Theme(
-        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-        child: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-          color: Colors.white,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+        color: Colors.white,
+        onPressed: () {
+          Navigator.pop(context);
+        },
       ),
       expandedHeight: rs.getSize(sliverAppBarHeight),
       collapsedHeight: rs.getSize(60),

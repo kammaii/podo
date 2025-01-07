@@ -194,17 +194,13 @@ class _WorkbookMainState extends State<WorkbookMain> {
         Positioned(
           top: 20,
           right: 20,
-          child: Theme(
-            data: Theme.of(context)
-                .copyWith(highlightColor: MyColors.navyLight),
-            child: Material(
-              color: Colors.transparent,
-              child: IconButton(
-                  icon: const Icon(Icons.cancel, color: Colors.white),
-                  onPressed: () {
-                    Get.back();
-                  }),
-            ),
+          child: Material(
+            color: Colors.transparent,
+            child: IconButton(
+                icon: const Icon(Icons.cancel, color: Colors.white),
+                onPressed: () {
+                  Get.back();
+                }),
           ),
         ),
       ],
@@ -296,17 +292,14 @@ class _WorkbookMainState extends State<WorkbookMain> {
                           ),
                           bgColor: Theme.of(context).cardColor),
                       const SizedBox(height: 10),
-                      Theme(
-                        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-                        child: ExpansionPanelList(
-                          expansionCallback: (index, isExpanded) {
-                            setState(() {
-                              closePanels();
-                              items[index].isExpanded = isExpanded;
-                            });
-                          },
-                          children: getExpansionPanel(),
-                        ),
+                      ExpansionPanelList(
+                        expansionCallback: (index, isExpanded) {
+                          setState(() {
+                            closePanels();
+                            items[index].isExpanded = isExpanded;
+                          });
+                        },
+                        children: getExpansionPanel(),
                       ),
                     ],
                   ),

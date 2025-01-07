@@ -72,15 +72,12 @@ class LessonSummaryMain extends StatelessWidget {
         SizedBox(
           width: rs.getSize(btnName == LEARNING ? 60 : 45),
           height: rs.getSize(btnName == LEARNING ? 60 : 45),
-          child: Theme(
-            data: Theme.of(cont).copyWith(highlightColor: MyColors.navyLight),
-            child: FloatingActionButton(
-              shape: const CircleBorder(),
-              heroTag: tag,
-              onPressed: fn,
-              backgroundColor: bgColor,
-              child: Icon(iconData, size: rs.getSize(iconSize)),
-            ),
+          child: FloatingActionButton(
+            shape: const CircleBorder(),
+            heroTag: tag,
+            onPressed: fn,
+            backgroundColor: bgColor,
+            child: Icon(iconData, size: rs.getSize(iconSize)),
           ),
         ),
         SizedBox(height: rs.getSize(5)),

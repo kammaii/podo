@@ -818,18 +818,14 @@ class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStat
                                                   progressColor: Theme.of(context).primaryColor,
                                                   backgroundColor: Theme.of(context).cardColor,
                                                 ),
-                                                Theme(
-                                                  data: Theme.of(context)
-                                                      .copyWith(highlightColor: MyColors.navyLight),
-                                                  child: IconButton(
-                                                    iconSize: rs.getSize(60),
-                                                    onPressed: () {
-                                                      controller.playAudio();
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.play_arrow_rounded,
-                                                      color: Theme.of(context).primaryColor,
-                                                    ),
+                                                IconButton(
+                                                  iconSize: rs.getSize(60),
+                                                  onPressed: () {
+                                                    controller.playAudio();
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.play_arrow_rounded,
+                                                    color: Theme.of(context).primaryColor,
                                                   ),
                                                 ),
                                               ],

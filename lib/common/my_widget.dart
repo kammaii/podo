@@ -15,15 +15,12 @@ class MyWidget {
     return AppBar(
       backgroundColor: Theme.of(context).cardColor,
       elevation: 0,
-      leading: Theme(
-        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-        child: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-          color: Theme.of(context).primaryColor,
-        ),
+      leading: IconButton(
+        onPressed: () {
+          Get.back();
+        },
+        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+        color: Theme.of(context).primaryColor,
       ),
       title: Padding(
         padding: EdgeInsets.symmetric(vertical: rs.getSize(10, bigger: 1.5)),

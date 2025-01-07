@@ -63,17 +63,14 @@ class FavoriteIcon {
       {bool b = false, Function()? fn, bool isWhiteIcon = false}) {
     return Stack(
       children: [
-        Theme(
-          data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-          child: IconButton(
-            padding: EdgeInsets.all(rs.getSize(5, bigger: 1.2)),
-            constraints: const BoxConstraints(),
-            onPressed: fn,
-            icon: Icon(
-              b ? FontAwesomeIcons.solidStar : FontAwesomeIcons.star,
-              color: isWhiteIcon ? Colors.white : Theme.of(context).primaryColor,
-              size: rs.getSize(20),
-            ),
+        IconButton(
+          padding: EdgeInsets.all(rs.getSize(5, bigger: 1.2)),
+          constraints: const BoxConstraints(),
+          onPressed: fn,
+          icon: Icon(
+            b ? FontAwesomeIcons.solidStar : FontAwesomeIcons.star,
+            color: isWhiteIcon ? Colors.white : Theme.of(context).primaryColor,
+            size: rs.getSize(20),
           ),
         ),
         Positioned(
