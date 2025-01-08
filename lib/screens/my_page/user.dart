@@ -250,6 +250,7 @@ class User {
     if(p != null) {
       path = p;
     }
+    fcmPermission = false;
     await Database().setDoc(collection: 'Users', doc: this);
     await FcmRequest().fcmRequest('signUp');
 

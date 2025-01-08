@@ -31,23 +31,27 @@ class MyTutorial {
             align: ContentAlign.custom,
             customPosition: CustomTargetContentPosition(bottom: 30),
             padding: const EdgeInsets.all(20),
-            child: MyWidget().getRoundedContainer(
-                widget: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset('assets/images/podo.png', width: 50, height: 50),
-                const SizedBox(height: 20),
-                Text(
-                  content,
-                  style: TextStyle(
-                    color: MyColors.purple,
-                    fontSize: 20,
-                    fontFamily: Platform.isIOS ? null : 'EnglishFont',
+            child: IgnorePointer(
+              ignoring: true,
+              child: MyWidget().getRoundedContainer(
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  widget: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/images/podo.png', width: 50, height: 50),
+                  const SizedBox(height: 20),
+                  Text(
+                    content,
+                    style: TextStyle(
+                      color: MyColors.purple,
+                      fontSize: 20,
+                      fontFamily: Platform.isIOS ? null : 'EnglishFont',
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            )))
+                ],
+              )),
+            ))
       ],
     );
   }

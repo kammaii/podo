@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class Credentials {
   final _auth = FirebaseAuth.instance;
@@ -16,10 +17,12 @@ class Credentials {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
+      UserCredential userCredential =  await _auth.signInWithCredential(credential);
+      String userId = auth.FirebaseAuth.instance.currentUser!.uid;
       if(isSignUp) {
-        await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google');
+        await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google', parameters: {'userId': userId});
       }
-      return await _auth.signInWithCredential(credential);
+      return userCredential;
     } catch (e) {
       print('Error: $e');
       return null;
@@ -59,11 +62,11 @@ class Credentials {
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
     );
+    UserCredential userCredential = await _auth.signInWithCredential(oauthCredential);
+    String userId = auth.FirebaseAuth.instance.currentUser!.uid;
     if(isSignUp) {
-      await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple');
+      await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple', parameters: {'userId': userId});
     }
-    // Sign in the user with Firebase. If the nonce we generated earlier does
-    // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-    return await _auth.signInWithCredential(oauthCredential);
+    return userCredential;
   }
 }
