@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/fcm_request.dart';
+import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -68,6 +69,8 @@ class _WritingMainState extends State<WritingMain>
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(animationController);
+
+    controller.isChecked = LocalStorage().prefs!.getBool(tr('iveReadTheFollowing')) ?? false;
   }
 
   @override
