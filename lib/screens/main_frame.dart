@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:podo/fcm_controller.dart';
+import 'package:podo/values/my_strings.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -182,7 +184,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     Get.put(LoadingController());
-    _controller = PersistentTabController(initialIndex: 0);
+    _controller = PersistentTabController(initialIndex: FcmController.firstNavIndex);
     _controller.addListener(() {
       controllerIndex = _controller.index;
       controller.update();
@@ -237,7 +239,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                           onPressed: () async {
                             await FirebaseAnalytics.instance.logEvent(name: 'click_trial_end');
                             Get.back();
-                            Get.toNamed('/premiumMain');
+                            Get.toNamed(MyStrings.routePremiumMain);
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
