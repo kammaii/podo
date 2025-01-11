@@ -16,6 +16,7 @@ import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:html/parser.dart' as htmlParser;
+import 'package:podo/values/my_strings.dart';
 
 class WritingMyList extends StatefulWidget {
   WritingMyList({Key? key}) : super(key: key);
@@ -35,7 +36,6 @@ class _WritingMyListState extends State<WritingMyList> {
   bool isLoaded = false;
   bool hasMore = true;
   late ResponsiveSize rs;
-  bool? hasBackBtn = Get.arguments;
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
@@ -89,17 +89,16 @@ class _WritingMyListState extends State<WritingMyList> {
             child: HtmlWidget(
               content,
               textStyle: TextStyle(
-                fontFamily: 'KoreanFont',
-                fontSize: rs.getSize(15),
-                height: 1.5,
-                color: Theme.of(context).secondaryHeaderColor
-              ),
+                  fontFamily: 'KoreanFont',
+                  fontSize: rs.getSize(15),
+                  height: 1.5,
+                  color: Theme.of(context).secondaryHeaderColor),
             ),
           ),
           Visibility(
             visible: writing.status == 1 && tag.contains('C') || writing.status == 2 && tag.contains('A'),
-            child: Obx(() =>
-                FavoriteIcon().getFlashcardIcon(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
+            child: Obx(() => FavoriteIcon()
+                .getFlashcardIcon(context, rs, controller: controller, itemId: writing.id, front: extractedText)),
           )
         ],
       ),
@@ -144,66 +143,72 @@ class _WritingMyListState extends State<WritingMyList> {
           ],
         ),
         MyWidget().getRoundedContainer(
-          widget: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  MyWidget().getRoundedContainer(
-                      widget: MyWidget().getTextWidget(rs, text: statusList[status], color: Theme.of(context).cardColor, size: 13),
-                      radius: 20,
-                      padding: EdgeInsets.symmetric(vertical: rs.getSize(2), horizontal: rs.getSize(10)),
-                      bgColor: statusColors[status]),
-                  SizedBox(width: rs.getSize(10)),
-                  Expanded(
-                      child: MyWidget().getTextWidget(rs,
-                          text: 'Lv.${(writing.questionLevel + 1).toString()}', color: Theme.of(context).disabledColor)),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.keyboard_double_arrow_left_rounded, size: rs.getSize(13), color: Theme.of(context).disabledColor),
-                          const SizedBox(width: 5),
-                          MyWidget().getTextWidget(rs,
-                              text: MyDateFormat().getDateFormat(writing.dateWriting), size: 12, color: Theme.of(context).disabledColor),
-                        ],
-                      ),
-                      writing.dateReply != null
-                          ? Row(
-                              children: [
-                                Icon(Icons.keyboard_double_arrow_right_rounded,
-                                    size: rs.getSize(13), color: Theme.of(context).disabledColor),
-                                const SizedBox(width: 5),
-                                MyWidget().getTextWidget(rs,
-                                    text: MyDateFormat().getDateFormat(writing.dateReply!),
-                                    size: 12,
-                                    color: Theme.of(context).disabledColor),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                ],
-              ),
-              const Divider(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: items,
-              ),
-              const Divider(),
-              Visibility(
-                visible: writing.comments != null,
-                child: Column(
+            widget: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    MyWidget().getTextWidget(rs, text: 'Comments', isBold: true, color: Theme.of(context).primaryColor),
-                    const SizedBox(height: 10),
-                    MyWidget().getTextWidget(rs, text: writing.comments, color: Theme.of(context).primaryColor),
+                    MyWidget().getRoundedContainer(
+                        widget: MyWidget()
+                            .getTextWidget(rs, text: statusList[status], color: Theme.of(context).cardColor, size: 13),
+                        radius: 20,
+                        padding: EdgeInsets.symmetric(vertical: rs.getSize(2), horizontal: rs.getSize(10)),
+                        bgColor: statusColors[status]),
+                    SizedBox(width: rs.getSize(10)),
+                    Expanded(
+                        child: MyWidget().getTextWidget(rs,
+                            text: 'Lv.${(writing.questionLevel + 1).toString()}',
+                            color: Theme.of(context).disabledColor)),
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.keyboard_double_arrow_left_rounded,
+                                size: rs.getSize(13), color: Theme.of(context).disabledColor),
+                            const SizedBox(width: 5),
+                            MyWidget().getTextWidget(rs,
+                                text: MyDateFormat().getDateFormat(writing.dateWriting),
+                                size: 12,
+                                color: Theme.of(context).disabledColor),
+                          ],
+                        ),
+                        writing.dateReply != null
+                            ? Row(
+                                children: [
+                                  Icon(Icons.keyboard_double_arrow_right_rounded,
+                                      size: rs.getSize(13), color: Theme.of(context).disabledColor),
+                                  const SizedBox(width: 5),
+                                  MyWidget().getTextWidget(rs,
+                                      text: MyDateFormat().getDateFormat(writing.dateReply!),
+                                      size: 12,
+                                      color: Theme.of(context).disabledColor),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                      ],
+                    ),
                   ],
                 ),
-              )
-            ],
-          ),
-        bgColor: Theme.of(context).cardColor),
+                const Divider(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: items,
+                ),
+                const Divider(),
+                Visibility(
+                  visible: writing.comments != null,
+                  child: Column(
+                    children: [
+                      MyWidget()
+                          .getTextWidget(rs, text: 'Comments', isBold: true, color: Theme.of(context).primaryColor),
+                      const SizedBox(height: 10),
+                      MyWidget().getTextWidget(rs, text: writing.comments, color: Theme.of(context).primaryColor),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            bgColor: Theme.of(context).cardColor),
       ],
     );
   }
@@ -214,11 +219,10 @@ class _WritingMyListState extends State<WritingMyList> {
     super.dispose();
   }
 
-
   @override
   void initState() {
     super.initState();
-    if(Get.isRegistered<WritingController>()) {
+    if (Get.isRegistered<WritingController>()) {
       controller = Get.find<WritingController>();
     } else {
       controller = Get.put(WritingController());
@@ -251,14 +255,13 @@ class _WritingMyListState extends State<WritingMyList> {
         });
       },
       child: Scaffold(
-        appBar: hasBackBtn != null && hasBackBtn! ? MyWidget().getAppbar(context, rs, title: '') : null,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: EdgeInsets.only(left: rs.getSize(20), top: rs.getSize(15)),
-              child: MyWidget()
-                  .getTextWidget(rs, text: tr('myWritings'), color: Theme.of(context).primaryColor, isBold: true, size: 18),
+              child: MyWidget().getTextWidget(rs,
+                  text: tr('myWritings'), color: Theme.of(context).primaryColor, isBold: true, size: 18),
             ),
             Expanded(
               child: Stack(

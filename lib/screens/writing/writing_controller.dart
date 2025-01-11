@@ -10,12 +10,6 @@ class WritingController extends GetxController {
   RxMap<dynamic, dynamic> hasFlashcard = {}.obs;
 
 
-  @override
-  void onInit() {
-    super.onInit();
-    isChecked = LocalStorage().prefs!.getBool(tr('iveReadTheFollowing')) ?? false;
-  }
-
   setCheckbox(bool? value) {
     isChecked = value!;
     LocalStorage().prefs!.setBool(tr('iveReadTheFollowing'), isChecked);

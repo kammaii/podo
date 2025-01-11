@@ -191,43 +191,40 @@ class _PodoMessageMainState extends State<PodoMessageMain> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: Theme(
-          data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-          child: AppBar(
-            backgroundColor: Theme.of(context).cardColor,
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () {
-                if (player != null) {
-                  player!.dispose();
-                }
-                Get.back();
-              },
-              icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-              color: Theme.of(context).primaryColor,
-            ),
-            title: MyWidget().getTextWidget(
-              rs,
-              text: PodoMessage().title![KO],
-              color: Theme.of(context).primaryColor,
-              isKorean: true,
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Get.dialog(AlertDialog(
-                    backgroundColor: Theme.of(context).cardColor,
-                    title: MyWidget().getTextWidget(rs,
-                        text: tr('howToUse'), size: 18, color: Theme.of(context).secondaryHeaderColor),
-                    content: MyWidget()
-                        .getTextWidget(rs, text: tr('replyDetail'), color: Theme.of(context).disabledColor),
-                  ));
-                },
-                icon: Icon(CupertinoIcons.info_circle,
-                    color: Theme.of(context).primaryColor, size: rs.getSize(23, bigger: 1.2)),
-              )
-            ],
+        child: AppBar(
+          backgroundColor: Theme.of(context).cardColor,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () {
+              if (player != null) {
+                player!.dispose();
+              }
+              Get.back();
+            },
+            icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+            color: Theme.of(context).primaryColor,
           ),
+          title: MyWidget().getTextWidget(
+            rs,
+            text: PodoMessage().title![KO],
+            color: Theme.of(context).primaryColor,
+            isKorean: true,
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Get.dialog(AlertDialog(
+                  backgroundColor: Theme.of(context).cardColor,
+                  title: MyWidget().getTextWidget(rs,
+                      text: tr('howToUse'), size: 18, color: Theme.of(context).secondaryHeaderColor),
+                  content: MyWidget()
+                      .getTextWidget(rs, text: tr('replyDetail'), color: Theme.of(context).disabledColor),
+                ));
+              },
+              icon: Icon(CupertinoIcons.info_circle,
+                  color: Theme.of(context).primaryColor, size: rs.getSize(23, bigger: 1.2)),
+            )
+          ],
         ),
       ),
       body: Stack(

@@ -9,6 +9,7 @@ import 'package:podo/values/my_strings.dart';
 class FcmController extends GetxController {
 
   bool hasPodoMsg = false;
+  static int firstNavIndex = 0;
 
   @override
   void onInit() {
@@ -38,7 +39,7 @@ class FcmController extends GetxController {
       String type = message.data['tag'];
       switch(type) {
         case 'writing' :
-          Get.toNamed(MyStrings.routeMyWritingList, arguments: true);
+          firstNavIndex = 2; // writingMyList 페이지 열기
           break;
 
         case 'podo_message' :

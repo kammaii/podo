@@ -25,7 +25,7 @@ class LocalStorage {
   late CollectionReference historyRef;
   bool hasPrefs = false;
   bool hasWelcome = false;
-  final THEME_MODE = 'themeMode';
+
 
   factory LocalStorage() {
     return _instance;
@@ -35,12 +35,16 @@ class LocalStorage {
     print('LocalStorage 초기화');
   }
 
-  bool getThemeMode() {
-    return prefs!.getBool(THEME_MODE) ?? false;
+  bool getBoolFromLocalStorage({required String key}) {
+    if(prefs != null) {
+      return prefs!.getBool(key) ?? false;
+    } else {
+      return false;
+    }
   }
 
-  void setThemeMode(bool isDarkMode) {
-    prefs!.setBool(THEME_MODE, isDarkMode);
+  void setBoolToLocalStorage({required String key, required bool value}) {
+    prefs!.setBool(key, value);
   }
 
   Future<void> getPrefs() async {

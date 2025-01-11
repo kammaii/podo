@@ -6,12 +6,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/lesson/lesson_summary.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../my_page/user.dart';
 
 class LessonSummaryMain extends StatelessWidget {
@@ -28,7 +30,11 @@ class LessonSummaryMain extends StatelessWidget {
   static const READING = 'reading';
   static const SPEAKING = 'speaking';
 
-  Widget getFloatingBtn({required String btnName, required Function() fn}) {
+  MyTutorial? myTutorial;
+  GlobalKey? keyOptional;
+  GlobalKey? keyLearning;
+
+  Widget getFloatingBtn({GlobalKey? key, required String btnName, required Function() fn}) {
     String tag = '${btnName}Btn';
     IconData iconData = Icons.play_arrow_rounded;
     double iconSize = 50;
@@ -72,15 +78,13 @@ class LessonSummaryMain extends StatelessWidget {
         SizedBox(
           width: rs.getSize(btnName == LEARNING ? 60 : 45),
           height: rs.getSize(btnName == LEARNING ? 60 : 45),
-          child: Theme(
-            data: Theme.of(cont).copyWith(highlightColor: MyColors.navyLight),
-            child: FloatingActionButton(
-              shape: const CircleBorder(),
-              heroTag: tag,
-              onPressed: fn,
-              backgroundColor: bgColor,
-              child: Icon(iconData, size: rs.getSize(iconSize)),
-            ),
+          child: FloatingActionButton(
+            key: key,
+            shape: const CircleBorder(),
+            heroTag: tag,
+            onPressed: fn,
+            backgroundColor: bgColor,
+            child: Icon(iconData, size: rs.getSize(iconSize)),
           ),
         ),
         SizedBox(height: rs.getSize(5)),
@@ -105,6 +109,22 @@ class LessonSummaryMain extends StatelessWidget {
     bool isFreeOptions = lesson.isFreeOptions ?? false;
     isFreeOptions || isPremiumUser ? isOptionsActive = true : isOptionsActive = false;
 
+    myTutorial = MyTutorial();
+    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_SUMMARY);
+    if(isTutorialEnabled) {
+      keyOptional = GlobalKey();
+      keyLearning = GlobalKey();
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_lesson_summary_1')),
+        myTutorial!.tutorialItem(id: "T2", keyTarget: keyOptional, content: tr('tutorial_lesson_summary_2'), isAlignBottom: false),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyLearning, content: tr('tutorial_lesson_summary_3'), isAlignBottom: false),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
+    }
+
     summaries = [];
     final Query query = FirebaseFirestore.instance
         .collection('Lessons/${lesson.id}/LessonSummaries')
@@ -123,6 +143,7 @@ class LessonSummaryMain extends StatelessWidget {
                   })
               : const SizedBox.shrink(),
           getFloatingBtn(
+              key: keyOptional,
               btnName: WRITING,
               fn: () {
                 isOptionsActive
@@ -132,13 +153,14 @@ class LessonSummaryMain extends StatelessWidget {
                       }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
               }),
           getFloatingBtn(
+              key: keyLearning,
               btnName: LEARNING,
               fn: () {
                 if (!isPremiumUser && !lesson.adFree) {
                   MyWidget().showDialog(context, rs, content: tr('watchRewardAdLesson'), yesFn: () {
                     Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                     AdsController().showRewardAd();
-                  }, hasNoBtn: false, hasTextBtn: true);
+                  }, hasNoBtn: false, textBtnText: tr('explorePremium'), textBtnFn: (){Get.toNamed(MyStrings.routePremiumMain);});
                 } else {
                   Get.toNamed(MyStrings.routeLessonFrame, arguments: lesson);
                 }

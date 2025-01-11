@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podo/common/favorite_icon.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/play_stop_icon.dart';
@@ -13,6 +14,7 @@ import 'package:podo/screens/flashcard/flashcard_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class FlashCardMain extends StatefulWidget {
   const FlashCardMain({Key? key}) : super(key: key);
@@ -34,6 +36,10 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   bool isBasicUser = User().status == 1;
   late ResponsiveSize rs;
   int limit = 20;
+
+  MyTutorial? myTutorial;
+  GlobalKey? keyCard;
+  GlobalKey? keyReview;
 
   @override
   void initState() {
@@ -64,6 +70,24 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
+
+    // 앱 실행 시 플래시 카드가 empty 면 실행 안 됨.
+    myTutorial = MyTutorial();
+    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_FLASHCARD_MAIN) && controller.cards.isNotEmpty;
+    if(isTutorialEnabled) {
+      keyCard = GlobalKey();
+      keyReview = GlobalKey();
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", keyTarget: keyCard, content: tr('tutorial_flashcard_frame_1')),
+        myTutorial!.tutorialItem(id: "T2", keyTarget: keyCard, content: tr('tutorial_flashcard_frame_2')),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyReview, content: tr('tutorial_flashcard_frame_3'), isAlignBottom: false),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -178,9 +202,10 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                         padding: EdgeInsets.only(top: rs.getSize(10), bottom: rs.getSize(80)),
                                         itemCount: cardsLength,
                                         itemBuilder: (BuildContext context, int index) {
+                                          bool hasKey = isTutorialEnabled && index == 0;
                                           return Padding(
                                             padding: EdgeInsets.only(bottom: rs.getSize(8)),
-                                            child: getFlashCardItem(index),
+                                            child: getFlashCardItem(index, hasKey),
                                           );
                                         },
                                       ),
@@ -205,6 +230,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                     child: GetBuilder<FlashCardController>(
                       builder: (_) {
                         return MyWidget().getRoundBtnWidget(
+                          key: keyReview,
                           rs,
                           text: tr('review'),
                           bgColor: controller.cards.isNotEmpty ? Theme.of(context).canvasColor : Theme.of(context).disabledColor,
@@ -245,7 +271,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
     }
   }
 
-  Widget getFlashCardItem(int index) {
+  Widget getFlashCardItem(int index, bool hasKey) {
     FlashCard card;
     searchText.isEmpty ? card = controller.cards[index] : card = cardsSearch[index];
     String front = card.front;
@@ -267,7 +293,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
             child: Row(
               children: [
                 Expanded(
-                    child: Text(front,
+                    child: Text(key: keyCard, front,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2), color: Theme.of(context).secondaryHeaderColor))),

@@ -23,7 +23,11 @@ class Database {
   Future<void> updateFlashcard({required FlashCard card}) async {
     final collection = 'Users/${User().id}/FlashCards';
     DocumentReference ref = firestore.collection(collection).doc(card.id);
-    return await ref.update({'front': card.front, 'back': card.back, 'date': card.date}).then((value) {
+    return await ref.update({
+      'front': card.front,
+      'back': card.back,
+      'date': card.date
+    }).then((value) {
       'Update succeed';
     }).catchError((e) {
       MyWidget().showSimpleDialog(tr('setError'), e.toString());
@@ -32,36 +36,53 @@ class Database {
   }
 
   Future<void> updateDoc(
-      {required String collection, required String docId, required String key, required dynamic value}) async {
+      {required String collection,
+      required String docId,
+      required String key,
+      required dynamic value}) async {
     final ref = firestore.collection(collection).doc(docId);
-    ref.update({key: value}).then((val) => print('Update succeed: $key $value'), onError: (e) {
+    ref.update({key: value}).then((val) => print('Update succeed: $key $value'),
+        onError: (e) {
       MyWidget().showSimpleDialog(tr('setError'), e.toString());
       FirebaseCrashlytics.instance.log('Update Document Error: $e');
     });
   }
 
   Future<void> updateFields(
-      {required String collection, required String docId, required Map<String, dynamic> fields}) async {
+      {required String collection,
+      required String docId,
+      required Map<String, dynamic> fields}) async {
     final ref = firestore.collection(collection).doc(docId);
-    ref.update(fields).then((val) => print('Update succeed: $fields'), onError: (e) {
+    ref.update(fields).then((val) => print('Update succeed: $fields'),
+        onError: (e) {
       MyWidget().showSimpleDialog(tr('setError'), e.toString());
       FirebaseCrashlytics.instance.log('Update Fields Error: $e');
     });
   }
 
-  Future<void> setDoc({required String collection, required dynamic doc, Function(dynamic)? thenFn}) async {
+  Future<void> setDoc(
+      {required String collection,
+      required dynamic doc,
+      Function(dynamic)? thenFn}) async {
     final ref = firestore.collection(collection).doc(doc.id);
     if (thenFn != null) {
-      await ref.set(doc.toJson()).then(thenFn).catchError((e) => Get.snackbar(tr('setError'), e));
+      await ref.set(doc.toJson()).then(thenFn).catchError((e) {
+        Get.snackbar(tr('setError'), e.toString());
+        print('E $e');
+      });
     } else {
-      await ref.set(doc.toJson()).then((value) => print('setDoc completed')).catchError((e) {
+      await ref
+          .set(doc.toJson())
+          .then((value) => print('setDoc completed'))
+          .catchError((e) {
         MyWidget().showSimpleDialog(tr('setError'), e.toString());
         FirebaseCrashlytics.instance.log('Set Document Error: $e');
       });
     }
   }
 
-  Future<dynamic> getDoc({required String collection, required String docId}) async {
+  Future<dynamic> getDoc(
+      {required String collection, required String docId}) async {
     dynamic document;
     final ref = firestore.collection(collection).doc(docId);
     try {
@@ -91,7 +112,8 @@ class Database {
     return documents;
   }
 
-  Future<void> deleteDoc({required String collection, required String docId}) async {
+  Future<void> deleteDoc(
+      {required String collection, required String docId}) async {
     DocumentReference ref = firestore.collection(collection).doc(docId);
     return await ref.delete().then((value) {
       print('Document is Deleted');
@@ -101,13 +123,17 @@ class Database {
     });
   }
 
-  Future<void> deleteDocs({required String collection, required List<String> ids}) async {
+  Future<void> deleteDocs(
+      {required String collection, required List<String> ids}) async {
     final batch = firestore.batch();
     for (String docId in ids) {
       final ref = firestore.collection(collection).doc(docId);
       batch.delete(ref);
     }
-    await batch.commit().then((value) => print('Documents are delete')).catchError((e) {
+    await batch
+        .commit()
+        .then((value) => print('Documents are delete'))
+        .catchError((e) {
       MyWidget().showSimpleDialog(tr('setError'), e.toString());
       FirebaseCrashlytics.instance.log('Delete Documents Error: $e');
     });

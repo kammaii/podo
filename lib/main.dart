@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
               cardColor: Colors.white,
               focusColor: MyColors.red,
               shadowColor: MyColors.pink,
-              highlightColor: MyColors.green,
+              highlightColor: MyColors.navyLight,
               disabledColor: MyColors.grey,
               secondaryHeaderColor: Colors.black,
               unselectedWidgetColor: Colors.black,

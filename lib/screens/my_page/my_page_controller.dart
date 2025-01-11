@@ -7,9 +7,11 @@ import 'package:podo/screens/message/podo_message.dart';
 class MyPageController extends GetxController {
   List<bool> modeToggle = [true, false];
   var themeMode = ThemeMode.system.obs;
+  final IS_DARK_MODE = 'isDarkMode';
+
 
   void loadThemeMode() {
-    if(LocalStorage().prefs != null && LocalStorage().getThemeMode()) {
+    if(LocalStorage().getBoolFromLocalStorage(key: IS_DARK_MODE)) {
       modeToggle = [true, false];
       themeMode.value = ThemeMode.dark;
     } else {
@@ -19,10 +21,15 @@ class MyPageController extends GetxController {
   }
 
   changeMode(int index) {
-    modeToggle[0] = 0 == index;
-    modeToggle[1] = 1 == index;
-    index == 0 ? themeMode.value = ThemeMode.dark : themeMode.value = ThemeMode.system;
-    LocalStorage().setThemeMode(index == 0);
+    bool isDarkMode = 0 == index;
+    modeToggle[0] = isDarkMode;
+    modeToggle[1] = !isDarkMode;
+    if(isDarkMode) {
+      themeMode.value = ThemeMode.dark;
+    } else {
+      themeMode.value = ThemeMode.system;
+    }
+    LocalStorage().setBoolToLocalStorage(key: IS_DARK_MODE, value: isDarkMode);
     update();
   }
 }

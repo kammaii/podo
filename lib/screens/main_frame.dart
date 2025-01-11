@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:podo/fcm_controller.dart';
+import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +13,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
@@ -44,10 +48,18 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   bool showTrialLeftDate = false;
   int controllerIndex = 0;
 
+  MyTutorial? myTutorial;
+  bool isTutorialEnabled = false;
+  bool shouldRunLessonListTutorial = false; // 레슨 코스에서 튜토리얼이 진행 되고난 후 코스를 선택하면 true가 됨.
+  // 튜토리얼 포커스용 키
+  GlobalKey? keyTopicMode;
+  GlobalKey? keyGrammarMode;
+  GlobalKey? keyCourse;
+
   List<Widget> _buildScreens() {
     LessonCourse? course = LocalStorage().getLessonCourse();
     return [
-      course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
+      course != null ? LessonListMain(course: course, isTutorialEnabled: shouldRunLessonListTutorial) : const SizedBox.shrink(),
       ReadingListMain(),
       WritingMyList(),
       const FlashCardMain(),
@@ -83,89 +95,92 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     }
   }
 
-  Widget getLessonCourseList({required LessonCourse lessonCourse}) {
+  Widget getLessonCourseList({required bool isFirst, required LessonCourse lessonCourse}) {
     bool hasTag = lessonCourse.tag != null && lessonCourse.tag!.isNotEmpty;
     String level = '';
-    if(hasTag) {
+    if (hasTag) {
       level = tr(lessonCourse.tag!);
     }
-    return Theme(
-      data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-      child: Column(
-        children: [
-          Visibility(
-            visible: hasTag,
-            child: Padding(
-              padding: EdgeInsets.only(top: rs.getSize(35),bottom: rs.getSize(5)),
-              child: MyWidget().getTextWidget(rs, text: level, size: rs.getSize(35), isBold: true, color: MyColors.navyLight),
-            ),
+    return Column(
+      children: [
+        Visibility(
+          visible: hasTag,
+          child: Padding(
+            padding: EdgeInsets.only(top: rs.getSize(35), bottom: rs.getSize(5)),
+            child: MyWidget()
+                .getTextWidget(rs, text: level, size: rs.getSize(35), isBold: true, color: MyColors.navyLight),
           ),
-          Card(
-            color: Theme.of(context).cardColor,
-            child: InkWell(
-              onTap: () {
-                LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
-                controller.setVisibility(false);
-              },
-              child: Padding(
-                padding: EdgeInsets.all(rs.getSize(15)),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        lessonCourse.image != null
-                            ? Padding(
-                                padding: EdgeInsets.only(right: rs.getSize(20)),
-                                child: Image.memory(base64Decode(lessonCourse.image!),
-                                    height: rs.getSize(80), width: rs.getSize(80)),
-                              )
-                            : const SizedBox.shrink(),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Icon(Icons.play_lesson_rounded, color: MyColors.navy, size: 18),
-                                  const SizedBox(width: 5),
-                                  MyWidget().getTextWidget(rs, text: lessonCourse.lessons.length.toString(), color: MyColors.navy),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: MyWidget().getTextWidget(
-                                      rs,
-                                      text: lessonCourse.title[setLanguage],
-                                      size: 20,
-                                      color: Theme.of(context).primaryColor,
-                                      isBold: true,
-                                    ),
+        ),
+        Card(
+          key: isFirst && isTutorialEnabled ? keyCourse : null,
+          color: Theme.of(context).cardColor,
+          child: InkWell(
+            onTap: () {
+              LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
+              controller.setVisibility(false);
+              if(isTutorialEnabled) {
+                shouldRunLessonListTutorial = true;
+              }
+            },
+            child: Padding(
+              padding: EdgeInsets.all(rs.getSize(15)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      lessonCourse.image != null
+                          ? Padding(
+                              padding: EdgeInsets.only(right: rs.getSize(20)),
+                              child: Image.memory(base64Decode(lessonCourse.image!),
+                                  height: rs.getSize(80), width: rs.getSize(80)),
+                            )
+                          : const SizedBox.shrink(),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Icon(Icons.play_lesson_rounded, color: MyColors.navy, size: 18),
+                                const SizedBox(width: 5),
+                                MyWidget().getTextWidget(rs,
+                                    text: lessonCourse.lessons.length.toString(), color: MyColors.navy),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: MyWidget().getTextWidget(
+                                    rs,
+                                    text: lessonCourse.title[setLanguage],
+                                    size: 20,
+                                    color: Theme.of(context).primaryColor,
+                                    isBold: true,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    SizedBox(height: modeToggle[0] ? rs.getSize(20) : 0),
-                    modeToggle[0]
-                        ? MyWidget().getTextWidget(
-                            rs,
-                            text: lessonCourse.description[setLanguage],
-                            color: Theme.of(context).disabledColor,
-                          )
-                        : const SizedBox.shrink(),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: modeToggle[0] ? rs.getSize(20) : 0),
+                  modeToggle[0]
+                      ? MyWidget().getTextWidget(
+                          rs,
+                          text: lessonCourse.description[setLanguage],
+                          color: Theme.of(context).disabledColor,
+                        )
+                      : const SizedBox.shrink(),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -173,7 +188,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     Get.put(LoadingController());
-    _controller = PersistentTabController(initialIndex: 0);
+    _controller = PersistentTabController(initialIndex: FcmController.firstNavIndex);
     _controller.addListener(() {
       controllerIndex = _controller.index;
       controller.update();
@@ -186,7 +201,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(animationController);
-    if(User().status == 3) {
+    if (User().status == 3) {
       trialLeftDate = User().trialEnd!.difference(DateTime.now()).inDays;
       showTrialLeftDate = true;
     }
@@ -195,55 +210,77 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
         LocalStorage().hasWelcome = true;
         MyWidget().showSnackbarWithPodo(rs, title: tr('welcome'), content: tr('welcomeMessage'));
         if (User().isConvertedBasic) {
-          Get.dialog(AlertDialog(
-            title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MyWidget().getTextWidget(rs,
-                    text: tr('premiumEnd'),
-                    isTextAlignCenter: true,
-                    size: 16),
-                const SizedBox(height: 10),
-                MyWidget().getTextWidget(rs,
-                    text: tr('getDiscount'),
-                    isTextAlignCenter: true,
-                    color: MyColors.purple,
-                    isBold: true,
-                    size: 18),
-              ],
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actionsPadding: EdgeInsets.only(
-                left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
-            actions: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+          Get.dialog(
+              AlertDialog(
+                title: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50)),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MyWidget().getTextWidget(rs, text: tr('premiumEnd'), isTextAlignCenter: true, size: 16),
+                    const SizedBox(height: 10),
+                    MyWidget().getTextWidget(rs,
+                        text: tr('getDiscount'),
+                        isTextAlignCenter: true,
+                        color: MyColors.purple,
+                        isBold: true,
+                        size: 18),
+                  ],
+                ),
+                actionsAlignment: MainAxisAlignment.center,
+                actionsPadding: EdgeInsets.only(
+                    left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+                actions: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              side: const BorderSide(color: MyColors.purple, width: 1),
+                              backgroundColor: MyColors.purple),
+                          onPressed: () async {
+                            await FirebaseAnalytics.instance.logEvent(name: 'click_trial_end');
+                            Get.back();
+                            Get.toNamed(MyStrings.routePremiumMain);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                            child: Text(tr('explorePremium'),
+                                style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
                           ),
-                          side: const BorderSide(color: MyColors.purple, width: 1),
-                          backgroundColor: MyColors.purple),
-                      onPressed: () async {
-                        await FirebaseAnalytics.instance.logEvent(name: 'click_trial_end');
-                        Get.back();
-                        Get.toNamed('/premiumMain');
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                        child: Text(tr('explorePremium'), style: TextStyle(color: Colors.white, fontSize: rs.getSize(15))),
+                        ),
                       ),
-                    ),
-                  ),
+                    ],
+                  )
                 ],
-              )
-            ],
-          ), barrierDismissible: false);
+              ),
+              barrierDismissible: false);
         }
       });
+    }
+
+    myTutorial = MyTutorial();
+
+    // 최초 앱 설치 후에만 controller.isVisible = true 임.
+    // 기존 유저에게도 튜토리얼을 보여주고 싶으면 myTutorial을 전역 변수로 옮기고 build에서 튜토리얼을 실행해야 함.
+    isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_COURSE) && controller.isVisible;
+    if (isTutorialEnabled) {
+      keyCourse = GlobalKey();
+      keyTopicMode = GlobalKey();
+      keyGrammarMode = GlobalKey();
+
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_course_1')),
+        myTutorial!.tutorialItem(id: "T2", keyTarget: keyTopicMode, content: tr('tutorial_course_2')),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyGrammarMode, content: tr('tutorial_course_3')),
+        myTutorial!.tutorialItem(id: "T4", keyTarget: keyCourse, content: tr('tutorial_course_4')),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
     }
   }
 
@@ -302,19 +339,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                     borderRadius: BorderRadius.circular(10.0),
                     colorBehindNavBar: Theme.of(context).cardColor,
                   ),
-                  // popAllScreensOnTapOfSelectedTab: true,
-                  // popActionScreens: PopActionScreensType.all,
-                  // itemAnimationProperties: const ItemAnimationProperties(
-                  //   // Navigation Bar's items animation properties.
-                  //   duration: Duration(milliseconds: 200),
-                  //   curve: Curves.ease,
-                  // ),
-                  // screenTransitionAnimation: const ScreenTransitionAnimation(
-                  //   // Screen transition animation on change of selected tab.
-                  //   animateTabTransition: true,
-                  //   curve: Curves.ease,
-                  //   duration: Duration(milliseconds: 200),
-                  // ),
                   navBarStyle: NavBarStyle.style3,
                   // Choose the nav bar style with this property.
                   navBarHeight: rs.getSize(55),
@@ -330,120 +354,129 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      child: SafeArea(
-                        child: Container(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          child: Padding(
-                            padding: EdgeInsets.all(rs.getSize(10)),
-                            child: Column(
-                              children: [
-                                SizedBox(height: rs.getSize(20)),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: MyWidget().getTextWidget(
+                      child: Container(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: rs.getSize(10), right: rs.getSize(10), bottom: rs.getSize(10), top: rs.getSize(50)),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: MyWidget().getTextWidget(
+                                      rs,
+                                      text: tr('selectCourse'),
+                                      size: 20,
+                                      color: Theme.of(context).primaryColor,
+                                      isBold: true,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      MyWidget().getTextWidget(
                                         rs,
-                                        text: tr('selectCourse'),
-                                        size: 20,
+                                        text: tr('mode'),
                                         color: Theme.of(context).primaryColor,
                                         isBold: true,
                                       ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        MyWidget().getTextWidget(
-                                          rs,
-                                          text: tr('mode'),
-                                          color: Theme.of(context).primaryColor,
-                                          isBold: true,
-                                        ),
-                                        SizedBox(width: rs.getSize(10)),
-                                        ToggleButtons(
-                                          isSelected: modeToggle,
-                                          onPressed: (int index) {
-                                            modeToggle[0] = 0 == index;
-                                            modeToggle[1] = 1 == index;
-                                            controller.update();
-                                          },
-                                          constraints:
-                                              BoxConstraints(minHeight: rs.getSize(30), minWidth: rs.getSize(50)),
-                                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                          selectedBorderColor: Theme.of(context).primaryColor,
-                                          selectedColor: Theme.of(context).cardColor,
-                                          fillColor: Theme.of(context).primaryColor,
-                                          color: Theme.of(context).primaryColor,
-                                          children: [
-                                            Text(tr('topic'), style: TextStyle(fontSize: rs.getSize(15))),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
-                                              child:
-                                              Text(tr('grammar'), style: TextStyle(fontSize: rs.getSize(15))),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: rs.getSize(10)),
-                                Expanded(
-                                  child: ListView.builder(
-                                    itemCount: courses.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      LessonCourse course = courses[index];
-                                      return getLessonCourseList(lessonCourse: course);
-                                    },
+                                      SizedBox(width: rs.getSize(10)),
+                                      ToggleButtons(
+                                        isSelected: modeToggle,
+                                        onPressed: (int index) {
+                                          modeToggle[0] = 0 == index;
+                                          modeToggle[1] = 1 == index;
+                                          controller.update();
+                                        },
+                                        constraints:
+                                            BoxConstraints(minHeight: rs.getSize(30), minWidth: rs.getSize(50)),
+                                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                        selectedBorderColor: Theme.of(context).primaryColor,
+                                        selectedColor: Theme.of(context).cardColor,
+                                        fillColor: Theme.of(context).primaryColor,
+                                        color: Theme.of(context).primaryColor,
+                                        children: [
+                                          Text(
+                                              key: isTutorialEnabled ? keyTopicMode : null,
+                                              tr('topic'),
+                                              style: TextStyle(fontSize: rs.getSize(15))),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
+                                            child: Text(
+                                                key: isTutorialEnabled ? keyGrammarMode : null,
+                                                tr('grammar'),
+                                                style: TextStyle(fontSize: rs.getSize(15))),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
+                                ],
+                              ),
+                              SizedBox(height: rs.getSize(10)),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: courses.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    LessonCourse course = courses[index];
+                                    bool isFirst = index == 0;
+                                    return getLessonCourseList(isFirst: isFirst, lessonCourse: course);
+                                  },
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                showTrialLeftDate && _controller.index != 3 ?
-                Positioned(
-                  right: rs.getSize(20),
-                  bottom: rs.getSize(80),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(0),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      backgroundColor: Colors.transparent,
-                    ),
-                    onPressed: () {
-                      Get.toNamed('/premiumMain', arguments: trialLeftDate);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: rs.getSize(5), horizontal: rs.getSize(25)),
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Column(
+                showTrialLeftDate && _controller.index != 3
+                    ? Positioned(
+                        right: rs.getSize(20),
+                        bottom: rs.getSize(80),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(0),
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          onPressed: () {
+                            Get.toNamed('/premiumMain', arguments: trialLeftDate);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: rs.getSize(5), horizontal: rs.getSize(25)),
+                            decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Column(
                               children: [
-                                MyWidget().getTextWidget(rs, text: '$trialLeftDate ${trialLeftDate! > 1 ? 'days' : 'day'} Left of Trial', color: Colors.white),
-                                MyWidget().getTextWidget(rs, text: tr('explorePremium'), color: Colors.white, isBold: true, hasUnderline: true),
+                                MyWidget().getTextWidget(rs,
+                                    text: '$trialLeftDate ${trialLeftDate! > 1 ? 'days' : 'day'} Left of Trial',
+                                    color: Colors.white),
+                                MyWidget().getTextWidget(rs,
+                                    text: tr('explorePremium'), color: Colors.white, isBold: true, hasUnderline: true),
                               ],
                             ),
-                    ),
-                  ),
-                ) : const SizedBox.shrink(),
-                showTrialLeftDate && _controller.index != 3 ?
-                Positioned(
-                  right: rs.getSize(5),
-                  bottom: rs.getSize(115),
-                  child: IconButton(
-                    onPressed: (){
-                      setState(() {
-                        showTrialLeftDate = false;
-                      });
-                    },
-                    icon: Icon(Icons.remove_circle, color: Theme.of(context).focusColor, size: rs.getSize(20)),
-                  ),
-                ) : const SizedBox.shrink(),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                showTrialLeftDate && _controller.index != 3
+                    ? Positioned(
+                        right: rs.getSize(5),
+                        bottom: rs.getSize(115),
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              showTrialLeftDate = false;
+                            });
+                          },
+                          icon: Icon(Icons.remove_circle, color: Theme.of(context).focusColor, size: rs.getSize(20)),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
           ),

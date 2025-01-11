@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/database.dart';
+import 'package:podo/common/fcm_request.dart';
+import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -13,6 +18,7 @@ import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/screens/writing/writing_question.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class WritingMain extends StatefulWidget {
   WritingMain({Key? key}) : super(key: key);
@@ -21,7 +27,8 @@ class WritingMain extends StatefulWidget {
   State<WritingMain> createState() => _WritingMainState();
 }
 
-class _WritingMainState extends State<WritingMain> with SingleTickerProviderStateMixin {
+class _WritingMainState extends State<WritingMain>
+    with SingleTickerProviderStateMixin {
   String lessonId = Get.arguments;
   List<WritingQuestion> questions = [];
   final rockets = ['rocket1', 'rocket2', 'rocket3'];
@@ -40,13 +47,21 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   int? requestCount;
   late ResponsiveSize rs;
 
+  MyTutorial? myTutorial;
+  GlobalKey? keyCorrectionCount;
+  GlobalKey? keyQuestion;
+
   @override
   void initState() {
     super.initState();
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final Query questionQuery = firestore.collection('Lessons/$lessonId/WritingQuestions').orderBy('orderId');
-    final Query countQuery =
-        firestore.collection('Writings').where('userId', isEqualTo: User().id).where('status', isEqualTo: 0);
+    final Query questionQuery = firestore
+        .collection('Lessons/$lessonId/WritingQuestions')
+        .orderBy('orderId');
+    final Query countQuery = firestore
+        .collection('Writings')
+        .where('userId', isEqualTo: User().id)
+        .where('status', isEqualTo: 0);
     futures = Future.wait([
       Database().getDocs(query: questionQuery),
       countQuery.count().get(),
@@ -60,6 +75,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(animationController);
+
+    controller.isChecked = LocalStorage().prefs!.getBool(tr('iveReadTheFollowing')) ?? false;
   }
 
   @override
@@ -68,7 +85,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     super.dispose();
   }
 
-  toggleVisibility() {
+  toggleVisibility({bool askFcmApproval = false}) {
     setState(() {
       isVisible = !isVisible;
       if (isVisible) {
@@ -78,19 +95,37 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
         textEditController.text = '';
         FocusScope.of(context).unfocus();
       }
+      if (askFcmApproval) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          MyWidget().showDialog(context, rs,
+              content: tr('askFcmApproval'),
+              yesFn: () async {
+                await FcmRequest().fcmRequest('writingCorrection');
+                Get.back();
+              },
+              hasNoBtn: false,
+              yesText: tr('askFcmApprovalYes'),
+              textBtnText: tr('later'),
+              textBtnFn: () {
+                Get.back();
+              });
+        });
+      }
     });
   }
 
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        MyWidget().showDialog(context, rs, content: tr('wantRequestCorrection'), yesFn: () async {
-          await FirebaseAnalytics.instance.logEvent(name: 'correction_request', parameters: {'userId': User().id});
+        MyWidget().showDialog(context, rs, content: tr('wantRequestCorrection'),
+            yesFn: () async {
+          await FirebaseAnalytics.instance.logEvent(
+              name: 'correction_request', parameters: {'userId': User().id});
           Writing writing = Writing(selectedQuestion!);
           writing.userWriting = textEditController.text;
           Get.back();
-          toggleVisibility();
-          Database().setDoc(
+          toggleVisibility(askFcmApproval: !User().fcmPermission);
+          await Database().setDoc(
               collection: 'Writings',
               doc: writing,
               thenFn: (value) {
@@ -104,9 +139,10 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     }
   }
 
-  Widget getWritingList(int index) {
+  Widget getWritingList(int index, bool hasKey) {
     WritingQuestion question = questions[index];
     return Card(
+      key: hasKey ? keyQuestion : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -120,16 +156,22 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
             Get.dialog(
               AlertDialog(
                 title: Text(tr('requestNotAvailableTitle'),
-                    style: TextStyle(fontSize: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor)),
+                    style: TextStyle(
+                        fontSize: rs.getSize(18),
+                        color: Theme.of(context).secondaryHeaderColor)),
                 content: Text(tr('requestNotAvailableContent'),
-                    style: TextStyle(fontSize: rs.getSize(15), color: Theme.of(context).secondaryHeaderColor)),
+                    style: TextStyle(
+                        fontSize: rs.getSize(15),
+                        color: Theme.of(context).secondaryHeaderColor)),
                 actions: [
                   ElevatedButton(
                     onPressed: () {
                       Get.back();
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
-                    child: MyWidget().getTextWidget(rs, text: tr('ok'), color: Theme.of(context).cardColor),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor),
+                    child: MyWidget().getTextWidget(rs,
+                        text: tr('ok'), color: Theme.of(context).cardColor),
                   ),
                 ],
               ),
@@ -144,7 +186,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
               Transform.scale(
                 alignment: Alignment.bottomLeft,
                 scale: 0.8,
-                child: Image.asset('assets/images/${rockets[question.level]}.png'),
+                child:
+                    Image.asset('assets/images/${rockets[question.level]}.png'),
               ),
               SizedBox(height: rs.getSize(10)),
               MyWidget().getTextWidget(
@@ -169,6 +212,24 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
+
+    myTutorial = MyTutorial();
+    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_WRITING_FRAME);
+    if(isTutorialEnabled) {
+      keyCorrectionCount = GlobalKey();
+      keyQuestion = GlobalKey();
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_writing_frame_1')),
+        myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_writing_frame_2')),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyCorrectionCount, content: tr('tutorial_writing_frame_3')),
+        myTutorial!.tutorialItem(id: "T4", keyTarget: keyQuestion, content: tr('tutorial_writing_frame_4')),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: MyWidget().getAppbar(
@@ -183,9 +244,11 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                 child: Image.asset('assets/images/podo.png'),
               ),
               Padding(
-                  padding: EdgeInsets.only(right: rs.getSize(20), top: rs.getSize(10)),
-                  child: Obx(() => MyWidget().getTextWidget(rs,
-                      text: 'x ${controller.leftRequestCount}', color: Theme.of(context).primaryColor))),
+                  padding: EdgeInsets.only(
+                      right: rs.getSize(20), top: rs.getSize(10)),
+                  child: Obx(() => MyWidget().getTextWidget(key: isTutorialEnabled ? keyCorrectionCount : null, rs,
+                      text: 'x ${controller.leftRequestCount}',
+                      color: Theme.of(context).primaryColor))),
             ],
           )
         ],
@@ -209,17 +272,21 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                     future: futures,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       questions = [];
-                      if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                      if (snapshot.hasData &&
+                          snapshot.connectionState != ConnectionState.waiting) {
                         for (dynamic snapshot in snapshot.data[0]) {
-                          questions.add(WritingQuestion.fromJson(snapshot.data() as Map<String, dynamic>));
+                          questions.add(WritingQuestion.fromJson(
+                              snapshot.data() as Map<String, dynamic>));
                         }
                         WidgetsBinding.instance!.addPostFrameCallback((_) {
-                          controller.leftRequestCount.value = maxRequestCount - snapshot.data[1].count as int;
+                          controller.leftRequestCount.value =
+                              maxRequestCount - snapshot.data[1].count as int;
                         });
                         return ListView.builder(
                           itemCount: questions.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return getWritingList(index);
+                            bool hasKey = isTutorialEnabled && index == 0;
+                            return getWritingList(index, hasKey);
                           },
                         );
                       } else {
@@ -253,7 +320,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 2 / 3,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(topLeft: borderRadius, topRight: borderRadius),
+                  borderRadius: BorderRadius.only(
+                      topLeft: borderRadius, topRight: borderRadius),
                   color: Theme.of(context).cardColor,
                 ),
                 child: GetBuilder<WritingController>(
@@ -281,7 +349,9 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                           ),
                           SizedBox(height: rs.getSize(20)),
                           MyWidget().getTextWidget(rs,
-                              text: selectedQuestion != null ? selectedQuestion!.title[KO] : '',
+                              text: selectedQuestion != null
+                                  ? selectedQuestion!.title[KO]
+                                  : '',
                               isKorean: true,
                               size: 20,
                               color: Theme.of(context).secondaryHeaderColor),
@@ -290,7 +360,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               controller: textEditController,
                               maxLength: maxLength,
                               maxLines: 1,
-                              hint: tr('writeYourAnswerInKorean'), onSubmitted: (value) {
+                              hint: tr('writeYourAnswerInKorean'),
+                              onSubmitted: (value) {
                             FocusScope.of(context).unfocus();
                           }),
                           SizedBox(height: rs.getSize(30)),
@@ -310,10 +381,12 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 MyWidget().getCheckBox(rs,
-                                    value: controller.isChecked, onChanged: controller.setCheckbox),
+                                    value: controller.isChecked,
+                                    onChanged: controller.setCheckbox),
                                 MyWidget().getTextWidget(rs,
                                     text: tr('iveReadTheFollowing'),
-                                    color: Theme.of(context).secondaryHeaderColor),
+                                    color:
+                                        Theme.of(context).secondaryHeaderColor),
                               ],
                             ),
                           ),
@@ -321,7 +394,8 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
                           Expanded(
                               child: SingleChildScrollView(
                                   child: MyWidget().getTextWidget(rs,
-                                      text: tr('writingComment'), color: Theme.of(context).disabledColor))),
+                                      text: tr('writingComment'),
+                                      color: Theme.of(context).disabledColor))),
                           SizedBox(height: rs.getSize(20)),
                         ],
                       ),

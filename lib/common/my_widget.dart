@@ -15,15 +15,12 @@ class MyWidget {
     return AppBar(
       backgroundColor: Theme.of(context).cardColor,
       elevation: 0,
-      leading: Theme(
-        data: Theme.of(context).copyWith(highlightColor: MyColors.navyLight),
-        child: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
-          color: Theme.of(context).primaryColor,
-        ),
+      leading: IconButton(
+        onPressed: () {
+          Get.back();
+        },
+        icon: Icon(Icons.arrow_back_ios_rounded, size: rs.getSize(20)),
+        color: Theme.of(context).primaryColor,
       ),
       title: Padding(
         padding: EdgeInsets.symmetric(vertical: rs.getSize(10, bigger: 1.5)),
@@ -71,6 +68,7 @@ class MyWidget {
 
   Text getTextWidget(
     ResponsiveSize rs, {
+      GlobalKey? key,
     required String? text,
     double size = 15,
     Color color = Colors.black,
@@ -83,6 +81,7 @@ class MyWidget {
     int? maxLine,
   }) {
     return Text(
+      key: key,
       text ?? '',
       style: TextStyle(
         fontFamily: isKorean ? 'KoreanFont' : (Platform.isIOS ? null : 'EnglishFont'),
@@ -104,6 +103,7 @@ class MyWidget {
 
   Widget getRoundBtnWidget(
     ResponsiveSize rs, {
+      GlobalKey? key,
     required String text,
     Color bgColor = MyColors.purple,
     Color fontColor = Colors.white,
@@ -115,6 +115,7 @@ class MyWidget {
     double borderRadius = 30,
   }) {
     return ElevatedButton(
+      key: key,
       style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
@@ -208,10 +209,9 @@ class MyWidget {
   showDialog(BuildContext context, ResponsiveSize rs,
       {required String content,
       required Function yesFn,
-      bool hasTextBtn = false,
       bool hasNoBtn = true,
       bool hasPremiumTag = false,
-      String? yesText}) {
+      String? yesText, String? noText, String? textBtnText, Function? textBtnFn}) {
     Get.dialog(AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       iconPadding: const EdgeInsets.only(bottom: 20),
@@ -262,7 +262,7 @@ class MyWidget {
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
-                        child: Text(tr('no'),
+                        child: Text(noText ?? tr('no'),
                             style: TextStyle(color: Theme.of(context).primaryColor, fontSize: rs.getSize(15))),
                       ),
                     ),
@@ -290,16 +290,18 @@ class MyWidget {
             ),
           ],
         ),
-        hasTextBtn
+        textBtnText != null
             ? Center(
                 child: Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: TextButton(
                   onPressed: () {
-                    Get.toNamed(MyStrings.routePremiumMain);
+                    if(textBtnFn != null) {
+                      textBtnFn();
+                    }
                   },
                   child: MyWidget()
-                      .getTextWidget(rs, text: tr('explorePremium'), color: Theme.of(context).primaryColor),
+                      .getTextWidget(rs, text: textBtnText, color: Theme.of(context).primaryColor),
                 ),
               ))
             : const SizedBox.shrink(),
