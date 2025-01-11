@@ -11,7 +11,7 @@ class MyPageController extends GetxController {
 
 
   void loadThemeMode() {
-    if(LocalStorage().getBoolFromLocalStorage(key: IS_DARK_MODE, defaultValue: false)) {
+    if(LocalStorage().getBoolFromLocalStorage(key: IS_DARK_MODE)) {
       modeToggle = [true, false];
       themeMode.value = ThemeMode.dark;
     } else {

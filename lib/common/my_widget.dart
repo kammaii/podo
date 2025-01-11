@@ -68,6 +68,7 @@ class MyWidget {
 
   Text getTextWidget(
     ResponsiveSize rs, {
+      GlobalKey? key,
     required String? text,
     double size = 15,
     Color color = Colors.black,
@@ -80,6 +81,7 @@ class MyWidget {
     int? maxLine,
   }) {
     return Text(
+      key: key,
       text ?? '',
       style: TextStyle(
         fontFamily: isKorean ? 'KoreanFont' : (Platform.isIOS ? null : 'EnglishFont'),
@@ -101,6 +103,7 @@ class MyWidget {
 
   Widget getRoundBtnWidget(
     ResponsiveSize rs, {
+      GlobalKey? key,
     required String text,
     Color bgColor = MyColors.purple,
     Color fontColor = Colors.white,
@@ -112,6 +115,7 @@ class MyWidget {
     double borderRadius = 30,
   }) {
     return ElevatedButton(
+      key: key,
       style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),

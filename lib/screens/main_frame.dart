@@ -48,17 +48,18 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   bool showTrialLeftDate = false;
   int controllerIndex = 0;
 
-  List<TargetFocus> tutorialItems = [];
+  MyTutorial? myTutorial;
   bool isTutorialEnabled = false;
+  bool shouldRunLessonListTutorial = false; // 레슨 코스에서 튜토리얼이 진행 되고난 후 코스를 선택하면 true가 됨.
   // 튜토리얼 포커스용 키
-  late final GlobalKey topicModeKey;
-  late final GlobalKey grammarModeKey;
-  late final GlobalKey courseKey;
+  GlobalKey? keyTopicMode;
+  GlobalKey? keyGrammarMode;
+  GlobalKey? keyCourse;
 
   List<Widget> _buildScreens() {
     LessonCourse? course = LocalStorage().getLessonCourse();
     return [
-      course != null ? LessonListMain(course: course) : const SizedBox.shrink(),
+      course != null ? LessonListMain(course: course, isTutorialEnabled: shouldRunLessonListTutorial) : const SizedBox.shrink(),
       ReadingListMain(),
       WritingMyList(),
       const FlashCardMain(),
@@ -94,7 +95,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     }
   }
 
-  Widget getLessonCourseList({bool hasKey = false, required LessonCourse lessonCourse}) {
+  Widget getLessonCourseList({required bool isFirst, required LessonCourse lessonCourse}) {
     bool hasTag = lessonCourse.tag != null && lessonCourse.tag!.isNotEmpty;
     String level = '';
     if (hasTag) {
@@ -111,12 +112,15 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           ),
         ),
         Card(
-          key: hasKey ? isTutorialEnabled ? courseKey : null : null,
+          key: isFirst && isTutorialEnabled ? keyCourse : null,
           color: Theme.of(context).cardColor,
           child: InkWell(
             onTap: () {
               LocalStorage().setLessonCourse(lessonCourse, resetPosition: true);
               controller.setVisibility(false);
+              if(isTutorialEnabled) {
+                shouldRunLessonListTutorial = true;
+              }
             },
             child: Padding(
               padding: EdgeInsets.all(rs.getSize(15)),
@@ -256,18 +260,27 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
         }
       });
     }
-    isTutorialEnabled = MyTutorial().isTutorialEnabled(MyTutorial.TUTORIAL_COURSE);
-    if (isTutorialEnabled) {
-      courseKey = GlobalKey();
-      topicModeKey = GlobalKey();
-      grammarModeKey = GlobalKey();
 
-      tutorialItems.addAll({
-        MyTutorial().tutorialItem(id: "T1", content: tr('tutorial_course_1')),
-        MyTutorial().tutorialItem(id: "T2", keyTarget: topicModeKey, content: tr('tutorial_course_2')),
-        MyTutorial().tutorialItem(id: "T3", keyTarget: grammarModeKey, content: tr('tutorial_course_3')),
-        MyTutorial().tutorialItem(id: "T4", keyTarget: courseKey, content: tr('tutorial_course_4')),
-      });
+    myTutorial = MyTutorial();
+
+    // 최초 앱 설치 후에만 controller.isVisible = true 임.
+    // 기존 유저에게도 튜토리얼을 보여주고 싶으면 myTutorial을 전역 변수로 옮기고 build에서 튜토리얼을 실행해야 함.
+    isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_COURSE) && controller.isVisible;
+    if (isTutorialEnabled) {
+      keyCourse = GlobalKey();
+      keyTopicMode = GlobalKey();
+      keyGrammarMode = GlobalKey();
+
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_course_1')),
+        myTutorial!.tutorialItem(id: "T2", keyTarget: keyTopicMode, content: tr('tutorial_course_2')),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyGrammarMode, content: tr('tutorial_course_3')),
+        myTutorial!.tutorialItem(id: "T4", keyTarget: keyCourse, content: tr('tutorial_course_4')),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
     }
   }
 
@@ -283,12 +296,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
       builder: (_) {
         modeToggle[0] ? courses = controller.courses[0] : courses = controller.courses[1];
         setCourseVisibility();
-
-        if (isTutorialEnabled && controller.isVisible) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            MyTutorial().runTutorial(context, tutorialItems, MyTutorial.TUTORIAL_COURSE);
-          });
-        }
 
         return WillPopScope(
           onWillPop: () async {
@@ -390,13 +397,13 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                         color: Theme.of(context).primaryColor,
                                         children: [
                                           Text(
-                                              key: isTutorialEnabled ? topicModeKey : null,
+                                              key: isTutorialEnabled ? keyTopicMode : null,
                                               tr('topic'),
                                               style: TextStyle(fontSize: rs.getSize(15))),
                                           Padding(
                                             padding: EdgeInsets.symmetric(horizontal: rs.getSize(5)),
                                             child: Text(
-                                                key: isTutorialEnabled ? grammarModeKey : null,
+                                                key: isTutorialEnabled ? keyGrammarMode : null,
                                                 tr('grammar'),
                                                 style: TextStyle(fontSize: rs.getSize(15))),
                                           ),
@@ -412,11 +419,8 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                                   itemCount: courses.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     LessonCourse course = courses[index];
-                                    bool hasKey = false;
-                                    if (index == 0) {
-                                      hasKey = true;
-                                    }
-                                    return getLessonCourseList(hasKey: hasKey, lessonCourse: course);
+                                    bool isFirst = index == 0;
+                                    return getLessonCourseList(isFirst: isFirst, lessonCourse: course);
                                   },
                                 ),
                               ),

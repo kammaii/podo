@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -16,6 +17,7 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class LessonComplete extends StatelessWidget {
   LessonComplete({Key? key}) : super(key: key);
@@ -24,6 +26,8 @@ class LessonComplete extends StatelessWidget {
   bool isPremiumUser = false;
   bool isFreeOptions = false;
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+  MyTutorial? myTutorial;
 
   Widget getBtn(BuildContext context, String title, IconData icon, Function() fn) {
     return Row(children: [
@@ -88,6 +92,21 @@ class LessonComplete extends StatelessWidget {
         showReviewRequest();
       }
     });
+
+    myTutorial = MyTutorial();
+    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_COMPLETE);
+    if(isTutorialEnabled) {
+      List<TargetFocus> targets = [];
+      targets.add(myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_lesson_complete_1')));
+      if(User().isFreeTrialEnabled) {
+        targets.add(myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_lesson_complete_2')));
+        targets.add(myTutorial!.tutorialItem(id: "T3", content: tr('tutorial_lesson_complete_3')));
+      }
+      myTutorial!.addTargetsAndRunTutorial(context, targets); // TODO: TRIAL 모드 활성화 후 grantFreeTrial = true 추가할 것
+
+    } else {
+      myTutorial = null;
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

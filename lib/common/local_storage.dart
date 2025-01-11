@@ -35,9 +35,9 @@ class LocalStorage {
     print('LocalStorage 초기화');
   }
 
-  bool getBoolFromLocalStorage({required String key, required bool defaultValue}) {
+  bool getBoolFromLocalStorage({required String key}) {
     if(prefs != null) {
-      return prefs!.getBool(key) ?? defaultValue;
+      return prefs!.getBool(key) ?? false;
     } else {
       return false;
     }

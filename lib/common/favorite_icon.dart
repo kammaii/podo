@@ -15,12 +15,12 @@ import 'package:podo/values/my_colors.dart';
 
 class FavoriteIcon {
   Widget getFlashcardIcon(BuildContext context, ResponsiveSize rs,
-      {required dynamic controller, required String itemId, required String front, String? back, String? audio}) {
+      {Key? key, required dynamic controller, required String itemId, required String front, String? back, String? audio}) {
     if (controller.hasFlashcard[itemId] == null) {
       controller.hasFlashcard[itemId] = LocalStorage().hasFlashcard(itemId: itemId);
     }
 
-    return getIcon(context, rs, b: controller.hasFlashcard[itemId], fn: () {
+    return getIcon(key: key, context, rs, b: controller.hasFlashcard[itemId], fn: () {
       if (controller.hasFlashcard[itemId]) {
         FlashCard().removeFlashcard(itemId: itemId);
         controller.hasFlashcard[itemId] = false;
@@ -41,11 +41,11 @@ class FavoriteIcon {
   }
 
   Widget getFavoriteReadingIcon(BuildContext context, ResponsiveSize rs,
-      {required dynamic item}) {
+      {Key? key, required dynamic item}) {
     String ref = 'Users/${User().id}/Readings';
     final controller = Get.find<ReadingController>();
 
-    return getIcon(context, rs, b: controller.hasFavoriteReading.value, fn: () {
+    return getIcon(key: key, context, rs, b: controller.hasFavoriteReading.value, fn: () {
       if (controller.hasFavoriteReading.value) {
         Database().deleteDoc(collection: ref, docId: item.id);
         controller.readingTitles.removeWhere((readingTitle) => readingTitle.id == item.id);
@@ -60,8 +60,9 @@ class FavoriteIcon {
   }
 
   Widget getIcon(BuildContext context, ResponsiveSize rs,
-      {bool b = false, Function()? fn, bool isWhiteIcon = false}) {
+      {Key? key, bool b = false, Function()? fn, bool isWhiteIcon = false}) {
     return Stack(
+      key: key,
       children: [
         IconButton(
           padding: EdgeInsets.all(rs.getSize(5, bigger: 1.2)),

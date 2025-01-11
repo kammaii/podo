@@ -45,6 +45,7 @@ class User {
   bool isConvertedBasic = false;
   bool needUpdate = false;
   String? path;
+  bool isFreeTrialEnabled = true; // TODO: 무료 trial 제공 여부를 Remote config로 A/B 테스트 할 것
 
   static const String ID = 'id';
   static const String OS = 'os';

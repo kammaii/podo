@@ -18,6 +18,7 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/favorite_icon.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_Stop_icon.dart';
 import 'package:podo/common/play_audio.dart';
@@ -27,6 +28,7 @@ import 'package:podo/screens/reading/reading.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
 import 'package:podo/screens/reading/reading_title.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class ReadingFrame extends StatefulWidget {
   const ReadingFrame({Key? key}) : super(key: key);
@@ -58,6 +60,13 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   Map<String, String> audioPaths = {};
   late ResponsiveSize rs;
   Map<String, PlayStopIcon> playStopIcons = {};
+
+  MyTutorial? myTutorial;
+  GlobalKey? keySaveReading;
+  GlobalKey? keySentence;
+  GlobalKey? keyFlashcard;
+  GlobalKey? keyAudio;
+  GlobalKey? keyTranslate;
 
   @override
   void dispose() {
@@ -218,7 +227,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               isBold: true,
             ),
           ),
-          Obx(() => FavoriteIcon().getFavoriteReadingIcon(context, rs, item: readingTitle))
+          Obx(() => FavoriteIcon().getFavoriteReadingIcon(key: keySaveReading, context, rs, item: readingTitle))
         ],
       ),
       flexibleSpace: Stack(
@@ -305,6 +314,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   Widget partContentKo(int index) {
     Reading reading = readings[index];
     final contentKo = reading.content[KO];
+    bool isFirst = index == 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,13 +327,14 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
               child: MyWidget().getTextWidget(rs,
                   text: (index + 1).toString(), color: Theme.of(context).primaryColor, isBold: true),
             )),
-            Obx(() => FavoriteIcon().getFlashcardIcon(context, rs,
+            Obx(() => FavoriteIcon().getFlashcardIcon(key: isFirst ? keyFlashcard : null, context, rs,
                 controller: controller,
                 itemId: reading.id,
                 front: reading.content[KO],
                 back: reading.content[fo],
                 audio: 'ReadingAudios_${readingTitle.id}_${reading.id}')),
             GestureDetector(
+              key: isFirst ? keyAudio : null,
               onTap: () async {
                 PlayAudio().stop();
                 if (reading.isPlay) {
@@ -353,6 +364,7 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
           ],
         ),
         Container(
+          key: isFirst ? keySentence : null,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
@@ -371,11 +383,12 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
 
   Widget partContentFo(int index) {
     final contentFo = readings[index].content[fo];
+    bool isFirst = index == 0;
     return ExpansionTile(
       onExpansionChanged: (value) {
         controller.setIsExpanded(index, value);
       },
-      leading: Icon(CupertinoIcons.globe, size: rs.getSize(20)),
+      leading: Icon(key: isFirst ? keyTranslate : null, CupertinoIcons.globe, size: rs.getSize(20)),
       iconColor: Theme.of(context).primaryColor,
       collapsedIconColor: Theme.of(context).disabledColor,
       title: const Text(''),
@@ -426,6 +439,28 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
+
+    myTutorial = MyTutorial();
+    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_READING_FRAME) && isLoading == false;
+    if(isTutorialEnabled) {
+      keySaveReading = GlobalKey();
+      keySentence = GlobalKey();
+      keyFlashcard = GlobalKey();
+      keyAudio = GlobalKey();
+      keyTranslate = GlobalKey();
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", keyTarget: keySaveReading, content: tr('tutorial_reading_frame_1')),
+        myTutorial!.tutorialItem(id: "T2", keyTarget: keySentence, content: tr('tutorial_reading_frame_2')),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyFlashcard, content: tr('tutorial_reading_frame_3')),
+        myTutorial!.tutorialItem(id: "T4", keyTarget: keyAudio, content: tr('tutorial_reading_frame_4')),
+        myTutorial!.tutorialItem(id: "T5", keyTarget: keyTranslate, content: tr('tutorial_reading_frame_5')),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
+    }
+
     return Scaffold(
       body: isLoading
           ? MyWidget().getLoading(context, rs, progressValue)

@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/lesson/lesson.dart';
@@ -24,12 +25,14 @@ import 'package:podo/screens/message/podo_message_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LessonListMain extends StatefulWidget {
-  LessonListMain({Key? key, required this.course}) : super(key: key);
+  LessonListMain({Key? key, required this.course, required this.isTutorialEnabled}) : super(key: key);
 
   late LessonCourse course;
+  late bool isTutorialEnabled;
 
   @override
   _LessonListMainState createState() => _LessonListMainState();
@@ -51,6 +54,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   bool isAdmin = false;
   late ResponsiveSize rs;
   late bool isPremiumUser;
+
+  MyTutorial? myTutorial;
+  GlobalKey? keyMenu;
 
   @override
   void initState() {
@@ -284,6 +290,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
     return SliverAppBar(
       leading: IconButton(
+        key: keyMenu,
         icon: Icon(Icons.menu, size: rs.getSize(25)),
         color: Theme.of(context).primaryColor,
         onPressed: () {
@@ -358,6 +365,23 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   Widget build(BuildContext context) {
     course = widget.course;
     rs = ResponsiveSize(context);
+
+    // LessonCourse 에서 튜토리얼을 보고 넘어왔을 경우에만 widget.isTutorialEnabled = true.
+    if(widget.isTutorialEnabled) {
+      myTutorial = MyTutorial();
+      bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_LIST); // 사실 필요없는 코드지만 한번 더 체크
+      if(isTutorialEnabled) {
+        keyMenu = GlobalKey();
+        List<TargetFocus> targets = [
+          myTutorial!.tutorialItem(id: "T1", keyTarget: keyMenu, content: tr('tutorial_lesson_list_1')),
+          myTutorial!.tutorialItem(id: "T2", content: User().isFreeTrialEnabled ? tr('tutorial_lesson_list_2') : tr('tutorial_lesson_list_3')),
+        ];
+        myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+      } else {
+        myTutorial = null;
+      }
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       Map<String, bool> map = {};

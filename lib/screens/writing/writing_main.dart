@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/my_page/user.dart';
@@ -17,6 +18,7 @@ import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/screens/writing/writing_question.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class WritingMain extends StatefulWidget {
   WritingMain({Key? key}) : super(key: key);
@@ -44,6 +46,10 @@ class _WritingMainState extends State<WritingMain>
   int maxRequestCount = 3;
   int? requestCount;
   late ResponsiveSize rs;
+
+  MyTutorial? myTutorial;
+  GlobalKey? keyCorrectionCount;
+  GlobalKey? keyQuestion;
 
   @override
   void initState() {
@@ -133,9 +139,10 @@ class _WritingMainState extends State<WritingMain>
     }
   }
 
-  Widget getWritingList(int index) {
+  Widget getWritingList(int index, bool hasKey) {
     WritingQuestion question = questions[index];
     return Card(
+      key: hasKey ? keyQuestion : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -205,6 +212,24 @@ class _WritingMainState extends State<WritingMain>
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
+
+    myTutorial = MyTutorial();
+    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_WRITING_FRAME);
+    if(isTutorialEnabled) {
+      keyCorrectionCount = GlobalKey();
+      keyQuestion = GlobalKey();
+      List<TargetFocus> targets = [
+        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_writing_frame_1')),
+        myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_writing_frame_2')),
+        myTutorial!.tutorialItem(id: "T3", keyTarget: keyCorrectionCount, content: tr('tutorial_writing_frame_3')),
+        myTutorial!.tutorialItem(id: "T4", keyTarget: keyQuestion, content: tr('tutorial_writing_frame_4')),
+      ];
+      myTutorial!.addTargetsAndRunTutorial(context, targets);
+
+    } else {
+      myTutorial = null;
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: MyWidget().getAppbar(
@@ -221,7 +246,7 @@ class _WritingMainState extends State<WritingMain>
               Padding(
                   padding: EdgeInsets.only(
                       right: rs.getSize(20), top: rs.getSize(10)),
-                  child: Obx(() => MyWidget().getTextWidget(rs,
+                  child: Obx(() => MyWidget().getTextWidget(key: isTutorialEnabled ? keyCorrectionCount : null, rs,
                       text: 'x ${controller.leftRequestCount}',
                       color: Theme.of(context).primaryColor))),
             ],
@@ -260,7 +285,8 @@ class _WritingMainState extends State<WritingMain>
                         return ListView.builder(
                           itemCount: questions.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return getWritingList(index);
+                            bool hasKey = isTutorialEnabled && index == 0;
+                            return getWritingList(index, hasKey);
                           },
                         );
                       } else {
