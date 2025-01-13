@@ -211,7 +211,7 @@ class MyWidget {
       required Function yesFn,
       bool hasNoBtn = true,
       bool hasPremiumTag = false,
-      String? yesText, String? noText, String? textBtnText, Function? textBtnFn}) {
+      String? yesText, String? noText, String? textBtnText, Function? textBtnFn, bool barrierDismissible = true}) {
     Get.dialog(AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       iconPadding: const EdgeInsets.only(bottom: 20),
@@ -306,7 +306,7 @@ class MyWidget {
               ))
             : const SizedBox.shrink(),
       ],
-    ));
+    ), barrierDismissible: barrierDismissible);
   }
 
   showSimpleDialog(String title, String content) {

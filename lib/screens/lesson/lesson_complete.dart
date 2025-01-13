@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:podo/common/history.dart';
 import 'package:podo/common/local_storage.dart';
-import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -17,7 +16,6 @@ import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class LessonComplete extends StatelessWidget {
   LessonComplete({Key? key}) : super(key: key);
@@ -26,8 +24,6 @@ class LessonComplete extends StatelessWidget {
   bool isPremiumUser = false;
   bool isFreeOptions = false;
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-
-  MyTutorial? myTutorial;
 
   Widget getBtn(BuildContext context, String title, IconData icon, Function() fn) {
     return Row(children: [
@@ -48,8 +44,7 @@ class LessonComplete extends StatelessWidget {
               SizedBox(width: rs.getSize(30)),
               Expanded(
                 child: Center(
-                  child:
-                      MyWidget().getTextWidget(rs, text: title, size: 20, color: Theme.of(context).primaryColor),
+                  child: MyWidget().getTextWidget(rs, text: title, size: 20, color: Theme.of(context).primaryColor),
                 ),
               ),
             ],
@@ -79,10 +74,10 @@ class LessonComplete extends StatelessWidget {
     controller.play();
     final lesson = Get.arguments;
     final lessonController = Get.find<LessonController>();
-    if(User().status == 2 || User().status == 3) {
+    if (User().status == 2 || User().status == 3) {
       isPremiumUser = true;
     }
-    if(lesson.isFreeOptions != null && lesson.isFreeOptions) {
+    if (lesson.isFreeOptions != null && lesson.isFreeOptions) {
       isFreeOptions = true;
     }
     History().addHistory(itemIndex: 0, itemId: lesson.id, content: lesson.title['ko']);
@@ -91,22 +86,30 @@ class LessonComplete extends StatelessWidget {
       if (LocalStorage().histories.isNotEmpty && LocalStorage().histories.length % 7 == 0) {
         showReviewRequest();
       }
-    });
 
-    myTutorial = MyTutorial();
-    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_COMPLETE);
-    if(isTutorialEnabled) {
-      List<TargetFocus> targets = [];
-      targets.add(myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_lesson_complete_1')));
-      if(User().isFreeTrialEnabled) {
-        targets.add(myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_lesson_complete_2')));
-        targets.add(myTutorial!.tutorialItem(id: "T3", content: tr('tutorial_lesson_complete_3')));
+      // trial mode 설정 여부 확인
+      bool trialEnabled = User().isFreeTrialEnabled == true && User().trialStart == null;
+      if (trialEnabled) {
+        MyWidget().showDialog(context, rs,
+            content: tr('tutorial_lesson_complete_1'),
+            hasNoBtn: false,
+            yesText: tr('tutorial_lesson_complete_2'), barrierDismissible: false, yesFn: () {
+          MyWidget().showDialog(context, rs,
+              content: tr('tutorial_lesson_complete_3'),
+              hasNoBtn: false,
+              yesText: tr('tutorial_lesson_complete_4'), barrierDismissible: false, yesFn: () {
+            MyWidget().showDialog(context, rs,
+                content: tr('tutorial_lesson_complete_5'),
+                hasNoBtn: false,
+                yesText: tr('tutorial_lesson_complete_6'), barrierDismissible: false, yesFn: () async {
+              await User().setTrialAuthorized();
+              MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
+              Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+            });
+          });
+        });
       }
-      myTutorial!.addTargetsAndRunTutorial(context, targets); // TODO: TRIAL 모드 활성화 후 grantFreeTrial = true 추가할 것
-
-    } else {
-      myTutorial = null;
-    }
+    });
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -130,7 +133,7 @@ class LessonComplete extends StatelessWidget {
             confettiController: controller,
             blastDirectionality: BlastDirectionality.explosive,
             shouldLoop: true,
-            gravity: 0.05,
+            gravity: 0.1,
             colors: const [
               MyColors.pink,
               MyColors.mustardLight,
@@ -142,7 +145,8 @@ class LessonComplete extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(height: rs.getSize(20)),
-              MyWidget().getTextWidget(rs, text: tr('congratulations'), size: 30, isBold: true, color: Theme.of(context).primaryColor),
+              MyWidget().getTextWidget(rs,
+                  text: tr('congratulations'), size: 30, isBold: true, color: Theme.of(context).primaryColor),
               Divider(
                 thickness: rs.getSize(1),
                 indent: rs.getSize(30),
@@ -181,18 +185,20 @@ class LessonComplete extends StatelessWidget {
                                   }
                                 }),
                                 SizedBox(height: rs.getSize(20)),
-                                lesson.isReadingReleased ?
-                                getBtn(context, tr('reading'), CupertinoIcons.book, () {
-                                  if (isPremiumUser || isFreeOptions) {
-                                    Get.offNamedUntil(MyStrings.routeReadingFrame,
-                                        ModalRoute.withName(MyStrings.routeLessonSummaryMain),
-                                        arguments: lesson.readingId);
-                                  } else {
-                                    MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
-                                      Get.toNamed(MyStrings.routePremiumMain);
-                                    }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
-                                  }
-                                }) : const SizedBox.shrink(),
+                                lesson.isReadingReleased
+                                    ? getBtn(context, tr('reading'), CupertinoIcons.book, () {
+                                        if (isPremiumUser || isFreeOptions) {
+                                          Get.offNamedUntil(MyStrings.routeReadingFrame,
+                                              ModalRoute.withName(MyStrings.routeLessonSummaryMain),
+                                              arguments: lesson.readingId);
+                                        } else {
+                                          MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'),
+                                              yesFn: () {
+                                            Get.toNamed(MyStrings.routePremiumMain);
+                                          }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+                                        }
+                                      })
+                                    : const SizedBox.shrink(),
                                 //todo: speaking, reading 버튼 추가
                                 Divider(
                                   thickness: rs.getSize(1),
@@ -224,15 +230,14 @@ class LessonComplete extends StatelessWidget {
                                   if (lessons[nextIndex] is String) {
                                     nextIndex++;
                                   }
-                                  Lesson nextLesson =
-                                      Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>);
+                                  Lesson nextLesson = Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>);
                                   if (nextLesson.hasOptions) {
-                                    Get.offNamedUntil(MyStrings.routeLessonSummaryMain,
-                                        ModalRoute.withName(MyStrings.routeMainFrame),
+                                    Get.offNamedUntil(
+                                        MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
                                         arguments: nextLesson);
                                   } else {
-                                    Get.offNamedUntil(MyStrings.routeLessonFrame,
-                                        ModalRoute.withName(MyStrings.routeMainFrame),
+                                    Get.offNamedUntil(
+                                        MyStrings.routeLessonFrame, ModalRoute.withName(MyStrings.routeMainFrame),
                                         arguments: nextLesson);
                                   }
                                 } else {

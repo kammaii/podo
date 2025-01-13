@@ -643,13 +643,13 @@ class _MyPageState extends State<MyPage> {
 
                                                           case 'google.com':
                                                             userCredential =
-                                                                await Credentials().getGoogleCredential(isSignUp: false);
+                                                                await Credentials().getGoogleCredential();
                                                             removeUserAccount(userCredential);
                                                             break;
 
                                                           case 'apple.com':
                                                             userCredential =
-                                                                await Credentials().getAppleCredential(isSignUp: false);
+                                                                await Credentials().getAppleCredential();
                                                             removeUserAccount(userCredential);
                                                             break;
                                                         }

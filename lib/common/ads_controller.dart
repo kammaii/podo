@@ -67,6 +67,7 @@ class AdsController extends GetxController {
   }
 
   void showRewardAd() {
+    //TODO: 보상형 광고가 null일 경우 광고 없이 레슨이 시작하는 문제에 대해 고민할 것
     if (rewardedInterstitialAd != null) {
       rewardedInterstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
           onAdShowedFullScreenContent: (RewardedInterstitialAd ad) {
