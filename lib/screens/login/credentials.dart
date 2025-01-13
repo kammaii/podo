@@ -8,8 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class Credentials {
   final _auth = FirebaseAuth.instance;
-
-  Future<UserCredential?> getGoogleCredential({bool isSignUp = true}) async {
+  Future<UserCredential?> getGoogleCredential() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -18,8 +17,8 @@ class Credentials {
         idToken: googleAuth?.idToken,
       );
       UserCredential userCredential =  await _auth.signInWithCredential(credential);
-      String userId = auth.FirebaseAuth.instance.currentUser!.uid;
-      if(isSignUp) {
+      if(userCredential.additionalUserInfo!.isNewUser) {
+        String userId = auth.FirebaseAuth.instance.currentUser!.uid;
         await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'google', parameters: {'userId': userId});
       }
       return userCredential;
@@ -36,7 +35,7 @@ class Credentials {
     return digest.toString();
   }
 
-  Future<UserCredential> getAppleCredential({bool isSignUp = true}) async {
+  Future<UserCredential> getAppleCredential() async {
     // To prevent replay attacks with the credential returned from Apple, we
     // include a nonce in the credential request. When signing in with
     // Firebase, the nonce in the id token returned by Apple, is expected to
@@ -61,10 +60,11 @@ class Credentials {
     final oauthCredential = OAuthProvider("apple.com").credential(
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
+      accessToken: appleCredential.authorizationCode,
     );
     UserCredential userCredential = await _auth.signInWithCredential(oauthCredential);
-    String userId = auth.FirebaseAuth.instance.currentUser!.uid;
-    if(isSignUp) {
+    if(userCredential.additionalUserInfo!.isNewUser) {
+      String userId = auth.FirebaseAuth.instance.currentUser!.uid;
       await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'apple', parameters: {'userId': userId});
     }
     return userCredential;

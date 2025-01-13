@@ -75,7 +75,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
     myTutorial = MyTutorial();
     bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_FLASHCARD_MAIN) && controller.cards.isNotEmpty;
     if(isTutorialEnabled) {
-      keyCard = GlobalKey();
+      keyCard = keyCard ?? GlobalKey();
       keyReview = GlobalKey();
       List<TargetFocus> targets = [
         myTutorial!.tutorialItem(id: "T1", keyTarget: keyCard, content: tr('tutorial_flashcard_frame_1')),
@@ -276,6 +276,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
     searchText.isEmpty ? card = controller.cards[index] : card = cardsSearch[index];
     String front = card.front;
     String back = card.back;
+    bool hasKey = index == 0;
 
     return Row(
       children: [
@@ -293,7 +294,7 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
             child: Row(
               children: [
                 Expanded(
-                    child: Text(key: keyCard, front,
+                    child: Text(key: hasKey ? keyCard : null, front,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2), color: Theme.of(context).secondaryHeaderColor))),

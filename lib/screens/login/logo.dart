@@ -12,6 +12,7 @@ import 'package:package_info/package_info.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/local_storage.dart';
+import 'package:podo/common/my_remote_config.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/common/responsive_size.dart';
@@ -45,7 +46,7 @@ class _LogoState extends State<Logo> {
     Future<void> getInitData() async {
       if (initCalled) return;
       initCalled = true;
-
+      MyRemoteConfig();
       await user.User().getUser();
       await LocalStorage().getPrefs();
       final myPageController = Get.find<MyPageController>();

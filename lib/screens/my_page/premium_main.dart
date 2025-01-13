@@ -47,68 +47,69 @@ class _PremiumMainState extends State<PremiumMain> {
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
-    await analytics.logViewItem(parameters: {'item': 'Premium'});
+    analytics.logViewItem(parameters: {'item': 'Premium'});
     if (trialLeftDate != null) {
-      if (trialLeftDate! > 5) {
+      if (trialLeftDate! > 3) {
         msgForTrial = tr('msgForTrial1');
-      } else if (trialLeftDate! <= 5) {
+      } else if (trialLeftDate! <= 3) {
         msgForTrial = tr('msgForTrial2');
       }
     }
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (User().showPremiumDialog) {
-        Get.dialog(
-            AlertDialog(
-              title:
-                  Center(child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  MyWidget().getTextWidget(rs,
-                      text: tr('premiumDialog1'), color: Theme.of(context).primaryColor, isBold: true, size: 18),
-                  SizedBox(height: rs.getSize(10)),
-                  MyWidget().getTextWidget(rs,
-                      text: tr('premiumDialog2'),
-                      isTextAlignCenter: true,
-                      color: Theme.of(context).secondaryHeaderColor),
-                  SizedBox(height: rs.getSize(10)),
-                  MyWidget().getTextWidget(rs,
-                      text: tr('premiumDialog3'),
-                      isTextAlignCenter: true,
-                      color: Theme.of(context).primaryColor,
-                      size: 13),
-                ],
-              ),
-              backgroundColor: Theme.of(context).cardColor,
-              actionsAlignment: MainAxisAlignment.center,
-              actionsPadding: EdgeInsets.only(
-                  left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
-              actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
-                      backgroundColor: Theme.of(context).canvasColor),
-                  onPressed: () {
-                    User().showPremiumDialog = false;
-                    Get.back();
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: rs.getSize(13), horizontal: rs.getSize(20)),
-                    child: Text(tr('premiumDialog4'),
-                        style: TextStyle(color: Theme.of(context).cardColor, fontSize: rs.getSize(15))),
-                  ),
-                ),
-              ],
-            ),
-            barrierDismissible: false);
-      }
-    });
+    // 구독하지 마세요 Dialog
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   if (trialLeftDate == null && User().showPremiumDialog) {
+    //     Get.dialog(
+    //         AlertDialog(
+    //           title:
+    //               Center(child: Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
+    //           content: Column(
+    //             mainAxisSize: MainAxisSize.min,
+    //             crossAxisAlignment: CrossAxisAlignment.center,
+    //             children: [
+    //               MyWidget().getTextWidget(rs,
+    //                   text: tr('premiumDialog1'), color: Theme.of(context).primaryColor, isBold: true, size: 18),
+    //               SizedBox(height: rs.getSize(10)),
+    //               MyWidget().getTextWidget(rs,
+    //                   text: tr('premiumDialog2'),
+    //                   isTextAlignCenter: true,
+    //                   color: Theme.of(context).secondaryHeaderColor),
+    //               SizedBox(height: rs.getSize(10)),
+    //               MyWidget().getTextWidget(rs,
+    //                   text: tr('premiumDialog3'),
+    //                   isTextAlignCenter: true,
+    //                   color: Theme.of(context).primaryColor,
+    //                   size: 13),
+    //             ],
+    //           ),
+    //           backgroundColor: Theme.of(context).cardColor,
+    //           actionsAlignment: MainAxisAlignment.center,
+    //           actionsPadding: EdgeInsets.only(
+    //               left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+    //           actions: [
+    //             ElevatedButton(
+    //               style: ElevatedButton.styleFrom(
+    //                   shape: RoundedRectangleBorder(
+    //                     borderRadius: BorderRadius.circular(30),
+    //                   ),
+    //                   side: BorderSide(color: Theme.of(context).canvasColor, width: 1),
+    //                   backgroundColor: Theme.of(context).canvasColor),
+    //               onPressed: () {
+    //                 User().showPremiumDialog = false;
+    //                 Get.back();
+    //               },
+    //               child: Padding(
+    //                 padding: EdgeInsets.symmetric(vertical: rs.getSize(13), horizontal: rs.getSize(20)),
+    //                 child: Text(tr('premiumDialog4'),
+    //                     style: TextStyle(color: Theme.of(context).cardColor, fontSize: rs.getSize(15))),
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //         barrierDismissible: false);
+    //   }
+    // });
   }
 
   Stream<String>? getTimeLeftStream() {
@@ -252,7 +253,7 @@ class _PremiumMainState extends State<PremiumMain> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(vertical: 5),
-                          color: trialLeftDate! > 5 ? MyColors.purple : MyColors.red,
+                          color: trialLeftDate! > 3 ? MyColors.purple : MyColors.red,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -606,6 +607,10 @@ class _PremiumMainState extends State<PremiumMain> {
                                       //     const Icon(Icons.check_circle_outline, color: MyColors.green)),
                                       getDataRow(
                                           tr('adFree'),
+                                          const Icon(Icons.remove_circle_outline, color: MyColors.red),
+                                          const Icon(Icons.check_circle_outline, color: MyColors.green)),
+                                      getDataRow(
+                                          tr('workbookDownload'),
                                           const Icon(Icons.remove_circle_outline, color: MyColors.red),
                                           const Icon(Icons.check_circle_outline, color: MyColors.green))
                                     ],
