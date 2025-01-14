@@ -66,13 +66,15 @@ class Login extends StatelessWidget {
           onSignup: (data) async {
             try {
               String email = data.name.toString();
-              await _auth.createUserWithEmailAndPassword(email: email, password: data.password.toString());
+              UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: data.password.toString());
               print('USER CREATED');
 
               final user = _auth.currentUser;
               if (user != null && !user.emailVerified) {
                 print('USER: $user');
-                await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'email', parameters: {'userId': user.uid});
+                if(userCredential.additionalUserInfo!.isNewUser) {
+                  await FirebaseAnalytics.instance.logSignUp(signUpMethod: 'email', parameters: {'userId': user.uid});
+                }
                 await _sendEmailVerificationLink(user.email!);
                 Get.dialog(Stack(
                   children: [

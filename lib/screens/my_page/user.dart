@@ -5,16 +5,17 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/languages.dart';
+import 'package:podo/common/my_remote_config.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,7 +47,7 @@ class User {
   bool isConvertedBasic = false;
   bool needUpdate = false;
   String? path;
-  bool isFreeTrialEnabled = true; // TODO: 무료 trial 제공 여부를 Remote config로 A/B 테스트 할 것
+  bool? isFreeTrialEnabled;
 
   static const String ID = 'id';
   static const String OS = 'os';
@@ -73,6 +74,7 @@ class User {
   static const String PREMIUM_EXPIRED_USERS = 'premiumExpiredUsers';
   static const String TRIAL_USERS = 'trialUsers';
   static const String PATH = 'path';
+  static const String IS_FREE_TRIAL_ENABLED = 'isFreeTrialEnabled';
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -99,6 +101,10 @@ class User {
     if (path != null) {
       map[PATH] = path;
     }
+    if(isFreeTrialEnabled != null) {
+      map[IS_FREE_TRIAL_ENABLED] = isFreeTrialEnabled;
+    }
+
     return map;
   }
 
@@ -150,6 +156,7 @@ class User {
       if (status == 3 && DateTime.now().isAfter(trialEnd!)) {
         messaging.unsubscribeFromTopic(TRIAL_USERS);
         status = 1;
+        isConvertedBasic = true;
       }
       await initRevenueCat();
 
@@ -210,18 +217,15 @@ class User {
         }
       }
 
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-
-      print('SETTINGS: ${settings.authorizationStatus}');
-      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-        NotificationSettings notisetting = await messaging.requestPermission();
-        print('NOTI: $notisetting');
-        await Permission.notification.request();
+      if(json[IS_FREE_TRIAL_ENABLED] != null) {
+        isFreeTrialEnabled = json[IS_FREE_TRIAL_ENABLED];
       }
 
       final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       await analytics.setUserId(id: id);
       await analytics.setUserProperty(name: 'status', value: status.toString());
+
+
     } else {
       print('신규유저입니다. DB를 생성합니다.');
       await makeNewUserOnDB();
@@ -262,10 +266,26 @@ class User {
       path = p;
     }
     fcmPermission = false;
+    isFreeTrialEnabled = MyRemoteConfig().getConfigBool(MyRemoteConfig.IS_FREE_TRIAL_ENABLED);
+
     await Database().setDoc(collection: 'Users', doc: this);
     await FcmRequest().fcmRequest('signUp');
 
     Get.put(AdsController());
     await initRevenueCat();
+  }
+
+  Future<void> setTrialAuthorized() async {
+    FirebaseMessaging.instance.subscribeToTopic(TRIAL_USERS);
+    status = 3;
+    DateTime now = DateTime.now();
+    trialStart = now;
+    trialEnd = now.add(const Duration(days: 7));
+    Map<String, dynamic> map = {
+      STATUS: status,
+      TRIAL_START: trialStart,
+      TRIAL_END: trialEnd,
+    };
+    await Database().updateFields(collection: 'Users', docId: id, fields: map);
   }
 }

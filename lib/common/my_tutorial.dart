@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:podo/common/local_storage.dart' as ls;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -59,7 +60,7 @@ class MyTutorial {
     );
   }
 
-  addTargetsAndRunTutorial(BuildContext context, List<TargetFocus> tf, {bool grantFreeTrial = false}) {
+  addTargetsAndRunTutorial(BuildContext context, List<TargetFocus> tf) {
     _targets = [];
     _targets.addAll(tf);
 
@@ -68,12 +69,14 @@ class MyTutorial {
         targets: _targets,
         colorShadow: Colors.transparent,
         onSkip: () {
-          setTutorialDisabled(grantFreeTrial);
+          setTutorialDisabled();
+          FirebaseAnalytics.instance.logEvent(name: 'tutorial_skip', parameters: {'tutorial_key': _tutorialKey});
           print("skip");
           return true;
         },
         onFinish: () {
-          setTutorialDisabled(grantFreeTrial);
+          setTutorialDisabled();
+          FirebaseAnalytics.instance.logEvent(name: 'tutorial_finish', parameters: {'tutorial_key': _tutorialKey});
           print("finish");
         },
       ).show(context: context);
@@ -83,15 +86,11 @@ class MyTutorial {
 
   bool isTutorialEnabled(String tutorialKey) {
     _tutorialKey = tutorialKey;
-    return false; // 튜토리얼 임시 비활성화
-    //return !ls.LocalStorage().getBoolFromLocalStorage(key: tutorialKey); // 튜토리얼을 본 적이 없거나 앱을 재설치 했을 때 true 반환
+    //return true; // 튜토리얼 임시 활성화
+    return !ls.LocalStorage().getBoolFromLocalStorage(key: tutorialKey); // 튜토리얼을 본 적이 없거나 앱을 재설치 했을 때 true 반환
   }
 
-  setTutorialDisabled(bool grantFreeTrial) {
+  setTutorialDisabled() {
     ls.LocalStorage().setBoolToLocalStorage(key: _tutorialKey, value: true);
-    if(grantFreeTrial) {
-      //TODO: Trial mode 설정
-      //TODO: 선물상자 이미지 출력
-    }
   }
 }
