@@ -69,14 +69,12 @@ class MyTutorial {
         targets: _targets,
         colorShadow: Colors.transparent,
         onSkip: () {
-          setTutorialDisabled();
-          FirebaseAnalytics.instance.logEvent(name: 'tutorial_skip', parameters: {'tutorial_key': _tutorialKey});
+          setTutorialDisabled('skip');
           print("skip");
           return true;
         },
         onFinish: () {
-          setTutorialDisabled();
-          FirebaseAnalytics.instance.logEvent(name: 'tutorial_finish', parameters: {'tutorial_key': _tutorialKey});
+          setTutorialDisabled('finish');
           print("finish");
         },
       ).show(context: context);
@@ -86,11 +84,11 @@ class MyTutorial {
 
   bool isTutorialEnabled(String tutorialKey) {
     _tutorialKey = tutorialKey;
-    //return true; // 튜토리얼 임시 활성화
     return !ls.LocalStorage().getBoolFromLocalStorage(key: tutorialKey); // 튜토리얼을 본 적이 없거나 앱을 재설치 했을 때 true 반환
   }
 
-  setTutorialDisabled() {
+  setTutorialDisabled(String status) async {
+    await FirebaseAnalytics.instance.logEvent(name: 'tutorial_end', parameters: {'tutorial_key': _tutorialKey, 'status': status});
     ls.LocalStorage().setBoolToLocalStorage(key: _tutorialKey, value: true);
   }
 }
