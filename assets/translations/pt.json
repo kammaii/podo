@@ -83,6 +83,7 @@
   "lessonComplete": "Lição completa!",
   "myPage": "Minha página",
   "getPremium": "Adquira o Podo Premium",
+  "getPremiumForFree": "Obtenha Premium de graça!",
   "home": "Página inicial",
   "editName": "Editar nome",
   "premiumDetail": "A assinatura Premium é renovada automaticamente e faturada através do método de pagamento registrado em sua conta da loja de aplicativos. O preço está sujeito a alterações sem aviso prévio. A assinatura será automaticamente renovada pelo preço existente, mesmo se o valor tiver sido aumentado, a menos que seja cancelada pelo menos 24 horas antes do final do período de assinatura atual. Se o preço tiver diminuído, a assinatura será renovada pelo preço reduzido. As assinaturas são geridas pelo usuário e você pode ir às configurações da sua conta para cancelar a renovação automática a qualquer momento. Se você cancelar sua assinatura e se inscrever novamente, será cobrado o preço atualizado. Para qualquer problema relacionado a compras, entre em contato conosco em akorean.help@gmail.com. Para mais detalhes, consulte nossos ",
@@ -222,8 +223,7 @@
   "tutorial_course_3": "Se você for um aprendiz intermediário, pode escolher o modo Gramática para aprender expressões específicas.",
   "tutorial_course_4": "Agora, escolha seu curso desejado e comece a aprender coreano!",
   "tutorial_lesson_list_1": "Você pode alterar o curso da lição pressionando este botão.",
-  "tutorial_lesson_list_2": "Agora conclua sua primeira lição!\nUm presente surpresa está esperando por você! :)",
-  "tutorial_lesson_list_3": "Agora conclua sua primeira lição!",
+  "tutorial_lesson_list_2": "Agora conclua sua primeira lição!",
   "tutorial_lesson_summary_1": "Você pode revisar o resumo antes de iniciar a lição.",
   "tutorial_lesson_summary_2": "Dependendo da lição, ela pode incluir prática de escrita e leitura.",
   "tutorial_lesson_summary_3": "Pressione este botão para iniciar a lição!",
@@ -244,5 +244,9 @@
   "tutorial_writing_frame_4": "Por favor, selecione uma pergunta.",
   "tutorial_flashcard_frame_1": "Você pode editar um flashcard clicando nele.",
   "tutorial_flashcard_frame_2": "Se você pressionar e segurar um flashcard, uma opção de exclusão aparecerá.",
-  "tutorial_flashcard_frame_3": "Revise diariamente os flashcards que você coletou!"
+  "tutorial_flashcard_frame_3": "Revise diariamente os flashcards que você coletou!",
+  "free_premium_title": "Parabéns!\nVocê ganhou Premium grátis!",
+  "free_premium_content": "Conclua sua primeira lição para desbloquear 7 dias de Premium grátis!\n\nNão perca esta oportunidade especial!",
+  "free_premium_button": "Comece a primeira lição!",
+  "free_premium_limit": "Esta recompensa está disponível por tempo limitado."
 }

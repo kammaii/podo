@@ -221,15 +221,19 @@ class User {
         isFreeTrialEnabled = json[IS_FREE_TRIAL_ENABLED];
       }
 
-      final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-      await analytics.setUserId(id: id);
-      await analytics.setUserProperty(name: 'status', value: status.toString());
+      setAnalyticsUserProp();
 
 
     } else {
       print('신규유저입니다. DB를 생성합니다.');
       await makeNewUserOnDB();
     }
+  }
+
+  Future<void> setAnalyticsUserProp() async {
+    final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    await analytics.setUserId(id: id);
+    await analytics.setUserProperty(name: 'status', value: status.toString());
   }
 
   Future<void> initRevenueCat() async {
@@ -267,6 +271,7 @@ class User {
     }
     fcmPermission = false;
     isFreeTrialEnabled = MyRemoteConfig().getConfigBool(MyRemoteConfig.IS_FREE_TRIAL_ENABLED);
+    setAnalyticsUserProp();
 
     await Database().setDoc(collection: 'Users', doc: this);
     await FcmRequest().fcmRequest('signUp');

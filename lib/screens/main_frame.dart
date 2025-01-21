@@ -448,7 +448,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: rs.getSize(5), horizontal: rs.getSize(25)),
                             decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                                color: MyColors.purple,
                                 borderRadius: BorderRadius.circular(30)),
                             child: Column(
                               children: [

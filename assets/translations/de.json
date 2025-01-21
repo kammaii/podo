@@ -83,6 +83,7 @@
   "lessonComplete": "Lektion abgeschlossen!",
   "myPage": "Meine Seite",
   "getPremium": "Hole dir Podo Premium",
+  "getPremiumForFree": "Erhalte Premium kostenlos!",
   "home": "Startseite",
   "editName": "Namen bearbeiten",
   "premiumDetail": "Das Premium-Abo wird automatisch verlängert und über die im App-Store-Account registrierte Zahlungsmethode abgerechnet. Der Preis kann ohne vorherige Ankündigung geändert werden. Das Abonnement wird zum bestehenden Preis automatisch verlängert, selbst wenn der Betrag erhöht wurde, es sei denn, es wird mindestens 24 Stunden vor dem Ende des aktuellen Abonnementzeitraums gekündigt. Wenn der Preis gesenkt wurde, wird das Abonnement zum reduzierten Preis verlängert. Abonnements können vom Benutzer verwaltet werden, und Sie können in Ihren Kontoeinstellungen jederzeit die automatische Verlängerung abbrechen. Wenn Sie Ihr Abonnement kündigen und dann erneut abonnieren, wird Ihnen der aktualisierte Preis in Rechnung gestellt. Bei Kaufproblemen kontaktieren Sie uns bitte unter akorean.help@gmail.com. Weitere Informationen finden Sie in unseren ",
@@ -222,8 +223,7 @@
   "tutorial_course_3": "Wenn du ein fortgeschrittener Lerner bist, kannst du den Grammatikmodus wählen, um spezifische Ausdrücke zu lernen.",
   "tutorial_course_4": "Wähle jetzt deinen gewünschten Kurs und beginne, Koreanisch zu lernen!",
   "tutorial_lesson_list_1": "Du kannst den Kurs der Lektion ändern, indem du auf diese Schaltfläche drückst.",
-  "tutorial_lesson_list_2": "Beende jetzt deine erste Lektion!\nEin Überraschungsgeschenk wartet auf dich! :)",
-  "tutorial_lesson_list_3": "Beende jetzt deine erste Lektion!",
+  "tutorial_lesson_list_2": "Beende jetzt deine erste Lektion!",
   "tutorial_lesson_summary_1": "Du kannst die Zusammenfassung vor Beginn der Lektion überprüfen.",
   "tutorial_lesson_summary_2": "Je nach Lektion kann sie Schreib- und Leseübungen enthalten.",
   "tutorial_lesson_summary_3": "Drücke diese Schaltfläche, um die Lektion zu starten!",
@@ -244,5 +244,9 @@
   "tutorial_writing_frame_4": "Bitte wähle eine Frage aus.",
   "tutorial_flashcard_frame_1": "Du kannst eine Karteikarte bearbeiten, indem du darauf klickst.",
   "tutorial_flashcard_frame_2": "Wenn du eine Karteikarte gedrückt hältst, erscheint eine Löschoption.",
-  "tutorial_flashcard_frame_3": "Überprüfe täglich die gesammelten Karteikarten!"
+  "tutorial_flashcard_frame_3": "Überprüfe täglich die gesammelten Karteikarten!",
+  "free_premium_title": "Herzlichen Glückwunsch!\nSie haben kostenloses Premium gewonnen!",
+  "free_premium_content": "Beenden Sie Ihre erste Lektion, um 7 Tage Premium kostenlos freizuschalten!\n\nVerpassen Sie nicht diese besondere Gelegenheit!",
+  "free_premium_button": "Beginnen Sie die erste Lektion!",
+  "free_premium_limit": "Diese Belohnung ist nur für eine begrenzte Zeit verfügbar."
 }

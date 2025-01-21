@@ -372,10 +372,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_LIST); // 사실 필요없는 코드지만 한번 더 체크
       if(isTutorialEnabled) {
         keyMenu = GlobalKey();
-        bool trialEnabled = User().isFreeTrialEnabled == true;
         List<TargetFocus> targets = [
           myTutorial!.tutorialItem(id: "T1", keyTarget: keyMenu, content: tr('tutorial_lesson_list_1')),
-          myTutorial!.tutorialItem(id: "T2", content: trialEnabled ? tr('tutorial_lesson_list_2') : tr('tutorial_lesson_list_3')),
+          myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_lesson_list_2')),
         ];
         myTutorial!.addTargetsAndRunTutorial(context, targets);
 

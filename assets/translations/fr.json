@@ -83,6 +83,7 @@
   "lessonComplete": "Leçon terminée !",
   "myPage": "Ma page",
   "getPremium": "Obtenez Podo Premium",
+  "getPremiumForFree": "Obtenez Premium gratuitement !",
   "home": "Accueil",
   "editName": "Modifier le nom",
   "premiumDetail": "Le Premium est automatiquement renouvelé et facturé via le moyen de paiement enregistré sur votre compte de l'App Store. Le prix peut changer sans préavis. L'abonnement sera automatiquement renouvelé au prix existant même si le montant a augmenté, à moins d'être annulé au moins 24 heures avant la fin de la période d'abonnement en cours. Si le montant a diminué, il sera renouvelé au prix réduit. Les abonnements sont gérés par l'utilisateur, et vous pouvez aller dans les paramètres de votre compte pour annuler le renouvellement automatique à tout moment. Si vous annulez puis vous réabonnez, vous serez facturé au prix mis à jour. Pour toute question liée à l'achat, contactez-nous à akorean.help@gmail.com. Pour plus de détails, veuillez consulter nos ",
@@ -222,8 +223,7 @@
   "tutorial_course_3": "Si vous êtes un apprenant intermédiaire, vous pouvez choisir le mode Grammaire pour apprendre des expressions spécifiques.",
   "tutorial_course_4": "Maintenant, choisissez le cours souhaité et commencez à apprendre le coréen !",
   "tutorial_lesson_list_1": "Vous pouvez changer de cours de leçon en appuyant sur ce bouton.",
-  "tutorial_lesson_list_2": "Terminez maintenant votre première leçon !\nUn cadeau surprise vous attend ! :)",
-  "tutorial_lesson_list_3": "Terminez maintenant votre première leçon !",
+  "tutorial_lesson_list_2": "Terminez maintenant votre première leçon !",
   "tutorial_lesson_summary_1": "Vous pouvez consulter le résumé avant de commencer la leçon.",
   "tutorial_lesson_summary_2": "Selon la leçon, elle peut inclure des exercices d'écriture et de lecture.",
   "tutorial_lesson_summary_3": "Appuyez sur ce bouton pour commencer la leçon !",
@@ -244,5 +244,9 @@
   "tutorial_writing_frame_4": "Veuillez sélectionner une question.",
   "tutorial_flashcard_frame_1": "Vous pouvez modifier une carte mémoire en cliquant dessus.",
   "tutorial_flashcard_frame_2": "Si vous maintenez une carte mémoire enfoncée, une option de suppression apparaîtra.",
-  "tutorial_flashcard_frame_3": "Revoyez quotidiennement les cartes mémoire que vous avez collectées !"
+  "tutorial_flashcard_frame_3": "Revoyez quotidiennement les cartes mémoire que vous avez collectées !",
+  "free_premium_title": "Félicitations !\nVous avez gagné un Premium gratuit !",
+  "free_premium_content": "Terminez votre première leçon pour débloquer 7 jours de Premium gratuits !\n\nNe manquez pas cette opportunité spéciale !",
+  "free_premium_button": "Commencez la première leçon !",
+  "free_premium_limit": "Cette récompense n'est disponible que pour une durée limitée."
 }

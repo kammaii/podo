@@ -136,7 +136,7 @@ class _MyPageState extends State<MyPage> {
         padding: EdgeInsets.all(rs.getSize(20)),
         child: Column(
           children: [
-            user.User().status == 0 || user.User().status == 1
+            user.User().status == 1
                 ? ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(0),
@@ -150,7 +150,7 @@ class _MyPageState extends State<MyPage> {
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: rs.getSize(13), horizontal: rs.getSize(30)),
                       decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                          color: MyColors.purple,
                           borderRadius: BorderRadius.circular(30)),
                       child: Row(
                         children: [
@@ -159,7 +159,7 @@ class _MyPageState extends State<MyPage> {
                             child: Center(
                               child: MyWidget().getTextWidget(
                                 rs,
-                                text: tr('getPremium'),
+                                text: user.User().isFreeTrialEnabled == true ? tr('getPremium') : tr('getPremiumForFree'),
                                 size: 20,
                                 color: Colors.white,
                                 isBold: true,
