@@ -248,5 +248,8 @@
   "free_premium_title": "Félicitations !\nVous avez gagné un Premium gratuit !",
   "free_premium_content": "Terminez votre première leçon pour débloquer 7 jours de Premium gratuits !\n\nNe manquez pas cette opportunité spéciale !",
   "free_premium_button": "Commencez la première leçon !",
-  "free_premium_limit": "Cette récompense n'est disponible que pour une durée limitée."
+  "free_premium_limit": "Cette récompense n'est disponible que pour une durée limitée.",
+  "oops": "Oups!",
+  "connection_issue": "Il semble que votre connexion réseau soit un peu instable.\nVeuillez vérifier votre connexion Internet et réessayer!",
+  "try_again": "Réessayer"
 }

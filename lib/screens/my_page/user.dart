@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
@@ -73,6 +75,7 @@ class User {
   static const String PREMIUM_USERS = 'premiumUsers';
   static const String PREMIUM_EXPIRED_USERS = 'premiumExpiredUsers';
   static const String TRIAL_USERS = 'trialUsers';
+  static const String TRIAL_EXPIRED_USERS = 'trialExpiredUsers';
   static const String PATH = 'path';
   static const String IS_FREE_TRIAL_ENABLED = 'isFreeTrialEnabled';
 
@@ -115,7 +118,23 @@ class User {
     }
     id = auth.FirebaseAuth.instance.currentUser!.uid;
     FirebaseCrashlytics.instance.setUserIdentifier(id);
-    DocumentSnapshot<Map<String, dynamic>> snapshot = await Database().getDoc(collection: 'Users', docId: id);
+    DocumentSnapshot<Map<String, dynamic>>? snapshot = await Database().getDoc(collection: 'Users', docId: id);
+    if(snapshot == null) {
+      await FirebaseAnalytics.instance.logEvent(name: 'connection_issue', parameters: {'userId': id});
+      await Get.dialog(
+          AlertDialog(
+            title: Text(tr('oops')),
+            content: Text(tr('connection_issue')),
+            actions: [
+              ElevatedButton(onPressed: () async {
+                Get.back();
+                getUser();
+              }, child: Text('try_again'))
+            ],
+          )
+      );
+      return;
+    }
     if (snapshot.exists) {
       final json = snapshot.data()!;
       id = json[ID];
@@ -169,12 +188,13 @@ class User {
           messaging.subscribeToTopic(PREMIUM_USERS);
           messaging.unsubscribeFromTopic(NEW_USERS);
           messaging.unsubscribeFromTopic(BASIC_USERS);
+          messaging.unsubscribeFromTopic(TRIAL_USERS);
           messaging.unsubscribeFromTopic(PREMIUM_EXPIRED_USERS);
+          messaging.unsubscribeFromTopic(TRIAL_EXPIRED_USERS);
           status = 2;
         } else {
           if (status == 2) {
             messaging.subscribeToTopic(PREMIUM_EXPIRED_USERS);
-            messaging.unsubscribeFromTopic(NEW_USERS);
             messaging.unsubscribeFromTopic(PREMIUM_USERS);
             status = 1;
           }
@@ -269,6 +289,8 @@ class User {
     if(p != null) {
       path = p;
     }
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    fcmToken = await messaging.getToken();
     fcmPermission = false;
     isFreeTrialEnabled = MyRemoteConfig().getConfigBool(MyRemoteConfig.IS_FREE_TRIAL_ENABLED);
     setAnalyticsUserProp();

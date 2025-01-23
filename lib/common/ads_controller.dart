@@ -51,44 +51,43 @@ class AdsController extends GetxController {
 
   void loadRewardAds() {
     RewardedInterstitialAd.load(
-        adUnitId: UNIT_ID[Platform.isIOS ? IOS_REWARD : ANDROID_REWARD]!,
-        request: const AdRequest(),
-        rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
-          onAdLoaded: (ad) {
-            debugPrint('RewardAd is loaded');
-            rewardedInterstitialAd = ad;
-          },
-          onAdFailedToLoad: (LoadAdError e) {
-            debugPrint('RewardedInterstitialAd failed to load: $e');
-            FirebaseCrashlytics.instance
-                .recordError(Exception('Failed to load rewardAd : $e'), null, printDetails: true);
-          },
-        ),);
+      adUnitId: UNIT_ID[Platform.isIOS ? IOS_REWARD : ANDROID_REWARD]!,
+      request: const AdRequest(),
+      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          debugPrint('RewardAd is loaded');
+          rewardedInterstitialAd = ad;
+        },
+        onAdFailedToLoad: (LoadAdError e) {
+          debugPrint('RewardedInterstitialAd failed to load: $e');
+          FirebaseCrashlytics.instance
+              .recordError(Exception('Failed to load rewardAd : $e'), null, printDetails: true);
+        },
+      ),
+    );
   }
 
   void showRewardAd() {
     //TODO: 보상형 광고가 null일 경우 광고 없이 레슨이 시작하는 문제에 대해 고민할 것
     if (rewardedInterstitialAd != null) {
-      rewardedInterstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-          onAdShowedFullScreenContent: (RewardedInterstitialAd ad) {
-            print('onRewardAdShowed');
-          },
-          onAdDismissedFullScreenContent: (ad) {
-            print('onRewardAd Dismissed');
-            if(!isAdFullWatched) {
-              print('onRewardAd Stopped');
-              Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
-            }
-            ad.dispose();
-            isAdFullWatched = false;
-            loadRewardAds();
-          },
-          onAdFailedToShowFullScreenContent: (RewardedInterstitialAd ad, AdError e) {
-            print('onRewardAdFailedToShow : $e');
-            FirebaseCrashlytics.instance
-                .recordError(Exception('onRewardAdFailedToShow : $e'), null, printDetails: true);
-            ad.dispose();
-          });
+      rewardedInterstitialAd!.fullScreenContentCallback =
+          FullScreenContentCallback(onAdShowedFullScreenContent: (RewardedInterstitialAd ad) {
+        print('onRewardAdShowed');
+      }, onAdDismissedFullScreenContent: (ad) {
+        print('onRewardAd Dismissed');
+        if (!isAdFullWatched) {
+          print('onRewardAd Stopped');
+          Get.until((route) => Get.currentRoute == MyStrings.routeMainFrame);
+        }
+        ad.dispose();
+        isAdFullWatched = false;
+        loadRewardAds();
+      }, onAdFailedToShowFullScreenContent: (RewardedInterstitialAd ad, AdError e) {
+        print('onRewardAdFailedToShow : $e');
+        FirebaseCrashlytics.instance
+            .recordError(Exception('onRewardAdFailedToShow : $e'), null, printDetails: true);
+        ad.dispose();
+      });
       rewardedInterstitialAd!.show(onUserEarnedReward: (ad, item) {
         print('onRewardAd Completed');
         isAdFullWatched = true;
@@ -102,23 +101,35 @@ class AdsController extends GetxController {
   }
 
   void loadBannerAd(AdSize size) {
+    // 기존 배너 광고를 정리
+    bannerAd?.dispose();
+    bannerAd = null;
+    isBannerAdLoaded = false;
+
     bannerAd = BannerAd(
       size: size,
       adUnitId: UNIT_ID[Platform.isIOS ? IOS_BANNER : ANDROID_BANNER]!,
-      listener: BannerAdListener(onAdFailedToLoad: (Ad ad, LoadAdError e) {
-        print('Failed to load bannerAd : $e');
-        FirebaseCrashlytics.instance.recordError(
-          Exception('Failed to load bannerAd : $e'),
-          null,
-          printDetails: true,
-        );
-        ad.dispose();
-      }, onAdLoaded: (Ad ad) {
-        print('BannerAd is loaded');
-        bannerAd = ad as BannerAd;
-        isBannerAdLoaded = true;
-        update();
-      }),
+      listener: BannerAdListener(
+        onAdFailedToLoad: (Ad ad, LoadAdError e) {
+          print('Failed to load bannerAd : $e');
+          FirebaseCrashlytics.instance.recordError(
+            Exception('Failed to load bannerAd : $e'),
+            null,
+            printDetails: true,
+          );
+          ad.dispose();
+          // 상태 초기화 및 업데이트
+          bannerAd = null;
+          isBannerAdLoaded = false;
+          update();
+        },
+        onAdLoaded: (Ad ad) {
+          print('BannerAd is loaded');
+          bannerAd = ad as BannerAd;
+          isBannerAdLoaded = true;
+          update();
+        },
+      ),
       request: const AdRequest(),
     )..load();
   }

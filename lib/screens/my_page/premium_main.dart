@@ -193,8 +193,6 @@ class _PremiumMainState extends State<PremiumMain> {
   }
 
   runPurchase() async {
-    FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
-    FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
     StoreProduct storeProduct = package!.storeProduct;
     String store = '';
     if(Platform.isIOS) {

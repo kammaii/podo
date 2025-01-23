@@ -248,5 +248,8 @@
   "free_premium_title": "Congratulations!\nYou’ve Won Free Premium!",
   "free_premium_content": "Finish your first lesson to unlock 7 days of premium for free!\n\nDon’t miss this special opportunity!",
   "free_premium_button": "Start the First Lesson!",
-  "free_premium_limit": "This reward is only available for a limited time."
+  "free_premium_limit": "This reward is only available for a limited time.",
+  "oops": "Oops!",
+  "connection_issue": "It seems like your network connection is a bit unstable.\nPlease check your internet and try again!",
+  "try_again": "Try Again"
 }

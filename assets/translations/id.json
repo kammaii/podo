@@ -248,5 +248,8 @@
   "free_premium_title": "Selamat!\nAnda Mendapatkan Premium Gratis!",
   "free_premium_content": "Selesaikan pelajaran pertama Anda untuk membuka 7 hari Premium gratis!\n\nJangan lewatkan kesempatan spesial ini!",
   "free_premium_button": "Mulai Pelajaran Pertama!",
-  "free_premium_limit": "Hadiah ini hanya tersedia untuk waktu terbatas."
+  "free_premium_limit": "Hadiah ini hanya tersedia untuk waktu terbatas.",
+  "oops": "Ups!",
+  "connection_issue": "Sepertinya koneksi jaringan Anda agak tidak stabil.\nSilakan periksa koneksi internet Anda dan coba lagi!",
+  "try_again": "Coba lagi"
 }
