@@ -193,8 +193,6 @@ class _PremiumMainState extends State<PremiumMain> {
   }
 
   runPurchase() async {
-    FirebaseMessaging.instance.subscribeToTopic('premiumUsers');
-    FirebaseMessaging.instance.unsubscribeFromTopic('basicUsers');
     StoreProduct storeProduct = package!.storeProduct;
     String store = '';
     if(Platform.isIOS) {
@@ -678,7 +676,8 @@ class _PremiumMainState extends State<PremiumMain> {
                 future: Purchases.getOfferings(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                    final offering = snapshot.data?.current;
+                    bool hasFreeTrial = User().isFreeTrialEnabled != true;
+                    final offering = hasFreeTrial ? snapshot.data?.getOffering("2 Months_7 Days Free") : snapshot.data?.current;
                     package = offering?.availablePackages[0];
                     return Stack(
                       children: [
@@ -700,7 +699,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                     child: Container(
                                   padding: EdgeInsets.symmetric(horizontal: rs.getSize(23), vertical: rs.getSize(10)),
                                   decoration: BoxDecoration(
-                                      gradient: const LinearGradient(colors: [MyColors.purple, MyColors.green]),
+                                      color: MyColors.purple,
                                       borderRadius: BorderRadius.circular(15)),
                                   child: offering != null
                                       ? Row(
@@ -738,7 +737,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                                           size: 18,
                                                           isBold: true),
                                                       MyWidget().getTextWidget(rs,
-                                                          text: ' / ${offering.identifier}',
+                                                          text: ' / ${offering.identifier.split('_')[0]}',
                                                           color: Colors.white,
                                                           size: 15),
                                                     ],

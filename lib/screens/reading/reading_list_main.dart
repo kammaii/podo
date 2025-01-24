@@ -38,7 +38,7 @@ class _ReadingListMainState extends State<ReadingListMain> {
   final IS_RELEASED = 'isReleased';
   final DATE = 'date';
   String fo = User().language;
-  final controller = Get.find<ReadingController>();
+  ReadingController controller = Get.isRegistered<ReadingController>() ? Get.find<ReadingController>() : Get.put(ReadingController());
   bool isBasicUser = User().status == 0 || User().status == 1;
   late Query query;
   bool shouldLoad = true; // TextField 로 인한 rebuild 방지용

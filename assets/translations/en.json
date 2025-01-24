@@ -83,6 +83,7 @@
   "lessonComplete": "Lesson Complete!",
   "myPage": "My page",
   "getPremium": "Get Podo Premium",
+  "getPremiumForFree": "Get Premium for Free!",
   "home": "home",
   "editName": "Edit name",
   "premiumDetail": "Premium is automatically renewed and billed through the payment method registered to your app store account. The price is subject to change without prior notice. Subscriptions will automatically renew at the existing price even if the amount has been increased, unless cancelled at least 24 hours before the end of the current subscription period. If the price has decreased, the subscription will renew at the reduced rate. Subscriptions are user-managed, and you can go to your account settings to cancel auto-renewal at any time. If you cancel your subscription and then resubscribe, you will be charged at the updated price. For any purchase-related issues, please contact us at akorean.help@gmail.com. For more details, please refer to our ",
@@ -222,8 +223,7 @@
   "tutorial_course_3": "If you're an intermediate learner, you can choose the Grammar mode to learn specific expressions.",
   "tutorial_course_4": "Now, pick your desired course and start learning Korean!",
   "tutorial_lesson_list_1": "You can change the lesson course by pressing this button.",
-  "tutorial_lesson_list_2": "Now complete your first lesson!\nA surprise gift is waiting for you! :)",
-  "tutorial_lesson_list_3": "Now complete your first lesson!",
+  "tutorial_lesson_list_2": "Now complete your first lesson!",
   "tutorial_lesson_summary_1": "You can review the summary before starting the lesson.",
   "tutorial_lesson_summary_2": "Depending on the lesson, it may include writing and reading practice.",
   "tutorial_lesson_summary_3": "Press this button to start the lesson!",
@@ -244,5 +244,12 @@
   "tutorial_writing_frame_4": "Please select a question.",
   "tutorial_flashcard_frame_1": "You can edit a flashcard by clicking on it.",
   "tutorial_flashcard_frame_2": "If you press and hold a flashcard, a delete option will appear.",
-  "tutorial_flashcard_frame_3": "Review the flashcards you've collected daily!"
+  "tutorial_flashcard_frame_3": "Review the flashcards you've collected daily!",
+  "free_premium_title": "Congratulations!\nYou’ve Won Free Premium!",
+  "free_premium_content": "Finish your first lesson to unlock 7 days of premium for free!\n\nDon’t miss this special opportunity!",
+  "free_premium_button": "Start the First Lesson!",
+  "free_premium_limit": "This reward is only available for a limited time.",
+  "oops": "Oops!",
+  "connection_issue": "It seems like your network connection is a bit unstable.\nPlease check your internet and try again!",
+  "try_again": "Try Again"
 }

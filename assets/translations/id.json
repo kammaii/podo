@@ -83,6 +83,7 @@
   "lessonComplete": "Pelajaran Selesai!",
   "myPage": "Halaman saya",
   "getPremium": "Dapatkan Podo Premium",
+  "getPremiumForFree": "Dapatkan Premium secara gratis!",
   "home": "Halaman utama",
   "editName": "Edit nama",
   "premiumDetail": "Premium akan diperbarui secara otomatis dan dibebankan melalui metode pembayaran yang terdaftar di akun toko aplikasi Anda. Harga dapat berubah tanpa pemberitahuan sebelumnya. Langganan akan diperbarui secara otomatis dengan harga yang ada meskipun jumlahnya telah ditingkatkan, kecuali dibatalkan paling lambat 24 jam sebelum berakhirnya periode langganan saat ini. Jika harganya telah berkurang, langganan akan diperbarui dengan harga yang lebih rendah. Langganan dapat dikelola oleh pengguna, dan Anda dapat pergi ke pengaturan akun Anda untuk membatalkan perpanjangan otomatis kapan saja. Jika Anda membatalkan langganan dan kemudian berlangganan lagi, Anda akan dikenakan biaya dengan harga yang telah diperbarui. Untuk masalah terkait pembelian, silakan hubungi kami di akorean.help@gmail.com. Untuk detail lebih lanjut, silakan merujuk ke ",
@@ -222,8 +223,7 @@
   "tutorial_course_3": "Jika kamu adalah pelajar menengah, kamu bisa memilih mode Tata Bahasa untuk mempelajari ekspresi tertentu.",
   "tutorial_course_4": "Sekarang, pilih kursus yang kamu inginkan dan mulai belajar bahasa Korea!",
   "tutorial_lesson_list_1": "Kamu bisa mengubah kursus pelajaran dengan menekan tombol ini.",
-  "tutorial_lesson_list_2": "Sekarang selesaikan pelajaran pertamamu!\nHadiah kejutan menantimu! :)",
-  "tutorial_lesson_list_3": "Sekarang selesaikan pelajaran pertamamu!",
+  "tutorial_lesson_list_2": "Sekarang selesaikan pelajaran pertamamu!",
   "tutorial_lesson_summary_1": "Kamu bisa meninjau ringkasan sebelum memulai pelajaran.",
   "tutorial_lesson_summary_2": "Bergantung pada pelajaran, mungkin termasuk latihan menulis dan membaca.",
   "tutorial_lesson_summary_3": "Tekan tombol ini untuk memulai pelajaran!",
@@ -244,5 +244,12 @@
   "tutorial_writing_frame_4": "Silakan pilih pertanyaan.",
   "tutorial_flashcard_frame_1": "Kamu bisa mengedit flashcard dengan mengkliknya.",
   "tutorial_flashcard_frame_2": "Jika kamu menekan dan menahan flashcard, opsi hapus akan muncul.",
-  "tutorial_flashcard_frame_3": "Tinjau flashcard yang telah kamu kumpulkan setiap hari!"
+  "tutorial_flashcard_frame_3": "Tinjau flashcard yang telah kamu kumpulkan setiap hari!",
+  "free_premium_title": "Selamat!\nAnda Mendapatkan Premium Gratis!",
+  "free_premium_content": "Selesaikan pelajaran pertama Anda untuk membuka 7 hari Premium gratis!\n\nJangan lewatkan kesempatan spesial ini!",
+  "free_premium_button": "Mulai Pelajaran Pertama!",
+  "free_premium_limit": "Hadiah ini hanya tersedia untuk waktu terbatas.",
+  "oops": "Ups!",
+  "connection_issue": "Sepertinya koneksi jaringan Anda agak tidak stabil.\nSilakan periksa koneksi internet Anda dan coba lagi!",
+  "try_again": "Coba lagi"
 }
