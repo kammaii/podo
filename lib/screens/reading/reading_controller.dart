@@ -11,7 +11,7 @@ class ReadingController extends GetxController {
 
 
   initIsExpanded(int length) {
-    isExpanded ??= List.generate(length, (index) => false).obs;
+    isExpanded = List.generate(length, (index) => false).obs;
   }
 
   setIsExpanded(int index, bool value) {
