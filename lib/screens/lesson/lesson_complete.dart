@@ -17,13 +17,20 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
-class LessonComplete extends StatelessWidget {
+class LessonComplete extends StatefulWidget {
   LessonComplete({Key? key}) : super(key: key);
 
+  @override
+  State<LessonComplete> createState() => _LessonCompleteState();
+}
+
+class _LessonCompleteState extends State<LessonComplete> {
   late ResponsiveSize rs;
+
   bool isPremiumUser = false;
   bool isFreeOptions = false;
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  bool isThumbUpClicked = false;
 
   Widget getBtn(BuildContext context, String title, IconData icon, Function() fn) {
     return Row(children: [
@@ -44,7 +51,8 @@ class LessonComplete extends StatelessWidget {
               SizedBox(width: rs.getSize(30)),
               Expanded(
                 child: Center(
-                  child: MyWidget().getTextWidget(rs, text: title, size: 20, color: Theme.of(context).primaryColor),
+                  child:
+                      MyWidget().getTextWidget(rs, text: title, size: 20, color: Theme.of(context).primaryColor),
                 ),
               ),
             ],
@@ -93,15 +101,18 @@ class LessonComplete extends StatelessWidget {
         MyWidget().showDialog(context, rs,
             content: tr('tutorial_lesson_complete_1'),
             hasNoBtn: false,
-            yesText: tr('tutorial_lesson_complete_2'), barrierDismissible: false, yesFn: () {
+            yesText: tr('tutorial_lesson_complete_2'),
+            barrierDismissible: false, yesFn: () {
           MyWidget().showDialog(context, rs,
               content: tr('tutorial_lesson_complete_3'),
               hasNoBtn: false,
-              yesText: tr('tutorial_lesson_complete_4'), barrierDismissible: false, yesFn: () {
+              yesText: tr('tutorial_lesson_complete_4'),
+              barrierDismissible: false, yesFn: () {
             MyWidget().showDialog(context, rs,
                 content: tr('tutorial_lesson_complete_5'),
                 hasNoBtn: false,
-                yesText: tr('tutorial_lesson_complete_6'), barrierDismissible: false, yesFn: () async {
+                yesText: tr('tutorial_lesson_complete_6'),
+                barrierDismissible: false, yesFn: () async {
               await User().setTrialAuthorized();
               MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
               Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
@@ -160,6 +171,30 @@ class LessonComplete extends StatelessWidget {
                 color: Theme.of(context).primaryColor,
               ),
               SizedBox(height: rs.getSize(20)),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: IconButton(
+                  onPressed: () async {
+                    await analytics.logEvent(name: 'click_thumb_up', parameters: {'content': lesson.title['ko']});
+                    setState(() {
+                      isThumbUpClicked = true;
+                    });
+                    if(LocalStorage().histories.length > 3) {
+                      showReviewRequest();
+                    }
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  icon: Icon(
+                    isThumbUpClicked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                    color: MyColors.purple,
+                    size: 50,
+                  ),
+                ),
+              ),
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: rs.getSize(20)),
@@ -232,8 +267,8 @@ class LessonComplete extends StatelessWidget {
                                   }
                                   Lesson nextLesson = Lesson.fromJson(lessons[nextIndex] as Map<String, dynamic>);
                                   if (nextLesson.hasOptions) {
-                                    Get.offNamedUntil(
-                                        MyStrings.routeLessonSummaryMain, ModalRoute.withName(MyStrings.routeMainFrame),
+                                    Get.offNamedUntil(MyStrings.routeLessonSummaryMain,
+                                        ModalRoute.withName(MyStrings.routeMainFrame),
                                         arguments: nextLesson);
                                   } else {
                                     Get.offNamedUntil(
