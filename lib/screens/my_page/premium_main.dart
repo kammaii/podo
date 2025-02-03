@@ -676,7 +676,7 @@ class _PremiumMainState extends State<PremiumMain> {
                 future: Purchases.getOfferings(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                    bool hasFreeTrial = User().isFreeTrialEnabled != true;
+                    bool hasFreeTrial = User().isFreeTrialEnabled == false;
                     final offering = hasFreeTrial ? snapshot.data?.getOffering("2 Months_7 Days Free") : snapshot.data?.current;
                     package = offering?.availablePackages[0];
                     return Stack(

@@ -159,7 +159,7 @@ class _MyPageState extends State<MyPage> {
                             child: Center(
                               child: MyWidget().getTextWidget(
                                 rs,
-                                text: user.User().isFreeTrialEnabled == true ? tr('getPremium') : tr('getPremiumForFree'),
+                                text: user.User().isFreeTrialEnabled == false ? tr('getPremiumForFree') : tr('getPremium'),
                                 size: 20,
                                 color: Colors.white,
                                 isBold: true,
