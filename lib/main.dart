@@ -53,6 +53,13 @@ void main() async {
   };
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  await FirebaseAnalytics.instance.setConsent(
+    analyticsStorageConsentGranted: true,
+    adStorageConsentGranted: true,
+    adUserDataConsentGranted: true,
+    adPersonalizationSignalsConsentGranted: true,
+  );
+
   runApp(EasyLocalization(supportedLocales: const [
     Locale('en'),
     Locale('es'),
@@ -84,7 +91,6 @@ class MyApp extends StatelessWidget {
             ),
             title: 'Podo Korean app',
             debugShowCheckedModeBanner: false,
-
             theme: ThemeData(
               useMaterial3: false,
               primaryColor: MyColors.purple,
