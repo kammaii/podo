@@ -108,9 +108,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       if (User().fcmPermission != permission) {
         FirebaseAnalytics analytics = FirebaseAnalytics.instance;
         if (permission) {
-          await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'true', 'location': 'noticeBar'});
+          await analytics
+              .logEvent(name: 'fcm_permission', parameters: {'status': 'true', 'location': 'noticeBar'});
         } else {
-          await analytics.logEvent(name: 'fcm_permission', parameters: {'status': 'false', 'location': 'noticeBar'});
+          await analytics
+              .logEvent(name: 'fcm_permission', parameters: {'status': 'false', 'location': 'noticeBar'});
         }
         Database().updateDoc(collection: 'Users', docId: User().id, key: 'fcmPermission', value: permission);
         User().fcmPermission = permission;
@@ -160,12 +162,13 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
     if (lesson.isReadingReleased) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
-      optionIcons.add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+      optionIcons
+          .add(Icon(FontAwesomeIcons.book, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
     if (lesson.isSpeakingReleased) {
       optionIcons.add(SizedBox(width: rs.getSize(8)));
-      optionIcons
-          .add(Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
+      optionIcons.add(
+          Icon(CupertinoIcons.bubble_right_fill, color: Theme.of(context).primaryColorDark, size: rs.getSize(13)));
     }
 
     return isReleased
@@ -361,23 +364,56 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     );
   }
 
+  Widget floatingBtn(
+      {required String tag,
+      required String route,
+      required Color btnColor,
+      required IconData btnIcon,
+      required String title,
+      required Color titleColor}) {
+    return Column(
+      children: [
+        SizedBox(
+          width: rs.getSize(56),
+          height: rs.getSize(56),
+          child: FloatingActionButton(
+            heroTag: tag,
+            onPressed: () {
+              Get.toNamed(route, arguments: course.id);
+            },
+            backgroundColor: btnColor,
+            child: Icon(btnIcon, size: rs.getSize(30)),
+          ),
+        ),
+        SizedBox(height: rs.getSize(5)),
+        MyWidget().getTextWidget(
+          rs,
+          text: title,
+          color: titleColor,
+          isBold: true,
+        ),
+        SizedBox(height: rs.getSize(20)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     course = widget.course;
     rs = ResponsiveSize(context);
 
     // LessonCourse 에서 튜토리얼을 보고 넘어왔을 경우에만 widget.isTutorialEnabled = true.
-    if(widget.isTutorialEnabled) {
+    if (widget.isTutorialEnabled) {
       myTutorial = MyTutorial();
-      bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_LIST); // 사실 필요없는 코드지만 한번 더 체크
-      if(isTutorialEnabled) {
+      bool isTutorialEnabled =
+          myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_LIST); // 사실 필요없는 코드지만 한번 더 체크
+      if (isTutorialEnabled) {
         keyMenu = GlobalKey();
         List<TargetFocus> targets = [
           myTutorial!.tutorialItem(id: "T1", keyTarget: keyMenu, content: tr('tutorial_lesson_list_1')),
           myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_lesson_list_2')),
         ];
         myTutorial!.addTargetsAndRunTutorial(context, targets);
-
       } else {
         myTutorial = null;
       }
@@ -400,33 +436,27 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
 
     return Scaffold(
-      floatingActionButton: course.hasWorkbook
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: rs.getSize(56),
-                  height: rs.getSize(56),
-                  child: FloatingActionButton(
-                    heroTag: 'workbookBtn',
-                    onPressed: () {
-                      Get.toNamed(MyStrings.routeWorkbookMain, arguments: course.id);
-                    },
-                    backgroundColor: MyColors.pinkDark,
-                    child: Icon(FontAwesomeIcons.solidFileAudio, size: rs.getSize(30)),
-                  ),
-                ),
-                SizedBox(height: rs.getSize(5)),
-                MyWidget().getTextWidget(
-                  rs,
-                  text: 'Workbook',
-                  color: MyColors.wine,
-                  isBold: true,
-                ),
-                SizedBox(height: rs.getSize(20)),
-              ],
-            )
-          : const SizedBox.shrink(),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          course.hasWorkbook
+              ? floatingBtn(
+                  tag: 'workbookBtn',
+                  route: MyStrings.routeWorkbookMain,
+                  btnColor: MyColors.pinkDark,
+                  btnIcon: FontAwesomeIcons.solidFileAudio,
+                  title: tr('workbook'),
+                  titleColor: MyColors.wine)
+              : const SizedBox.shrink(),
+          floatingBtn(
+              tag: 'koreanBitesBtn',
+              route: MyStrings.routeKoreanBiteListMain,
+              btnColor: MyColors.purple,
+              btnIcon: Icons.cookie,
+              title: 'Korean Bites',
+              titleColor: MyColors.purple),
+        ],
+      ),
       body: Column(
         children: [
           GetBuilder<LessonController>(
@@ -518,7 +548,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                                 child: Obx(
                                   () => MyWidget().getRoundedContainer(
                                     radius: 30,
-                                    padding: EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: rs.getSize(10), vertical: rs.getSize(5)),
                                     bgColor: cloudController.podoMsgBtnActive.value
                                         ? Theme.of(context).brightness == Brightness.dark
                                             ? MyColors.darkPurple

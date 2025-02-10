@@ -296,7 +296,8 @@ class _ReadingFrameState extends State<ReadingFrame> with TickerProviderStateMix
                         padding: EdgeInsets.only(bottom: rs.getSize(100)),
                         child: MyWidget().getRoundBtnWidget(rs, text: tr('complete'), f: () {
                           History().addHistory(itemIndex: 1, itemId: readingTitle.id, content: readingTitle.title['ko']);
-                          LocalStorage().prefs!.remove(readingTitle.id);
+                          //뭔지 몰라서 남겨둠. 이상 없는지 확인 후 삭제
+                          //LocalStorage().prefs!.remove(readingTitle.id);
                           controller.isCompleted[readingTitle.id] = true;
                           Get.back();
                         }, bgColor: Theme.of(context).primaryColor, fontColor: Theme.of(context).cardColor),

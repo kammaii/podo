@@ -211,7 +211,6 @@
   "clickHere": "Haga clic aquí",
   "updateRequest": "Por favor, actualice Podo Korean a la última versión para obtener la mejor experiencia y nuevas funciones.",
   "blog": "Blog",
-  "community": "Comunidad",
   "workbookDialog": "Este cuaderno es solo para usuarios Premium.",
   "podoApps": "Aplicaciones de Podo",
   "discoverApps": "¡Descubre más aplicaciones de Podo!",
@@ -251,5 +250,11 @@
   "free_premium_limit": "Esta recompensa está disponible solo por tiempo limitado.",
   "oops": "¡Ups!",
   "connection_issue": "Parece que tu conexión de red es un poco inestable.\n¡Por favor, verifica tu internet y vuelve a intentarlo!",
-  "try_again": "Intentar de nuevo"
+  "try_again": "Intentar de nuevo",
+  "korean_bites": "Píldoras de Coreano",
+  "noKoreanBiteTitle": "No hay Korean Bites disponibles en esta categoría.",
+  "subscribeToKoreanBites": "¿Te gustaría suscribirte\npara acceder a Korean Bites?",
+  "watchRewardAdKoreanBite": "¿Te gustaría ver un anuncio\npara acceder a este Korean Bite?",
+  "examples": "Ejemplos",
+  "explain": "Explicar"
 }

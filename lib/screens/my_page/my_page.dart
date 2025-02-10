@@ -42,7 +42,6 @@ class _MyPageState extends State<MyPage> {
     MyPageItem(CupertinoIcons.globe, tr('language')),
     MyPageItem(Icons.feedback_outlined, tr('feedback')),
     MyPageItem(FontAwesomeIcons.blogger, tr('blog')),
-    MyPageItem(FontAwesomeIcons.facebook, tr('community')),
     MyPageItem(Icons.apps, tr('podoApps')),
     MyPageItem(Icons.logout_rounded, tr('logOut')),
     MyPageItem(Icons.remove_circle_outline_rounded, tr('removeAccount')),
@@ -68,12 +67,10 @@ class _MyPageState extends State<MyPage> {
   late bool hasUserName;
   late ResponsiveSize rs;
   final String blogUrl = "https://blog.podokorean.com";
-  final String communityUrl = "https://www.facebook.com/share/g/1AsBwWqNpK/";
   final String TITLE = 'title';
   final String ANDROID = 'android';
   final String IOS = 'ios';
   final String CLICK_BLOG = 'click_blog';
-  final String CLICK_COMMUNITY = 'click_community';
   final String CLICK_APPS = 'click_apps';
 
   Future<void> _launchUrl(Uri url) async {
@@ -434,22 +431,9 @@ class _MyPageState extends State<MyPage> {
                           _launchUrl(Uri.parse(blogUrl));
                         }, isExpandable: false),
 
-                        // Community
-                        getExpansionPanel(
-                          items[4],
-                          const SizedBox.shrink(),
-                          onTap: () async {
-                            await FirebaseAnalytics.instance.logEvent(
-                              name: CLICK_COMMUNITY,
-                            );
-                            _launchUrl(Uri.parse(communityUrl));
-                          },
-                          isExpandable: false,
-                        ),
-
                         // Podo Apps
                         getExpansionPanel(
-                          items[5],
+                          items[4],
                           ListTile(
                             title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,7 +485,7 @@ class _MyPageState extends State<MyPage> {
 
                         // Logout
                         getExpansionPanel(
-                            items[6],
+                            items[5],
                             ListTile(
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,7 +539,7 @@ class _MyPageState extends State<MyPage> {
 
                         // Remove account
                         getExpansionPanel(
-                            items[7],
+                            items[6],
                             ListTile(
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

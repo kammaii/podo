@@ -211,7 +211,6 @@
   "clickHere": "Klik di sini",
   "updateRequest": "Silakan perbarui Podo Korean ke versi terbaru untuk pengalaman terbaik dan fitur-fitur baru.",
   "blog": "Blog",
-  "community": "Komunitas",
   "workbookDialog": "Buku kerja ini hanya untuk pengguna Premium.",
   "podoApps": "Aplikasi Podo",
   "discoverApps": "Temukan lebih banyak aplikasi dari Podo!",
@@ -251,5 +250,11 @@
   "free_premium_limit": "Hadiah ini hanya tersedia untuk waktu terbatas.",
   "oops": "Ups!",
   "connection_issue": "Sepertinya koneksi jaringan Anda agak tidak stabil.\nSilakan periksa koneksi internet Anda dan coba lagi!",
-  "try_again": "Coba lagi"
+  "try_again": "Coba lagi",
+  "korean_bites": "Potongan Korea",
+  "noKoreanBiteTitle": "Tidak ada Korean Bites yang tersedia dalam kategori ini.",
+  "subscribeToKoreanBites": "Apakah Anda ingin berlangganan\nuntuk mengakses Korean Bites?",
+  "watchRewardAdKoreanBite": "Apakah Anda ingin menonton iklan\nuntuk mengakses Korean Bite ini?",
+  "examples": "Contoh",
+  "explain": "Menjelaskan"
 }

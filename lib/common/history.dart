@@ -56,7 +56,7 @@ class History {
     return map;
   }
 
-  final List<String> historyItem = ['lesson', 'reading', 'podoMsg'];
+  final List<String> historyItem = ['lesson', 'reading', 'podoMsg', 'koreanBite'];
 
   void setHistoryCount(int itemIndex) {
     int count = 0;
@@ -90,14 +90,7 @@ class History {
       LocalStorage().histories.insert(0, history);
       LocalStorage().setHistories();
       print('히스토리 추가');
-
-      if(itemIndex == 0) {
-        setHistoryCount(0);
-      } else if (itemIndex == 1) {
-        setHistoryCount(1);
-      } else if (itemIndex == 2) {
-        setHistoryCount(2);
-      }
+      setHistoryCount(itemIndex);
     } else {
       print('히스토리 있음');
     }

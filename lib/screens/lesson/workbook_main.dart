@@ -152,6 +152,7 @@ class _WorkbookMainState extends State<WorkbookMain> {
       name: "workbook_download",
       parameters: {
         "title": workbook.title,
+        "userId": User().id,
       }
     );
     final ref = FirebaseStorage.instance.ref().child('Workbooks/${workbook.id}/${workbook.pdfFile}');

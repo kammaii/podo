@@ -9,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:podo/screens/flashcard/flashcard_edit.dart';
 import 'package:podo/screens/flashcard/flashcard_review.dart';
+import 'package:podo/screens/korean_bite/korean_bite_frame.dart';
+import 'package:podo/screens/korean_bite/korean_bite_list_main.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
@@ -20,6 +22,7 @@ import 'package:podo/screens/message/podo_message_main.dart';
 import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/premium_main.dart';
 import 'package:podo/screens/reading/reading_frame.dart';
+import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/screens/writing/writing_main.dart';
 import 'package:podo/screens/writing/writing_my_list.dart';
 import 'package:podo/screens/writing/writing_other_list.dart';
@@ -134,12 +137,15 @@ class MyApp extends StatelessWidget {
               GetPage(name: MyStrings.routeWritingMain, page: () => WritingMain()),
               GetPage(name: MyStrings.routeMyWritingList, page: () => WritingMyList()),
               GetPage(name: MyStrings.routeOtherWritingList, page: () => WritingOtherList()),
+              GetPage(name: MyStrings.routeReadingListMain, page: () => ReadingListMain()),
               GetPage(name: MyStrings.routeReadingFrame, page: () => const ReadingFrame()),
               GetPage(name: MyStrings.routeFlashcardEdit, page: () => FlashCardEdit()),
               GetPage(name: MyStrings.routeFlashcardReview, page: () => const FlashCardReview()),
               GetPage(name: MyStrings.routePremiumMain, page: () => PremiumMain()),
               GetPage(name: MyStrings.routePodoMessageMain, page: () => PodoMessageMain()),
               GetPage(name: MyStrings.routeWorkbookMain, page: () => const WorkbookMain()),
+              GetPage(name: MyStrings.routeKoreanBiteListMain, page: () => const KoreanBiteListMain()),
+              GetPage(name: MyStrings.routeKoreanBiteFrame, page: () => const KoreanBiteFrame()),
             ],
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
