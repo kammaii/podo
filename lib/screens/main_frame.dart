@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:podo/fcm_controller.dart';
+import 'package:podo/screens/korean_bite/korean_bite.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -24,6 +25,8 @@ import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/reading/reading_list_main.dart';
 import 'package:podo/screens/writing/writing_my_list.dart';
 import 'package:podo/values/my_colors.dart';
+
+import '../common/database.dart';
 
 class MainFrame extends StatefulWidget {
   const MainFrame({Key? key}) : super(key: key);
@@ -188,7 +191,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     Get.put(LoadingController());
-    _controller = PersistentTabController(initialIndex: FcmController.firstNavIndex);
+    _controller = PersistentTabController(initialIndex: 0);
     _controller.addListener(() {
       controllerIndex = _controller.index;
       controller.update();
@@ -263,7 +266,7 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
 
     myTutorial = MyTutorial();
 
-    // 최초 앱 설치 후에만 controller.isVisible = true 임.
+    // 최초 앱 (재)설치 후에만 controller.isVisible = true 임.
     // 기존 유저에게도 튜토리얼을 보여주고 싶으면 myTutorial을 전역 변수로 옮기고 build에서 튜토리얼을 실행해야 함.
     isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_COURSE) && controller.isVisible;
     if (isTutorialEnabled) {
@@ -282,6 +285,29 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     } else {
       myTutorial = null;
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if(FcmController.pendingFcmData != null) {
+        Map<String,dynamic> fcmData = FcmController.pendingFcmData!;
+        String? tag = fcmData['tag'];
+        if(tag != null) {
+          switch (tag) {
+            case 'koreanBite':
+              String koreanBiteId = fcmData['koreanBiteId']!;
+              await Database().getDoc(collection: 'KoreanBites', docId: koreanBiteId).then((snapshot){
+                KoreanBite bite = KoreanBite.fromJson(snapshot.data() as Map<String, dynamic>);
+                Get.toNamed(MyStrings.routeKoreanBiteListMain, arguments: bite);
+              });
+              break;
+
+            case 'writing' :
+              _controller.index = 2;
+              break;
+          }
+          FcmController.pendingFcmData == null;
+        }
+      }
+    });
   }
 
   @override

@@ -37,7 +37,6 @@ class Logo extends StatefulWidget {
 
 class _LogoState extends State<Logo> {
   bool initCalled = false;
-  Set<String> displayedMsg = {};
 
   @override
   Widget build(BuildContext context) {
@@ -117,37 +116,6 @@ class _LogoState extends State<Logo> {
     initDynamicLinks();
 
     Get.put(FcmController());
-
-    FirebaseInAppMessaging.instance;
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print('Got a message whilst in the foreground!: ${message.data['tag']}');
-      print('MSG ID: ${message.messageId}');
-      print('1: $displayedMsg');
-      if(message.notification != null && !displayedMsg.contains(message.messageId)) {
-        PlayAudio().playAlarm();
-        displayedMsg.add(message.messageId!);
-        print('2: $displayedMsg');
-        switch (message.data['tag']) {
-          case 'podo_message':
-            MyWidget().showSnackbarWithPodo(rs,
-                title: tr('podosMsg'),
-                content: message.notification!.body!);
-            await PodoMessage().getPodoMessage();
-            final messageController = Get.put(PodoMessageController());
-            messageController.setPodoMsgBtn();
-            final lessonController = Get.find<LessonController>();
-            lessonController.update();
-            break;
-
-          case 'writing':
-            MyWidget().showSnackbarWithPodo(rs,
-                title: message.notification!.title!,
-                content: message.notification!.body!);
-            break;
-        }
-      }
-    });
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       try {

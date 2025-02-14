@@ -26,7 +26,6 @@ import 'package:podo/screens/korean_bite/korean_bite_example.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:podo/values/my_colors.dart';
-import 'korean_bite.dart';
 
 class KoreanBiteFrame extends StatefulWidget {
   const KoreanBiteFrame({super.key});
@@ -41,7 +40,6 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
   Map<String, String> audioPaths = {};
   late ResponsiveSize rs;
   Map<String, PlayStopIcon> playStopIcons = {};
-  late List<KoreanBite> koreanBites;
   late List<KoreanBiteExample> examples;
   late AnimationController animationController;
   late Animation<double> animation;
@@ -58,7 +56,6 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
   void initState() {
     super.initState();
     isLoading = true;
-    koreanBites = [];
     examples = [];
     progressValue = 0.0;
 

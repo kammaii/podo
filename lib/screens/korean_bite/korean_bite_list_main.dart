@@ -46,6 +46,7 @@ class _KoreanBiteListMainState extends State<KoreanBiteListMain> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScrollController _scrollController = ScrollController();
   Map<String, bool> isCompletedMap = {};
+  KoreanBite? shouldOpenKoreanBite = Get.arguments;
 
   @override
   void initState() {
@@ -55,6 +56,14 @@ class _KoreanBiteListMainState extends State<KoreanBiteListMain> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
         fetchKoreanBites();
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      print('SHOULD OPEN: $shouldOpenKoreanBite');
+      if(shouldOpenKoreanBite != null) {
+        Get.toNamed(MyStrings.routeKoreanBiteFrame, arguments: shouldOpenKoreanBite);
+        shouldOpenKoreanBite = null;
       }
     });
   }

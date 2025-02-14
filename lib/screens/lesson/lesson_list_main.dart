@@ -364,13 +364,15 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     );
   }
 
-  Widget floatingBtn(
-      {required String tag,
-      required String route,
-      required Color btnColor,
-      required IconData btnIcon,
-      required String title,
-      required Color titleColor}) {
+  Widget floatingBtn({
+    required String tag,
+    required String route,
+    required Color btnColor,
+    required IconData btnIcon,
+    required String title,
+    required Color titleColor,
+    String? id,
+  }) {
     return Column(
       children: [
         SizedBox(
@@ -379,7 +381,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           child: FloatingActionButton(
             heroTag: tag,
             onPressed: () {
-              Get.toNamed(route, arguments: course.id);
+              Get.toNamed(route, arguments: id);
             },
             backgroundColor: btnColor,
             child: Icon(btnIcon, size: rs.getSize(30)),
@@ -446,7 +448,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   btnColor: MyColors.pinkDark,
                   btnIcon: FontAwesomeIcons.solidFileAudio,
                   title: tr('workbook'),
-                  titleColor: MyColors.wine)
+                  titleColor: MyColors.wine,
+                  id: course.id,
+                )
               : const SizedBox.shrink(),
           floatingBtn(
               tag: 'koreanBitesBtn',
