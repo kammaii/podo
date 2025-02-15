@@ -661,7 +661,7 @@ class _PremiumMainState extends State<PremiumMain> {
                               style: TextStyle(color: Colors.blue, fontSize: ResponsiveSize(context).getSize(15)),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  launchUrl(Uri.parse('https://podo-49335.web.app/privacyPolicy.html'));
+                                  launchUrl(Uri.parse('https://www.podokorean.com/privacyPolicy.html'));
                                 },
                             )
                           ]),
@@ -676,8 +676,8 @@ class _PremiumMainState extends State<PremiumMain> {
                 future: Purchases.getOfferings(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
-                    bool hasFreeTrial = User().isFreeTrialEnabled == false;
-                    final offering = hasFreeTrial ? snapshot.data?.getOffering("2 Months_7 Days Free") : snapshot.data?.current;
+                    bool hasFreeTrialPackage = User().isFreeTrialEnabled == false;
+                    final offering = hasFreeTrialPackage ? snapshot.data?.getOffering("2 Months_7 Days Free") : snapshot.data?.current;
                     package = offering?.availablePackages[0];
                     return Stack(
                       children: [
@@ -726,10 +726,10 @@ class _PremiumMainState extends State<PremiumMain> {
                                                           color: Colors.white,
                                                           hasCancelLine: true,
                                                           size: 15),
-                                                      const SizedBox(width: 10),
+                                                      const SizedBox(width: 5),
                                                       const Icon(Icons.arrow_forward_rounded,
                                                           color: Colors.white, size: 18),
-                                                      const SizedBox(width: 10),
+                                                      const SizedBox(width: 5),
                                                       MyWidget().getTextWidget(rs,
                                                           text: offering
                                                               .availablePackages[0].storeProduct.priceString,
@@ -737,7 +737,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                                           size: 18,
                                                           isBold: true),
                                                       MyWidget().getTextWidget(rs,
-                                                          text: ' / ${offering.identifier.split('_')[0]}',
+                                                          text: ' every ${offering.identifier.split('_')[0]}',
                                                           color: Colors.white,
                                                           size: 15),
                                                     ],

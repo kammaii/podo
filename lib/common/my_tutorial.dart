@@ -148,6 +148,7 @@ class MyTutorial {
                       ),
                       const SizedBox(height: 10),
                       Text(tr('free_premium_limit'),
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: (Platform.isIOS ? null : 'EnglishFont'),
                               color: MyColors.purple,

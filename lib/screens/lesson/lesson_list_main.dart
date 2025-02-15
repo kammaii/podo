@@ -57,6 +57,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
 
   MyTutorial? myTutorial;
   GlobalKey? keyMenu;
+  GlobalKey? keyKoreanBites;
 
   @override
   void initState() {
@@ -372,8 +373,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     required String title,
     required Color titleColor,
     String? id,
+    GlobalKey? key,
   }) {
     return Column(
+      key: key,
       children: [
         SizedBox(
           width: rs.getSize(56),
@@ -411,9 +414,11 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_LIST); // 사실 필요없는 코드지만 한번 더 체크
       if (isTutorialEnabled) {
         keyMenu = GlobalKey();
+        keyKoreanBites = GlobalKey();
         List<TargetFocus> targets = [
           myTutorial!.tutorialItem(id: "T1", keyTarget: keyMenu, content: tr('tutorial_lesson_list_1')),
-          myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_lesson_list_2')),
+          myTutorial!.tutorialItem(id: "T2", keyTarget: keyKoreanBites, content: tr('tutorial_lesson_list_2'), isAlignBottom: false),
+          myTutorial!.tutorialItem(id: "T3", content: tr('tutorial_lesson_list_3')),
         ];
         myTutorial!.addTargetsAndRunTutorial(context, targets);
       } else {
@@ -453,6 +458,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                 )
               : const SizedBox.shrink(),
           floatingBtn(
+              key: keyKoreanBites,
               tag: 'koreanBitesBtn',
               route: MyStrings.routeKoreanBiteListMain,
               btnColor: MyColors.purple,
