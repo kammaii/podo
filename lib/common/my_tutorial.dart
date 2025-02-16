@@ -27,10 +27,7 @@ class MyTutorial {
   late String _tutorialKey;
 
   TargetFocus tutorialItem(
-      {required String id,
-      GlobalKey? keyTarget,
-      required String content,
-      bool isAlignBottom = true}) {
+      {required String id, GlobalKey? keyTarget, required String content, bool isAlignBottom = true}) {
     return TargetFocus(
       identify: id,
       keyTarget: keyTarget,
@@ -101,7 +98,7 @@ class MyTutorial {
 
     // 첫 레슨 완료 유도
     print('유저: ${User().isFreeTrialEnabled}');
-    if (_tutorialKey == TUTORIAL_LESSON_LIST && User().isFreeTrialEnabled == true) {
+    if (_tutorialKey == TUTORIAL_LESSON_LIST && User().isFreeTrialEnabled == true && User().trialStart == null) {
       final ConfettiController controller = ConfettiController();
       controller.play();
       PlayAudio().playYay();
@@ -151,6 +148,7 @@ class MyTutorial {
                       ),
                       const SizedBox(height: 10),
                       Text(tr('free_premium_limit'),
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: (Platform.isIOS ? null : 'EnglishFont'),
                               color: MyColors.purple,

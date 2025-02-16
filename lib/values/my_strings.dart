@@ -17,11 +17,14 @@ class MyStrings {
   static const String routeMyWritingList = '/myWritingList';
   static const String routeOtherWritingList = '/otherWritingList';
   static const String routeReadingFrame = '/readingFrame';
+  static const String routeReadingListMain = '/readingListMain';
   static const String routeFlashcardEdit = '/flashcardEdit';
   static const String routeFlashcardReview = '/flashcardReview';
   static const String routePremiumMain = '/premiumMain';
   static const String routePodoMessageMain = '/podoMessageMain';
   static const String routeWorkbookMain = '/workbookMain';
+  static const String routeKoreanBiteListMain = '/koreanBiteListMain';
+  static const String routeKoreanBiteFrame = '/koreanBiteFrame';
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String repeat = 'repeat';

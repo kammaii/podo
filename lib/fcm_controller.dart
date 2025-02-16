@@ -1,24 +1,33 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:podo/common/database.dart';
+import 'package:podo/common/my_widget.dart';
+import 'package:podo/common/play_audio.dart';
+import 'package:podo/screens/korean_bite/korean_bite.dart';
+import 'package:podo/screens/korean_bite/korean_bite_controller.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
+import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
 class FcmController extends GetxController {
-
   bool hasPodoMsg = false;
-  static int firstNavIndex = 0;
+  Set<String> displayedMsg = {};
+  static Map<String,String>? pendingFcmData;
 
   @override
   void onInit() {
     super.onInit();
     setupInteractedMessage();
-    //setForegroundNotificationForAndroid();
     setForegroundNotificationForIos();
+    setForegroundNotificationForAndroid();
+    FirebaseInAppMessaging.instance;
   }
-
 
   // 백그라운드 상태 시
   Future<void> setupInteractedMessage() async {
@@ -35,14 +44,16 @@ class FcmController extends GetxController {
 
   void _handleMessage(RemoteMessage message) async {
     User? user = FirebaseAuth.instance.currentUser;
-    if(user != null && user.emailVerified) {
+    if (user != null && user.emailVerified) {
       String type = message.data['tag'];
-      switch(type) {
-        case 'writing' :
-          firstNavIndex = 2; // writingMyList 페이지 열기
+      switch (type) {
+        case 'writing':
+          pendingFcmData = {};
+          pendingFcmData!['tag'] = type;
           break;
 
-        case 'podo_message' :
+          //TODO: 이것도 나중에 pendingFCmData에 저장하고 아래 코드들은 main_frame으로 옮길것
+        case 'podo_message':
           hasPodoMsg = true;
           await PodoMessage().getPodoMessage();
           final msgController = Get.put(PodoMessageController());
@@ -51,56 +62,64 @@ class FcmController extends GetxController {
           lessonController.update();
           Get.toNamed(MyStrings.routePodoMessageMain);
           break;
+
+        case 'koreanBite':
+          pendingFcmData = {};
+          pendingFcmData!['tag'] = type;
+          pendingFcmData!['koreanBiteId'] = message.data['koreanBiteId'];
+          break;
       }
     }
   }
-
+  
+  // 포그라운드 상태
   void setForegroundNotificationForIos() async {
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
   }
 
-  // void setForegroundNotificationForAndroid() async {
-  //   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  //     'high_importance_channel', // id
-  //     'High Importance Notifications', // title
-  //     'This channel is used for important notifications.', // description
-  //     importance: Importance.max,
-  //   );
-  //
-  //   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  //
-  //   print('PLUGIN: $flutterLocalNotificationsPlugin');
-  //
-  //   await flutterLocalNotificationsPlugin
-  //       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-  //       ?.createNotificationChannel(channel);
-  //
-  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  //     RemoteNotification? notification = message.notification;
-  //     AndroidNotification? android = message.notification?.android;
-  //
-  //     // If `onMessage` is triggered with a notification, construct our own
-  //     // local notification to show to users using the created channel.
-  //     if (notification != null && android != null) {
-  //       flutterLocalNotificationsPlugin.show(
-  //           notification.hashCode,
-  //           notification.title,
-  //           notification.body,
-  //           NotificationDetails(
-  //               android: AndroidNotificationDetails(
-  //                 channel.id,
-  //                 channel.name,
-  //                 channel.description,
-  //                 icon: android?.smallIcon,
-  //                 // other properties...
-  //               ),
-  //               iOS: const IOSNotificationDetails(
-  //                 badgeNumber: 1,
-  //                 subtitle: 'subTitle',
-  //                 sound: 'sound',
-  //               )
-  //           ));
-  //     }
-  //   });
-  // }
+  void setForegroundNotificationForAndroid() async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print('Got a message whilst in the foreground!: ${message.data['tag']}');
+      print('MSG ID: ${message.messageId}');
+      print('1: $displayedMsg');
+      if (message.notification != null && !displayedMsg.contains(message.messageId)) {
+        PlayAudio().playAlarm();
+        displayedMsg.add(message.messageId!);
+        print('2: $displayedMsg');
+        switch (message.data['tag']) {
+          case 'podo_message':
+            showSnackBar(tr('podosMsg'), message.notification!.body!);
+            await PodoMessage().getPodoMessage();
+            final messageController = Get.put(PodoMessageController());
+            messageController.setPodoMsgBtn();
+            final lessonController = Get.find<LessonController>();
+            lessonController.update();
+            break;
+
+          case 'writing':
+            showSnackBar(message.notification!.title!, message.notification!.body!);
+            break;
+            
+          case 'koreanBite':
+            showSnackBar(message.notification!.title!, message.notification!.body!);
+          break;
+        }
+      }
+    });
+  }
+  
+  void showSnackBar(String title, String content) {
+    Get.snackbar(
+      title,
+      content,
+      colorText: MyColors.purple,
+      backgroundColor: Colors.white,
+      icon: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Image.asset('assets/images/podo.png', height: 100, width: 100),
+      ),
+      duration: Duration(milliseconds: 2000),
+    );
+  }
 }
