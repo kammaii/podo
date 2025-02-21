@@ -118,7 +118,7 @@ class _KoreanBiteListMainState extends State<KoreanBiteListMain> {
       color: Theme.of(context).cardColor,
       child: InkWell(
         onTap: () {
-          if (!isBasicUser) {
+          if (isBasicUser) {
             MyWidget().showDialog(context, rs,
                 content: tr('watchRewardAdKoreanBite'),
                 yesFn: () async {
@@ -164,7 +164,7 @@ class _KoreanBiteListMainState extends State<KoreanBiteListMain> {
                   rs,
                   text: koreanBite.title[KO],
                   size: 20,
-                  color: MyColors.purple,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               SizedBox(height: rs.getSize(10)),

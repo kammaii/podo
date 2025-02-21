@@ -188,9 +188,9 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
         icon: Icon(
           Icons.arrow_back_ios_rounded,
           size: rs.getSize(20),
-          color: MyColors.purple,
+          color: Theme.of(context).primaryColor,
         ),
-        color: MyColors.purple,
+        color: Theme.of(context).primaryColor,
         onPressed: () {
           Navigator.pop(context);
         },
@@ -203,7 +203,7 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
         rs,
         text: '${koreanBite.title[KO]}',
         size: 18,
-        color: MyColors.purple,
+        color: Theme.of(context).primaryColor,
         isBold: true,
       ),
       flexibleSpace: Stack(
@@ -236,9 +236,14 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
         sliver: SliverList(
           delegate: SliverChildListDelegate([
             MyWidget().getTextWidget(rs,
-                text: tr('explain'), isBold: true, hasUnderline: true, size: 20, color: MyColors.purple),
+                text: tr('explain'),
+                isBold: true,
+                hasUnderline: true,
+                size: 20,
+                color: Theme.of(context).primaryColor),
             const SizedBox(height: 10),
             Card(
+              color: Theme.of(context).cardColor,
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: HtmlWidget(
@@ -263,7 +268,11 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
             ),
             const SizedBox(height: 30),
             MyWidget().getTextWidget(rs,
-                text: tr('examples'), isBold: true, hasUnderline: true, size: 20, color: MyColors.purple),
+                text: tr('examples'),
+                isBold: true,
+                hasUnderline: true,
+                size: 20,
+                color: Theme.of(context).primaryColor),
             const SizedBox(height: 10),
             ...List.generate(examples.length, (index) => getExampleWidget(examples[index])),
             const SizedBox(height: 20),
@@ -273,7 +282,7 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
                 History().addHistory(itemIndex: 3, itemId: koreanBite.id, content: koreanBite.title[KO]);
                 controller.isCompleted[koreanBite.id] = true;
                 Get.back();
-              }, bgColor: Theme.of(context).primaryColor, fontColor: Theme.of(context).cardColor),
+              }, bgColor: Theme.of(context).canvasColor, fontColor: Theme.of(context).cardColor),
             ),
           ]),
         ));
@@ -312,71 +321,72 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Obx(() => FavoriteIcon().getFlashcardIcon(context, rs,
+                controller: controller,
+                itemId: example.id,
+                front: example.example.replaceAll("\$", ""),
+                back: example.exampleTrans[fo],
+                audio: 'KoreanBitesAudios_${koreanBite.id}_${example.id}')),
+            SizedBox(height: 20, child: VerticalDivider()),
+            GestureDetector(
+              onTap: () async {
+                PlayAudio().stop();
+                if (example.isPlay) {
+                  setPlayStopIcon(example, isForward: false);
+                } else {
+                  String fileName = example.id;
+                  if (audioPaths.containsKey(fileName)) {
+                    String path = audioPaths[fileName]!;
+                    PlayAudio().player.setFilePath(path);
+                    PlayAudio().player.setVolume(1);
+                    PlayAudio().player.playerStateStream.listen((event) {
+                      if (event.processingState == ProcessingState.completed) {
+                        setPlayStopIcon(example, isForward: false);
+                        PlayAudio().stream.cancel();
+                      }
+                    });
+                    PlayAudio().player.play();
+                  }
+                  for (int i = 0; i < examples.length; i++) {
+                    setPlayStopIcon(examples[i], isForward: false);
+                  }
+                  setPlayStopIcon(example, isForward: true);
+                }
+              },
+              child: playStopIcons[example.id]!.icon,
+            ),
+          ],
+        ),
         Card(
+            color: Theme.of(context).cardColor,
             child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Obx(() => FavoriteIcon().getFlashcardIcon(context, rs,
-                            controller: controller,
-                            itemId: example.id,
-                            front: example.example.replaceAll("\$", ""),
-                            back: example.exampleTrans[fo],
-                            audio: 'KoreanBitesAudios_${koreanBite.id}_${example.id}')),
-                        GestureDetector(
-                          onTap: () async {
-                            PlayAudio().stop();
-                            if (example.isPlay) {
-                              setPlayStopIcon(example, isForward: false);
-                            } else {
-                              String fileName = example.id;
-                              if (audioPaths.containsKey(fileName)) {
-                                String path = audioPaths[fileName]!;
-                                PlayAudio().player.setFilePath(path);
-                                PlayAudio().player.setVolume(1);
-                                PlayAudio().player.playerStateStream.listen((event) {
-                                  if (event.processingState == ProcessingState.completed) {
-                                    setPlayStopIcon(example, isForward: false);
-                                    PlayAudio().stream.cancel();
-                                  }
-                                });
-                                PlayAudio().player.play();
-                              }
-                              for (int i = 0; i < examples.length; i++) {
-                                setPlayStopIcon(examples[i], isForward: false);
-                              }
-                              setPlayStopIcon(example, isForward: true);
-                            }
-                          },
-                          child: playStopIcons[example.id]!.icon,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text.rich(TextSpan(children: spans),
+                              style: TextStyle(fontSize: 20, fontFamily: 'KoreanFont', height: 1.5, color: Theme.of(context).secondaryHeaderColor)),
                         ),
+                        const SizedBox(height: 5),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child:
+                              MyWidget().getTextWidget(rs, text: example.exampleTrans[fo], color: MyColors.grey),
+                        )
                       ],
                     ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text.rich(TextSpan(children: spans),
-                          style: TextStyle(fontSize: 20, fontFamily: 'KoreanFont', height: 1.5)),
-                    ),
-                    const SizedBox(height: 5),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: MyWidget()
-                          .getTextWidget(rs, text: example.exampleTrans[fo], color: MyColors.grey),
-                    )
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )),
+            )),
         const SizedBox(height: 10),
         Divider(),
       ],
