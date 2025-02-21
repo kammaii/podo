@@ -294,8 +294,9 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
           switch (tag) {
             case 'koreanBite':
               String koreanBiteId = fcmData['koreanBiteId']!;
-              await Database().getDoc(collection: 'KoreanBites', docId: koreanBiteId).then((snapshot){
+              await Database().getDoc(collection: 'KoreanBites', docId: koreanBiteId).then((snapshot) async {
                 KoreanBite bite = KoreanBite.fromJson(snapshot.data() as Map<String, dynamic>);
+                await FirebaseAnalytics.instance.logEvent(name: 'fcm_click_koreanbite', parameters: {'title': bite.title['ko']});
                 Get.toNamed(MyStrings.routeKoreanBiteListMain, arguments: bite);
               });
               break;

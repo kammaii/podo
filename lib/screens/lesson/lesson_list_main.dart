@@ -461,10 +461,10 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               key: keyKoreanBites,
               tag: 'koreanBitesBtn',
               route: MyStrings.routeKoreanBiteListMain,
-              btnColor: MyColors.purple,
+              btnColor: Theme.of(context).primaryColor,
               btnIcon: Icons.cookie,
               title: 'Korean Bites',
-              titleColor: MyColors.purple),
+              titleColor: Theme.of(context).primaryColor),
         ],
       ),
       body: Column(
