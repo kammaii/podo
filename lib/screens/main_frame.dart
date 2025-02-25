@@ -458,10 +458,10 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                     ),
                   ),
                 ),
-                showTrialLeftDate && _controller.index != 3
+                showTrialLeftDate && _controller.index == 0
                     ? Positioned(
-                        right: rs.getSize(20),
-                        bottom: rs.getSize(80),
+                        right: rs.getSize(10),
+                        top: rs.getSize(90),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.all(0),
@@ -473,34 +473,20 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                             Get.toNamed('/premiumMain', arguments: trialLeftDate);
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: rs.getSize(5), horizontal: rs.getSize(25)),
+                            padding: EdgeInsets.symmetric(vertical: rs.getSize(5), horizontal: rs.getSize(20)),
                             decoration: BoxDecoration(
-                                color: MyColors.purple,
-                                borderRadius: BorderRadius.circular(30)),
+                                color: MyColors.green,
+                                borderRadius: BorderRadius.circular(20)),
                             child: Column(
                               children: [
                                 MyWidget().getTextWidget(rs,
-                                    text: '$trialLeftDate ${trialLeftDate! > 1 ? 'days' : 'day'} Left of Trial',
+                                    text: '$trialLeftDate ${trialLeftDate! > 1 ? 'days' : 'day'} Left in Trial',
                                     color: Colors.white),
                                 MyWidget().getTextWidget(rs,
                                     text: tr('explorePremium'), color: Colors.white, isBold: true, hasUnderline: true),
                               ],
                             ),
                           ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-                showTrialLeftDate && _controller.index != 3
-                    ? Positioned(
-                        right: rs.getSize(5),
-                        bottom: rs.getSize(115),
-                        child: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              showTrialLeftDate = false;
-                            });
-                          },
-                          icon: Icon(Icons.remove_circle, color: Theme.of(context).focusColor, size: rs.getSize(20)),
                         ),
                       )
                     : const SizedBox.shrink(),
