@@ -6,6 +6,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
@@ -59,9 +60,9 @@ class _KoreanBiteListMainState extends State<KoreanBiteListMain> {
       }
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       print('SHOULD OPEN: $shouldOpenKoreanBite');
-      if(shouldOpenKoreanBite != null) {
+      if (shouldOpenKoreanBite != null) {
         Get.toNamed(MyStrings.routeKoreanBiteFrame, arguments: shouldOpenKoreanBite);
         shouldOpenKoreanBite = null;
       }
@@ -192,12 +193,27 @@ class _KoreanBiteListMainState extends State<KoreanBiteListMain> {
   @override
   Widget build(BuildContext context) {
     rs = ResponsiveSize(context);
+    List<Widget>? actions;
+    if (!User().fcmPermission) {
+      actions = [
+        IconButton(
+            onPressed: () {
+              MyWidget().showDialog(context, rs, content: tr('enable_notification'), yesFn: () {
+                openAppSettings();
+              }, hasNoBtn: false);
+            },
+            icon: Icon(
+              Icons.lightbulb,
+              color: Colors.yellow,
+            ))
+      ];
+    }
     return RefreshIndicator(
       onRefresh: () async {
         setState(() {});
       },
       child: Scaffold(
-        appBar: MyWidget().getAppbar(context, rs, title: tr('korean_bites')),
+        appBar: MyWidget().getAppbar(context, rs, title: tr('korean_bites'), actions: actions),
         body: Padding(
           padding: EdgeInsets.all(rs.getSize(10)),
           child: GetBuilder<KoreanBiteController>(
