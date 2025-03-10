@@ -41,8 +41,10 @@ class _MyPageState extends State<MyPage> {
     MyPageItem(Icons.account_circle_rounded, tr('editName')),
     MyPageItem(CupertinoIcons.globe, tr('language')),
     MyPageItem(Icons.feedback_outlined, tr('feedback')),
+    MyPageItem(Icons.discord, tr('community')),
     MyPageItem(FontAwesomeIcons.blogger, tr('blog')),
     MyPageItem(Icons.apps, tr('podoApps')),
+    MyPageItem(Icons.home, tr('podoStory')),
     MyPageItem(Icons.logout_rounded, tr('logOut')),
     MyPageItem(Icons.remove_circle_outline_rounded, tr('removeAccount')),
   ];
@@ -66,12 +68,16 @@ class _MyPageState extends State<MyPage> {
   List<Map<String, String>> podoApps = [];
   late bool hasUserName;
   late ResponsiveSize rs;
+  final String discordUrl = "https://discord.gg/Ghc23CPu";
   final String blogUrl = "https://blog.podokorean.com";
+  final String websiteUrl = "https://www.podokorean.com";
   final String TITLE = 'title';
   final String ANDROID = 'android';
   final String IOS = 'ios';
+  final String CLICK_DISCORD = 'click_discord';
   final String CLICK_BLOG = 'click_blog';
   final String CLICK_APPS = 'click_apps';
+  final String CLICK_WEBSITE = 'click_website';
 
   Future<void> _launchUrl(Uri url) async {
     if (await canLaunchUrl(url)) {
@@ -423,8 +429,16 @@ class _MyPageState extends State<MyPage> {
                               ],
                             ))),
 
-                        // Blog
+                        // Discord
                         getExpansionPanel(items[3], const SizedBox.shrink(), onTap: () async {
+                          await FirebaseAnalytics.instance.logEvent(
+                            name: CLICK_DISCORD,
+                          );
+                          _launchUrl(Uri.parse(discordUrl));
+                        }, isExpandable: false),
+
+                        // Blog
+                        getExpansionPanel(items[4], const SizedBox.shrink(), onTap: () async {
                           await FirebaseAnalytics.instance.logEvent(
                             name: CLICK_BLOG,
                           );
@@ -433,7 +447,7 @@ class _MyPageState extends State<MyPage> {
 
                         // Podo Apps
                         getExpansionPanel(
-                          items[4],
+                          items[5],
                           ListTile(
                             title: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,9 +497,17 @@ class _MyPageState extends State<MyPage> {
                           ),
                         ),
 
+                        // Podo's Story
+                        getExpansionPanel(items[6], const SizedBox.shrink(), onTap: () async {
+                          await FirebaseAnalytics.instance.logEvent(
+                            name: CLICK_WEBSITE,
+                          );
+                          _launchUrl(Uri.parse(websiteUrl));
+                        }, isExpandable: false),
+
                         // Logout
                         getExpansionPanel(
-                            items[5],
+                            items[7],
                             ListTile(
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -539,7 +561,7 @@ class _MyPageState extends State<MyPage> {
 
                         // Remove account
                         getExpansionPanel(
-                            items[6],
+                            items[8],
                             ListTile(
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

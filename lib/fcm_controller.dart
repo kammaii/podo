@@ -119,7 +119,7 @@ class FcmController extends GetxController {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Image.asset('assets/images/podo.png', height: 100, width: 100),
       ),
-      duration: Duration(milliseconds: 2000),
+      duration: Duration(milliseconds: 5000),
     );
   }
 }
