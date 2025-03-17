@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
@@ -51,6 +52,7 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
   double sliverAppBarHeight = 200.0;
   double sliverAppBarStretchOffset = 100.0;
   final Map<String, Uint8List> _imageCache = {};
+  bool isLike = false;
 
   @override
   void initState() {
@@ -226,10 +228,6 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
 
   sliverList() {
     String html = koreanBite.explain[fo] ?? koreanBite.explain['en'];
-    List<Widget> l = [];
-    for (KoreanBiteExample example in examples) {
-      l.add(getExampleWidget(example));
-    }
 
     return SliverPadding(
         padding: EdgeInsets.all(rs.getSize(20)),
@@ -275,6 +273,34 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
                 color: Theme.of(context).primaryColor),
             const SizedBox(height: 10),
             ...List.generate(examples.length, (index) => getExampleWidget(examples[index])),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        if(!isLike) {
+                          isLike = true;
+                          final FirebaseFirestore firestore = FirebaseFirestore.instance;
+                          DocumentReference docRef = firestore.collection('KoreanBites').doc(koreanBite.id);
+                          firestore.runTransaction((transaction) async {
+                            DocumentSnapshot snapshot = await transaction.get(docRef);
+                            if (!snapshot.exists) {
+                              throw Exception("문서가 존재하지 않습니다!");
+                            }
+                            Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+                            int currentLikes = (data?['like'] ?? 0) as int;
+                            transaction.update(docRef, {'like': currentLikes + 1});
+                          }).catchError((error) {
+                            print("좋아요 증가 중 오류 발생: $error");
+                          });
+                        }
+                      });
+                    },
+                    icon: Icon(isLike ? CupertinoIcons.heart_fill : CupertinoIcons.heart),
+                    color: MyColors.red),
+              ],
+            ),
             const SizedBox(height: 20),
             Padding(
               padding: EdgeInsets.only(bottom: rs.getSize(100)),
@@ -373,7 +399,11 @@ class _KoreanBiteFrameState extends State<KoreanBiteFrame> with TickerProviderSt
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text.rich(TextSpan(children: spans),
-                              style: TextStyle(fontSize: 20, fontFamily: 'KoreanFont', height: 1.5, color: Theme.of(context).secondaryHeaderColor)),
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: 'KoreanFont',
+                                  height: 1.5,
+                                  color: Theme.of(context).secondaryHeaderColor)),
                         ),
                         const SizedBox(height: 5),
                         FittedBox(

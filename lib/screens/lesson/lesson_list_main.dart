@@ -27,6 +27,8 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class LessonListMain extends StatefulWidget {
   LessonListMain({Key? key, required this.course, required this.isTutorialEnabled}) : super(key: key);
@@ -383,8 +385,17 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
           height: rs.getSize(56),
           child: FloatingActionButton(
             heroTag: tag,
-            onPressed: () {
-              Get.toNamed(route, arguments: id);
+            onPressed: () async {
+              if (route == 'discord') {
+                Uri url = Uri.parse("https://discord.gg/Ghc23CPu");
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
+                } else {
+                  throw 'Could not launch $url';
+                }
+              } else {
+                Get.toNamed(route, arguments: id);
+              }
             },
             backgroundColor: btnColor,
             child: Icon(btnIcon, size: rs.getSize(30)),
@@ -417,7 +428,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         keyKoreanBites = GlobalKey();
         List<TargetFocus> targets = [
           myTutorial!.tutorialItem(id: "T1", keyTarget: keyMenu, content: tr('tutorial_lesson_list_1')),
-          myTutorial!.tutorialItem(id: "T2", keyTarget: keyKoreanBites, content: tr('tutorial_lesson_list_2'), isAlignBottom: false),
+          myTutorial!.tutorialItem(
+              id: "T2", keyTarget: keyKoreanBites, content: tr('tutorial_lesson_list_2'), isAlignBottom: false),
           myTutorial!.tutorialItem(id: "T3", content: tr('tutorial_lesson_list_3')),
         ];
         myTutorial!.addTargetsAndRunTutorial(context, targets);
@@ -450,13 +462,21 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               ? floatingBtn(
                   tag: 'workbookBtn',
                   route: MyStrings.routeWorkbookMain,
-                  btnColor: MyColors.pinkDark,
+                  btnColor: MyColors.greenDark,
                   btnIcon: FontAwesomeIcons.solidFileAudio,
                   title: tr('workbook'),
-                  titleColor: MyColors.wine,
+                  titleColor: MyColors.greenDark,
                   id: course.id,
                 )
               : const SizedBox.shrink(),
+          floatingBtn(
+              key: keyKoreanBites,
+              tag: 'discordBtn',
+              route: 'discord',
+              btnColor: MyColors.pinkDark,
+              btnIcon: Icons.discord,
+              title: tr('Community'),
+              titleColor: MyColors.wine),
           floatingBtn(
               key: keyKoreanBites,
               tag: 'koreanBitesBtn',
