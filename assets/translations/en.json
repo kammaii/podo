@@ -260,5 +260,7 @@
   "watchRewardAdKoreanBite": "Would you like to watch an ad \nto access this Korean Bite?",
   "examples": "Examples",
   "explain": "Explain",
-  "enable_notification": "Enable notifications and never miss new content!"
+  "enable_notification": "Enable notifications and never miss new content!",
+  "resubmit": "Resubmit"
+
 }

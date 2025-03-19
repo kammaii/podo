@@ -475,7 +475,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               route: 'discord',
               btnColor: MyColors.pinkDark,
               btnIcon: Icons.discord,
-              title: tr('Community'),
+              title: tr('community'),
               titleColor: MyColors.wine),
           floatingBtn(
               key: keyKoreanBites,

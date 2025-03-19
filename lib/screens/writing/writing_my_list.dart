@@ -30,7 +30,12 @@ class _WritingMyListState extends State<WritingMyList> {
   late final WritingController controller;
   final scrollController = ScrollController();
   final docsLimit = 10;
-  List<String> statusList = [tr('writingStatus0'), tr('writingStatus1'), tr('writingStatus2'), tr('writingStatus3')];
+  List<String> statusList = [
+    tr('writingStatus0'),
+    tr('writingStatus1'),
+    tr('writingStatus2'),
+    tr('writingStatus3')
+  ];
   List<Color> statusColors = [MyColors.mustard, MyColors.purple, MyColors.green, MyColors.red];
   DocumentSnapshot? lastSnapshot;
   bool isLoaded = false;
@@ -39,7 +44,8 @@ class _WritingMyListState extends State<WritingMyList> {
 
   loadWritings({bool isContinue = false}) async {
     final ref = FirebaseFirestore.instance.collection('Writings');
-    Query query = ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
+    Query query =
+        ref.where('userId', isEqualTo: User().id).orderBy('dateWriting', descending: true).limit(docsLimit);
 
     if (isContinue) {
       query = query.startAfterDocument(lastSnapshot!);
@@ -70,12 +76,16 @@ class _WritingMyListState extends State<WritingMyList> {
 
   Widget getItem(Writing writing, {required String tag}) {
     String content = '';
+    Icon? icon;
     if (tag == 'Q') {
       content = writing.questionTitle;
+      icon = Icon(CupertinoIcons.question, color: Theme.of(context).primaryColor);
     } else if (tag == 'A') {
       content = writing.userWriting;
+      icon = Icon(Icons.mode, color: Theme.of(context).primaryColor);
     } else if (tag == 'C') {
       content = writing.correction;
+      icon = Icon(CupertinoIcons.check_mark_circled, color: Theme.of(context).primaryColor);
     }
     String extractedText = htmlParser.parse(content).body!.text;
 
@@ -83,7 +93,7 @@ class _WritingMyListState extends State<WritingMyList> {
       padding: EdgeInsets.symmetric(vertical: tag == 'A' ? rs.getSize(10) : 0),
       child: Row(
         children: [
-          MyWidget().getTextWidget(rs, text: '$tag. ', isBold: true, color: Theme.of(context).secondaryHeaderColor),
+          icon ?? const SizedBox.shrink(),
           SizedBox(width: rs.getSize(15)),
           Expanded(
             child: HtmlWidget(
@@ -147,18 +157,14 @@ class _WritingMyListState extends State<WritingMyList> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     MyWidget().getRoundedContainer(
-                        widget: MyWidget()
-                            .getTextWidget(rs, text: statusList[status], color: Theme.of(context).cardColor, size: 13),
+                        widget: MyWidget().getTextWidget(rs,
+                            text: statusList[status], color: Theme.of(context).cardColor, size: 13),
                         radius: 20,
                         padding: EdgeInsets.symmetric(vertical: rs.getSize(2), horizontal: rs.getSize(10)),
                         bgColor: statusColors[status]),
-                    SizedBox(width: rs.getSize(10)),
-                    Expanded(
-                        child: MyWidget().getTextWidget(rs,
-                            text: 'Lv.${(writing.questionLevel + 1).toString()}',
-                            color: Theme.of(context).disabledColor)),
                     Column(
                       children: [
                         Row(
@@ -194,21 +200,37 @@ class _WritingMyListState extends State<WritingMyList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: items,
                 ),
-                const Divider(),
                 Visibility(
                   visible: writing.comments != null,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyWidget()
-                          .getTextWidget(rs, text: 'Comments', isBold: true, color: Theme.of(context).primaryColor),
+                      const Divider(),
+                      Icon(CupertinoIcons.chat_bubble, color: Theme.of(context).primaryColor),
                       const SizedBox(height: 10),
                       MyWidget().getTextWidget(rs, text: writing.comments, color: Theme.of(context).primaryColor),
                     ],
                   ),
-                )
+                ),
               ],
             ),
             bgColor: Theme.of(context).cardColor),
+        const SizedBox(height: 5),
+        writing.lessonId != null && writing.status != 0
+            ? MyWidget().getRoundBtnWidget(
+                rs,
+                text: tr('resubmit'),
+                f: () {
+                  Get.toNamed(MyStrings.routeWritingMain, arguments: writing.lessonId);
+                },
+                textSize: 15,
+                verticalPadding: 5,
+                horizontalPadding: 5,
+                borderRadius: 8,
+                bgColor: Theme.of(context).canvasColor,
+                fontColor: Theme.of(context).cardColor,
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }
