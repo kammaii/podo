@@ -27,11 +27,9 @@ class WritingMain extends StatefulWidget {
   State<WritingMain> createState() => _WritingMainState();
 }
 
-class _WritingMainState extends State<WritingMain>
-    with SingleTickerProviderStateMixin {
+class _WritingMainState extends State<WritingMain> with SingleTickerProviderStateMixin {
   String lessonId = Get.arguments;
   List<WritingQuestion> questions = [];
-  final rockets = ['rocket1', 'rocket2', 'rocket3'];
   final KO = 'ko';
   String fo = User().language;
   late AnimationController animationController;
@@ -55,13 +53,9 @@ class _WritingMainState extends State<WritingMain>
   void initState() {
     super.initState();
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final Query questionQuery = firestore
-        .collection('Lessons/$lessonId/WritingQuestions')
-        .orderBy('orderId');
-    final Query countQuery = firestore
-        .collection('Writings')
-        .where('userId', isEqualTo: User().id)
-        .where('status', isEqualTo: 0);
+    final Query questionQuery = firestore.collection('Lessons/$lessonId/WritingQuestions').orderBy('orderId');
+    final Query countQuery =
+        firestore.collection('Writings').where('userId', isEqualTo: User().id).where('status', isEqualTo: 0);
     futures = Future.wait([
       Database().getDocs(query: questionQuery),
       countQuery.count().get(),
@@ -117,11 +111,10 @@ class _WritingMainState extends State<WritingMain>
   Function? onSendBtn() {
     if (controller.isChecked) {
       return () {
-        MyWidget().showDialog(context, rs, content: tr('wantRequestCorrection'),
-            yesFn: () async {
-          await FirebaseAnalytics.instance.logEvent(
-              name: 'correction_request', parameters: {'userId': User().id});
+        MyWidget().showDialog(context, rs, content: tr('wantRequestCorrection'), yesFn: () async {
+          await FirebaseAnalytics.instance.logEvent(name: 'correction_request', parameters: {'userId': User().id});
           Writing writing = Writing(selectedQuestion!);
+          writing.lessonId = lessonId;
           writing.userWriting = textEditController.text;
           Get.back();
           toggleVisibility(askFcmApproval: !User().fcmPermission);
@@ -156,22 +149,16 @@ class _WritingMainState extends State<WritingMain>
             Get.dialog(
               AlertDialog(
                 title: Text(tr('requestNotAvailableTitle'),
-                    style: TextStyle(
-                        fontSize: rs.getSize(18),
-                        color: Theme.of(context).secondaryHeaderColor)),
+                    style: TextStyle(fontSize: rs.getSize(18), color: Theme.of(context).secondaryHeaderColor)),
                 content: Text(tr('requestNotAvailableContent'),
-                    style: TextStyle(
-                        fontSize: rs.getSize(15),
-                        color: Theme.of(context).secondaryHeaderColor)),
+                    style: TextStyle(fontSize: rs.getSize(15), color: Theme.of(context).secondaryHeaderColor)),
                 actions: [
                   ElevatedButton(
                     onPressed: () {
                       Get.back();
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor),
-                    child: MyWidget().getTextWidget(rs,
-                        text: tr('ok'), color: Theme.of(context).cardColor),
+                    style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+                    child: MyWidget().getTextWidget(rs, text: tr('ok'), color: Theme.of(context).cardColor),
                   ),
                 ],
               ),
@@ -186,8 +173,7 @@ class _WritingMainState extends State<WritingMain>
               Transform.scale(
                 alignment: Alignment.bottomLeft,
                 scale: 0.8,
-                child:
-                    Image.asset('assets/images/${rockets[question.level]}.png'),
+                child: Image.asset('assets/images/rocket${question.level + 1}.png'),
               ),
               SizedBox(height: rs.getSize(10)),
               MyWidget().getTextWidget(
@@ -215,7 +201,7 @@ class _WritingMainState extends State<WritingMain>
 
     myTutorial = MyTutorial();
     bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_WRITING_FRAME);
-    if(isTutorialEnabled) {
+    if (isTutorialEnabled) {
       keyCorrectionCount = GlobalKey();
       keyQuestion = GlobalKey();
       List<TargetFocus> targets = [
@@ -225,7 +211,6 @@ class _WritingMainState extends State<WritingMain>
         myTutorial!.tutorialItem(id: "T4", keyTarget: keyQuestion, content: tr('tutorial_writing_frame_4')),
       ];
       myTutorial!.addTargetsAndRunTutorial(context, targets);
-
     } else {
       myTutorial = null;
     }
@@ -244,9 +229,10 @@ class _WritingMainState extends State<WritingMain>
                 child: Image.asset('assets/images/podo.png'),
               ),
               Padding(
-                  padding: EdgeInsets.only(
-                      right: rs.getSize(20), top: rs.getSize(10)),
-                  child: Obx(() => MyWidget().getTextWidget(key: isTutorialEnabled ? keyCorrectionCount : null, rs,
+                  padding: EdgeInsets.only(right: rs.getSize(20), top: rs.getSize(10)),
+                  child: Obx(() => MyWidget().getTextWidget(
+                      key: isTutorialEnabled ? keyCorrectionCount : null,
+                      rs,
                       text: 'x ${controller.leftRequestCount}',
                       color: Theme.of(context).primaryColor))),
             ],
@@ -263,24 +249,19 @@ class _WritingMainState extends State<WritingMain>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
                   child: MyWidget().getTextWidget(rs,
-                      text: tr('selectQuestion'),
-                      isTextAlignCenter: true,
-                      color: Theme.of(context).primaryColor),
+                      text: tr('selectQuestion'), isTextAlignCenter: true, color: Theme.of(context).primaryColor),
                 ),
                 Expanded(
                   child: FutureBuilder(
                     future: futures,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       questions = [];
-                      if (snapshot.hasData &&
-                          snapshot.connectionState != ConnectionState.waiting) {
+                      if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                         for (dynamic snapshot in snapshot.data[0]) {
-                          questions.add(WritingQuestion.fromJson(
-                              snapshot.data() as Map<String, dynamic>));
+                          questions.add(WritingQuestion.fromJson(snapshot.data() as Map<String, dynamic>));
                         }
                         WidgetsBinding.instance!.addPostFrameCallback((_) {
-                          controller.leftRequestCount.value =
-                              maxRequestCount - snapshot.data[1].count as int;
+                          controller.leftRequestCount.value = maxRequestCount - snapshot.data[1].count as int;
                         });
                         return ListView.builder(
                           itemCount: questions.length,
@@ -320,8 +301,7 @@ class _WritingMainState extends State<WritingMain>
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 2 / 3,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: borderRadius, topRight: borderRadius),
+                  borderRadius: BorderRadius.only(topLeft: borderRadius, topRight: borderRadius),
                   color: Theme.of(context).cardColor,
                 ),
                 child: GetBuilder<WritingController>(
@@ -335,8 +315,7 @@ class _WritingMainState extends State<WritingMain>
                             children: [
                               TextButton(
                                   onPressed: () {
-                                    Get.toNamed(MyStrings.routeOtherWritingList,
-                                        arguments: selectedQuestion!.id);
+                                    Get.toNamed(MyStrings.routeOtherWritingList, arguments: selectedQuestion!.id);
                                   },
                                   child: MyWidget().getTextWidget(
                                     rs,
@@ -349,9 +328,7 @@ class _WritingMainState extends State<WritingMain>
                           ),
                           SizedBox(height: rs.getSize(20)),
                           MyWidget().getTextWidget(rs,
-                              text: selectedQuestion != null
-                                  ? selectedQuestion!.title[KO]
-                                  : '',
+                              text: selectedQuestion != null ? selectedQuestion!.title[KO] : '',
                               isKorean: true,
                               size: 20,
                               color: Theme.of(context).secondaryHeaderColor),
@@ -360,8 +337,7 @@ class _WritingMainState extends State<WritingMain>
                               controller: textEditController,
                               maxLength: maxLength,
                               maxLines: 1,
-                              hint: tr('writeYourAnswerInKorean'),
-                              onSubmitted: (value) {
+                              hint: tr('writeYourAnswerInKorean'), onSubmitted: (value) {
                             FocusScope.of(context).unfocus();
                           }),
                           SizedBox(height: rs.getSize(30)),
@@ -381,12 +357,10 @@ class _WritingMainState extends State<WritingMain>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 MyWidget().getCheckBox(rs,
-                                    value: controller.isChecked,
-                                    onChanged: controller.setCheckbox),
+                                    value: controller.isChecked, onChanged: controller.setCheckbox),
                                 MyWidget().getTextWidget(rs,
                                     text: tr('iveReadTheFollowing'),
-                                    color:
-                                        Theme.of(context).secondaryHeaderColor),
+                                    color: Theme.of(context).secondaryHeaderColor),
                               ],
                             ),
                           ),
@@ -394,8 +368,7 @@ class _WritingMainState extends State<WritingMain>
                           Expanded(
                               child: SingleChildScrollView(
                                   child: MyWidget().getTextWidget(rs,
-                                      text: tr('writingComment'),
-                                      color: Theme.of(context).disabledColor))),
+                                      text: tr('writingComment'), color: Theme.of(context).disabledColor))),
                           SizedBox(height: rs.getSize(20)),
                         ],
                       ),

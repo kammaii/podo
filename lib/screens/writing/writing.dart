@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 class Writing {
   late String id;
+  String? lessonId;
   late String questionId;
   late String questionTitle;
   late int questionLevel;
@@ -32,6 +33,7 @@ class Writing {
   }
 
   static const String ID = 'id';
+  static const String LESSON_ID = 'lessonId';
   static const String QUESTIONID = 'questionId';
   static const String QUESTIONTITLE = 'questionTitle';
   static const String QUESTIONLEVEL = 'questionLevel';
@@ -47,6 +49,9 @@ class Writing {
 
   Writing.fromJson(Map<String, dynamic> json) {
     id = json[ID];
+    if(json[LESSON_ID] != null) {
+      lessonId = json[LESSON_ID];
+    }
     questionId = json[QUESTIONID];
     questionTitle = json[QUESTIONTITLE];
     questionLevel = json[QUESTIONLEVEL];
@@ -69,6 +74,7 @@ class Writing {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
       ID: id,
+      LESSON_ID: lessonId,
       QUESTIONID: questionId,
       QUESTIONTITLE: questionTitle,
       QUESTIONLEVEL: questionLevel,
