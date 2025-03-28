@@ -25,6 +25,7 @@ class MyStrings {
   static const String routeWorkbookMain = '/workbookMain';
   static const String routeKoreanBiteListMain = '/koreanBiteListMain';
   static const String routeKoreanBiteFrame = '/koreanBiteFrame';
+  static const String routeLessonCourseList = '/lessonCourseList';
   static const String subject = 'subject';
   static const String explain = 'explain';
   static const String repeat = 'repeat';

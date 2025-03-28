@@ -56,6 +56,9 @@ class _LogoState extends State<Logo> {
       Get.put(WritingController());
       Get.put(ReadingController());
       Get.toNamed(MyStrings.routeMainFrame);
+      if(!courseController.isCourseExist) {
+        Get.toNamed(MyStrings.routeLessonCourseList);
+      }
       if (user.User().os.isEmpty) {
         String os = '';
         if (Platform.isIOS) {

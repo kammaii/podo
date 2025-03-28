@@ -51,22 +51,18 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
-  final courseController = Get.find<LessonCourseController>();
   final lessonController = Get.put(LessonController());
-  bool isAdmin = false;
   late ResponsiveSize rs;
   late bool isPremiumUser;
 
   MyTutorial? myTutorial;
   GlobalKey? keyMenu;
   GlobalKey? keyKoreanBites;
+  GlobalKey? keyDiscord;
 
   @override
   void initState() {
     super.initState();
-    if (User().email == User().admin) {
-      isAdmin = true;
-    }
     User().status == 2 || User().status == 3 ? isPremiumUser = true : isPremiumUser = false;
     animationController = AnimationController(
       vsync: this,
@@ -155,8 +151,6 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     lesson = Lesson.fromJson(course.lessons[index] as Map<String, dynamic>);
     bool isReleased = lesson.isReleased;
 
-    isAdmin ? isReleased = true : null;
-
     bool isLocked = !lesson.isFree && !isPremiumUser;
 
     List<Widget> optionIcons = [];
@@ -175,112 +169,108 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     }
 
     return isReleased
-        ? Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(cardBorderRadius),
-                  ),
-                  color: Theme.of(context).cardColor,
-                  child: InkWell(
-                    onTap: () {
-                      if (isLocked) {
-                        MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
-                          Get.toNamed(MyStrings.routePremiumMain);
-                        }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
-                      } else {
-                        if (!isPremiumUser && !lesson.hasOptions && !lesson.adFree) {
-                          MyWidget().showDialog(context, rs,
-                              content: tr('watchRewardAdLesson'),
-                              yesFn: () {
-                                AdsController().showRewardAd();
-                                runLesson(lesson);
-                              },
-                              hasNoBtn: false,
-                              textBtnText: tr('explorePremium'),
-                              textBtnFn: () {
-                                Get.toNamed(MyStrings.routePremiumMain);
-                              });
-                        } else {
+        ? Padding(
+          padding: EdgeInsets.symmetric(horizontal: rs.getSize(10)),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+            ),
+            color: Theme.of(context).cardColor,
+            child: InkWell(
+              onTap: () {
+                if (isLocked) {
+                  MyWidget().showDialog(context, rs, content: tr('wantUnlockLesson'), yesFn: () {
+                    Get.toNamed(MyStrings.routePremiumMain);
+                  }, hasPremiumTag: true, hasNoBtn: false, yesText: tr('explorePremium'));
+                } else {
+                  if (!isPremiumUser && !lesson.hasOptions && !lesson.adFree) {
+                    MyWidget().showDialog(context, rs,
+                        content: tr('watchRewardAdLesson'),
+                        yesFn: () {
+                          AdsController().showRewardAd();
                           runLesson(lesson);
-                        }
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(rs.getSize(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  MyWidget().getTextWidget(rs,
-                                      text: '$index. ${lesson.type}', color: Theme.of(context).primaryColorDark),
-                                  Obx(
-                                    () => lessonController.getIsCompleted(lesson.id)
-                                        ? Padding(
-                                            padding: const EdgeInsets.only(left: 10),
-                                            child: Icon(
-                                              Icons.check_circle,
-                                              color: Theme.of(context).brightness == Brightness.dark
-                                                  ? MyColors.darkPurple
-                                                  : MyColors.green,
-                                              size: rs.getSize(20),
-                                            ),
-                                          )
-                                        : const SizedBox.shrink(),
-                                  ),
-                                  lesson.tag != null && lesson.tag.toString().isNotEmpty
-                                      ? Padding(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          child: MyWidget().getRoundedContainer(
-                                              widget: MyWidget().getTextWidget(rs,
-                                                  text: lesson.tag, color: Theme.of(context).focusColor, size: 13),
-                                              bgColor: Theme.of(context).shadowColor,
-                                              radius: 30,
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
-                                        )
-                                      : const SizedBox.shrink(),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Row(children: optionIcons),
-                                  isLocked
-                                      ? Padding(
-                                          padding: EdgeInsets.only(left: rs.getSize(8)),
-                                          child: Icon(CupertinoIcons.lock_fill,
-                                              color: Theme.of(context).disabledColor, size: 15),
-                                        )
-                                      : const SizedBox.shrink(),
-                                ],
-                              )
-                            ],
-                          ),
-                          SizedBox(height: rs.getSize(10)),
-                          MyWidget().getTextWidget(
-                            rs,
-                            text: lesson.title[KO],
-                            size: 20,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          SizedBox(height: rs.getSize(10)),
-                          course.isTopicMode
-                              ? MyWidget().getTextWidget(rs,
-                                  text: lesson.title[language], color: Theme.of(context).disabledColor)
-                              : const SizedBox.shrink(),
-                        ],
-                      ),
+                        },
+                        hasNoBtn: false,
+                        textBtnText: tr('explorePremium'),
+                        textBtnFn: () {
+                          Get.toNamed(MyStrings.routePremiumMain);
+                        });
+                  } else {
+                    runLesson(lesson);
+                  }
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.all(rs.getSize(10)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            MyWidget().getTextWidget(rs,
+                                text: '$index. ${lesson.type}', color: Theme.of(context).primaryColorDark),
+                            Obx(
+                              () => lessonController.getIsCompleted(lesson.id)
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? MyColors.darkPurple
+                                            : MyColors.green,
+                                        size: rs.getSize(20),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                            lesson.tag != null && lesson.tag.toString().isNotEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: MyWidget().getRoundedContainer(
+                                        widget: MyWidget().getTextWidget(rs,
+                                            text: lesson.tag, color: Theme.of(context).focusColor, size: 13),
+                                        bgColor: Theme.of(context).shadowColor,
+                                        radius: 30,
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3)),
+                                  )
+                                : const SizedBox.shrink(),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Row(children: optionIcons),
+                            isLocked
+                                ? Padding(
+                                    padding: EdgeInsets.only(left: rs.getSize(8)),
+                                    child: Icon(CupertinoIcons.lock_fill,
+                                        color: Theme.of(context).disabledColor, size: 15),
+                                  )
+                                : const SizedBox.shrink(),
+                          ],
+                        )
+                      ],
                     ),
-                  ),
+                    SizedBox(height: rs.getSize(10)),
+                    MyWidget().getTextWidget(
+                      rs,
+                      text: lesson.title[KO],
+                      size: 20,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    SizedBox(height: rs.getSize(10)),
+                    course.isTopicMode
+                        ? MyWidget().getTextWidget(rs,
+                            text: lesson.title[language], color: Theme.of(context).disabledColor)
+                        : const SizedBox.shrink(),
+                  ],
                 ),
               ),
-            ],
-          )
+            ),
+          ),
+        )
         : const SizedBox.shrink();
   }
 
@@ -300,7 +290,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
         icon: Icon(Icons.menu, size: rs.getSize(25)),
         color: Theme.of(context).primaryColor,
         onPressed: () {
-          courseController.setVisibility(true);
+          Get.toNamed(MyStrings.routeLessonCourseList);
           Future.delayed(const Duration(milliseconds: 500), () {
             scrollController.jumpTo(0);
           });
@@ -426,11 +416,14 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
       if (isTutorialEnabled) {
         keyMenu = GlobalKey();
         keyKoreanBites = GlobalKey();
+        keyDiscord = GlobalKey();
         List<TargetFocus> targets = [
           myTutorial!.tutorialItem(id: "T1", keyTarget: keyMenu, content: tr('tutorial_lesson_list_1')),
           myTutorial!.tutorialItem(
               id: "T2", keyTarget: keyKoreanBites, content: tr('tutorial_lesson_list_2'), isAlignBottom: false),
-          myTutorial!.tutorialItem(id: "T3", content: tr('tutorial_lesson_list_3')),
+          myTutorial!.tutorialItem(
+              id: "T3", keyTarget: keyDiscord, content: tr('tutorial_lesson_list_3'), isAlignBottom: false),
+          myTutorial!.tutorialItem(id: "T4", content: tr('tutorial_lesson_list_4')),
         ];
         myTutorial!.addTargetsAndRunTutorial(context, targets);
       } else {
@@ -470,7 +463,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                 )
               : const SizedBox.shrink(),
           floatingBtn(
-              key: keyKoreanBites,
+              key: keyDiscord,
               tag: 'discordBtn',
               route: 'discord',
               btnColor: MyColors.pinkDark,

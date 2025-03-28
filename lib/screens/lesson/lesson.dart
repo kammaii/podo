@@ -13,6 +13,7 @@ class Lesson {
   late bool isSpeakingReleased;
   late bool isReadingReleased;
   late bool adFree; // 광고 제거 (For 한글,한자 레슨 Intro)
+  String? courseTitle; // Grammar 모드에서 검색으로 레슨을 실행 시 logEvent 입력용.
 
   static const String ID = 'id';
   static const String TYPE = 'type';

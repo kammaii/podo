@@ -12,6 +12,7 @@ import 'package:podo/screens/flashcard/flashcard_review.dart';
 import 'package:podo/screens/korean_bite/korean_bite_frame.dart';
 import 'package:podo/screens/korean_bite/korean_bite_list_main.dart';
 import 'package:podo/screens/lesson/lesson_complete.dart';
+import 'package:podo/screens/lesson/lesson_course_list.dart';
 import 'package:podo/screens/lesson/lesson_frame.dart';
 import 'package:podo/screens/lesson/lesson_summary_main.dart';
 import 'package:podo/screens/lesson/workbook_main.dart';
@@ -146,6 +147,11 @@ class MyApp extends StatelessWidget {
               GetPage(name: MyStrings.routeWorkbookMain, page: () => const WorkbookMain()),
               GetPage(name: MyStrings.routeKoreanBiteListMain, page: () => const KoreanBiteListMain()),
               GetPage(name: MyStrings.routeKoreanBiteFrame, page: () => const KoreanBiteFrame()),
+              GetPage(
+                  name: MyStrings.routeLessonCourseList,
+                  page: () => const LessonCourseList(),
+                  transition: Transition.downToUp,
+                  transitionDuration: Duration(milliseconds: 300)),
             ],
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,

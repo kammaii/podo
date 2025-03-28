@@ -45,7 +45,6 @@ class User {
   int? buildNumber;
   String? expirationDate; // only for MyPage
   bool showPremiumDialog = true;
-  final admin = 'gabmanpark@gmail.com';
   bool isConvertedBasic = false;
   bool needUpdate = false;
   String? path;
