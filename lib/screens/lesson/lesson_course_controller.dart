@@ -5,20 +5,15 @@ import 'package:podo/common/database.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
 import 'package:podo/screens/my_page/user.dart';
+import 'package:podo/values/my_strings.dart';
 
 class LessonCourseController extends GetxController {
 
-  bool isVisible = false;
   List<List<LessonCourse>> courses = [[],[]];
+  bool isCourseExist = false;
 
   Future<void> loadCourses() async {
-    bool isAdmin = User().email == User().admin;
-    final Query query;
-    if(isAdmin) {
-      query = FirebaseFirestore.instance.collection('LessonCourses');
-    } else {
-      query = FirebaseFirestore.instance.collection('LessonCourses').where('isReleased', isEqualTo: true);
-    }
+    final Query query = FirebaseFirestore.instance.collection('LessonCourses').where('isReleased', isEqualTo: true);
     List<dynamic> snapshots = await Database().getDocs(query: query);
     courses = [[],[]];
     for(dynamic snapshot in snapshots) {
@@ -32,12 +27,9 @@ class LessonCourseController extends GetxController {
     courses[0].sort((a,b) => a.orderId.compareTo(b.orderId));
     courses[1].sort((a,b) => a.orderId.compareTo(b.orderId));
     LessonCourse? course = LocalStorage().getLessonCourse();
-    bool isCourseExist = false;
+
     if(course != null) {
       isCourseExist = checkExist(course.id);
-    }
-    if(!isCourseExist) {
-      isVisible = true;
     }
   }
 
@@ -51,10 +43,5 @@ class LessonCourseController extends GetxController {
       }
     }
     return false;
-  }
-
-  setVisibility(bool isVisible) {
-    this.isVisible = isVisible;
-    update();
   }
 }

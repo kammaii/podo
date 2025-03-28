@@ -73,17 +73,18 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
 
     // 앱 실행 시 플래시 카드가 empty 면 실행 안 됨.
     myTutorial = MyTutorial();
-    bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_FLASHCARD_MAIN) && controller.cards.isNotEmpty;
-    if(isTutorialEnabled) {
+    bool isTutorialEnabled =
+        myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_FLASHCARD_MAIN) && controller.cards.isNotEmpty;
+    if (isTutorialEnabled) {
       keyCard = keyCard ?? GlobalKey();
       keyReview = GlobalKey();
       List<TargetFocus> targets = [
         myTutorial!.tutorialItem(id: "T1", keyTarget: keyCard, content: tr('tutorial_flashcard_frame_1')),
         myTutorial!.tutorialItem(id: "T2", keyTarget: keyCard, content: tr('tutorial_flashcard_frame_2')),
-        myTutorial!.tutorialItem(id: "T3", keyTarget: keyReview, content: tr('tutorial_flashcard_frame_3'), isAlignBottom: false),
+        myTutorial!.tutorialItem(
+            id: "T3", keyTarget: keyReview, content: tr('tutorial_flashcard_frame_3'), isAlignBottom: false),
       ];
       myTutorial!.addTargetsAndRunTutorial(context, targets);
-
     } else {
       myTutorial = null;
     }
@@ -95,11 +96,17 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
             padding: const EdgeInsets.all(10),
             child: Column(
               children: [
-                MyWidget().getSearchWidget(context, rs,
-                    focusNode: _focusNode, controller: searchController, hint: tr('search'), onChanged: (text) {
-                  searchText = searchController.text;
-                  controller.update();
-                }),
+                MyWidget().getSearchWidget(
+                  context,
+                  rs,
+                  focusNode: _focusNode,
+                  controller: searchController,
+                  hint: tr('search'),
+                  onChanged: (text) {
+                    searchText = searchController.text;
+                    controller.update();
+                  },
+                ),
                 SizedBox(height: rs.getSize(20)),
                 Expanded(
                   child: GetBuilder<FlashCardController>(
@@ -137,7 +144,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                   children: [
                                     animationWidget(IconButton(
                                         onPressed: () {
-                                          MyWidget().showDialog(context, rs, content: tr('wantRemoveFlashcard'), yesFn: () {
+                                          MyWidget().showDialog(context, rs, content: tr('wantRemoveFlashcard'),
+                                              yesFn: () {
                                             List<String> ids = [];
                                             for (int i = 0; i < controller.isChecked.length; i++) {
                                               controller.isChecked[i] ? ids.add(controller.cards[i].id) : null;
@@ -160,7 +168,8 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                       child: Row(
                                         children: [
                                           MyWidget().getTextWidget(rs,
-                                              text: '$cardsLength ', color: Theme.of(context).secondaryHeaderColor),
+                                              text: '$cardsLength ',
+                                              color: Theme.of(context).secondaryHeaderColor),
                                           isBasicUser
                                               ? MyWidget().getTextWidget(
                                                   rs,
@@ -186,7 +195,10 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                                         FavoriteIcon().getIcon(context, rs),
                                         SizedBox(height: rs.getSize(10)),
                                         MyWidget().getTextWidget(rs,
-                                            text: tr('noFlashCards'), isTextAlignCenter: true, size: 18, color: Theme.of(context).secondaryHeaderColor),
+                                            text: tr('noFlashCards'),
+                                            isTextAlignCenter: true,
+                                            size: 18,
+                                            color: Theme.of(context).secondaryHeaderColor),
                                         SizedBox(height: rs.getSize(50)),
                                       ],
                                     )
@@ -230,14 +242,15 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                     child: GetBuilder<FlashCardController>(
                       builder: (_) {
                         return MyWidget().getRoundBtnWidget(
-                          key: keyReview,
-                          rs,
-                          text: tr('review'),
-                          bgColor: controller.cards.isNotEmpty ? Theme.of(context).canvasColor : Theme.of(context).disabledColor,
-                          f: onReviewBtn,
-                          hasNullFunction: true,
-                          fontColor: Theme.of(context).cardColor
-                        );
+                            key: keyReview,
+                            rs,
+                            text: tr('review'),
+                            bgColor: controller.cards.isNotEmpty
+                                ? Theme.of(context).canvasColor
+                                : Theme.of(context).disabledColor,
+                            f: onReviewBtn,
+                            hasNullFunction: true,
+                            fontColor: Theme.of(context).cardColor);
                       },
                     ),
                   ),
@@ -294,10 +307,14 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
             child: Row(
               children: [
                 Expanded(
-                    child: Text(key: hasKey ? keyCard : null, front,
+                    child: Text(
+                        key: hasKey ? keyCard : null,
+                        front,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2), color: Theme.of(context).secondaryHeaderColor))),
+                        style: TextStyle(
+                            fontSize: rs.getSize(15, bigger: 1.2),
+                            color: Theme.of(context).secondaryHeaderColor))),
                 SizedBox(
                     width: rs.getSize(20),
                     height: rs.getSize(20),
@@ -306,7 +323,9 @@ class _FlashCardMainState extends State<FlashCardMain> with TickerProviderStateM
                     child: Text(back,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(fontSize: rs.getSize(15, bigger: 1.2), color: Theme.of(context).secondaryHeaderColor))),
+                        style: TextStyle(
+                            fontSize: rs.getSize(15, bigger: 1.2),
+                            color: Theme.of(context).secondaryHeaderColor))),
               ],
             ),
           ),
