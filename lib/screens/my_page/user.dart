@@ -49,6 +49,7 @@ class User {
   bool needUpdate = false;
   String? path;
   bool? isFreeTrialEnabled;
+  String discordLink = ''; // discord 초대 링크 만료 문제 해결되면 삭제할 것
 
   static const String ID = 'id';
   static const String OS = 'os';
@@ -231,6 +232,7 @@ class User {
       DocumentSnapshot<Map<String, dynamic>> buildNumSnapshot = await Database().getDoc(collection: 'BuildNumber', docId: 'latest');
       if(buildNumSnapshot.exists) {
         int lastBuildNum = buildNumSnapshot.data()!['buildNumber'];
+        discordLink = buildNumSnapshot.data()!['discordLink'];
         if(lastBuildNum > buildNumber!) {
           needUpdate = true;
         }

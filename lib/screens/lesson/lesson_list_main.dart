@@ -377,7 +377,8 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
             heroTag: tag,
             onPressed: () async {
               if (route == 'discord') {
-                Uri url = Uri.parse("https://discord.gg/Ghc23CPu");
+                FirebaseAnalytics.instance.logEvent(name: 'click_discord');
+                Uri url = Uri.parse(User().discordLink);
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
