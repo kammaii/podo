@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -102,14 +103,22 @@ class FcmController extends GetxController {
             break;
             
           case 'koreanBite':
-            showSnackBar(message.notification!.title!, message.notification!.body!);
+            showSnackBar(message.notification!.title!, message.notification!.body!, f: () async {
+              String koreanBiteId = message.data['koreanBiteId'];
+              await Database().getDoc(collection: 'KoreanBites', docId: koreanBiteId).then((snapshot) async {
+                KoreanBite bite = KoreanBite.fromJson(snapshot.data() as Map<String, dynamic>);
+                await FirebaseAnalytics.instance
+                    .logEvent(name: 'fcm_click_koreanbite', parameters: {'title': bite.title['ko']});
+                Get.toNamed(MyStrings.routeKoreanBiteListMain, arguments: bite);
+              });
+            });
           break;
         }
       }
     });
   }
   
-  void showSnackBar(String title, String content) {
+  void showSnackBar(String title, String content, {Function? f}) {
     Get.snackbar(
       title,
       content,
@@ -120,6 +129,7 @@ class FcmController extends GetxController {
         child: Image.asset('assets/images/podo.png', height: 100, width: 100),
       ),
       duration: Duration(milliseconds: 5000),
+      onTap: f != null ? f() : null,
     );
   }
 }
