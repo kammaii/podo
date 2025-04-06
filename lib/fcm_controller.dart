@@ -129,7 +129,7 @@ class FcmController extends GetxController {
         child: Image.asset('assets/images/podo.png', height: 100, width: 100),
       ),
       duration: Duration(milliseconds: 5000),
-      onTap: f != null ? f() : null,
+      onTap: f != null ? (_) => f() : null,
     );
   }
 }
