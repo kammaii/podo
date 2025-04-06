@@ -68,7 +68,6 @@ class _MyPageState extends State<MyPage> {
   List<Map<String, String>> podoApps = [];
   late bool hasUserName;
   late ResponsiveSize rs;
-  final String discordUrl = "https://discord.gg/Ghc23CPu";
   final String blogUrl = "https://blog.podokorean.com";
   final String websiteUrl = "https://www.podokorean.com";
   final String TITLE = 'title';
@@ -434,7 +433,7 @@ class _MyPageState extends State<MyPage> {
                           await FirebaseAnalytics.instance.logEvent(
                             name: CLICK_DISCORD,
                           );
-                          _launchUrl(Uri.parse(discordUrl));
+                          _launchUrl(Uri.parse(user.User().discordLink));
                         }, isExpandable: false),
 
                         // Blog
