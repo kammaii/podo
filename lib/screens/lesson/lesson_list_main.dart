@@ -457,7 +457,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
                   tag: 'workbookBtn',
                   route: MyStrings.routeWorkbookMain,
                   btnColor: MyColors.greenDark,
-                  btnIcon: FontAwesomeIcons.solidFileAudio,
+                  btnIcon: Icons.menu_book,
                   title: tr('workbook'),
                   titleColor: MyColors.greenDark,
                   id: course.id,
