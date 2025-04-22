@@ -49,6 +49,7 @@ class _WorkbookMainState extends State<WorkbookMain> {
   late Workbook workbook;
   String? workbookPrice;
   final Map<String, Uint8List> _imageCache = {};
+  ScrollController sc = ScrollController();
 
   @override
   void initState() {
@@ -119,6 +120,7 @@ class _WorkbookMainState extends State<WorkbookMain> {
           body: Column(
             children: [
               GridView.builder(
+                controller: sc,
                 padding: EdgeInsets.all(rs.getSize(20)),
                 shrinkWrap: true,
                 itemCount: item.audios.length,
@@ -217,6 +219,7 @@ class _WorkbookMainState extends State<WorkbookMain> {
             ? Padding(
                 padding: EdgeInsets.all(rs.getSize(20)),
                 child: SingleChildScrollView(
+                  controller: sc,
                   child: Column(
                     children: [
                       Visibility(
