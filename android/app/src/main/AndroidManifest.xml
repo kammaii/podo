@@ -71,8 +71,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data
                     android:scheme="https"
-                    android:host="podo-49335.firebaseapp.com or a custom hosting domain"
-                    android:pathPrefix="/__/auth/links" />
+                    android:host="podo-49335.firebaseapp.com"
+                    android:pathPrefix="/__/auth" />
             </intent-filter>
         </activity>
 

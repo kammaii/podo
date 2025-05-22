@@ -20,6 +20,7 @@ import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_remote_config.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class User {
   User._init();
@@ -275,6 +276,24 @@ class User {
     await Purchases.configure(configuration..appUserID = id);
   }
 
+  sendWelcomeEmail() async {
+    final response = await http.post(
+      Uri.parse('https://us-central1-podo-49335.cloudfunctions.net/onSendWelcomeEmail'),
+      body: {
+        'email': email,
+        'userId': id,
+        'appInstalledOn': dateSignUp.toIso8601String(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('환영 이메일 전송 성공');
+    } else {
+      print('환영 이메일 전송 실패: ${response.statusCode}');
+      print(response.body);
+    }
+  }
+
   Future<void> makeNewUserOnDB() async {
     auth.User user = auth.FirebaseAuth.instance.currentUser!;
     id = user.uid;
@@ -301,7 +320,7 @@ class User {
     fcmPermission = false;
     isFreeTrialEnabled = MyRemoteConfig().getConfigBool(MyRemoteConfig.IS_FREE_TRIAL_ENABLED);
     timezone = await FlutterTimezone.getLocalTimezone();
-    
+
     setAnalyticsUserProp();
 
     await Database().setDoc(collection: 'Users', doc: this);
@@ -309,6 +328,8 @@ class User {
 
     Get.put(AdsController());
     await initRevenueCat();
+
+    sendWelcomeEmail();
   }
 
   Future<void> setTrialAuthorized() async {
