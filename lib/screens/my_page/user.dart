@@ -6,11 +6,11 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
 import 'package:package_info/package_info.dart';
 import 'package:podo/common/ads_controller.dart';
@@ -20,6 +20,7 @@ import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_remote_config.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class User {
   User._init();
@@ -50,6 +51,7 @@ class User {
   String? path;
   bool? isFreeTrialEnabled;
   String discordLink = ''; // discord 초대 링크 만료 문제 해결되면 삭제할 것
+  String? timezone;
 
   static const String ID = 'id';
   static const String OS = 'os';
@@ -78,6 +80,7 @@ class User {
   static const String TRIAL_EXPIRED_USERS = 'trialExpiredUsers';
   static const String PATH = 'path';
   static const String IS_FREE_TRIAL_ENABLED = 'isFreeTrialEnabled';
+  static const String TIMEZONE = 'timezone';
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {
@@ -244,6 +247,10 @@ class User {
 
       setAnalyticsUserProp();
 
+      final String timeZone = await FlutterTimezone.getLocalTimezone();
+      print('타임존: $timeZone');
+      Database().updateDoc(collection: 'Users', docId: id, key: TIMEZONE, value: timeZone);
+
 
     } else {
       print('신규유저입니다. DB를 생성합니다.');
@@ -267,6 +274,24 @@ class User {
       configuration = PurchasesConfiguration('appl_hEvHiLFZOlJwFZxscsqtYyYfTyO');
     }
     await Purchases.configure(configuration..appUserID = id);
+  }
+
+  sendWelcomeEmail() async {
+    final response = await http.post(
+      Uri.parse('https://us-central1-podo-49335.cloudfunctions.net/onSendWelcomeEmail'),
+      body: {
+        'email': email,
+        'userId': id,
+        'appInstalledOn': dateSignUp.toIso8601String(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('환영 이메일 전송 성공');
+    } else {
+      print('환영 이메일 전송 실패: ${response.statusCode}');
+      print(response.body);
+    }
   }
 
   Future<void> makeNewUserOnDB() async {
@@ -294,6 +319,8 @@ class User {
     fcmToken = await messaging.getToken();
     fcmPermission = false;
     isFreeTrialEnabled = MyRemoteConfig().getConfigBool(MyRemoteConfig.IS_FREE_TRIAL_ENABLED);
+    timezone = await FlutterTimezone.getLocalTimezone();
+
     setAnalyticsUserProp();
 
     await Database().setDoc(collection: 'Users', doc: this);
@@ -301,6 +328,8 @@ class User {
 
     Get.put(AdsController());
     await initRevenueCat();
+
+    sendWelcomeEmail();
   }
 
   Future<void> setTrialAuthorized() async {

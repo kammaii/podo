@@ -46,6 +46,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
   late ResponsiveSize rs;
 
   MyTutorial? myTutorial;
+  GlobalKey? keyTitle;
   GlobalKey? keyCorrectionCount;
   GlobalKey? keyQuestion;
 
@@ -202,10 +203,11 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
     myTutorial = MyTutorial();
     bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_WRITING_FRAME);
     if (isTutorialEnabled) {
+      keyTitle = GlobalKey();
       keyCorrectionCount = GlobalKey();
       keyQuestion = GlobalKey();
       List<TargetFocus> targets = [
-        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_writing_frame_1')),
+        myTutorial!.tutorialItem(id: "T1", keyTarget: keyTitle, content: tr('tutorial_writing_frame_1')),
         myTutorial!.tutorialItem(id: "T2", content: tr('tutorial_writing_frame_2')),
         myTutorial!.tutorialItem(id: "T3", keyTarget: keyCorrectionCount, content: tr('tutorial_writing_frame_3')),
         myTutorial!.tutorialItem(id: "T4", keyTarget: keyQuestion, content: tr('tutorial_writing_frame_4')),
@@ -238,6 +240,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
             ],
           )
         ],
+        key: keyTitle,
       ),
       body: Stack(
         children: [

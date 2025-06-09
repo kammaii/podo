@@ -104,7 +104,7 @@ class _LessonCourseListState extends State<LessonCourseList> with SingleTickerPr
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                const Icon(Icons.play_lesson_rounded, color: MyColors.navy, size: 18),
+                                const Icon(Icons.library_books_outlined, color: MyColors.navy, size: 18),
                                 const SizedBox(width: 5),
                                 MyWidget().getTextWidget(rs,
                                     text: lessonCourse.lessons.length.toString(), color: MyColors.navy),

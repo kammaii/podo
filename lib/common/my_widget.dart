@@ -11,7 +11,7 @@ import 'package:podo/values/my_strings.dart';
 
 class MyWidget {
   AppBar getAppbar(BuildContext context, ResponsiveSize rs,
-      {required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true}) {
+      {required String title, List<Widget>? actions, bool isKorean = false, bool isBold = true, GlobalKey? key}) {
     return AppBar(
       backgroundColor: Theme.of(context).cardColor,
       elevation: 0,
@@ -25,6 +25,7 @@ class MyWidget {
       title: Padding(
         padding: EdgeInsets.symmetric(vertical: rs.getSize(10, bigger: 1.5)),
         child: MyWidget().getTextWidget(
+          key: key,
           rs,
           text: title,
           color: Theme.of(context).primaryColor,
