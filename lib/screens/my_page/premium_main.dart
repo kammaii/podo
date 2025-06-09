@@ -3,13 +3,11 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
@@ -20,6 +18,8 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+
 
 class PremiumMain extends StatefulWidget {
   PremiumMain({Key? key}) : super(key: key);
@@ -49,6 +49,7 @@ class _PremiumMainState extends State<PremiumMain> {
   bool isYearlySelected = true;
   late Future<Offerings> offerings;
   String plan = 'Yearly';
+  Offering? yearlyOffering;
 
   @override
   void initState() {
@@ -197,7 +198,24 @@ class _PremiumMainState extends State<PremiumMain> {
     ]);
   }
 
+  sendPremiumEmail() async {
+    final response = await http.post(
+      Uri.parse('https://us-central1-podo-49335.cloudfunctions.net/onSendPremiumEmail'),
+      body: {
+        'email': User().email,
+        'name': User().name,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('프리미엄 이메일 전송 성공');
+    } else {
+      print('프리미엄 이메일 전송 실패: $response');
+    }
+  }
+
   runPurchase() async {
+    package ??= yearlyOffering!.availablePackages[0];
     StoreProduct storeProduct = package!.storeProduct;
     String store = '';
     if (Platform.isIOS) {
@@ -230,6 +248,7 @@ class _PremiumMainState extends State<PremiumMain> {
         await Database().updateDoc(collection: 'Users', docId: User().id, key: 'status', value: 2);
         MyWidget().showSnackbarWithPodo(rs, title: tr('purchaseTitle'), content: tr('purchaseContent'));
         User().getUser();
+        sendPremiumEmail();
         Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
       }
     } on PlatformException catch (e) {
@@ -718,7 +737,7 @@ class _PremiumMainState extends State<PremiumMain> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                         final monthlyOffering = snapshot.data?.getOffering("1 Month");
-                        final yearlyOffering = snapshot.data?.getOffering("1 Year");
+                        yearlyOffering = snapshot.data?.getOffering("1 Year");
                         Map<String, String> yearlyDiscountInfo =
                             getYearlyDiscountInfo(monthlyOffering!, yearlyOffering!);
                         return Padding(
@@ -738,7 +757,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    package = yearlyOffering.availablePackages[0];
+                                    package = yearlyOffering!.availablePackages[0];
                                     isYearlySelected = true;
                                     plan = 'Yearly';
                                   });
@@ -764,7 +783,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                     ),
                                     const SizedBox(height: 10),
                                     MyWidget().getTextWidget(rs,
-                                        text: yearlyOffering.serverDescription, color: MyColors.navy),
+                                        text: yearlyOffering!.serverDescription, color: MyColors.navy),
                                     Divider(),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -779,7 +798,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                               const SizedBox(width: 10),
                                               MyWidget().getTextWidget(rs,
                                                   text:
-                                                      yearlyOffering.availablePackages[0].storeProduct.priceString,
+                                                      yearlyOffering!.availablePackages[0].storeProduct.priceString,
                                                   size: 18,
                                                   isBold: true),
                                             ],

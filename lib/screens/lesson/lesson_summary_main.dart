@@ -31,6 +31,7 @@ class LessonSummaryMain extends StatelessWidget {
   static const SPEAKING = 'speaking';
 
   MyTutorial? myTutorial;
+  GlobalKey? keyTitle;
   GlobalKey? keyOptional;
   GlobalKey? keyLearning;
 
@@ -112,10 +113,11 @@ class LessonSummaryMain extends StatelessWidget {
     myTutorial = MyTutorial();
     bool isTutorialEnabled = myTutorial!.isTutorialEnabled(myTutorial!.TUTORIAL_LESSON_SUMMARY);
     if(isTutorialEnabled) {
+      keyTitle = GlobalKey();
       keyOptional = GlobalKey();
       keyLearning = GlobalKey();
       List<TargetFocus> targets = [
-        myTutorial!.tutorialItem(id: "T1", content: tr('tutorial_lesson_summary_1')),
+        myTutorial!.tutorialItem(id: "T1", keyTarget: keyTitle, content: tr('tutorial_lesson_summary_1')),
         myTutorial!.tutorialItem(id: "T2", keyTarget: keyOptional, content: tr('tutorial_lesson_summary_2'), isAlignBottom: false),
         myTutorial!.tutorialItem(id: "T3", keyTarget: keyLearning, content: tr('tutorial_lesson_summary_3'), isAlignBottom: false),
       ];
@@ -167,7 +169,7 @@ class LessonSummaryMain extends StatelessWidget {
               }),
         ],
       ),
-      appBar: MyWidget().getAppbar(context, rs, title: tr('lessonSummary')),
+      appBar: MyWidget().getAppbar(context, rs, title: tr('lessonSummary'), key: keyTitle),
       body: FutureBuilder(
           future: Database().getDocs(query: query),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
