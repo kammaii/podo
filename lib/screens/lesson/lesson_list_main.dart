@@ -426,7 +426,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
               id: "T3", keyTarget: keyDiscord, content: tr('tutorial_lesson_list_3'), isAlignBottom: false),
           myTutorial!.tutorialItem(id: "T4", content: tr('tutorial_lesson_list_4')),
         ];
-        myTutorial!.addTargetsAndRunTutorial(context, targets);
+        myTutorial!.addTargetsAndRunTutorial(context, targets, firstLesson: Lesson.fromJson(course.lessons.first as Map<String, dynamic>));
       } else {
         myTutorial = null;
       }

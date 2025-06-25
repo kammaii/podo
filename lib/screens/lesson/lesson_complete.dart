@@ -91,7 +91,7 @@ class _LessonCompleteState extends State<LessonComplete> {
     History().addHistory(itemIndex: 0, itemId: lesson.id, content: lesson.title['ko']);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       lessonController.isCompleted[lesson.id] = true;
-      if (LocalStorage().histories.isNotEmpty && LocalStorage().histories.length % 7 == 0) {
+      if (LocalStorage().histories.isNotEmpty && LocalStorage().histories.length % 3 == 0) {
         showReviewRequest();
       }
 
@@ -115,7 +115,60 @@ class _LessonCompleteState extends State<LessonComplete> {
                 barrierDismissible: false, yesFn: () async {
               await User().setTrialAuthorized();
               MyWidget().showSnackbarWithPodo(rs, title: tr('congratulations'), content: tr('trialActivated'));
-              Get.offNamedUntil(MyStrings.routeMainFrame, ModalRoute.withName(MyStrings.routeLogo));
+
+              // trial 모드 활성화 후 리뷰 요청
+              Get.dialog(
+                  AlertDialog(
+                    backgroundColor: Get.theme.cardColor,
+                    iconPadding: const EdgeInsets.only(bottom: 20),
+                    title: Center(
+                        child:
+                            Image.asset('assets/images/podo.png', width: rs.getSize(50), height: rs.getSize(50))),
+                    content: MyWidget().getTextWidget(rs,
+                        text: tr('tutorial_lesson_complete_7'),
+                        isTextAlignCenter: true,
+                        size: 16,
+                        color: Get.theme.secondaryHeaderColor),
+                    actionsAlignment: MainAxisAlignment.center,
+                    actionsPadding: EdgeInsets.only(
+                        left: rs.getSize(20), right: rs.getSize(20), bottom: rs.getSize(20), top: rs.getSize(10)),
+                    actions: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  side: BorderSide(color: Get.theme.canvasColor, width: 1),
+                                  backgroundColor: Get.theme.canvasColor),
+                              onPressed: () {
+                                Get.back();
+                                showReviewRequest();
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: rs.getSize(13)),
+                                child: Text(tr('tutorial_lesson_complete_8'),
+                                    style: TextStyle(color: Get.theme.cardColor, fontSize: rs.getSize(15))),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Center(
+                          child: Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: TextButton(
+                          onPressed: () {
+                            Get.back();
+                          },
+                          child: MyWidget().getTextWidget(rs, text: tr('later'), color: Get.theme.primaryColor),
+                        ),
+                      ))
+                    ],
+                  ),
+                  barrierDismissible: false);
             });
           });
         });
@@ -176,15 +229,14 @@ class _LessonCompleteState extends State<LessonComplete> {
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
+                width: 80,
+                height: 80,
                 child: IconButton(
                   onPressed: () async {
                     await analytics.logEvent(name: 'click_thumb_up', parameters: {'content': lesson.title['ko']});
                     setState(() {
                       isThumbUpClicked = true;
                     });
-                    if(LocalStorage().histories.length > 3) {
-                      showReviewRequest();
-                    }
                   },
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
