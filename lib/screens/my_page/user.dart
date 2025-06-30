@@ -282,6 +282,7 @@ class User {
       body: {
         'email': email,
         'userId': id,
+        'language': language,
         'appInstalledOn': dateSignUp.toIso8601String(),
       },
     );
@@ -343,6 +344,7 @@ class User {
       TRIAL_START: trialStart,
       TRIAL_END: trialEnd,
     };
+    await FirebaseAnalytics.instance.logEvent(name: 'trial_activate', parameters: {'userId': id});
     await Database().updateFields(collection: 'Users', docId: id, fields: map);
   }
 }

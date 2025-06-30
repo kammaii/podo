@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
+import 'package:podo/screens/lesson/lesson.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:podo/values/my_strings.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class MyTutorial {
@@ -38,7 +40,7 @@ class MyTutorial {
         TargetContent(
             align: ContentAlign.custom,
             customPosition:
-                isAlignBottom ? CustomTargetContentPosition(bottom: 30) : CustomTargetContentPosition(top: 30),
+            isAlignBottom ? CustomTargetContentPosition(bottom: 30) : CustomTargetContentPosition(top: 30),
             padding: const EdgeInsets.all(20),
             child: IgnorePointer(
               ignoring: true,
@@ -65,7 +67,7 @@ class MyTutorial {
     );
   }
 
-  addTargetsAndRunTutorial(BuildContext context, List<TargetFocus> tf) {
+  addTargetsAndRunTutorial(BuildContext context, List<TargetFocus> tf, {Lesson? firstLesson}) {
     _targets = [];
     _targets.addAll(tf);
 
@@ -74,12 +76,12 @@ class MyTutorial {
         targets: _targets,
         colorShadow: Colors.transparent,
         onSkip: () {
-          setTutorialDisabled('skip');
+          setTutorialDisabled('skip', firstLesson: firstLesson);
           print("skip");
           return true;
         },
         onFinish: () {
-          setTutorialDisabled('finish');
+          setTutorialDisabled('finish', firstLesson: firstLesson);
           print("finish");
         },
       ).show(context: context);
@@ -91,7 +93,7 @@ class MyTutorial {
     return !ls.LocalStorage().getBoolFromLocalStorage(key: tutorialKey); // 튜토리얼을 본 적이 없거나 앱을 재설치 했을 때 true 반환
   }
 
-  setTutorialDisabled(String status) async {
+  setTutorialDisabled(String status, {Lesson? firstLesson}) async {
     await FirebaseAnalytics.instance
         .logEvent(name: 'tutorial_end', parameters: {'tutorial_key': _tutorialKey, 'status': status});
     ls.LocalStorage().setBoolToLocalStorage(key: _tutorialKey, value: true);
@@ -134,8 +136,14 @@ class MyTutorial {
                             ),
                             side: BorderSide(color: MyColors.purple, width: 1),
                             backgroundColor: MyColors.purple),
-                        onPressed: () {
+                        onPressed: () async {
+                          await FirebaseAnalytics.instance.logEvent(name: 'click_start_first_lesson');
                           Get.back();
+                          if (!firstLesson!.hasOptions) {
+                            Get.toNamed(MyStrings.routeLessonFrame, arguments: firstLesson);
+                          } else {
+                            Get.toNamed(MyStrings.routeLessonSummaryMain, arguments: firstLesson);
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 13),
@@ -146,6 +154,18 @@ class MyTutorial {
                                   fontSize: 18)),
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: TextButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              child: Text(tr('later'), style: TextStyle(color: Get.theme.primaryColor,
+                                  fontSize: 15)),
+                            ),
+                          )),
                       const SizedBox(height: 10),
                       Text(tr('free_premium_limit'),
                           textAlign: TextAlign.center,
