@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:podo/common/database.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/local_storage.dart';
@@ -20,6 +20,8 @@ import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+
 
 class MyPageItem {
   late IconData icon;
@@ -403,12 +405,22 @@ class _MyPageState extends State<MyPage> {
                                         f: () async {
                                           try {
                                             if (feedback.isNotEmpty) {
-                                              fb.Feedback userFeedback = fb.Feedback();
-                                              userFeedback.userId = userId;
-                                              userFeedback.email = userEmail;
-                                              userFeedback.message = feedback;
-                                              await Database()
-                                                  .setDoc(collection: 'Feedbacks', doc: userFeedback);
+                                              final response = await http.post(
+                                                Uri.parse('https://us-central1-podo-49335.cloudfunctions.net/onSendFeedbackEmail'),
+                                                body: {
+                                                  'userEmail': userEmail,
+                                                  'userId': userId,
+                                                  'appName': 'Podo Korean',
+                                                  'feedback': feedback,
+                                                },
+                                              );
+
+                                              if (response.statusCode == 200) {
+                                                print('피드백 이메일 전송 성공');
+                                              } else {
+                                                print('피드백 이메일 전송 실패: ${response.statusCode}');
+                                                print(response.body);
+                                              }
                                               MyWidget().showSnackbar(rs, title: tr('thanksFeedback'));
                                             }
                                           } catch (e) {

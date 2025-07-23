@@ -47,7 +47,7 @@ android {
     defaultConfig {
         applicationId "net.awesomekorean.newpodo"
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

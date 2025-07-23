@@ -11,6 +11,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:newpodo.page.link</string>
+		<string>applinks:link.podokorean.com</string>
 	</array>
 </dict>
 </plist>
