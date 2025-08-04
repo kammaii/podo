@@ -126,6 +126,7 @@ class MyApp extends StatelessWidget {
             navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
             initialRoute: MyStrings.routeLogo,
             getPages: [
+              GetPage(name: '/', page: () => Logo()),
               GetPage(name: MyStrings.routeMainFrame, page: () => const MainFrame()),
               GetPage(name: MyStrings.routeLogo, page: () => Logo()),
               GetPage(name: MyStrings.routeLogin, page: () => Login()),
