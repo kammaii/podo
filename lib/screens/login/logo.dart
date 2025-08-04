@@ -38,44 +38,71 @@ class Logo extends StatefulWidget {
 class _LogoState extends State<Logo> {
   bool initCalled = false;
 
+  Future<void> getInitData() async {
+    if (initCalled) return;
+    initCalled = true;
+    MyRemoteConfig();
+    await user.User().getUser();
+    await LocalStorage().getPrefs();
+    final myPageController = Get.find<MyPageController>();
+    myPageController.loadThemeMode();
+    final courseController = Get.put(LessonCourseController());
+    await courseController.loadCourses();
+    await PodoMessage().getPodoMessage();
+    Get.put(WritingController());
+    Get.put(ReadingController());
+    Get.toNamed(MyStrings.routeMainFrame);
+    if(!courseController.isCourseExist) {
+      Get.toNamed(MyStrings.routeLessonCourseList);
+    }
+    if (user.User().os.isEmpty) {
+      String os = '';
+      if (Platform.isIOS) {
+        os = 'iOS';
+      } else if (Platform.isAndroid) {
+        os = 'android';
+      } else {
+        os = 'others';
+      }
+      Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
+    }
+    bool permission = await FcmRequest().getFcmRequest();
+    if (user.User().fcmPermission != permission) {
+      Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
+      user.User().fcmPermission = permission;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Get.put(FcmController());
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      try {
+        if (user != null && user.emailVerified) {
+          print('AUTH STATE CHANGES: Email Verified');
+          getInitData();
+        } else {
+          print('AUTH STATE CHANGES: User is null or not verified');
+          Get.offNamed(MyStrings.routeLogin);
+        }
+      } catch (e, stackTrace) {
+        final fc = FirebaseCrashlytics.instance;
+        fc.log('AuthStateChanges Error');
+        if (user != null) {
+          fc.setCustomKey('user', user);
+          fc.setCustomKey('emailVerified', user.emailVerified);
+        } else {
+          fc.log('User is null');
+        }
+        fc.recordError(e, stackTrace);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ResponsiveSize rs = ResponsiveSize(context);
-
-    Future<void> getInitData() async {
-      if (initCalled) return;
-      initCalled = true;
-      MyRemoteConfig();
-      await user.User().getUser();
-      await LocalStorage().getPrefs();
-      final myPageController = Get.find<MyPageController>();
-      myPageController.loadThemeMode();
-      final courseController = Get.put(LessonCourseController());
-      await courseController.loadCourses();
-      await PodoMessage().getPodoMessage();
-      Get.put(WritingController());
-      Get.put(ReadingController());
-      Get.toNamed(MyStrings.routeMainFrame);
-      if(!courseController.isCourseExist) {
-        Get.toNamed(MyStrings.routeLessonCourseList);
-      }
-      if (user.User().os.isEmpty) {
-        String os = '';
-        if (Platform.isIOS) {
-          os = 'iOS';
-        } else if (Platform.isAndroid) {
-          os = 'android';
-        } else {
-          os = 'others';
-        }
-        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
-      }
-      bool permission = await FcmRequest().getFcmRequest();
-      if (user.User().fcmPermission != permission) {
-        Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
-        user.User().fcmPermission = permission;
-      }
-    }
 
     void runDeepLink(Uri deepLink) async {
       print('RUN DEEPLINK: $deepLink');
@@ -117,30 +144,6 @@ class _LogoState extends State<Logo> {
     }
 
     initDynamicLinks();
-
-    Get.put(FcmController());
-
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      try {
-        if (user != null && user.emailVerified) {
-          print('AUTH STATE CHANGES: Email Verified');
-          getInitData();
-        } else {
-          print('AUTH STATE CHANGES: User is null or not verified');
-          Get.offNamed(MyStrings.routeLogin);
-        }
-      } catch (e, stackTrace) {
-        final fc = FirebaseCrashlytics.instance;
-        fc.log('AuthStateChanges Error');
-        if (user != null) {
-          fc.setCustomKey('user', user);
-          fc.setCustomKey('emailVerified', user.emailVerified);
-        } else {
-          fc.log('User is null');
-        }
-        fc.recordError(e, stackTrace);
-      }
-    });
 
     return Scaffold(
       body: Container(

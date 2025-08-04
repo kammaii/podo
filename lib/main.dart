@@ -30,7 +30,6 @@ import 'package:podo/screens/writing/writing_other_list.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -126,6 +125,7 @@ class MyApp extends StatelessWidget {
             navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
             initialRoute: MyStrings.routeLogo,
             getPages: [
+              GetPage(name: '/', page: () => Logo()),
               GetPage(name: MyStrings.routeMainFrame, page: () => const MainFrame()),
               GetPage(name: MyStrings.routeLogo, page: () => Logo()),
               GetPage(name: MyStrings.routeLogin, page: () => Login()),
