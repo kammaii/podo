@@ -17,7 +17,7 @@ class Login extends StatelessWidget {
 
   Future<void> _sendEmailVerificationLink(String email) async {
     await _auth.currentUser?.sendEmailVerification(ActionCodeSettings(
-      url: 'https://link.podokorean.com/?mode=verifyEmail',
+      url: 'https://link.podokorean.com/korean?mode=verifyEmail',
       androidPackageName: 'net.awesomekorean.newpodo',
       iOSBundleId: 'net.awesomekorean.newpodo',
       handleCodeInApp: true,
@@ -29,10 +29,24 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     os = Theme.of(context).platform;
 
-    return WillPopScope(
-      onWillPop: () async {
-        SystemNavigator.pop();
-        return true;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        await Get.dialog(AlertDialog(
+          title: Text(tr('exitApp')),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  SystemNavigator.pop();
+                },
+                child: Text(tr('yes'), style: TextStyle(color: MyColors.navy))),
+            TextButton(
+                onPressed: () {
+                  Get.back();
+                },
+                child: Text(tr('no'), style: TextStyle(color: MyColors.purple))),
+          ],
+        ));
       },
       child: Center(
         child: FlutterLogin(

@@ -15,9 +15,9 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:podo/common/ads_controller.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/languages.dart';
 import 'package:podo/common/my_remote_config.dart';
+import 'package:podo/screens/login/fcm_controller.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -156,7 +156,7 @@ class User {
         fcmToken = json[FCM_TOKEN];
       }
       fcmPermission = json[FCM_PERMISSION] ?? false;
-      bool p = await FcmRequest().getFcmRequest();
+      bool p = await FcmController().getFcmRequest();
 
       if(fcmPermission != p) {
         fcmPermission = p;
@@ -325,7 +325,7 @@ class User {
     setAnalyticsUserProp();
 
     await Database().setDoc(collection: 'Users', doc: this);
-    await FcmRequest().fcmRequest('signUp');
+    await FcmController().fcmRequest('signUp');
 
     Get.put(AdsController());
     await initRevenueCat();

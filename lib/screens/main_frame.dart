@@ -8,7 +8,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
-import 'package:podo/fcm_controller.dart';
+import 'package:podo/screens/login/fcm_controller.dart';
 import 'package:podo/screens/flashcard/flashcard_main.dart';
 import 'package:podo/screens/korean_bite/korean_bite.dart';
 import 'package:podo/screens/lesson/lesson_course.dart';
@@ -179,16 +179,15 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
     rs = ResponsiveSize(context);
     return GetBuilder<LessonCourseController>(
       builder: (_) {
-        return WillPopScope(
-          onWillPop: () async {
-            bool isExit = false;
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
             await Get.dialog(AlertDialog(
               title: MyWidget().getTextWidget(rs, text: tr('exitApp')),
               actions: [
                 TextButton(
                     onPressed: () {
                       SystemNavigator.pop();
-                      isExit = true;
                     },
                     child: MyWidget().getTextWidget(rs, text: tr('yes'), color: MyColors.navy)),
                 TextButton(
@@ -198,7 +197,6 @@ class _MainFrameState extends State<MainFrame> with SingleTickerProviderStateMix
                     child: MyWidget().getTextWidget(rs, text: tr('no'), color: MyColors.purple)),
               ],
             ));
-            return isExit;
           },
           child: Scaffold(
             body: Stack(

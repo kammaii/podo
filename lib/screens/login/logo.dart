@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
-import 'package:podo/fcm_controller.dart';
+import 'package:podo/screens/login/fcm_controller.dart';
 import 'package:podo/screens/login/auth_controller.dart';
 import 'package:podo/screens/login/deeplinks.dart';
 
@@ -15,9 +15,6 @@ class Logo extends StatefulWidget {
 }
 
 class _LogoState extends State<Logo> {
-  bool initCalled = false;
-
-
 
   @override
   void initState() {
@@ -25,6 +22,11 @@ class _LogoState extends State<Logo> {
     Get.isRegistered<FcmController>() ? null : Get.put(FcmController(), permanent: true);
     Get.isRegistered<AuthController>() ? null : Get.put(AuthController(), permanent: true);
     Get.isRegistered<DeepLinks>() ? null : Get.put(DeepLinks(), permanent: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.previousRoute.isNotEmpty) {
+        Get.back();
+      }
+    });
   }
 
   @override

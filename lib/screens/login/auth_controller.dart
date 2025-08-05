@@ -1,13 +1,12 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_remote_config.dart';
 import 'package:podo/screens/lesson/lesson_course_controller.dart';
+import 'package:podo/screens/login/fcm_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/reading/reading_controller.dart';
@@ -50,7 +49,7 @@ class AuthController extends GetxController {
       }
       Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'os', value: os);
     }
-    bool permission = await FcmRequest().getFcmRequest();
+    bool permission = await FcmController().getFcmRequest();
     if (user.User().fcmPermission != permission) {
       Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
       user.User().fcmPermission = permission;
@@ -58,11 +57,11 @@ class AuthController extends GetxController {
   }
 
   void _runListener() {
-    _auth.authStateChanges().listen((User? user) {
+    _auth.authStateChanges().listen((User? user) async {
       try {
         if (user != null && user.emailVerified) {
           print('AUTH STATE CHANGES: Email Verified');
-          getInitData();
+          await getInitData();
         } else {
           print('AUTH STATE CHANGES: User is null or not verified');
           Get.offNamed(MyStrings.routeLogin);
@@ -95,11 +94,10 @@ class AuthController extends GetxController {
 
       if(user != null && user.emailVerified) {
         print('이메일 인증 성공');
-        getInitData();
+        await getInitData();
       }
     } catch (e) {
       print('이메일 인증 처리 중 오류 발생: $e');
-      Get.back();
       Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
   }

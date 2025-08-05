@@ -56,13 +56,17 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
+                    android:scheme="https"
                     android:host="link.podokorean.com"
-                    android:scheme="https"/>
+                    android:pathPrefix="/korean"/>
             </intent-filter>
         </activity>
 
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="flutter_deeplinking_enabled"
+            android:value="false" />
     </application>
 </manifest>
