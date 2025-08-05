@@ -17,13 +17,10 @@ class Login extends StatelessWidget {
 
   Future<void> _sendEmailVerificationLink(String email) async {
     await _auth.currentUser?.sendEmailVerification(ActionCodeSettings(
-      url: 'https://newpodo.page.link/?mode=verifyEmail',
+      url: 'https://link.podokorean.com/?mode=verifyEmail',
       androidPackageName: 'net.awesomekorean.newpodo',
-      androidInstallApp: true,
-      androidMinimumVersion: '12',
       iOSBundleId: 'net.awesomekorean.newpodo',
-      handleCodeInApp: false,
-      dynamicLinkDomain: 'newpodo.page.link',
+      handleCodeInApp: true,
     ));
     print('EMAIL SNT');
   }
