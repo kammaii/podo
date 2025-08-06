@@ -47,8 +47,8 @@ class _PremiumMainState extends State<PremiumMain> {
   bool isPodoStoryActive = false;
   int selectedPlan = 1;
   late Future<Offerings> offerings;
-  String plan = 'Six Months';
-  Offering? sixMonthsOffering;
+  String plan = 'Two Months';
+  Offering? twoMonthsOffering;
 
   @override
   void initState() {
@@ -214,7 +214,7 @@ class _PremiumMainState extends State<PremiumMain> {
   }
 
   runPurchase() async {
-    package ??= sixMonthsOffering!.availablePackages[0];
+    package ??= twoMonthsOffering!.availablePackages[0];
     StoreProduct storeProduct = package!.storeProduct;
     String store = '';
     if (Platform.isIOS) {
@@ -266,10 +266,9 @@ class _PremiumMainState extends State<PremiumMain> {
     purchaseTrace.stop();
   }
 
-  Map<String, String> getDiscountInfo(Offering monthlyOffering, Offering sixMonthsOffering, Offering yearlyOffering) {
+  Map<String, String> getDiscountInfo(Offering monthlyOffering, Offering twoMonthsOffering) {
     String? monthlyPriceString = monthlyOffering.availablePackages[0].storeProduct.priceString;
-    double? sixMonthsPrice = sixMonthsOffering.availablePackages[0].storeProduct.price;
-    double? yearlyPrice = yearlyOffering.availablePackages[0].storeProduct.price;
+    double? twoMonthsPrice = twoMonthsOffering.availablePackages[0].storeProduct.price;
 
     // 통화 기호 추출
     String currencySymbol = monthlyPriceString.replaceAll(RegExp(r'[0-9.,]'), '').trim();
@@ -279,11 +278,9 @@ class _PremiumMainState extends State<PremiumMain> {
 
     // 12배 계산
     double price = double.parse(numericString);
-    double multipliedPrice12 = price * 12;
-    double multipliedPrice6 = price * 6;
+    double multipliedPrice = price * 2;
 
-    int discountRate12 = ((multipliedPrice12 - yearlyPrice) / multipliedPrice12 * 100).round();
-    int discountRate6 = ((multipliedPrice6 - sixMonthsPrice) / multipliedPrice6 * 100).round();
+    int discountRate = ((multipliedPrice - twoMonthsPrice) / multipliedPrice * 100).round();
 
     // 입력값에 소수점이 포함되어 있었는지 확인
     bool hasDecimal = numericString.contains('.');
@@ -292,18 +289,13 @@ class _PremiumMainState extends State<PremiumMain> {
     final formatter = NumberFormat(hasDecimal ? "#,##0.00" : "#,###");
 
     // 결과 포맷 후 출력
-    String originalPrice12 = '$currencySymbol${formatter.format(multipliedPrice12)}';
-    String originalPrice6 = '$currencySymbol${formatter.format(multipliedPrice6)}';
-    String monthlyFromYearlyPrice = '$currencySymbol${formatter.format(yearlyPrice / 12)}';
-    String monthlyFromSixMonthsPrice = '$currencySymbol${formatter.format(sixMonthsPrice / 6)}';
+    String originalPrice = '$currencySymbol${formatter.format(multipliedPrice)}';
+    String monthlyFromTwoMonthsPrice = '$currencySymbol${formatter.format(twoMonthsPrice / 2)}';
 
     return {
-      'originalPrice12': originalPrice12,
-      'originalPrice6': originalPrice6,
-      'discountRate12': '$discountRate12%',
-      'discountRate6': '$discountRate6%',
-      'monthlyPrice12': monthlyFromYearlyPrice,
-      'monthlyPrice6': monthlyFromSixMonthsPrice,
+      'originalPrice': originalPrice,
+      'discountRate': '$discountRate%',
+      'monthlyPrice': monthlyFromTwoMonthsPrice,
     };
   }
 
@@ -744,10 +736,9 @@ class _PremiumMainState extends State<PremiumMain> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
                         final monthlyOffering = snapshot.data?.getOffering("1 Month");
-                        sixMonthsOffering = snapshot.data?.getOffering("6 Months");
-                        final yearlyOffering = snapshot.data?.getOffering("1 Year");
+                        twoMonthsOffering = snapshot.data?.getOffering("2 Months");
                         Map<String, String> discountInfo =
-                        getDiscountInfo(monthlyOffering!, sixMonthsOffering!, yearlyOffering!);
+                        getDiscountInfo(monthlyOffering!, twoMonthsOffering!);
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
@@ -800,9 +791,9 @@ class _PremiumMainState extends State<PremiumMain> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    package = sixMonthsOffering!.availablePackages[0];
+                                    package = twoMonthsOffering!.availablePackages[0];
                                     selectedPlan = 1;
-                                    plan = 'Six Months';
+                                    plan = 'Two Months';
                                   });
                                 },
                                 child: Column(
@@ -812,10 +803,10 @@ class _PremiumMainState extends State<PremiumMain> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         MyWidget().getTextWidget(rs,
-                                            text: 'Six Months', isBold: true, size: 18, color: MyColors.purple),
+                                            text: 'Two Months', isBold: true, size: 18, color: MyColors.purple),
                                         MyWidget().getRoundedContainer(
                                             widget: Text(
-                                              '${discountInfo['discountRate6']!} off',
+                                              '${discountInfo['discountRate']!} off',
                                               style: TextStyle(
                                                   color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                                             ),
@@ -826,7 +817,7 @@ class _PremiumMainState extends State<PremiumMain> {
                                     ),
                                     const SizedBox(height: 10),
                                     MyWidget().getTextWidget(rs,
-                                        text: sixMonthsOffering!.serverDescription, color: MyColors.navy),
+                                        text: twoMonthsOffering!.serverDescription, color: MyColors.navy),
                                     Divider(),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -835,88 +826,20 @@ class _PremiumMainState extends State<PremiumMain> {
                                           child: Row(
                                             children: [
                                               MyWidget().getTextWidget(rs,
-                                                  text: discountInfo['originalPrice6'],
+                                                  text: discountInfo['originalPrice'],
                                                   hasCancelLine: true,
                                                   color: MyColors.navy),
                                               const SizedBox(width: 10),
                                               MyWidget().getTextWidget(rs,
                                                   text:
-                                                  sixMonthsOffering!.availablePackages[0].storeProduct.priceString,
+                                                  twoMonthsOffering!.availablePackages[0].storeProduct.priceString,
                                                   size: 18,
                                                   isBold: true),
                                             ],
                                           ),
                                         ),
                                         MyWidget().getTextWidget(rs,
-                                            text: '${discountInfo['monthlyPrice6']} / month')
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.all(10),
-                                  elevation: 3,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side: BorderSide(
-                                        color: selectedPlan == 2 ? MyColors.purple : Colors.transparent, width: 2),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    package = yearlyOffering.availablePackages[0];
-                                    selectedPlan = 2;
-                                    plan = 'Yearly';
-                                  });
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        MyWidget().getTextWidget(rs,
-                                            text: 'Yearly', isBold: true, size: 18, color: MyColors.purple),
-                                        MyWidget().getRoundedContainer(
-                                            widget: Text(
-                                              '${discountInfo['discountRate12']!} off',
-                                              style: TextStyle(
-                                                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                                            ),
-                                            bgColor: MyColors.red,
-                                            radius: 15,
-                                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    MyWidget().getTextWidget(rs,
-                                        text: yearlyOffering.serverDescription, color: MyColors.navy),
-                                    Divider(),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Row(
-                                            children: [
-                                              MyWidget().getTextWidget(rs,
-                                                  text: discountInfo['originalPrice12'],
-                                                  hasCancelLine: true,
-                                                  color: MyColors.navy),
-                                              const SizedBox(width: 10),
-                                              MyWidget().getTextWidget(rs,
-                                                  text:
-                                                  yearlyOffering.availablePackages[0].storeProduct.priceString,
-                                                  size: 18,
-                                                  isBold: true),
-                                            ],
-                                          ),
-                                        ),
-                                        MyWidget().getTextWidget(rs,
-                                            text: '${discountInfo['monthlyPrice12']} / month')
+                                            text: '${discountInfo['monthlyPrice']} / month')
                                       ],
                                     )
                                   ],

@@ -27,7 +27,6 @@ import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
 class LessonListMain extends StatefulWidget {
@@ -51,7 +50,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
-  final lessonController = Get.put(LessonController());
+  final lessonController = Get.put(LessonController(), permanent: true);
   late ResponsiveSize rs;
   late bool isPremiumUser;
 

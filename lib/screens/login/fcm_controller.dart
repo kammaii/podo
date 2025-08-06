@@ -6,13 +6,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/play_audio.dart';
 import 'package:podo/screens/korean_bite/korean_bite.dart';
-import 'package:podo/screens/korean_bite/korean_bite_controller.dart';
 import 'package:podo/screens/lesson/lesson_controller.dart';
 import 'package:podo/screens/message/podo_message.dart';
 import 'package:podo/screens/message/podo_message_controller.dart';
+import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 
@@ -20,6 +19,8 @@ class FcmController extends GetxController {
   bool hasPodoMsg = false;
   Set<String> displayedMsg = {};
   static Map<String,String>? pendingFcmData;
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   @override
   void onInit() {
@@ -131,5 +132,33 @@ class FcmController extends GetxController {
       duration: Duration(milliseconds: 5000),
       onTap: f != null ? (_) => f() : null,
     );
+  }
+
+  Future<bool> fcmRequest(String location) async {
+    bool permission;
+    NotificationSettings settings = await messaging.requestPermission();
+    print('SETTINGS: $settings');
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      permission = true;
+      await analytics.logEvent(
+          name: 'fcm_permission',
+          parameters: {'status': 'true', 'location': location});
+    } else {
+      permission = false;
+      await analytics.logEvent(
+          name: 'fcm_permission',
+          parameters: {'status': 'false', 'location': location});
+    }
+    user.User().fcmPermission = permission;
+    await Database().updateDoc(collection: 'Users', docId: user.User().id, key: 'fcmPermission', value: permission);
+    print('PERMISSION: $permission');
+    return permission;
+  }
+
+  Future<bool> getFcmRequest() async {
+    final settings = await messaging.getNotificationSettings();
+    bool permission = settings.authorizationStatus == AuthorizationStatus.authorized;
+    print('GET FCM REQUEST: $permission');
+    return permission;
   }
 }

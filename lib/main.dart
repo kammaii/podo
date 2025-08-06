@@ -30,7 +30,6 @@ import 'package:podo/screens/writing/writing_other_list.dart';
 import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')

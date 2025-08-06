@@ -1,22 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:podo/common/database.dart';
-import 'package:podo/common/fcm_request.dart';
 import 'package:podo/common/local_storage.dart';
 import 'package:podo/common/my_tutorial.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
+import 'package:podo/screens/login/fcm_controller.dart';
 import 'package:podo/screens/my_page/user.dart';
 import 'package:podo/screens/writing/writing.dart';
 import 'package:podo/screens/writing/writing_controller.dart';
 import 'package:podo/screens/writing/writing_question.dart';
-import 'package:podo/values/my_colors.dart';
 import 'package:podo/values/my_strings.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
@@ -95,7 +91,7 @@ class _WritingMainState extends State<WritingMain> with SingleTickerProviderStat
           MyWidget().showDialog(context, rs,
               content: tr('askFcmApproval'),
               yesFn: () async {
-                await FcmRequest().fcmRequest('writingCorrection');
+                await FcmController().fcmRequest('writingCorrection');
                 Get.back();
               },
               hasNoBtn: false,
