@@ -51,7 +51,7 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
   final cardBorderRadius = 8.0;
   late AnimationController animationController;
   late Animation<double> animation;
-  final lessonController = Get.put(LessonController());
+  final lessonController = Get.put(LessonController(), permanent: true);
   late ResponsiveSize rs;
   late bool isPremiumUser;
 

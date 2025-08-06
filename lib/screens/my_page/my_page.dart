@@ -15,7 +15,6 @@ import 'package:podo/common/my_date_format.dart';
 import 'package:podo/common/my_widget.dart';
 import 'package:podo/common/responsive_size.dart';
 import 'package:podo/screens/login/credentials.dart';
-import 'package:podo/screens/my_page/feedback.dart' as fb;
 import 'package:podo/screens/my_page/my_page_controller.dart';
 import 'package:podo/screens/my_page/user.dart' as user;
 import 'package:podo/values/my_colors.dart';
@@ -140,7 +139,7 @@ class _MyPageState extends State<MyPage> {
         padding: EdgeInsets.all(rs.getSize(20)),
         child: Column(
           children: [
-            user.User().status == 1
+            user.User().status != 2
                 ? ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(0),
