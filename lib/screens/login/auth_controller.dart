@@ -80,15 +80,8 @@ class AuthController extends GetxController {
     });
   }
 
-  Future<void> applyActionCode(String code) async {
+  Future<void> verifyEmail() async {
     try {
-      // oobCode 유효성 확인
-      await _auth.checkActionCode(code);
-
-      // 이메일 인증 적용
-      await _auth.applyActionCode(code);
-
-      // 상태 최신화
       await _auth.currentUser?.reload();
       User? user = _auth.currentUser;
 

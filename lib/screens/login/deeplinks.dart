@@ -17,28 +17,25 @@ class DeepLinks extends GetxController {
 
     if (deepLink == null) return;
 
-    Uri uri = Uri.parse(deepLink.queryParameters['link']!);
-
+    Uri uri = Uri.parse(deepLink.toString());
     String? mode = uri.queryParameters['mode'];
     String? path = uri.queryParameters['path'];
-    String? oobCode = uri.queryParameters['oobCode'];
 
     print('MODE: $mode');
     print('PATH: $path');
-    print('OOB CODE: $oobCode');
 
     if (path != null) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('path', path);
     }
 
-    if (mode == 'verifyEmail' && oobCode != null) {
+    if (mode == 'verifyEmail') {
       Get.dialog(
         Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
       );
       final authController = Get.find<AuthController>();
-      await authController.applyActionCode(oobCode);
+      await authController.verifyEmail();
       Get.back();
     }
   }

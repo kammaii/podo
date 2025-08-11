@@ -44,6 +44,7 @@ class LessonFrame extends StatefulWidget {
 class _LessonFrameState extends State<LessonFrame> with SingleTickerProviderStateMixin {
   final lesson = Get.arguments;
   int thisIndex = 0;
+  // Next Lesson 으로 진입 시 LessonController onDelete() 방지
   final controller = Get.isRegistered<LessonController>() ? Get.find<LessonController>() : Get.put(LessonController(), permanent: true);
   final KO = 'ko';
   final PRONUN = 'pronun';

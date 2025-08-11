@@ -8,6 +8,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:podo/screens/login/credentials.dart';
 import 'package:podo/values/my_colors.dart';
+import 'package:http/http.dart' as http;
+
 
 // apple OAuth callback : https://podo-49335.firebaseapp.com/__/auth/handler
 
@@ -16,13 +18,19 @@ class Login extends StatelessWidget {
   late TargetPlatform os;
 
   Future<void> _sendEmailVerificationLink(String email) async {
-    await _auth.currentUser?.sendEmailVerification(ActionCodeSettings(
-      url: 'https://link.podokorean.com/korean?mode=verifyEmail',
-      androidPackageName: 'net.awesomekorean.newpodo',
-      iOSBundleId: 'net.awesomekorean.newpodo',
-      handleCodeInApp: true,
-    ));
-    print('EMAIL SNT');
+    final response = await http.post(
+      Uri.parse('https://us-central1-podo-49335.cloudfunctions.net/onSendAuthEmail'),
+      body: {
+        'email': email,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('인증 이메일 전송 성공');
+    } else {
+      print('인증 이메일 전송 실패: ${response.statusCode}');
+      print(response.body);
+    }
   }
 
   @override
