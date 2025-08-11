@@ -149,6 +149,9 @@ class _LessonListMainState extends State<LessonListMain> with TickerProviderStat
     late Lesson lesson;
 
     lesson = Lesson.fromJson(course.lessons[index] as Map<String, dynamic>);
+    if(index == 0) {
+      lesson.adFree = true;
+    }
     bool isReleased = lesson.isReleased;
 
     bool isLocked = !lesson.isFree && !isPremiumUser;
